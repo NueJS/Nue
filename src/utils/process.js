@@ -1,26 +1,27 @@
 import getAttributes from './getAttributes.js';
 import getSlice from './getSlice.js';
+import { isCurled, uncurl } from './str.js';
 
 function processAttributes(node) {
 	const attributes = getAttributes(node);
 
 	Object.keys(attributes).forEach(name => {
-		const value = attributes[name];
+		const value = uncurl(attributes[name]);
 
 		// process on:event={handler}
-		if (name.startsWith('on:')) {
+		if (name.startsWith('@')) {
 			// remove on:event attribute from node
 			node.removeAttribute(name);
 			// get event from on:event
-			const eventName = name.substr(3);
+			const eventName = name.substr(1);
 			// get options.handler
-			const handler = this.options[attributes[name]];
+			const handler = this.options[value];
 			// handler should be called with current 'this'
 			node.addEventListener(eventName, handler.bind(this));
 		}
 		// process name={value} attribute
-		else if (isCurly(value)) {
-			const key = this.uncurl(value);
+		else if (isCurled(value)) {
+			const key = uncurl(value);
 			this.bindAttributeValue(node, name, key);
 
 			// reactive binding for inputs
@@ -39,6 +40,21 @@ function processAttributes(node) {
 }
 
 function processNode(node) {
+	if (node.nodeName === 'STYLE') return;
+	if (node.nodeName === 'TEMPLATE') {
+		const each = node.getAttribute('each');
+
+		if (each) {
+			const as = uncurl(node.getAttribute('as'));
+			const at = uncurl(node.getAttribute('at'));
+			const frag = node.content.cloneNode(true);
+			const array = this.state[uncurl(each)];
+
+			console.log({ as, at });
+			console.log(frag.childNodes);
+		}
+		return;
+	}
 	if (node.nodeName !== '#text') this.processAttributes(node);
 	if (node.childNodes.length) [...node.childNodes].forEach(n => this.processNode(n));
 	else this.processText(node);

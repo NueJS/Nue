@@ -1,18 +1,13 @@
-function buildShadowDOM() {
-	this.attachShadow({ mode: this.options.mode || 'open' });
-	const parser = new DOMParser();
-	const shadowDOM = parser.parseFromString(this.options.html, 'text/html');
-	const shadowNodes = [...shadowDOM.body.children];
-	shadowNodes.forEach(node => {
-		console.log('this', this);
-		this.processNode(node);
-	});
+// replace placeholders with actual content from state
+// and add state dependency on node's text and attributes
+// then append these nodes to shadowRoot
 
-	// add styles and html in shadowDOM
-	const styles = document.createElement('style');
-	styles.textContent = this.options.css || '';
+function buildShadowDOM(template) {
+	this.attachShadow({ mode: this.options.mode || 'open' });
+	const fragment = template.content.cloneNode(true);
+	const shadowNodes = [...fragment.children];
+	shadowNodes.forEach(node => this.processNode(node));
 	shadowNodes.forEach(node => this.shadowRoot.append(node));
-	this.shadowRoot.append(styles);
 }
 
 export default buildShadowDOM;
