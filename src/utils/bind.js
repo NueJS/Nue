@@ -1,3 +1,5 @@
+import getSlice from './getSlice.js';
+
 // when a key in state changes, update the textContent of <node>
 export function bindText(node, key) {
 	this.onStateChange(key, () => {
@@ -7,7 +9,7 @@ export function bindText(node, key) {
 
 // when key in state changes, update attribute <name> of <node>
 export function bindAttributeValue(node, name, key) {
-	node.setAttribute(name, getSlice(state, key));
+	node.setAttribute(name, getSlice(this.state, key));
 	this.onStateChange(key, () => {
 		node.setAttribute(name, getSlice(state, key));
 	});
