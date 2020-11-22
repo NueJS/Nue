@@ -16,7 +16,7 @@ function processAttributes(node) {
 		if (attributeName.startsWith('@')) {
 			node.removeAttribute(attributeName); // remove @event={handler} from node
 			const eventName = attributeName.substr(1); // get event from @event
-			const handler = this.options[value]; // add event listener, bind the handler
+			const handler = this.options[attributeValue]; // add event listener, bind the handler
 			node.addEventListener(eventName, handler.bind(this));
 		} else {
 			this.bindAttributeValue(node, attributeName, attributeValue);
