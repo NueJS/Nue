@@ -4,9 +4,13 @@ function onChange(chain, value, trap) {
 	const success = silentMutate(this.state, chain, value, trap);
 	const chainString = chain.join('.');
 	const cbs = this.deps[chainString];
-	if (cbs) {
+
+	if (this.options.onStateChange) {
+		// do not call cbs when arr.length is updated
+		if (chain[chain.length - 1] !== 'length') this.options.onStateChange.call(this, chain[0]);
+	}
+	if (cbs && chain[chain.length - 1] !== 'length') {
 		cbs.forEach(d => d());
-		if (this.options.onStateChange) this.options.onStateChange.call(thisVal, chainString);
 	}
 	return success;
 }
