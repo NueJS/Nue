@@ -14,3 +14,16 @@ export function bindAttributeValue(node, name, key) {
 		node.setAttribute(name, getSlice(this.state, key));
 	});
 }
+
+export function bindInput(node, attributeName) {
+	if (attributeName === 'value') {
+		const eventName = 'input';
+		const handler = e => {
+			const value = e.target[attributeName];
+			const isNumber = node.type === 'number' || node.type === 'range';
+			mutate(this.state, key.split('.'), isNumber ? Number(value) : value, 'set');
+		};
+
+		node.addEventListener(eventName, handler);
+	}
+}

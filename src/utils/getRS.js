@@ -1,43 +1,64 @@
-const isObject = (x) => typeof x === 'object' && x !== null;
+const isObject = x => typeof x === 'object' && x !== null;
 
 let disableOnChange = false;
 
 function getRS(_state, onChange, chain = []) {
-  const state = typeof _state === 'function' ? _state() : _state;
-  if (!isObject(state)) return state;
+	const state = typeof _state === 'function' ? _state() : _state;
+	if (!isObject(state)) return state;
 
-  // make all children radioactive and save it in a wrapper
-  const radioactiveWrapper = Array.isArray(state) ? [] : {};
-  Object.keys(state).forEach((key) => {
-    radioactiveWrapper[key] = getRS(state[key], onChange, [...chain, key]);
-  });
+	// make all children radioactive and save it in a wrapper
+	const radioactiveWrapper = Array.isArray(state) ? [] : {};
+	Object.keys(state).forEach(key => {
+		radioactiveWrapper[key] = getRS(state[key], onChange, [...chain, key]);
+	});
 
-  // when state is mutated $ gets incremented
-  // const $ = 0;
+	// when state is mutated $ gets incremented
+	// const $ = 0;
 
-  // make the wrapper radioactive
-  return new Proxy(radioactiveWrapper, {
-    set(target, prop, value) {
-      if (disableOnChange) return Reflect.set(target, prop, value);
-      return onChange([...chain, prop], value, 'set');
-    },
+	// make the wrapper radioactive
+	return new Proxy(radioactiveWrapper, {
+		set(target, prop, value) {
+			if (disableOnChange) return Reflect.set(target, prop, value);
+			return onChange([...chain, prop], value, 'set');
+		},
 
-    deleteProperty(target, prop) {
-      if (disableOnChange) return Reflect.deleteProperty(target, prop);
-      return onChange([...chain, prop], undefined, 'deleteProperty');
-    },
+		deleteProperty(target, prop) {
+			if (disableOnChange) return Reflect.deleteProperty(target, prop);
+			return onChange([...chain, prop], undefined, 'deleteProperty');
+		},
 
-    get(target, prop) {
-      if (prop === '__isRadioactive__') return true;
-      if (prop === '__disableOnChange__') {
-        return (value) => {
-          disableOnChange = value;
-        };
-      }
+		get(target, prop) {
+			if (prop === '__isRadioactive__') return true;
+			if (prop === '__disableOnChange__') {
+				return value => {
+					disableOnChange = value;
+				};
+			}
 
-      return Reflect.get(target, prop);
-    },
-  });
-};
+			return Reflect.get(target, prop);
+		},
+	});
+}
+
+// export function deepAccessListener(obj, chain = []) {
+// 	return new Proxy(
+// 		{},
+// 		{
+// 			get(target, prop) {
+// 				if (obj && obj[prop]) {
+// 					return obj[prop];
+// 				}
+// 				const x = deepAccessListener(null, [...chain, prop]);
+// 				x.path = [...chain, prop];
+// 				return x;
+// 			},
+
+// 			apply(target, that, args) {
+// 				console.log('apply called');
+// 				return deepAccessListener(null, [...chain, prop]);
+// 			},
+// 		}
+// 	);
+// }
 
 export default getRS;
