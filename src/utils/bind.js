@@ -1,4 +1,5 @@
 import getSlice from './getSlice.js';
+import { mutate } from './mutate.js';
 
 // when a key in state changes, update the textContent of <node>
 export function bindText(node, key) {
@@ -15,13 +16,13 @@ export function bindAttributeValue(node, name, key) {
 	});
 }
 
-export function bindInput(node, attributeName) {
+export function bindInput(node, attributeName, attributeValue) {
 	if (attributeName === 'value') {
 		const eventName = 'input';
 		const handler = e => {
 			const value = e.target[attributeName];
 			const isNumber = node.type === 'number' || node.type === 'range';
-			mutate(this.state, key.split('.'), isNumber ? Number(value) : value, 'set');
+			mutate(this.state, attributeValue.split('.'), isNumber ? Number(value) : value, 'set');
 		};
 
 		node.addEventListener(eventName, handler);

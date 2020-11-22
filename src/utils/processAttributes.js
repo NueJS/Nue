@@ -20,7 +20,7 @@ function processAttributes(node) {
 			node.addEventListener(eventName, handler.bind(this));
 		} else {
 			this.bindAttributeValue(node, attributeName, attributeValue);
-			if (node.nodeName === 'INPUT') this.bindInput(node, attributeName);
+			if (node.nodeName === 'INPUT') this.bindInput(node, attributeName, attributeValue);
 		}
 	}
 }
