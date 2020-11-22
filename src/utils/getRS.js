@@ -12,9 +12,6 @@ function getRS(_state, onChange, chain = []) {
 		radioactiveWrapper[key] = getRS(state[key], onChange, [...chain, key]);
 	});
 
-	// when state is mutated $ gets incremented
-	// const $ = 0;
-
 	// make the wrapper radioactive
 	return new Proxy(radioactiveWrapper, {
 		set(target, prop, value) {
@@ -39,26 +36,5 @@ function getRS(_state, onChange, chain = []) {
 		},
 	});
 }
-
-// export function deepAccessListener(obj, chain = []) {
-// 	return new Proxy(
-// 		{},
-// 		{
-// 			get(target, prop) {
-// 				if (obj && obj[prop]) {
-// 					return obj[prop];
-// 				}
-// 				const x = deepAccessListener(null, [...chain, prop]);
-// 				x.path = [...chain, prop];
-// 				return x;
-// 			},
-
-// 			apply(target, that, args) {
-// 				console.log('apply called');
-// 				return deepAccessListener(null, [...chain, prop]);
-// 			},
-// 		}
-// 	);
-// }
 
 export default getRS;
