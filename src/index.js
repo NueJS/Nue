@@ -1,4 +1,4 @@
-import onChange, { notifyDeps } from './utils/onChange.js';
+import onChange, { onStateChange } from './utils/onChange.js';
 import { bindText, bindAttributeValue } from './utils/bind.js';
 import addState from './utils/state.js';
 import buildShadowDOM from './utils/buildShadowDOM.js';
@@ -40,7 +40,7 @@ function $(elementName, options) {
 	}
 
 	El.prototype.onChange = onChange;
-	El.prototype.notifyDeps = notifyDeps;
+	El.prototype.onStateChange = onStateChange;
 	El.prototype.bindText = bindText;
 	El.prototype.bindAttributeValue = bindAttributeValue;
 	El.prototype.buildShadowDOM = buildShadowDOM;
