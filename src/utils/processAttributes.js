@@ -9,7 +9,7 @@ function processAttributes(node) {
 		let attributeValue = attributes[attributeName];
 
 		// if attribute value is not curled, no processing is needed
-		if (!isCurled(attributeValue)) return;
+		if (!isCurled(attributeValue)) continue;
 		attributeValue = uncurl(attributeValue);
 
 		// if event handler attribute
@@ -17,6 +17,7 @@ function processAttributes(node) {
 			node.removeAttribute(attributeName); // remove @event={handler} from node
 			const eventName = attributeName.substr(1); // get event from @event
 			const handler = this.options[attributeValue]; // add event listener, bind the handler
+
 			node.addEventListener(eventName, handler.bind(this));
 		} else {
 			this.bindAttributeValue(node, attributeName, attributeValue);
