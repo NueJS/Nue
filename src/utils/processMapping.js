@@ -1,4 +1,5 @@
 import { uncurl } from './str.js';
+import getAttributes from './getAttributes.js';
 
 function processMapping(node) {
 	const each = node.getAttribute('each');
