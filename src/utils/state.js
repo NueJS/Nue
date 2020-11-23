@@ -1,16 +1,24 @@
 import getRS from './getRS.js';
 
+// populate initial state with options.state
+// override them with this.props
+// create this.state by making the initstate object reactive
+
 function addState() {
-	// if the state is a function, call with props to get the state object
-	const initState = this.options.state;
-	for (const prop of this.observedProps) {
-		const propValue = this.getAttribute(prop);
-		if (propValue) {
-			initState[prop] = propValue;
+	// console.log('build state of', this.nodeName);
+	// console.log('props are', this.props);
+
+	const state = this.options.state;
+	if (this.props) {
+		for (const prop in this.props) {
+			const propValue = this.props[prop];
+			if (propValue !== undefined) state[prop] = propValue;
 		}
 	}
+
 	// reactify state object
-	this.state = getRS(initState, this.onChange.bind(this));
+	this.state = getRS(state, this.onChange.bind(this));
+	// console.log('state of ', this.nodeName, this.state);
 }
 
 export default addState;
