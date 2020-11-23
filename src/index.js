@@ -1,5 +1,5 @@
 import onChange, { onStateChange } from './utils/onChange.js';
-import { bindText, bindAttributeValue, bindInput } from './utils/bind.js';
+import { bindTextContent, bindAttributeValue, bindInput } from './utils/bind.js';
 import addState from './utils/state.js';
 import buildShadowDOM from './utils/buildShadowDOM.js';
 // process
@@ -17,7 +17,9 @@ function $(elementName, options) {
 
 	class El extends HTMLElement {
 		constructor() {
+			// this.props is set by its parent node
 			super();
+			// collection of callbacks that should be called when their dependant state is changed
 			this.deps = {};
 			this.options = options;
 			this.observedProps = observedProps;
@@ -38,7 +40,7 @@ function $(elementName, options) {
 		}
 
 		attributeChangedCallback(prop, oldVal, newVal) {
-			this.state[prop] = newVal;
+			if (this.state) this.state[prop] = newVal;
 		}
 	}
 
@@ -46,7 +48,7 @@ function $(elementName, options) {
 	El.prototype.onStateChange = onStateChange;
 	El.prototype.addState = addState;
 	// binding
-	El.prototype.bindText = bindText;
+	El.prototype.bindTextContent = bindTextContent;
 	El.prototype.bindAttributeValue = bindAttributeValue;
 	El.prototype.bindInput = bindInput;
 	El.prototype.buildShadowDOM = buildShadowDOM;
