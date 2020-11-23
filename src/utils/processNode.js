@@ -13,7 +13,6 @@ function processNode(node) {
 		this.processMapping(node);
 		return;
 	}
-
 	// process attributes for all other nodes
 	this.processAttributes(node);
 

@@ -5,9 +5,6 @@ import getRS from './getRS.js';
 // create this.state by making the initstate object reactive
 
 function addState() {
-	// console.log('build state of', this.nodeName);
-	// console.log('props are', this.props);
-
 	const state = this.options.state;
 	if (this.props) {
 		for (const prop in this.props) {
@@ -16,9 +13,7 @@ function addState() {
 		}
 	}
 
-	// reactify state object
 	this.state = getRS(state, this.onChange.bind(this));
-	// console.log('state of ', this.nodeName, this.state);
 }
 
 export default addState;

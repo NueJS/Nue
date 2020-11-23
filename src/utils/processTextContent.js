@@ -22,9 +22,10 @@ function processTextContent(node, source = this.state, bind = true) {
 		// everything in between {} is variable
 		else if (openBracketFound && text[i] === '}') {
 			openBracketFound = false;
+
 			const varValue = getSlice(source, acc);
 			const textNode = document.createTextNode(varValue);
-			if (bind) this.bindText(textNode, acc);
+			if (bind) this.bindTextContent(textNode, acc);
 			textNodes.push(textNode);
 			acc = ''; // reset accumulator
 		} else {
