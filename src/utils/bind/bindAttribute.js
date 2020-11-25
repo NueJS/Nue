@@ -1,4 +1,6 @@
 import getValue, { getSlice } from '../value.js'
+import onStateChange from '../state/onStateChange.js'
+import addContextDependency from '../context.js'
 
 // get the value from context / state
 // if the value is taken from context - save the context dependency
@@ -8,11 +10,12 @@ function bindAttribute (node, atrName, atrKey, context) {
   // if value is taken from context
   if (isStateKey) {
     node.setAttribute(atrName, value)
-    this.onStateChange(atrKey, () => {
+
+    onStateChange.call(this, atrKey, () => {
       node.setAttribute(atrName, getSlice.call(this, atrKey))
     })
   } else {
-    this.addContextDependency(node, {
+    addContextDependency.call(this, node, {
       type: 'attribute',
       name: atrName,
       key: atrKey
