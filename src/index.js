@@ -13,16 +13,17 @@ function $ (elementName, options) {
   const style = options.css ? `<style> ${options.css}</style>` : ''
   template.innerHTML = options.html + style
 
-  const observedProps = Object.keys(options.state)
+  // whatever is in the state should be observed for changes
+  // const observedProps = Object.keys(options.state)
 
   class El extends HTMLElement {
     constructor () {
-      // this.props is set by its parent node
       super()
+      // this.props is set by its parent node
       // collection of callbacks that should be called when their dependant state is changed
       this.deps = {}
       this.options = options
-      this.observedProps = observedProps
+      // this.observedProps = observedProps
       this.addState()
       this.buildShadowDOM(template)
     }
@@ -35,13 +36,13 @@ function $ (elementName, options) {
       if (options.onDisconnect) options.onDisconnect.call(this)
     }
 
-    static get observedAttributes () {
-      return observedProps || []
-    }
+    // static get observedAttributes () {
+    //   return observedProps || []
+    // }
 
-    attributeChangedCallback (prop, oldVal, newVal) {
-      if (this.state) this.state[prop] = newVal
-    }
+    // attributeChangedCallback (prop, oldVal, newVal) {
+    //   if (this.state) this.state[prop] = newVal
+    // }
   }
 
   El.prototype.onChange = onChange
