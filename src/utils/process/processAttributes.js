@@ -14,6 +14,10 @@ function processAttributes (node, context = {}) {
   for (const atrName in attributes) {
     const [atrValue, isVariable] = attributes[atrName]
 
+    if (atrName === 'id') {
+      this.refs[atrValue] = node
+    }
+
     // state.name={value} or state.name=value
     if (atrName.startsWith('state.')) {
       addStateAttribute(node, atrName, atrValue)

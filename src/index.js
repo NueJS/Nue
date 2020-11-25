@@ -12,6 +12,7 @@ function $ (compName, compObj) {
       this.stateDeps = { }
       this.computedStateDeps = []
       this.compObj = compObj
+      this.refs = {}
       addState.call(this)
       buildShadowDOM.call(this, template)
     }
