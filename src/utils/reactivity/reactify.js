@@ -11,6 +11,7 @@ function reactify (_state, chain = []) {
   if (typeof _state === 'function') {
     const key = chain.join('.')
     state = _state(this.compObj.state)
+    this.compObj.state[key] = state
     const handleStateChange = () => {
       const newValue = _state(this.state)
       const currentValue = this.state[key]
