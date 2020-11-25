@@ -1,6 +1,8 @@
 import { getUncurledAttribute } from '../str.js'
 import deepClone from '../deepClone.js'
 import deepEqual from '../deepEqual.js'
+import processNode from './processNode.js'
+import onStateChange from '../state/onStateChange.js'
 
 function processMapping (templateNode, context) {
   const arrayKey = getUncurledAttribute(templateNode, 'each')
@@ -22,7 +24,7 @@ function processMapping (templateNode, context) {
     function createFrag (value, index) {
       const frag = templateNode.content.cloneNode(true)
       const context = { [as]: value, [at]: index };
-      [...frag.children].forEach(fragChild => this.processNode(fragChild, context))
+      [...frag.children].forEach(fragChild => processNode.call(this, fragChild, context))
       return frag
     }
 
@@ -91,7 +93,7 @@ function processMapping (templateNode, context) {
 
     // build nodes and when the array is changed, re-build
     buildNodes.call(this)
-    this.onStateChange(arrayKey, () => {
+    onStateChange.call(this, arrayKey, () => {
       reBuildNodes.call(this)
     })
   }
