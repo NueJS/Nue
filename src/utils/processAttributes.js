@@ -8,8 +8,16 @@ function processAttributes (node, source = {}) {
     // get placeholder value of attribute
     let attributeValue = attributes[attributeName]
 
-    // if attribute value is not curled, no processing is needed
-    if (!isCurled(attributeValue)) continue
+    // if attribute value is not curled
+    if (!isCurled(attributeValue)) {
+      if (attributeName[0] === ':') {
+        if (!node.props) node.props = {}
+        node.props[attributeName.substr(1)] = attributeValue
+        node.removeAttribute(attributeName)
+        console.log('process attributes of ', node.nodeName)
+      }
+      continue
+    }
     attributeValue = uncurl(attributeValue)
 
     if (attributeName === 'key') {
