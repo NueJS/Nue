@@ -31,7 +31,7 @@ function processAttributes (node, context = {}) {
     if (atrName.startsWith('@')) {
       // node.removeAttribute(atrName)
       const eventName = atrName.substr(1)
-      node.addEventListener(eventName, this.compObj[atrValue])
+      node.addEventListener(eventName, this.compObj[atrValue].bind(this))
       continue
     }
 
@@ -39,6 +39,7 @@ function processAttributes (node, context = {}) {
     if (atrName.startsWith('bind:')) {
       bindInput.call(this, node, atrName, atrValue)
     } else {
+      // name={value}
       bindAttribute.call(this, node, atrName, atrValue, context)
     }
   }
