@@ -1,7 +1,8 @@
 import onChange, { onStateChange } from './utils/onChange.js'
 import { bindTextContent, bindAttributeValue, bindInput } from './utils/bind.js'
-import addState from './utils/state.js'
+import addState from './utils/addState.js'
 import buildShadowDOM from './utils/buildShadowDOM.js'
+import dispatchCustomEvent from './utils/dispatchCustomEvent.js'
 // process
 import processNode from './utils/processNode.js'
 import processAttributes from './utils/processAttributes.js'
@@ -19,9 +20,7 @@ function $ (elementName, options) {
   class El extends HTMLElement {
     constructor () {
       super()
-      // this.props is set by its parent node
-      // collection of callbacks that should be called when their dependant state is changed
-      this.deps = {}
+      this.deps = {} // collection of callbacks that should be called when their dependant state is changed
       this.options = options
       // this.observedProps = observedProps
       this.addState()
@@ -48,6 +47,7 @@ function $ (elementName, options) {
   El.prototype.onChange = onChange
   El.prototype.onStateChange = onStateChange
   El.prototype.addState = addState
+  El.prototype.dispatchCustomEvent = dispatchCustomEvent
   // binding
   El.prototype.bindTextContent = bindTextContent
   El.prototype.bindAttributeValue = bindAttributeValue
@@ -58,14 +58,6 @@ function $ (elementName, options) {
   El.prototype.processAttributes = processAttributes
   El.prototype.processMapping = processMapping
   El.prototype.processTextContent = processTextContent
-
-  El.prototype.dispatchCustomEvent = function (eventName, detail) {
-    this.dispatchEvent(
-      new CustomEvent(eventName, {
-        detail
-      })
-    )
-  }
 
   customElements.define(elementName, El)
 }
