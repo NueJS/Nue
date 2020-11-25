@@ -8,9 +8,8 @@ import addContextDependency from '../context.js'
 function bindAttribute (node, atrName, atrKey, context) {
   const [value, isStateKey] = getValue.call(this, atrKey, context)
   // if value is taken from context
+  node.setAttribute(atrName, value)
   if (isStateKey) {
-    node.setAttribute(atrName, value)
-
     onStateChange.call(this, atrKey, () => {
       node.setAttribute(atrName, getSlice.call(this, atrKey))
     })
