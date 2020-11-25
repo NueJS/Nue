@@ -1,45 +1,98 @@
-import { uncurl } from './str.js'
-import getAttributes from './getAttributes.js'
+import { getUncurledAttribute } from './str.js'
+import deepClone from './deepClone.js'
+import deepEqual from './deepEqual.js'
 
-function processMapping (node) {
-  const each = node.getAttribute('each')
-  if (each) {
-    const as = node.getAttribute('as')
-    const at = node.getAttribute('at')
-    const asVal = uncurl(as)
-    const atVal = uncurl(at)
-    const depKey = uncurl(each)
+function processMapping (templateNode) {
+  const arrayKey = getUncurledAttribute(templateNode, 'each')
+
+  if (arrayKey) {
+    // get mapping attributes from template
+    const as = getUncurledAttribute(templateNode, 'as')
+    const at = getUncurledAttribute(templateNode, 'at')
+    const key = getUncurledAttribute(templateNode, 'key')
+
+    // keep track of added nodes
+    // { key1: [...nodes], key2: [...nodes] }
+    const frags = {}
+
+    // keep copy of previous version of array
+    let prevArray
+
+    // create new frag and process frag children nodes
+    function createFrag (value, index) {
+      const frag = templateNode.content.cloneNode(true)
+      const source = { [as]: value, [at]: index };
+      [...frag.children].forEach(fragChild => this.processNode(fragChild, source))
+      return frag
+    }
+
+    // key is a unique property of each child in array
+    // if no unique property is given use the index
+    const getFragKey = (index) => key === null ? index : this.state[arrayKey][key]
+
+    const saveFrag = (frag, fragKey) => {
+      frags[fragKey] = [...frag.children]
+    }
 
     function buildNodes () {
-      const array = this.state[depKey]
-      array.forEach((value, i) => {
-        const frag = node.content.cloneNode(true);
-        [...frag.children].forEach(fragNode => {
-          // process text
-          this.processTextContent(fragNode, { [asVal]: value, [atVal]: i }, false)
-          // process attributes
-          const attributes = getAttributes(fragNode)
-          for (const attributeName in attributes) {
-            if (attributes[attributeName] === as) {
-              fragNode.setAttribute(attributeName, value)
-            }
+      const array = this.state[arrayKey]
+      array.forEach((value, index) => {
+        const frag = createFrag.call(this, value, index)
+        const fragKey = getFragKey(index)
+        saveFrag(frag, fragKey)
+        templateNode.before(frag)
+      })
 
-            if (attributes[attributeName] === at) {
-              fragNode.setAttribute(attributeName, i)
-            }
+      prevArray = deepClone(array)
+    }
+
+    function reBuildNodes () {
+      const array = this.state[arrayKey]
+
+      array.forEach((value, i) => {
+        // if ith value mismatch
+        if (!deepEqual(prevArray[i], value)) {
+          const fragKey = getFragKey(i)
+
+          // if prevArray was shorter and new value is added in array
+          if (i > prevArray.length - 1) {
+            // create new node and add it at the end
+            const frag = createFrag.call(this, value, i)
+            saveFrag(frag, fragKey)
+            templateNode.before(frag)
+            prevArray.push(deepClone(value))
+          } else {
+            // if the value is changed at index i
+            // change the frag nodes at index i
+            const oldNodes = frags[fragKey]
+            oldNodes.forEach((oldNode, j) => {
+              // console.log(oldNode.mapArrayUsage)
+              oldNode.mapArrayUsage.forEach(usage => {
+                if (usage.type === 'text') {
+                  const source = { [as]: value, [at]: i }
+                  const currentValue = usage.node.textContent
+                  const newValue = source[usage.key]
+                  if (currentValue !== newValue) { usage.node.textContent = newValue }
+                }
+                if (usage.type === 'attribute') {
+                  const source = { [as]: value, [at]: i }
+                  const currentValue = oldNode.getAttribute(usage.name)
+                  const newValue = source[usage.key]
+                  if (currentValue !== newValue) { oldNode.setAttribute(usage.name, newValue) }
+                }
+              })
+            })
+
+            prevArray[i] = deepClone(value)
           }
-        })
-        // add only at the end
-        node.before(frag)
+        }
       })
     }
 
+    // build nodes and when the array is changed, re-build
     buildNodes.call(this)
-
-    // when array is changed need to build it again
-    this.onStateChange(depKey, () => {
-      // remove previously added nodes
-      buildNodes.call(this)
+    this.onStateChange(arrayKey, () => {
+      reBuildNodes.call(this)
     })
   }
 }
