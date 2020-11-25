@@ -1,11 +1,9 @@
 import getRS from './getRS.js'
 
-// populate initial state with options.state
-// override them with this.props
-// create this.state by making the initstate object reactive
+// state is created from this.props, fallback values are given in options.state
 
 function addState () {
-  const state = this.options.state
+  const state = this.options.state || {}
   if (this.props) {
     for (const prop in this.props) {
       const propValue = this.props[prop]
