@@ -1,4 +1,4 @@
-import onChange from './onChange.js'
+import onChange from '../state/onChange.js'
 const isObject = x => typeof x === 'object' && x !== null
 let disableOnChange = false
 
@@ -17,7 +17,10 @@ function reactify (_state, chain = []) {
       if (newValue !== currentValue) { this.state[key] = newValue }
     }
 
-    this.computedStateDeps[key] = handleStateChange
+    this.computedStateDeps.push({
+      notFor: key,
+      callback: handleStateChange
+    })
   }
 
   if (!isObject(state)) return state

@@ -1,5 +1,4 @@
-function onStateChange (chain, cb) {
-  const key = chain[0]
+function onStateChange (key, cb) {
   if (!this.stateDeps[key]) this.stateDeps[key] = []
   this.stateDeps[key].push(cb)
 }

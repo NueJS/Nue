@@ -10,7 +10,7 @@ function $ (compName, compObj) {
     constructor () {
       super()
       this.stateDeps = { }
-      this.computedStateDeps = {}
+      this.computedStateDeps = []
       this.compObj = compObj
       addState.call(this)
       buildShadowDOM.call(this, template)
