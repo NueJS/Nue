@@ -15,8 +15,10 @@ function getRS (_state, onChange, chain = []) {
   // make the wrapper radioactive
   return new Proxy(radioactiveWrapper, {
     set (target, prop, value) {
-      if (disableOnChange) return Reflect.set(target, prop, value)
-      return onChange([...chain, prop], value, 'set')
+      let v = value
+      if (isObject(value)) v = getRS(value, onChange, [...chain, prop])
+      if (disableOnChange) return Reflect.set(target, prop, v)
+      return onChange([...chain, prop], v, 'set')
     },
 
     deleteProperty (target, prop) {
