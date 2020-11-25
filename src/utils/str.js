@@ -6,7 +6,7 @@ export const uncurl = str => str.substr(1, str.length - 2)
 // '{xxx}' -> yes '{xx' -> no
 export const isCurled = str => str[0] === '{' && str[str.length - 1] === '}'
 
-export const getUncurledAttribute = (node, attributeName) => {
-  const str = node.getAttribute(attributeName)
+export const getUncurledAttribute = (node, atrName) => {
+  const str = node.getAttribute(atrName)
   return str === null ? null : uncurl(str)
 }

@@ -1,8 +1,8 @@
-import { getUncurledAttribute } from './str.js'
-import deepClone from './deepClone.js'
-import deepEqual from './deepEqual.js'
+import { getUncurledAttribute } from '../str.js'
+import deepClone from '../deepClone.js'
+import deepEqual from '../deepEqual.js'
 
-function processMapping (templateNode) {
+function processMapping (templateNode, context) {
   const arrayKey = getUncurledAttribute(templateNode, 'each')
 
   if (arrayKey) {
@@ -21,8 +21,8 @@ function processMapping (templateNode) {
     // create new frag and process frag children nodes
     function createFrag (value, index) {
       const frag = templateNode.content.cloneNode(true)
-      const source = { [as]: value, [at]: index };
-      [...frag.children].forEach(fragChild => this.processNode(fragChild, source))
+      const context = { [as]: value, [at]: index };
+      [...frag.children].forEach(fragChild => this.processNode(fragChild, context))
       return frag
     }
 
@@ -69,15 +69,15 @@ function processMapping (templateNode) {
               // console.log(oldNode.mapArrayUsage)
               oldNode.mapArrayUsage.forEach(usage => {
                 if (usage.type === 'text') {
-                  const source = { [as]: value, [at]: i }
+                  const context = { [as]: value, [at]: i }
                   const currentValue = usage.node.textContent
-                  const newValue = source[usage.key]
+                  const newValue = context[usage.key]
                   if (currentValue !== newValue) { usage.node.textContent = newValue }
                 }
                 if (usage.type === 'attribute') {
-                  const source = { [as]: value, [at]: i }
+                  const context = { [as]: value, [at]: i }
                   const currentValue = oldNode.getAttribute(usage.name)
-                  const newValue = source[usage.key]
+                  const newValue = context[usage.key]
                   if (currentValue !== newValue) { oldNode.setAttribute(usage.name, newValue) }
                 }
               })

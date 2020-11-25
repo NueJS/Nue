@@ -1,65 +1,31 @@
-import onChange, { onStateChange } from './utils/onChange.js'
-import { bindTextContent, bindAttributeValue, bindInput } from './utils/bind.js'
-import addState from './utils/addState.js'
+import addState from './utils/state/addState.js'
 import buildShadowDOM from './utils/buildShadowDOM.js'
-import dispatchCustomEvent from './utils/dispatchCustomEvent.js'
-// process
-import processNode from './utils/processNode.js'
-import processAttributes from './utils/processAttributes.js'
-import processTextContent from './utils/processTextContent.js'
-import processMapping from './utils/processMapping.js'
 
-function $ (elementName, options) {
+function $ (compName, compObj) {
   const template = document.createElement('template')
-  const style = options.css ? `<style> ${options.css}</style>` : ''
-  template.innerHTML = options.html + style
-
-  // whatever is in the state should be observed for changes
-  // const observedProps = Object.keys(options.state)
+  const style = compObj.css ? `<style> ${compObj.css}</style>` : ''
+  template.innerHTML = compObj.html.trim() + style
 
   class El extends HTMLElement {
     constructor () {
       super()
-      this.deps = {} // collection of callbacks that should be called when their dependant state is changed
-      this.options = options
-      // this.observedProps = observedProps
-      this.addState()
-      this.buildShadowDOM(template)
+      this.stateDeps = { }
+      this.computedStateDeps = {}
+      this.compObj = compObj
+      addState.call(this)
+      buildShadowDOM.call(this, template)
     }
 
     connectedCallback () {
-      if (options.onConnect) options.onConnect.call(this)
+      if (compObj.onConnect) compObj.onConnect.call(this)
     }
 
     disconnectedCallback () {
-      if (options.onDisconnect) options.onDisconnect.call(this)
+      if (compObj.onDisconnect) compObj.onDisconnect.call(this)
     }
-
-    // static get observedAttributes () {
-    //   return observedProps || []
-    // }
-
-    // attributeChangedCallback (prop, oldVal, newVal) {
-    //   if (this.state) this.state[prop] = newVal
-    // }
   }
 
-  El.prototype.onChange = onChange
-  El.prototype.onStateChange = onStateChange
-  El.prototype.addState = addState
-  El.prototype.dispatchCustomEvent = dispatchCustomEvent
-  // binding
-  El.prototype.bindTextContent = bindTextContent
-  El.prototype.bindAttributeValue = bindAttributeValue
-  El.prototype.bindInput = bindInput
-  El.prototype.buildShadowDOM = buildShadowDOM
-  // process
-  El.prototype.processNode = processNode
-  El.prototype.processAttributes = processAttributes
-  El.prototype.processMapping = processMapping
-  El.prototype.processTextContent = processTextContent
-
-  customElements.define(elementName, El)
+  customElements.define(compName, El)
 }
 
 export default $
