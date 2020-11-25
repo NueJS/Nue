@@ -6,8 +6,8 @@ function buildShadowDOM (template) {
   this.attachShadow({ mode: this.options.mode || 'open' })
   const fragment = template.content.cloneNode(true)
   const shadowNodes = [...fragment.childNodes]
-  shadowNodes.forEach(node => this.shadowRoot.append(node))
   shadowNodes.forEach(node => this.processNode(node))
+  shadowNodes.forEach(node => this.shadowRoot.append(node))
 }
 
 export default buildShadowDOM
