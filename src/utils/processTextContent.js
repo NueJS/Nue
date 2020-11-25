@@ -2,7 +2,7 @@ import getSlice from './getSlice.js'
 
 // replace placeholder in textContent of node to state's content
 // setup binding to update the content when the state is changed
-function processTextContent (node, source = this.state, bind = true) {
+function processTextContent (node, source = {}) {
   const textNodes = []
   const text = node.textContent
   let openBracketFound = false
@@ -17,17 +17,34 @@ function processTextContent (node, source = this.state, bind = true) {
         acc = ''
       }
       openBracketFound = true
-    }
-
-    // everything in between {} is variable
-    else if (openBracketFound && text[i] === '}') {
+    } else if (openBracketFound && text[i] === '}') {
+      // everything in between {} is variable
       openBracketFound = false
+      let fromSource = false
+      let varValue
 
-      const varValue = getSlice(source, acc)
+      try {
+        varValue = getSlice(this.state, acc)
+        if (varValue !== undefined) { fromSource = true }
+      } catch {
+
+      }
+      if (!fromSource) {
+        varValue = getSlice(source, acc)
+      }
+
       const textNode = document.createTextNode(varValue)
-      if (bind) this.bindTextContent(textNode, acc)
       textNodes.push(textNode)
       acc = '' // reset accumulator
+
+      if (fromSource) {
+        if (!node.mapArrayUsage) node.mapArrayUsage = []
+        node.mapArrayUsage.push({
+          type: 'text',
+          key: acc,
+          node: textNode
+        })
+      } else this.bindTextContent(textNode, acc)
     } else {
       acc += text[i]
     }

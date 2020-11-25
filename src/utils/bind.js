@@ -8,25 +8,44 @@ export function bindTextContent (node, key) {
 }
 
 // when key in state changes, update attribute <name> of <node>
-export function bindAttributeValue (node, name, key) {
-  const value = getSlice(this.state, key)
+export function bindAttributeValue (node, name, key, source = {}) {
+  let fromSource = false
+  let value = getSlice(this.state, key)
+  if (!value) {
+    fromSource = true
+    value = getSlice(source, key)
+    // for efficient, add attributes which depend on mapping
+    if (!node.mapArrayUsage) node.mapArrayUsage = []
+    node.mapArrayUsage.push({
+      type: 'attribute',
+      name,
+      key
+    })
+  }
+
   const isProp = name[0] === ':'
   const propName = name.substr(1)
   if (isProp) {
     if (!node.props) node.props = {}
     node.props[propName] = value
     node.removeAttribute(name)
-    this.onStateChange(key, () => {
-      node.state[propName] = getSlice(this.state, key)
-    })
+    if (!fromSource) {
+      this.onStateChange(key, () => {
+        node.state[propName] = getSlice(this.state, key)
+      })
+    }
   } else {
     node.setAttribute(name, value)
-    this.onStateChange(key, () => {
-      node.setAttribute(name, getSlice(this.state, key))
-    })
+    if (!fromSource) {
+      this.onStateChange(key, () => {
+        node.setAttribute(name, getSlice(this.state, key))
+      })
+    }
   }
 }
 
+// mapping support not added
+// source not added
 export function bindInput (node, attributeName, attributeValue) {
   if (attributeName === 'value') {
     const eventName = 'input'
