@@ -3,6 +3,7 @@ import deepClone from '../deepClone.js'
 import deepEqual from '../deepEqual.js'
 import processNode from './processNode.js'
 import onStateChange from '../state/onStateChange.js'
+import getValue from '../value.js'
 
 function processMapping (templateNode, context) {
   const arrayKey = getUncurledAttribute(templateNode, 'each')
@@ -18,13 +19,13 @@ function processMapping (templateNode, context) {
     const frags = {}
 
     // keep copy of previous version of array
-    let prevArray
+    let prevArray, fromState
 
     // create new frag and process frag children nodes
     function createFrag (value, index) {
       const frag = templateNode.content.cloneNode(true)
-      const context = { [as]: value, [at]: index };
-      [...frag.children].forEach(fragChild => processNode.call(this, fragChild, context))
+      const ctx = { [as]: value, [at]: index };
+      [...frag.children].forEach(fragChild => processNode.call(this, fragChild, ctx))
       return frag
     }
 
@@ -37,7 +38,8 @@ function processMapping (templateNode, context) {
     }
 
     function buildNodes () {
-      const array = this.state[arrayKey]
+      const [array, isStateKey] = getValue.call(this, arrayKey, context)
+      fromState = isStateKey
       array.forEach((value, index) => {
         const frag = createFrag.call(this, value, index)
         const fragKey = getFragKey(index)
@@ -49,8 +51,7 @@ function processMapping (templateNode, context) {
     }
 
     function reBuildNodes () {
-      const array = this.state[arrayKey]
-
+      const [array] = getValue.call(this, arrayKey, context)
       array.forEach((value, i) => {
         // if ith value mismatch
         if (!deepEqual(prevArray[i], value)) {
@@ -68,7 +69,6 @@ function processMapping (templateNode, context) {
             // change the frag nodes at index i
             const oldNodes = frags[fragKey]
             oldNodes.forEach((oldNode, j) => {
-              // console.log(oldNode.mapArrayUsage)
               oldNode.mapArrayUsage.forEach(usage => {
                 if (usage.type === 'text') {
                   const context = { [as]: value, [at]: i }
@@ -93,9 +93,11 @@ function processMapping (templateNode, context) {
 
     // build nodes and when the array is changed, re-build
     buildNodes.call(this)
-    onStateChange.call(this, arrayKey, () => {
-      reBuildNodes.call(this)
-    })
+    if (fromState) {
+      onStateChange.call(this, arrayKey, () => {
+        reBuildNodes.call(this)
+      })
+    }
   }
 }
 

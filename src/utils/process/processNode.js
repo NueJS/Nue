@@ -3,7 +3,7 @@ import processMapping from './processMapping.js'
 import processIf from './processIf.js'
 import processAttributes from './processAttributes.js'
 
-function processNode (node, context = {}) {
+function processNode (node, context) {
   if (node.nodeName === 'STYLE') return
 
   if (node.nodeName === '#text') {
