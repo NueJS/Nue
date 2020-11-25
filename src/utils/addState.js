@@ -4,7 +4,6 @@ import getRS from './getRS.js'
 
 function addState () {
   const state = this.options.state || {}
-  console.log('add state to', this.nodeName)
   if (this.props) {
     for (const prop in this.props) {
       const propValue = this.props[prop]
@@ -12,7 +11,7 @@ function addState () {
     }
   }
 
-  this.state = getRS(state, this.onChange.bind(this))
+  this.state = getRS.call(this, state, this.onChange.bind(this))
 }
 
 export default addState
