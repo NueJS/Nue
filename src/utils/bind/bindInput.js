@@ -1,4 +1,5 @@
 import { mutate } from '../reactivity/mutate.js'
+import onStateChange from '../state/onStateChange.js'
 import { getSlice } from '../value.js'
 
 function bindInput (node, atrName, atrKey) {
@@ -7,12 +8,16 @@ function bindInput (node, atrName, atrKey) {
   const eventName = 'input'
   const attributeValueSplit = atrKey.split('.').slice(1)
   const isNumber = node.type === 'number' || node.type === 'range'
-  node.value = getSlice.call(this, atrKey)
+  node[bindName] = getSlice.call(this, atrKey)
 
   const handler = e => {
     const value = e.target[bindName]
     mutate(this.state, attributeValueSplit, isNumber ? Number(value) : value, 'set')
   }
+
+  onStateChange.call(this, atrKey, () => {
+    node[bindName] = getSlice.call(this, atrKey)
+  })
 
   node.addEventListener(eventName, handler)
 }
