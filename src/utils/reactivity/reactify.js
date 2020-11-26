@@ -1,4 +1,4 @@
-import onChange from '../state/onChange.js'
+import onChange from './onChange.js'
 const isObject = x => typeof x === 'object' && x !== null
 let disableOnChange = false
 
