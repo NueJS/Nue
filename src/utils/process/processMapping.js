@@ -24,7 +24,7 @@ function processMapping (templateNode, context) {
     // create new frag and process frag children nodes
     function createFrag (value, index) {
       const frag = templateNode.content.cloneNode(true)
-      const ctx = { [as]: value, [at]: index };
+      const ctx = { ...context, [as]: value, [at]: index };
       [...frag.children].forEach(fragChild => processNode.call(this, fragChild, ctx))
       return frag
     }
@@ -52,6 +52,7 @@ function processMapping (templateNode, context) {
 
     function reBuildNodes () {
       const [array] = getValue.call(this, arrayKey, context)
+
       array.forEach((value, i) => {
         // if ith value mismatch
         if (!deepEqual(prevArray[i], value)) {
@@ -68,21 +69,37 @@ function processMapping (templateNode, context) {
             // if the value is changed at index i
             // change the frag nodes at index i
             const oldNodes = frags[fragKey]
-            oldNodes.forEach((oldNode, j) => {
-              oldNode.mapArrayUsage.forEach(usage => {
-                if (usage.type === 'text') {
-                  const context = { [as]: value, [at]: i }
-                  const currentValue = usage.node.textContent
-                  const newValue = context[usage.key]
-                  if (currentValue !== newValue) { usage.node.textContent = newValue }
-                }
-                if (usage.type === 'attribute') {
-                  const context = { [as]: value, [at]: i }
-                  const currentValue = oldNode.getAttribute(usage.name)
-                  const newValue = context[usage.key]
-                  if (currentValue !== newValue) { oldNode.setAttribute(usage.name, newValue) }
-                }
-              })
+
+            function updateNode (node) {
+              // debugger
+              if (node.mapArrayUsage) {
+                node.mapArrayUsage.forEach(usage => {
+                  const ctx = { ...context, [as]: value, [at]: i }
+                  // console.log({ context, usage, key: context[usage.key] })
+                  if (usage.type === 'text') {
+                    const currentValue = node.textContent
+                    const newValue = ctx[usage.key]
+                    if (currentValue !== newValue) { node.textContent = newValue }
+                  }
+                  else if (usage.type === 'attribute') {
+                    const currentValue = node.getAttribute(usage.name)
+                    const newValue = ctx[usage.key]
+                    if (currentValue !== newValue) { node.setAttribute(usage.name, newValue) }
+                  }
+                  else if (usage.type === 'state-attribute') {
+                    const currentValue = node.getAttribute(usage.name)
+                    const newValue = ctx[usage.key]
+                    if (currentValue !== newValue) { node.state[usage.name] = newValue }
+                  }
+                })
+              }
+              if (node.hasChildNodes) {
+                [...node.childNodes].forEach(n => updateNode(n))
+              }
+            }
+
+            oldNodes.forEach((oldNode) => {
+              updateNode(oldNode)
             })
 
             prevArray[i] = deepClone(value)
