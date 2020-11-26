@@ -14,7 +14,7 @@ function bindAttribute (node, atrName, atrKey, context) {
       node.setAttribute(atrName, getSlice.call(this, atrKey))
     })
   } else {
-    addContextDependency.call(this, node, {
+    addContextDependency(node, {
       type: 'attribute',
       name: atrName,
       key: atrKey

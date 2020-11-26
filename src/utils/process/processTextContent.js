@@ -26,10 +26,9 @@ function processTextContent (node, context) {
       if (isStateKey) {
         bindTextContent.call(this, textNode, str)
       } else {
-        addContextDependency.call(this, {
+        addContextDependency(textNode, {
           type: 'text',
-          key: str,
-          node: textNode
+          key: str
         })
       }
 
