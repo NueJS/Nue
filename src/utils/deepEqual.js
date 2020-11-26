@@ -24,8 +24,9 @@ function deepEqual (x, y) {
   if (typeof x === 'object') {
     const keysOfX = Object.keys(x)
     const keysOfY = Object.keys(y)
+
     // keys length match
-    if (keysOfX.length !== keysOfY) return false
+    if (keysOfX.length !== keysOfY.length) return false
     // keys match
     if (!deepEqual(keysOfX, keysOfY)) return false
 
@@ -38,4 +39,5 @@ function deepEqual (x, y) {
   }
 }
 
+window.deepEqual = deepEqual
 export default deepEqual
