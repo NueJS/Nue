@@ -1,4 +1,4 @@
-import { silentMutate } from '../reactivity/mutate.js'
+import { silentMutate } from './mutate.js'
 
 function onChange (chain, value, trap) {
   const success = silentMutate(this.state, chain, value, trap)
