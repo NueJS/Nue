@@ -6,12 +6,13 @@ import addContextDependency from '../context.js'
 // if the value is taken from context - save the context dependency
 // if the value is taken from state - add state dependency
 function bindAttribute (node, atrName, atrKey, context) {
-  const [value, isStateKey] = getValue.call(this, atrKey, context)
+  const chain = atrKey.split('.')
+  const [value, isStateKey] = getValue.call(this, chain, context)
   // if value is taken from context
   node.setAttribute(atrName, value)
   if (isStateKey) {
-    onStateChange.call(this, atrKey, () => {
-      node.setAttribute(atrName, getSlice.call(this, atrKey))
+    onStateChange.call(this, chain, () => {
+      node.setAttribute(atrName, getSlice.call(this, chain))
     })
   } else {
     addContextDependency(node, {
