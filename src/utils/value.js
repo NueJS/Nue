@@ -1,12 +1,11 @@
 // "a.b.c" -> returns this.a.b.c
-export function getSlice (key) {
-  const arr = key.split('.')
-  if (arr.length === 1) return this[key]
+export function getSlice (chain) {
+  if (chain.length === 1) return this[chain[0]]
   else {
     let value = this
-    for (let i = 0; i < arr.length; i++) {
-      if (typeof value !== 'object') throw new Error(`invalid variable used: ${key} in ${this}`)
-      value = value[arr[i]]
+    for (let i = 0; i < chain.length; i++) {
+      if (typeof value !== 'object') throw new Error(`invalid variable used: ${chain.join('.')} in ${this}`)
+      value = value[chain[i]]
     }
 
     return value
@@ -15,11 +14,10 @@ export function getSlice (key) {
 
 // "state.a.b.c" returns this.state.a.b.c
 // a.b.c returns context.a.b.c
-function getValue (key, context) {
-  const keySplit = key.split('.')
-  const isStateKey = keySplit[0] === 'state'
+function getValue (chain, context) {
+  const isStateKey = chain[0] === 'state'
   const _this = isStateKey ? this : context
-  return [getSlice.call(_this, key), isStateKey]
+  return [getSlice.call(_this, chain), isStateKey]
 }
 
 export default getValue
