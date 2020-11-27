@@ -1,5 +1,6 @@
 import addState from './utils/state/addState.js'
 import buildShadowDOM from './utils/buildShadowDOM.js'
+import reactify from './utils/reactivity/reactify.js'
 
 function loadComponents (template) {
   [...template.content.children].forEach(node => {
@@ -23,8 +24,10 @@ function loadComponents (template) {
 
 function customElement (compName, compObj) {
   const template = document.createElement('template')
-  const style = compObj.css ? `<style> ${compObj.css}</style>` : ''
-  template.innerHTML = compObj.html.trim() + style
+  const style = `<style>${(compObj.css || '').trim()}</style>`
+  const commonStyle = `<style common-styles > ${window.commonCSS}</style>`
+
+  template.innerHTML = compObj.html.trim() + commonStyle + style
   loadComponents(template)
   class El extends HTMLElement {
     constructor () {
@@ -58,8 +61,15 @@ window.loadedComponents = {
 
 window.showNodeUpdates = true
 window.textNodeUpdated = (textNode) => {
-  textNode.parentNode.style.background = 'yellow'
+  textNode.parentNode.style.background = '#55efc4'
   setTimeout(() => {
     textNode.parentNode.style.background = null
   }, 300)
+}
+
+window.commonCSS = `
+:host {display: block; }
+`
+window.globalState = function (obj) {
+  window.globalState = reactify(obj)
 }
