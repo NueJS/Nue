@@ -10,6 +10,7 @@ function bindAttribute (node, atrName, atrKey, context) {
   const [value, isStateKey] = getValue.call(this, chain, context)
   // if value is taken from context
   node.setAttribute(atrName, value)
+
   if (isStateKey) {
     onStateChange.call(this, chain, () => {
       node.setAttribute(atrName, getSlice.call(this, chain))

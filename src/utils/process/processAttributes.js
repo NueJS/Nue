@@ -62,7 +62,8 @@ function processAttributes (node, context) {
     if (atrName.startsWith('@')) {
       node.removeAttribute(atrName)
       const eventName = atrName.substr(1)
-      node.addEventListener(eventName, this.compObj[atrValue].bind(this))
+      // console.log({ eventName, handler: this.compObj.handle[atrValue], atrValue })
+      node.addEventListener(eventName, this.handle[atrValue])
       continue
     }
 

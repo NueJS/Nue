@@ -3,26 +3,26 @@ const isObject = x => typeof x === 'object' && x !== null
 let disableOnChange = false
 
 function reactify (_state, chain = []) {
-  let state = _state
+  const state = _state
 
   // if state.key is a function
   // call it with initial value of state to set the initial value
   // update this value whenever the state changes
-  if (typeof _state === 'function') {
-    const key = chain.join('.')
-    state = _state(this.compObj.state)
-    this.compObj.state[key] = state
-    const handleStateChange = () => {
-      const newValue = _state(this.state)
-      const currentValue = this.state[key]
-      if (newValue !== currentValue) { this.state[key] = newValue }
-    }
+  // if (typeof _state === 'function') {
+  //   const key = chain.join('.')
+  //   state = _state(this.compObj.state)
+  //   this.compObj.state[key] = state
+  //   const handleStateChange = () => {
+  //     const newValue = _state(this.state)
+  //     const currentValue = this.state[key]
+  //     if (newValue !== currentValue) { this.state[key] = newValue }
+  //   }
 
-    this.computedStateDeps.push({
-      notFor: key,
-      callback: handleStateChange
-    })
-  }
+  //   this.computedStateDeps.push({
+  //     notFor: key,
+  //     callback: handleStateChange
+  //   })
+  // }
 
   if (!isObject(state)) return state
 
@@ -33,6 +33,7 @@ function reactify (_state, chain = []) {
   })
 
   const _this = this
+  console.log({ _this, _state })
 
   // make the wrapper radioactive
   return new Proxy(wrapper, {
@@ -57,7 +58,24 @@ function reactify (_state, chain = []) {
         }
       }
 
+      else if (prop === 'init') {
+        return (obj) => {
+          disableOnChange = true
+          Object.keys(obj).forEach(k => {
+            target[k] = obj[k]
+          })
+          disableOnChange = false
+          // Reflect.set(target, obj, 'set')
+        }
+      }
+
       return Reflect.get(target, prop)
+    },
+
+    apply (target, thisArg, args) {
+      console.log({ target })
+      target = {}
+      Reflect.set(target, args[0], 'set')
     }
   })
 }

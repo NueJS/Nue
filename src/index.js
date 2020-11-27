@@ -21,34 +21,61 @@ function loadComponents (template) {
     }
   }
 }
-
-function customElement (compName, compObj) {
-  const template = document.createElement('template')
-  const style = `<style>${(compObj.css || '').trim()}</style>`
-  const commonStyle = `<style common-styles > ${window.commonCSS}</style>`
-
-  template.innerHTML = compObj.html.trim() + commonStyle + style
-  loadComponents(template)
+// const compsAdded = {}
+function customElement (compName, component) {
   class El extends HTMLElement {
     constructor () {
       super()
+      let htmlString
+      let cssString
+      const handle = {}
+      const on = {
+        add: (fn) => {},
+        remove: (fn) => {},
+        change: (fn) => {}
+      }
+      const html = (s) => { htmlString = s[0] }
+      const css = (s) => { cssString = s[0] }
+
+      const compObj = {}
+      const state = reactify.call(this, {})
+
+      component({ state, handle, html, css, on })
+
+      this.state = state
+      this.handle = handle
+      console.log(compObj)
+
+      // compsAdded[compName] = compObj
+
+      // console.log(compsAdded[compName])
+      // handle.increment()
+      // console.log(compsAdded[compName])
+
+      const template = document.createElement('template')
+      const style = `<style>${(cssString.css || '').trim()}</style>`
+      const commonStyle = `<style common-styles > ${window.commonCSS}</style>`
+
+      template.innerHTML = htmlString.trim() + commonStyle + style
+      loadComponents(template)
+
       this.stateDeps = {}
       this.computedStateDeps = []
       this.compObj = compObj
       this.refs = {}
       this.compName = compName
-      addState.call(this)
+
       buildShadowDOM.call(this, template)
       window.loadedComponents[compName] = true
     }
 
-    connectedCallback () {
-      if (compObj.onConnect) compObj.onConnect.call(this)
-    }
+    // connectedCallback () {
+    //   if (compObj.onConnect) compObj.onConnect.call(this)
+    // }
 
-    disconnectedCallback () {
-      if (compObj.onDisconnect) compObj.onDisconnect.call(this)
-    }
+    // disconnectedCallback () {
+    //   if (compObj.onDisconnect) compObj.onDisconnect.call(this)
+    // }
   }
 
   customElements.define(compName, El)
