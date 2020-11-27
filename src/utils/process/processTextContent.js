@@ -1,49 +1,42 @@
-import getValue, { getSlice } from '../value.js'
+import getSlice from '../value.js'
 import addContextDependency from '../context.js'
 import onStateChange from '../state/onStateChange.js'
+import splitText from '../str.js'
 
-function processTextContent (node, context) {
-  const textNodes = []
-  const text = node.textContent
+function createReactiveTextNode (str, state) {
+  const chain = str.split('.')
+  const stateChain = chain.slice(1)
+  const value = getSlice(state, stateChain)
+  const textNode = document.createTextNode(value)
 
-  let openBracketFound = false
-  let str = ''
-  for (let i = 0; i < text.length; i++) {
-    if (openBracketFound && text[i] !== '}') str += text[i]
-    else if (text[i] === '{') {
-      openBracketFound = true
-      if (str) {
-        // create text node for all string before the variable
-        textNodes.push(document.createTextNode(str))
-        str = ''
-      }
-    } else if (openBracketFound && text[i] === '}') {
-      // treat everything in between {} as variable
-      const chain = str.split('.')
-      const [value, isStateKey] = getValue.call(this, chain, context)
-      const textNode = document.createTextNode(value)
-      textNodes.push(textNode)
-
-      if (isStateKey) {
-        onStateChange.call(this, chain, () => {
-          textNode.textContent = getSlice.call(this, chain)
-          if (window.showNodeUpdates) window.textNodeUpdated(textNode)
-        })
-      } else {
-        addContextDependency(textNode, {
-          type: 'text',
-          key: str
-        })
-      }
-
-      openBracketFound = false
-      str = '' // reset accumulator
-    } else {
-      str += text[i]
-    }
+  if (chain[0] === 'state') {
+    onStateChange.call(this, chain, () => {
+      textNode.textContent = getSlice(state, stateChain)
+      if (window.supersweet.showUpdates) window.supersweet.nodeUpdated(textNode)
+    })
   }
 
-  if (str) textNodes.push(document.createTextNode(str))
+  else {
+    addContextDependency(textNode, {
+      type: 'text',
+      key: str
+    })
+  }
+
+  return textNode
+}
+
+function processTextContent (node, context) {
+  const strings = splitText(node.textContent)
+  const textNodes = []
+  strings.forEach(str => {
+    if (str.isVariable) {
+      const textNode = createReactiveTextNode.call(str, this.state)
+      textNodes.push(textNode)
+    } else {
+      textNodes.push(document.createTextNode(str))
+    }
+  })
 
   if (node.nodeName === '#text') {
     textNodes.forEach(n => node.before(n))

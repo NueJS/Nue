@@ -3,7 +3,7 @@ import { silentMutate } from './mutate.js'
 function onChange (chain, value, trap) {
   const success = silentMutate(this.state, chain, value, trap)
   if (chain[chain.length - 1] === 'length') return success
-  console.log({ chain, dis: this })
+  console.log({ chain })
   // const key = chain[0]
 
   // if (this.compObj.on.change) this.compObj.onStateChange.call(this, key)

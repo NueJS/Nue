@@ -12,5 +12,8 @@ module.exports = {
   },
   rules: {
     'brace-style': 'off'
+  },
+  globals: {
+    'supersweet': 'readonly'
   }
 }

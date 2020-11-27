@@ -3,7 +3,7 @@ import deepClone from '../deepClone.js'
 import deepEqual from '../deepEqual.js'
 import processNode from './processNode.js'
 import onStateChange from '../state/onStateChange.js'
-import getValue, { getSlice } from '../value.js'
+import getSlice from '../value.js'
 
 function processMapping (template, context) {
   const each = attr(template, 'each')
@@ -25,15 +25,15 @@ function processMapping (template, context) {
 
   // key is a unique property of each child in array
   // if no unique property is given use the index
-  const getFragKey = (index) => key === null ? index : getSlice.call(this, chain)[key]
+  const getFragKey = (index) => key === null ? index : getSlice(this.state, chain)[key]
 
   const saveFrag = (frag, fragKey) => {
     frags[fragKey] = [...frag.children]
   }
 
-  const getArray = () => getValue.call(this, chain, context)[0]
+  const getArray = () => getSlice(this.state, chain)
 
-  const [array, isStateKey] = getValue.call(this, chain, context)
+  const array = getSlice(this.state, chain)
   array.forEach((value, index) => {
     const frag = createFrag.call(this, value, index)
     const fragKey = getFragKey(index)

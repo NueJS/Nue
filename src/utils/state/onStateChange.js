@@ -1,7 +1,7 @@
 function onStateChange (chain, cb) {
   let target = this.stateDeps
-  const lastIndex = chain.length - 2
-  chain.slice(1).forEach((c, i) => {
+  const lastIndex = chain.length - 1
+  chain.forEach((c, i) => {
     if (!target[c]) {
       target[c] = {
         $: []

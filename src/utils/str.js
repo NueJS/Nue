@@ -15,3 +15,29 @@ export function attr (node, atrName, optional) {
 
   return uncurl(str)
 }
+
+export function splitText (text) {
+  const arr = []
+  let openBracketFound = false
+  let str = ''
+
+  for (let i = 0; i < text.length; i++) {
+    if (openBracketFound && text[i] !== '}') str += text[i]
+    else if (text[i] === '{') {
+      openBracketFound = true
+      if (str) {
+        arr.push({ string: str })
+        str = ''
+      }
+    } else if (openBracketFound && text[i] === '}') {
+      arr.push({ string: str, isVariable: true })
+      openBracketFound = false
+      str = '' // reset accumulator
+    } else {
+      str += text[i]
+    }
+  }
+
+  if (str) arr.push({ string: str })
+  return arr
+}

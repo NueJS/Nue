@@ -1,4 +1,5 @@
 import onChange from './onChange.js'
+import onStateChange from '../state/onStateChange.js'
 const isObject = x => typeof x === 'object' && x !== null
 let disableOnChange = false
 
@@ -33,7 +34,7 @@ function reactify (_state, chain = []) {
   })
 
   const _this = this
-  console.log({ _this, _state })
+  // console.log({ _this, _state })
 
   // make the wrapper radioactive
   return new Proxy(wrapper, {
@@ -62,10 +63,20 @@ function reactify (_state, chain = []) {
         return (obj) => {
           disableOnChange = true
           Object.keys(obj).forEach(k => {
+            console.log('set : ', k)
             target[k] = obj[k]
           })
           disableOnChange = false
           // Reflect.set(target, obj, 'set')
+        }
+      }
+
+      else if (prop === 'onChange') {
+        return (fn, deps) => {
+          deps.forEach(d => {
+            console.log('register for', d)
+            onStateChange.call(_this, d.split('.'), fn)
+          })
         }
       }
 

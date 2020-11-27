@@ -1,5 +1,5 @@
 import processTextContent from './processTextContent.js'
-import processMapping from './processMapping.js'
+// import processMapping from './processMapping.js'
 import processIf from './processIf.js'
 import processAttributes from './processAttributes.js'
 
@@ -12,17 +12,14 @@ function processNode (node, context) {
   }
 
   if (node.nodeName === 'TEMPLATE') {
-    processMapping.call(this, node, context)
+    // processMapping.call(this, node, context)
     processIf.call(this, node, context)
     return
   }
 
   processAttributes.call(this, node, context)
-
-  // if node has multiple childNodes, do not process textContent on it
-  if (node.childNodes.length > 1) {
-    [...node.childNodes].forEach(n => processNode.call(this, n, context))
-  } else { processTextContent.call(this, node, context) }
+  if (node.childNodes.length > 1) [...node.childNodes].forEach(n => processNode.call(this, n, context))
+  else processTextContent.call(this, node, context)
 }
 
 export default processNode

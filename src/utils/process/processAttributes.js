@@ -1,78 +1,74 @@
-import getAttributes from '../getAttributes.js'
+import attrs from '../attrs.js'
 import bindInput from '../bind/bindInput.js'
 import bindAttribute from '../bind/bindAttribute.js'
-import getValue, { getSlice } from '../value.js'
+import getSlice from '../value.js'
 import addContextDependency from '../context.js'
 import onStateChange from '../state/onStateChange.js'
 import { mutate } from '../reactivity/mutate.js'
 
-function addStateAttribute (node, atrName, atrKey) {
+function addProps (node, key, value) {
   if (!node.props) node.props = {}
-  node.props[atrName] = atrKey
-  node.removeAttribute(atrName)
+  node.props[key] = value
 }
 
 function processAttributes (node, context) {
-  const attributes = getAttributes(node)
+  const attributes = attrs(node)
 
-  for (const atrName in attributes) {
-    const [atrValue, isVariable] = attributes[atrName]
-    const chain = atrValue.split('.')
+  for (const attr in attributes) {
+    const [key, isVariable] = attributes[attr]
+    const chain = key.split('.')
 
-    if (atrName === 'id') {
-      this.refs[atrValue] = node
+    // refs API
+    if (attr === 'id') {
+      this.refs[key] = node
     }
 
-    // state.name={value} or state.name=value
-    if (atrName.startsWith(':')) {
-      const name = atrName.substr(1)
+    // :name={var} or :name=value
+    if (attr.startsWith(':')) {
+      node.removeAttribute(attr)
+      const name = attr.substr(1)
 
-      let initValue = atrValue
       if (isVariable) {
-        const [value, isStateKey] = getValue.call(this, chain, context)
-        initValue = value
-
-        if (isStateKey) {
+        if (chain[0] === 'state') {
           const nameChain = name.split('.')
-          const chain = atrValue.split('.')
-          onStateChange.call(this, chain, () => {
-            const value = getSlice.call(this, chain)
-            mutate(node.state, nameChain, value, 'set')
+          const stateChain = chain.slice(1)
+          addProps(node, name, getSlice(this.state, stateChain))
+
+          // change node's state when its props change
+          onStateChange.call(this, stateChain, () => {
+            mutate(node.state, nameChain, getSlice(this.state, stateChain), 'set')
           })
         }
 
         else {
+          addProps(node, name, key)
           addContextDependency(node, {
             type: 'state-attribute',
             name: name,
-            key: atrValue
+            key
           })
         }
-
-        node.removeAttribute(atrName)
       }
-      addStateAttribute(node, name, initValue)
+
       continue
     }
 
-    // if attribute value is not curled
     if (!isVariable) continue
 
     // @event={handler}
-    if (atrName.startsWith('@')) {
-      node.removeAttribute(atrName)
-      const eventName = atrName.substr(1)
-      // console.log({ eventName, handler: this.compObj.handle[atrValue], atrValue })
-      node.addEventListener(eventName, this.handle[atrValue])
+    if (attr.startsWith('@')) {
+      node.removeAttribute(attr)
+      const eventName = attr.substr(1) // remove @
+      node.addEventListener(eventName, this.handle[key])
       continue
     }
 
     // bind:event={handler}
-    if (atrName.startsWith('bind:')) {
-      bindInput.call(this, node, atrName, atrValue)
+    if (attr.startsWith('bind:')) {
+      bindInput.call(this, node, attr, key)
     } else {
       // name={value}
-      bindAttribute.call(this, node, atrName, atrValue, context)
+      bindAttribute.call(this, node, attr, key, context)
     }
   }
 }
