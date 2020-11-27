@@ -6,7 +6,7 @@ import addContextDependency from '../context.js'
 
 function addStateAttribute (node, atrName, atrKey) {
   if (!node.props) node.props = {}
-  node.props[atrName.substr(6)] = atrKey
+  node.props[atrName] = atrKey
   node.removeAttribute(atrName)
 }
 
@@ -15,20 +15,22 @@ function processAttributes (node, context) {
 
   for (const atrName in attributes) {
     const [atrValue, isVariable] = attributes[atrName]
+    const chain = atrValue.split('.')
 
     if (atrName === 'id') {
       this.refs[atrValue] = node
     }
 
     // state.name={value} or state.name=value
-    if (atrName.startsWith('state.')) {
+    if (atrName.startsWith(':')) {
+      const name = atrName.substr(1)
       if (isVariable) {
-        const [value, isStateKey] = getValue.call(this, atrValue, context)
-        addStateAttribute(node, atrName, value)
+        const [value, isStateKey] = getValue.call(this, chain, context)
+        addStateAttribute(node, name, value)
         if (!isStateKey) {
           addContextDependency(node, {
             type: 'state-attribute',
-            name: atrName.substr(6),
+            name: name,
             key: atrValue
           })
         }
