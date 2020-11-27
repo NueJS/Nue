@@ -10,7 +10,8 @@ function processIf (templateNode, context) {
   let ifKey = templateNode.getAttribute('if')
   if (ifKey) {
     ifKey = uncurl(ifKey)
-    const [ifValue, isStateKey] = getValue.call(this, ifKey, context)
+    const chain = ifKey
+    const [ifValue, isStateKey] = getValue.call(this, chain, context)
     const frag = templateNode.content.cloneNode(true);
     [...frag.childNodes].forEach(node => {
       templateNode.before(node)
