@@ -1,6 +1,6 @@
-import getValue from '../value.js'
-import bindTextContent from '../bind/bindTextContent.js'
+import getValue, { getSlice } from '../value.js'
 import addContextDependency from '../context.js'
+import onStateChange from '../state/onStateChange.js'
 
 function processTextContent (node, context) {
   const textNodes = []
@@ -19,12 +19,15 @@ function processTextContent (node, context) {
       }
     } else if (openBracketFound && text[i] === '}') {
       // treat everything in between {} as variable
-      const [value, isStateKey] = getValue.call(this, str, context)
+      const chain = str.split('.')
+      const [value, isStateKey] = getValue.call(this, chain, context)
       const textNode = document.createTextNode(value)
       textNodes.push(textNode)
 
       if (isStateKey) {
-        bindTextContent.call(this, textNode, str)
+        onStateChange.call(this, chain, () => {
+          textNode.textContent = getSlice.call(this, chain)
+        })
       } else {
         addContextDependency(textNode, {
           type: 'text',
