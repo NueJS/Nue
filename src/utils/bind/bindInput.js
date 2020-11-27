@@ -6,17 +6,18 @@ function bindInput (node, atrName, atrKey) {
   node.removeAttribute(atrName)
   const bindName = atrName.substr(5) // remove bind:
   const eventName = 'input'
-  const attributeValueSplit = atrKey.split('.').slice(1)
+  const chain = atrKey.split('.')
+  // const attributeValueSplit = chain.slice(1)
   const isNumber = node.type === 'number' || node.type === 'range'
-  node[bindName] = getSlice.call(this, atrKey)
+  node[bindName] = getSlice.call(this, chain)
 
   const handler = e => {
     const value = e.target[bindName]
-    mutate(this.state, attributeValueSplit, isNumber ? Number(value) : value, 'set')
+    mutate(this.state, chain.slice(1), isNumber ? Number(value) : value, 'set')
   }
 
-  onStateChange.call(this, atrKey, () => {
-    node[bindName] = getSlice.call(this, atrKey)
+  onStateChange.call(this, chain, () => {
+    node[bindName] = getSlice.call(this, chain)
   })
 
   node.addEventListener(eventName, handler)
