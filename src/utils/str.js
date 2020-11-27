@@ -6,7 +6,12 @@ export const uncurl = str => str.substr(1, str.length - 2)
 // '{xxx}' -> yes '{xx' -> no
 export const isCurled = str => str[0] === '{' && str[str.length - 1] === '}'
 
-export const getUncurledAttribute = (node, atrName) => {
+export function attr (node, atrName, optional) {
   const str = node.getAttribute(atrName)
-  return str === null ? null : uncurl(str)
+  if (!str) {
+    if (optional) return null
+    else throw new Error(`missing "${atrName}" attribute on <${node.nodeName}> in <${this.compName}>`)
+  }
+
+  return uncurl(str)
 }
