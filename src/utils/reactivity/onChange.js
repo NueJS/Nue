@@ -11,14 +11,23 @@ function onChange (chain, value, trap) {
   //   if (ob.notFor !== key) ob.callback()
   // })
 
-  let target = this.stateDeps
-  chain.forEach(c => {
-    target = target[c]
-    if (target) target.$.forEach(cb => cb(chain))
-  })
+  const call$Cbs = target => target.$.forEach(cb => cb(chain))
 
-  // const cbs = this.stateDeps[key]
-  // if (cbs) cbs.forEach(f => f())
+  function callAllCbs (target) {
+    for (const k in target) {
+      if (k === '$') call$Cbs(target)
+      else callAllCbs(target[k])
+    }
+  }
+
+  let target = this.stateDeps
+  chain.forEach((c, i) => {
+    target = target[c]
+    if (target) {
+      if (i !== chain.length - 1) call$Cbs(target)
+      else callAllCbs(target)
+    }
+  })
 
   return success
 }
