@@ -7,12 +7,18 @@ function onChange (chain, value, trap) {
 
   if (this.compObj.onStateChange) this.compObj.onStateChange.call(this, key)
 
-  this.computedStateDeps.forEach(ob => {
-    if (ob.notFor !== key) ob.callback()
+  // this.computedStateDeps.forEach(ob => {
+  //   if (ob.notFor !== key) ob.callback()
+  // })
+
+  let target = this.stateDeps
+  chain.forEach(c => {
+    target = target[c]
+    if (target) target.$.forEach(cb => cb(chain))
   })
 
-  const cbs = this.stateDeps[key]
-  if (cbs) cbs.forEach(f => f())
+  // const cbs = this.stateDeps[key]
+  // if (cbs) cbs.forEach(f => f())
 
   return success
 }
