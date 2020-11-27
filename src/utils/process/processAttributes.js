@@ -1,8 +1,10 @@
 import getAttributes from '../getAttributes.js'
 import bindInput from '../bind/bindInput.js'
 import bindAttribute from '../bind/bindAttribute.js'
-import getValue from '../value.js'
+import getValue, { getSlice } from '../value.js'
 import addContextDependency from '../context.js'
+import onStateChange from '../state/onStateChange.js'
+import { mutate } from '../reactivity/mutate.js'
 
 function addStateAttribute (node, atrName, atrKey) {
   if (!node.props) node.props = {}
@@ -24,18 +26,32 @@ function processAttributes (node, context) {
     // state.name={value} or state.name=value
     if (atrName.startsWith(':')) {
       const name = atrName.substr(1)
+
+      let initValue = atrValue
       if (isVariable) {
         const [value, isStateKey] = getValue.call(this, chain, context)
-        addStateAttribute(node, name, value)
-        if (!isStateKey) {
+        initValue = value
+
+        if (isStateKey) {
+          const nameChain = name.split('.')
+          const chain = atrValue.split('.')
+          onStateChange.call(this, chain, () => {
+            const value = getSlice.call(this, chain)
+            mutate(node.state, nameChain, value, 'set')
+          })
+        }
+
+        else {
           addContextDependency(node, {
             type: 'state-attribute',
             name: name,
             key: atrValue
           })
         }
+
+        node.removeAttribute(atrName)
       }
-      else addStateAttribute(node, atrName, atrValue)
+      addStateAttribute(node, name, initValue)
       continue
     }
 
