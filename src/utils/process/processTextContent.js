@@ -27,6 +27,7 @@ function processTextContent (node, context) {
       if (isStateKey) {
         onStateChange.call(this, chain, () => {
           textNode.textContent = getSlice.call(this, chain)
+          if (window.showNodeUpdates) window.textNodeUpdated(textNode)
         })
       } else {
         addContextDependency(textNode, {
