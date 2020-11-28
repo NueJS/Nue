@@ -1,17 +1,17 @@
 import getSlice from '../value.js'
 import addContextDependency from '../context.js'
-import onStateChange from '../state/onStateChange.js'
-import splitText from '../str.js'
+import onStateChange from '../reactivity/onStateChange.js'
+import { splitText } from '../str.js'
 
-function createReactiveTextNode (str, state) {
+function createReactiveTextNode (str) {
   const chain = str.split('.')
   const stateChain = chain.slice(1)
-  const value = getSlice(state, stateChain)
+  const value = getSlice(this.state, stateChain)
   const textNode = document.createTextNode(value)
 
   if (chain[0] === 'state') {
-    onStateChange.call(this, chain, () => {
-      textNode.textContent = getSlice(state, stateChain)
+    onStateChange.call(this, stateChain, () => {
+      textNode.textContent = getSlice(this.state, stateChain)
       if (window.supersweet.showUpdates) window.supersweet.nodeUpdated(textNode)
     })
   }
@@ -27,14 +27,14 @@ function createReactiveTextNode (str, state) {
 }
 
 function processTextContent (node, context) {
-  const strings = splitText(node.textContent)
+  const textArray = splitText(node.textContent)
   const textNodes = []
-  strings.forEach(str => {
-    if (str.isVariable) {
-      const textNode = createReactiveTextNode.call(str, this.state)
+  textArray.forEach(t => {
+    if (t.isVariable) {
+      const textNode = createReactiveTextNode.call(this, t.string)
       textNodes.push(textNode)
     } else {
-      textNodes.push(document.createTextNode(str))
+      textNodes.push(document.createTextNode(t.string))
     }
   })
 

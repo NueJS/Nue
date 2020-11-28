@@ -1,42 +1,24 @@
 import onChange from './onChange.js'
-import onStateChange from '../state/onStateChange.js'
+import onStateChange from '../reactivity/onStateChange.js'
+import { mutate } from './mutate.js'
 const isObject = x => typeof x === 'object' && x !== null
+
+let getHistory = []
+let detectionMode = false
 let disableOnChange = false
+const setDisableOnChange = v => { disableOnChange = v }
+const setDetectionMode = v => { detectionMode = v }
 
-function reactify (_state, chain = []) {
-  const state = _state
-
-  // if state.key is a function
-  // call it with initial value of state to set the initial value
-  // update this value whenever the state changes
-  // if (typeof _state === 'function') {
-  //   const key = chain.join('.')
-  //   state = _state(this.compObj.state)
-  //   this.compObj.state[key] = state
-  //   const handleStateChange = () => {
-  //     const newValue = _state(this.state)
-  //     const currentValue = this.state[key]
-  //     if (newValue !== currentValue) { this.state[key] = newValue }
-  //   }
-
-  //   this.computedStateDeps.push({
-  //     notFor: key,
-  //     callback: handleStateChange
-  //   })
-  // }
-
+function reactify (state, chain = []) {
   if (!isObject(state)) return state
 
-  // make all children radioactive and save it in a wrapper
   const wrapper = Array.isArray(state) ? [] : {}
   Object.keys(state).forEach(key => {
     wrapper[key] = reactify.call(this, state[key], [...chain, key])
   })
 
   const _this = this
-  // console.log({ _this, _state })
 
-  // make the wrapper radioactive
   return new Proxy(wrapper, {
 
     set (target, prop, value) {
@@ -52,42 +34,32 @@ function reactify (_state, chain = []) {
     },
 
     get (target, prop) {
-      // if (prop === '__isRadioactive__') return true
-      if (prop === '__disableOnChange__') {
-        return value => {
-          disableOnChange = value
-        }
+      if (detectionMode) {
+        getHistory.push([...chain, prop].join('.'))
       }
-
-      else if (prop === 'init') {
-        return (obj) => {
-          disableOnChange = true
-          Object.keys(obj).forEach(k => {
-            console.log('set : ', k)
-            target[k] = obj[k]
-          })
-          disableOnChange = false
-          // Reflect.set(target, obj, 'set')
-        }
-      }
-
-      else if (prop === 'onChange') {
-        return (fn, deps) => {
-          deps.forEach(d => {
-            console.log('register for', d)
-            onStateChange.call(_this, d.split('.'), fn)
-          })
-        }
-      }
+      // initialize state
+      if (prop === 'init') { return (obj) => {
+        Object.keys(obj).forEach(k => {
+          let v = obj[k]
+          if (typeof v === 'function') {
+            setDetectionMode(true)
+            v = v()
+            setDetectionMode(false)
+            _this.on.update(() => {
+              const value = obj[k]()
+              mutate(_this.state, [...chain, k], value, 'set')
+            }, getHistory)
+            getHistory = []
+          }
+          target[k] = v
+        })
+      } }
+      else if (prop === '__isRadioactive__') return true
+      else if (prop === '__setDisableOnChange__') return setDisableOnChange
 
       return Reflect.get(target, prop)
-    },
-
-    apply (target, thisArg, args) {
-      console.log({ target })
-      target = {}
-      Reflect.set(target, args[0], 'set')
     }
+
   })
 }
 

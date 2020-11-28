@@ -1,56 +1,30 @@
-// import addState from './utils/state/addState.js'
 import buildShadowDOM from './utils/buildShadowDOM.js'
 import reactify from './utils/reactivity/reactify.js'
-import fetchComponents from './utils/fetchComponents.js'
+import addLifeCycles from './utils/addLifeCycles.js'
+import buildTemplate from './utils/buildTemplate.js'
 
 function element (compName, component) {
-  let template
-  class El extends HTMLElement {
+  const config = {}
+
+  customElements.define(compName, class extends HTMLElement {
     constructor () {
       super()
       window.supersweet.elements[compName] = true
       this.handle = {}
-      this.stateDeps = {}
+      this.stateDeps = { $: [] }
       this.mode = 'open'
       this.computedStateDeps = []
       this.refs = {}
       this.compName = compName
       this.onAddCbs = []
       this.onRemoveCbs = []
-      this.on = {
-        add: (fn) => this.onAddCbs.push(fn),
-        remove: (fn) => this.onRemoveCbs.push(fn),
-        change: (fn, deps) => {}
-      }
+      addLifeCycles.call(this)
 
-      const state = reactify.call(this, {})
-
-      if (this.props) {
-        for (const prop in this.props) {
-          state[prop] = this.props[prop]
-        }
-      }
-
-      if (!template) {
-        let htmlString
-        const html = (s) => { htmlString = s[0] }
-        component({ state, handle: this.handle, html, on: this.on })
-
-        // create a template node
-        const tmp = document.createElement('template')
-        const commonStyle = `<style common-styles > ${window.commonCSS}</style>`
-        tmp.innerHTML = htmlString + commonStyle
-        // fetch needed JS for used components in the template
-        fetchComponents(tmp)
-        template = tmp
-      } else {
-        // since all the instances will have the same html and css, no need to do anything for html and css
-        const f = () => {}
-        component({ state, handle: this.handle, html: f, on: this.on })
-      }
-
+      const state = reactify.call(this, this.props || {})
+      buildTemplate.call(this, component, state, config)
       this.state = state
-      buildShadowDOM.call(this, template)
+
+      buildShadowDOM.call(this, config.template)
     }
 
     connectedCallback () {
@@ -60,9 +34,7 @@ function element (compName, component) {
     disconnectedCallback () {
       this.onRemoveCbs.forEach(cb => cb())
     }
-  }
-
-  customElements.define(compName, El)
+  })
 }
 
 const nodeUpdated = (textNode) => {

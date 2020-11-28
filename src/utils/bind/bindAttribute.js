@@ -1,5 +1,5 @@
 import getSlice from '../value.js'
-import onStateChange from '../state/onStateChange.js'
+import onStateChange from '../reactivity/onStateChange.js'
 import addContextDependency from '../context.js'
 
 function bindAttribute (node, atrName, atrKey, context) {

@@ -2,7 +2,7 @@ import { attr } from '../str.js'
 import deepClone from '../deepClone.js'
 import deepEqual from '../deepEqual.js'
 import processNode from './processNode.js'
-import onStateChange from '../state/onStateChange.js'
+import onStateChange from '../reactivity/onStateChange.js'
 import getSlice from '../value.js'
 
 function processMapping (template, context) {

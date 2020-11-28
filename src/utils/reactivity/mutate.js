@@ -7,9 +7,9 @@ const mutate = (state, chain, value, trap) => {
 
 // mutate the state but do not call onChange
 const silentMutate = (state, ...args) => {
-  state.__disableOnChange__(true)
+  state.__setDisableOnChange__(true)
   const success = mutate(state, ...args)
-  state.__disableOnChange__(false)
+  state.__setDisableOnChange__(false)
   return success
 }
 
