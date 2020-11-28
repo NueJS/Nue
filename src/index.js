@@ -18,6 +18,7 @@ function element (compName, component) {
       this.compName = compName
       this.onAddCbs = []
       this.onRemoveCbs = []
+      this.conditions = {}
       addLifeCycles.call(this)
 
       const state = reactify.call(this, this.props || {})
@@ -38,15 +39,18 @@ function element (compName, component) {
 }
 
 const nodeUpdated = (textNode) => {
-  textNode.parentNode.style.background = '#55efc4'
-  setTimeout(() => {
-    textNode.parentNode.style.background = null
-  }, 300)
+  const parentStyle = textNode.parentNode.style
+  if (parentStyle) {
+    parentStyle.background = '#55efc4'
+    setTimeout(() => {
+      parentStyle.background = null
+    }, 300)
+  }
 }
 
 const supersweet = {
   element,
-  showUpdates: true,
+  showUpdates: false,
   nodeUpdated,
   commonCSS: ':host {display: block;}',
   loadedComponents: {},
