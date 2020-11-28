@@ -10,10 +10,18 @@ function createReactiveTextNode (str) {
   const textNode = document.createTextNode(value)
 
   if (chain[0] === 'state') {
-    onStateChange.call(this, stateChain, () => {
+    const cb = () => {
       textNode.textContent = getSlice(this.state, stateChain)
       if (window.supersweet.showUpdates) window.supersweet.nodeUpdated(textNode)
-    })
+    }
+
+    textNode.addStateListener = () => {
+      textNode.textContent = getSlice(this.state, stateChain)
+      textNode.removeStateListener = onStateChange.call(this, stateChain, cb)
+    }
+
+    textNode.addStateListener()
+    console.log(textNode)
   }
 
   else {

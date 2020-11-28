@@ -12,6 +12,10 @@ function onStateChange (chain, cb) {
       target.$.push(cb)
     }
   })
+
+  return () => {
+    target.$ = target.$.filter(f => f !== cb)
+  }
 }
 
 export default onStateChange
