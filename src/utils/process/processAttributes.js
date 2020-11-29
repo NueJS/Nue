@@ -1,45 +1,7 @@
-import attrs from '../attrs.js'
+// import attrs from '../attrs.js'
 import bindInput from '../bind/bindInput.js'
 import bindAttribute from '../bind/bindAttribute.js'
-import getSlice from '../value.js'
-import addContextDependency from '../context.js'
-import onStateChange from '../reactivity/onStateChange.js'
-import { mutate } from '../reactivity/mutate.js'
-
-function addProps (node, key, value) {
-  if (!node.props) node.props = {}
-  node.props[key] = value
-}
-
-// attribute -> :name={var} or :name=value
-// atr = ':name'
-// key = var or value
-// chain is ['var'] or ['value']
-// isVariable true or false
-function bindStateToNode (node, propName, isVar, stateChain) {
-  const propNameSplit = propName.split('.')
-  if (isVar) {
-    addProps(node, name, getSlice(this.state, stateChain))
-
-    // change node's state when its props change
-    onStateChange.call(this, stateChain, () => {
-      mutate(node.state, propNameSplit, getSlice(this.state, stateChain), 'set')
-    })
-
-    // if (chain[0] === 'state') {
-
-    // }
-
-    // else {
-    //   addProps(node, name, key)
-    //   addContextDependency(node, {
-    //     type: 'state-attribute',
-    //     name: name,
-    //     key
-    //   })
-    // }
-  }
-}
+import bindState from '../bind/bindState.js'
 
 function processAttributes (node, context) {
   const info = this.getNodeInfo(node)
@@ -56,7 +18,7 @@ function processAttributes (node, context) {
         bindInput.call(this, node, eventName, targetProp, stateChain)
       }
     } else if (propName) { // :name={var} or :name=value
-      bindStateToNode.call(this, node, propName, isVar, stateChain)
+      bindState.call(this, node, propName, isVar, stateChain)
     } else {
       bindAttribute.call(this, node, name, stateChain)
     }
