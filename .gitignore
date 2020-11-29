@@ -1,5 +1,3 @@
 node_modules/
-*.html
-usage.js
 .vscode
-test
+test/
