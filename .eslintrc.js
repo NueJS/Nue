@@ -1,7 +1,8 @@
 module.exports = {
   env: {
     browser: true,
-    es2021: true
+    es2021: true,
+    jest: true
   },
   extends: [
     'standard'
@@ -13,7 +14,7 @@ module.exports = {
   rules: {
     'brace-style': 'off'
   },
-  globals: {
-    'supersweet': 'readonly'
-  }
+  // globals: {
+  //   supersweet: 'readonly'
+  // }
 }
