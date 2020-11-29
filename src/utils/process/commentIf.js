@@ -39,6 +39,9 @@ function commentIf (commentNode, commentSplit) {
 
     processNode.call(this, node)
     node = node.nextSibling
+    if (node === null) {
+      throw new Error(`missing end-if comment in ${this.nodeName}`)
+    }
   }
 
   const onConditionChange = () => {
