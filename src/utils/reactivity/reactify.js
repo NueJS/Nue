@@ -23,7 +23,7 @@ function detectStateKeysUsed (fn) {
 
 function handleReactiveSlice (fn, chain) {
   const [initValue, deps] = detectStateKeysUsed(fn)
-  console.log({ deps })
+  // console.log({ deps })
   let prevValue = initValue
 
   // when any of its deps changes, update its value

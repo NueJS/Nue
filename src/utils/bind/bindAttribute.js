@@ -1,23 +1,24 @@
 import getSlice from '../value.js'
 import onStateChange from '../reactivity/onStateChange.js'
-import addContextDependency from '../context.js'
+// import addContextDependency from '../context.js'
 
-function bindAttribute (node, atrName, atrKey, context) {
-  const chain = atrKey.split('.')
+function bindAttribute (node, name, stateChain) {
+  node.setAttribute(name, getSlice(this.state, stateChain))
+  onStateChange.call(this, stateChain, () => {
+    node.setAttribute(name, getSlice(this.state, stateChain))
+  })
 
-  if (chain[0] === 'state') {
-    const stateChain = chain.slice(1)
-    node.setAttribute(atrName, getSlice(this.state, stateChain))
-    onStateChange.call(this, stateChain, () => {
-      node.setAttribute(atrName, getSlice(this.state, stateChain))
-    })
-  } else {
-    node.setAttribute(atrName, getSlice(context, chain))
-    addContextDependency(node, {
-      type: 'attribute',
-      name: atrName,
-      key: atrKey
-    })
-  }
+  // if (chain[0] === 'state') {
+
+  // }
+
+  // else {
+  //   node.setAttribute(atrName, getSlice(context, chain))
+  //   addContextDependency(node, {
+  //     type: 'attribute',
+  //     name: atrName,
+  //     key: atrKey
+  //   })
+  // }
 }
 export default bindAttribute

@@ -1,11 +1,13 @@
 import buildShadowDOM from './utils/buildShadowDOM.js'
-import reactify from './utils/reactivity/reactify.js'
 import addLifeCycles from './utils/addLifeCycles.js'
 import buildTemplate from './utils/buildTemplate.js'
 
 function element (compName, component) {
-  const config = {}
+  const config = {
+    templateInfo: {
 
+    }
+  }
   customElements.define(compName, class extends HTMLElement {
     constructor () {
       super()
@@ -19,12 +21,10 @@ function element (compName, component) {
       this.onAddCbs = []
       this.onRemoveCbs = []
       this.conditions = {}
+      this.config = config
+      this.getNodeInfo = (node) => this.config.templateInfo[node.sweetuid]
       addLifeCycles.call(this)
-
-      const state = reactify.call(this, this.props || {})
-      buildTemplate.call(this, component, state, config)
-      this.state = state
-
+      buildTemplate.call(this, component, config)
       buildShadowDOM.call(this, config.template)
     }
 

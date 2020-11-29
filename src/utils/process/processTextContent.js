@@ -21,7 +21,7 @@ function createReactiveTextNode (str) {
     }
 
     textNode.addStateListener()
-    console.log(textNode)
+    // console.log(textNode)
   }
 
   else {
