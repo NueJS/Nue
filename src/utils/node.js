@@ -1,6 +1,6 @@
 import attrs from './attrs.js'
-
-const uid = () => '' + Math.random()
+import processTextContent from './process/processTextContent.js'
+import { uid } from './others.js'
 
 export function forAllNodesInSubtree (node, cb) {
   cb(node)
@@ -18,7 +18,6 @@ function saveAttributeInfo (node) {
   node.dataset.sweetuid = sweetuid
   this.config.templateInfo[sweetuid] = { attributes: [] }
   const target = this.config.templateInfo[sweetuid]
-  node.sweetuid = sweetuid
 
   const attributes = attrs(node)
   Object.keys(attributes).forEach(atrName => {
@@ -67,7 +66,7 @@ function saveAttributeInfo (node) {
       }
     }
 
-    target.attributes.push(attrInfo)
+    if (attrInfo) target.attributes.push(attrInfo)
   })
 }
 
@@ -80,6 +79,9 @@ export function processTemplate (template) {
     // remove empty text nodes
     if (node.nodeName === '#text') {
       if (!node.textContent.trim()) removeNodes.push(node)
+      else {
+        processTextContent(node)
+      }
     }
 
     else if (node.attributes && node.attributes.length) {
