@@ -34,7 +34,7 @@ function createReactiveTextNode (str) {
   return textNode
 }
 
-function processTextContent (node, context) {
+function processTextContent (node) {
   const textArray = splitText(node.textContent)
   const textNodes = []
   textArray.forEach(t => {

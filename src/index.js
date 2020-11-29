@@ -3,11 +3,7 @@ import addLifeCycles from './utils/addLifeCycles.js'
 import buildTemplate from './utils/buildTemplate.js'
 
 function element (compName, component) {
-  const config = {
-    templateInfo: {
-
-    }
-  }
+  const config = { templateInfo: { } }
   customElements.define(compName, class extends HTMLElement {
     constructor () {
       super()

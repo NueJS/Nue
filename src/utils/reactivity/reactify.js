@@ -1,55 +1,16 @@
 import onChange from './onChange.js'
-// import onStateChange from '../reactivity/onStateChange.js'
 import { mutate } from './mutate.js'
+
 const isObject = x => typeof x === 'object' && x !== null
 
 // when detection mode is enabled is records all the keys that are accessed in state
 // if state.a.b and state.c.d.e is accessed it becomes ['a', 'c']
 let keyAccesses = []
 
+// flags
 let detectionMode = false
 let disableOnChange = false
 const setDisableOnChange = v => { disableOnChange = v }
-// const setDetectionMode = v => { detectionMode = v }
-
-function detectStateKeysUsed (fn) {
-  detectionMode = true
-  const returnVal = fn()
-  detectionMode = false
-  const deps = [...keyAccesses]
-  keyAccesses = [] // reset keyAccesses
-  return [returnVal, deps]
-}
-
-function handleReactiveSlice (fn, chain) {
-  const [initValue, deps] = detectStateKeysUsed(fn)
-  // console.log({ deps })
-  let prevValue = initValue
-
-  // when any of its deps changes, update its value
-  const onDepUpdate = () => {
-    const value = fn()
-    if (prevValue !== value) {
-      mutate(this.state, chain, value, 'set')
-      prevValue = value
-    }
-  }
-
-  this.on.update(onDepUpdate, deps)
-  return initValue
-}
-
-function initializeState (chain, target) {
-  return (stateObj) => {
-    Object.keys(stateObj).forEach(k => {
-      let value = stateObj[k]
-      if (typeof value === 'function') {
-        value = handleReactiveSlice.call(this, value, [...chain, k])
-      }
-      target[k] = value
-    })
-  }
-}
 
 function reactify (state, chain = []) {
   if (!isObject(state)) return state
@@ -84,6 +45,43 @@ function reactify (state, chain = []) {
     }
 
   })
+}
+
+function detectStateKeysUsed (fn) {
+  detectionMode = true
+  const returnVal = fn()
+  detectionMode = false
+  const deps = [...keyAccesses]
+  keyAccesses = [] // reset keyAccesses
+  return [returnVal, deps]
+}
+
+function handleReactiveSlice (fn, chain) {
+  const [initValue, deps] = detectStateKeysUsed(fn)
+  let prevValue = initValue
+
+  const onDepUpdate = () => {
+    const value = fn()
+    if (prevValue !== value) { // only mutate if the value is actually changed
+      mutate(this.state, chain, value, 'set')
+      prevValue = value
+    }
+  }
+  // when any of its deps changes, update its value
+  this.on.update(onDepUpdate, deps)
+  return initValue
+}
+
+function initializeState (chain, target) {
+  return (stateObj) => {
+    Object.keys(stateObj).forEach(k => {
+      let value = stateObj[k]
+      if (typeof value === 'function') {
+        value = handleReactiveSlice.call(this, value, [...chain, k])
+      }
+      target[k] = value
+    })
+  }
 }
 
 export default reactify

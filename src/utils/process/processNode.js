@@ -3,12 +3,17 @@ import processAttributes from './processAttributes.js'
 import commentIf from './commentIf.js'
 
 function processNode (node, context) {
+  // ignore if the node is processed
   if (node.processed) return
   node.processed = true
+
+  // add sweetuid to get info from config.templateInfo
   node.sweetuid = node.dataset.sweetuid
   node.removeAttribute('data-sweetuid')
 
+  // ignore style node
   if (node.nodeName === 'STYLE') return
+
   if (node.nodeName === '#comment') {
     const commentSplit = node.textContent.trim().split(' ')
     if (commentSplit[0] === 'if') {
@@ -19,12 +24,6 @@ function processNode (node, context) {
 
   if (node.nodeName === '#text') {
     processTextContent.call(this, node, context)
-    return
-  }
-
-  if (node.nodeName === 'TEMPLATE') {
-    // processMapping.call(this, node, context)
-    // processIf.call(this, node, context)
     return
   }
 
