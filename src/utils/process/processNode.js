@@ -7,10 +7,6 @@ function processNode (node, context) {
   if (node.processed) return
   node.processed = true
 
-  // add sweetuid to get info from config.templateInfo
-  node.sweetuid = node.dataset.sweetuid
-  node.removeAttribute('data-sweetuid')
-
   // ignore style node
   if (node.nodeName === 'STYLE') return
 
@@ -21,6 +17,10 @@ function processNode (node, context) {
     }
     return
   }
+
+  // add sweetuid to get info from config.templateInfo
+  node.sweetuid = node.dataset.sweetuid
+  node.removeAttribute('data-sweetuid')
 
   if (node.nodeName === '#text') {
     processTextContent.call(this, node, context)
