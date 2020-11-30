@@ -2,6 +2,12 @@ import processTextContent from './processTextContent.js'
 import processAttributes from './processAttributes.js'
 import commentIf from './commentIf.js'
 
+/**
+ * process node
+ * @param {import('../../typedefs.js').SweetNode} node - node to be processed
+ * @param {Object} context
+ */
+
 function processNode (node, context) {
   // ignore if the node is processed
   if (node.processed) return
@@ -18,17 +24,17 @@ function processNode (node, context) {
     return
   }
 
-  // add sweetuid to get info from config.templateInfo
-  node.sweetuid = node.dataset.sweetuid
-  node.removeAttribute('data-sweetuid')
-
   if (node.nodeName === '#text') {
     processTextContent.call(this, node, context)
     return
   }
 
+  // add sweetuid to get info from config.templateInfo
+  node.sweetuid = node.dataset.sweetuid
+  node.removeAttribute('data-sweetuid')
+
   processAttributes.call(this, node, context)
-  if (node.childNodes.length > 1) [...node.childNodes].forEach(n => processNode.call(this, n, context))
+  if (node.hasChildNodes()) [...node.childNodes].forEach(n => processNode.call(this, n, context))
   else processTextContent.call(this, node, context)
 }
 
