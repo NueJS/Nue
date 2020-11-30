@@ -3,57 +3,56 @@ import addContextDependency from '../context.js'
 import onStateChange from '../reactivity/onStateChange.js'
 import { splitText } from '../str.js'
 
-function createReactiveTextNode (str) {
-  const chain = str.split('.')
-  const stateChain = chain.slice(1)
+// create text node with given key as its dependency on state
+function createReactiveTextNode (key) {
+  const stateChain = key.split('.')
   const value = getSlice(this.state, stateChain)
   const textNode = document.createTextNode(value)
 
-  if (chain[0] === 'state') {
-    const cb = () => {
-      textNode.textContent = getSlice(this.state, stateChain)
-      if (window.supersweet.showUpdates) window.supersweet.nodeUpdated(textNode)
-    }
-
-    textNode.addStateListener = () => {
-      textNode.textContent = getSlice(this.state, stateChain)
-      textNode.removeStateListener = onStateChange.call(this, stateChain, cb)
-    }
-
-    textNode.addStateListener()
-    // console.log(textNode)
+  const cb = () => {
+    textNode.textContent = getSlice(this.state, stateChain)
+    if (window.supersweet.showUpdates) window.supersweet.nodeUpdated(textNode)
   }
 
-  else {
-    addContextDependency(textNode, {
-      type: 'text',
-      key: str
-    })
+  textNode.addStateListener = () => {
+    textNode.textContent = getSlice(this.state, stateChain)
+    textNode.removeStateListener = onStateChange.call(this, stateChain, cb)
   }
+
+  textNode.addStateListener()
+
+  // if (chain[0] === 'state') {
+
+  // }
+
+  // else {
+  //   addContextDependency(textNode, {
+  //     type: 'text',
+  //     key
+  //   })
+  // }
 
   return textNode
 }
 
-function processTextContent (node) {
-  const textArray = splitText(node.textContent)
+function processTextContent (element) {
+  const textArray = splitText.call(this, element.textContent)
   const textNodes = []
   textArray.forEach(t => {
     if (t.isVariable) {
-      const textNode = createReactiveTextNode.call(this, t.string)
-      textNodes.push(textNode)
+      const element = createReactiveTextNode.call(this, t.string)
+      textNodes.push(element)
     } else {
       textNodes.push(document.createTextNode(t.string))
     }
   })
 
-  if (node.nodeName === '#text') {
-    textNodes.forEach(n => node.before(n))
-    node.remove()
-  }
-
-  else {
-    node.innerHTML = ''
-    textNodes.forEach(n => node.append(n))
+  if (element.nodeName === '#text') {
+    textNodes.forEach(n => element.before(n))
+    element.remove()
+  } else {
+    element.innerHTML = ''
+    textNodes.forEach(n => element.append(n))
   }
 }
 
