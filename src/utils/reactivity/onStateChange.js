@@ -13,9 +13,13 @@ function onStateChange (chain, cb) {
     }
   })
 
-  return () => {
-    target.$ = target.$.filter(f => f !== cb)
+  // remove the added cb to avoid memory leak
+  const removeCb = () => {
+    const index = target.$.findIndex(cb)
+    target.$.splice(index, 1)
   }
+
+  return removeCb
 }
 
 export default onStateChange
