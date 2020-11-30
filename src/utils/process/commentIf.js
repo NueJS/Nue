@@ -2,19 +2,19 @@ import onStateChange from '../reactivity/onStateChange.js'
 import { uncurl } from '../str.js'
 import getSlice from '../value.js'
 import processNode from './processNode.js'
-import { addTree, removeTree } from '../node.js'
+import { addTree, removeTree } from '../node/tree.js'
+import { reverseForEach } from '../others.js'
 
-function reverseForEach (arr, cb) {
-  for (let i = arr.length - 1; i >= 0; i--) {
-    cb(arr[i], i)
-  }
-}
-
+/**
+ * process if, else-if, else-if, else conditional rendering
+ * @param {Node} commentNode
+ * @param {Array<string>} commentSplit
+ */
 function commentIf (commentNode, commentSplit) {
   const conditional = []
   const stateDeps = []
   let node = commentNode.nextSibling
-  const ifStateChain = uncurl(commentSplit[1]).split('.').slice(1)
+  const ifStateChain = uncurl(commentSplit[1]).split('.')
   let cIndex = 0
   conditional.push({ nodes: [], stateChain: ifStateChain, commentNode, type: 'if' })
   stateDeps.push(ifStateChain)
@@ -23,7 +23,7 @@ function commentIf (commentNode, commentSplit) {
     if (node.nodeName === '#comment') {
       const textSplit = node.textContent.trim().split(' ')
       if (textSplit[0] === 'else-if') {
-        const stateChain = uncurl(textSplit[1]).split('.').slice(1)
+        const stateChain = uncurl(textSplit[1]).split('.')
         conditional.push({ nodes: [], stateChain, commentNode: node, type: 'else-if' })
         stateDeps.push(stateChain)
         cIndex++
@@ -40,7 +40,7 @@ function commentIf (commentNode, commentSplit) {
     processNode.call(this, node)
     node = node.nextSibling
     if (node === null) {
-      throw new Error(`missing end-if comment in ${this.nodeName}`)
+      this.showError('missing end-if comment')
     }
   }
 
@@ -48,6 +48,9 @@ function commentIf (commentNode, commentSplit) {
     let trueFound = false
     conditional.forEach((group, i) => {
       const conditionValue = group.type !== 'else' ? getSlice(this.state, group.stateChain) : true
+
+      // if condition becomes truthy and another one before it is not truthy
+      // then show this if not already
       if (conditionValue && !trueFound) {
         trueFound = true
         if (group.isRemoved) {
@@ -56,8 +59,7 @@ function commentIf (commentNode, commentSplit) {
           })
           group.isRemoved = false
         }
-      }
-      else {
+      } else {
         if (!group.isRemoved) {
           group.nodes.forEach(n => removeTree(n))
           group.isRemoved = true
