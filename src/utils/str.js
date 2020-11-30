@@ -1,23 +1,41 @@
-// remove curly braces around string
-// turn '{xxx}' into 'xxx'
+/**
+ * removes curly braces from string
+ * input: "{xxx}" output "xxx"
+ * @param {string} str
+ */
 export const uncurl = str => str.substr(1, str.length - 2)
 
-// check if the string is contained in curly braces
-// '{xxx}' -> yes '{xx' -> no
+/**
+ * checks the the string is wrapped in braces
+ * @param {String} str
+ */
 export const isCurled = str => str[0] === '{' && str[str.length - 1] === '}'
 
-export function attr (node, atrName, optional) {
-  const str = node.getAttribute(atrName)
+/**
+ * return attribute value of an element
+ * return null if the value is null and  optional
+ * throw error if value is null and not optional
+ * @param {Element} element
+ * @param {String} attributeName
+ * @param {Boolean} optional
+ */
+export function attr (element, attributeName, optional) {
+  const str = element.getAttribute(attributeName)
   if (!str) {
     if (optional) return null
-    else throw new Error(`missing "${atrName}" attribute on <${node.nodeName}> in <${this.compName}>`)
+    else throw new Error(`missing "${attributeName}" attribute on <${element.nodeName}> in <${this.compName}>`)
   }
 
   return uncurl(str)
 }
 
+/**
+ * detect the parts of text which are variable which is wrapped in braces {}
+ * @param {String} text
+ */
+
 export function splitText (text) {
-  const arr = []
+  const parts = []
   let openBracketFound = false
   let str = ''
 
@@ -26,18 +44,19 @@ export function splitText (text) {
     else if (text[i] === '{') {
       openBracketFound = true
       if (str) {
-        arr.push({ string: str })
+        parts.push({ string: str })
         str = ''
       }
     } else if (openBracketFound && text[i] === '}') {
-      arr.push({ string: str, isVariable: true })
+      parts.push({ string: str, isVariable: true })
       openBracketFound = false
-      str = '' // reset accumulator
+      str = '' // reset
     } else {
       str += text[i]
     }
   }
 
-  if (str) arr.push({ string: str })
-  return arr
+  if (openBracketFound) throw new Error(`"{" not closed in ${this.nodeName} either escape it using \\{ or add a closing bracket`)
+  if (str) parts.push({ string: str })
+  return parts
 }
