@@ -13,6 +13,7 @@ let disableOnChange = false
 const setDisableOnChange = v => { disableOnChange = v }
 
 function reactify (state, chain = []) {
+  if (typeof state === 'function') return state
   if (!isObject(state)) return state
 
   const wrapper = Array.isArray(state) ? [] : {}
@@ -27,6 +28,7 @@ function reactify (state, chain = []) {
     set (target, prop, value) {
       let v = value
       if (isObject(value)) v = reactify.call(_this, value, [...chain, prop])
+      if (prop === '$') return initializeState.call(_this, v, chain, target)
       if (disableOnChange) return Reflect.set(target, prop, v)
       return onChange.call(_this, [...chain, prop], v, 'set')
     },
@@ -38,7 +40,6 @@ function reactify (state, chain = []) {
 
     get (target, prop) {
       if (detectionMode) keyAccesses.push([...chain, prop].join('.'))
-      if (prop === 'init') return initializeState.call(_this, chain, target)
       else if (prop === '__isRadioactive__') return true
       else if (prop === '__setDisableOnChange__') return setDisableOnChange
       return Reflect.get(target, prop)
@@ -72,16 +73,14 @@ function handleReactiveSlice (fn, chain) {
   return initValue
 }
 
-function initializeState (chain, target) {
-  return (stateObj) => {
-    Object.keys(stateObj).forEach(k => {
-      let value = stateObj[k]
-      if (typeof value === 'function') {
-        value = handleReactiveSlice.call(this, value, [...chain, k])
-      }
-      target[k] = value
-    })
-  }
+function initializeState (initState, chain, target) {
+  Object.keys(initState).forEach(k => {
+    let value = initState[k]
+    if (typeof value === 'function') {
+      value = handleReactiveSlice.call(this, value, [...chain, k])
+    }
+    target[k] = value
+  })
 }
 
 export default reactify
