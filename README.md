@@ -1,0 +1,1 @@
+cdn : https://cdn.jsdelivr.net/gh/MananTank/supersweet/cdn/index.js
