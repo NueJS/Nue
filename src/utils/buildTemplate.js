@@ -1,29 +1,44 @@
 import fetchComponents from './fetchComponents.js'
 import reactify from './reactivity/reactify.js'
-import { processTemplate } from './node.js'
+import processTemplate from './process/processTemplate.js'
 
-function buildTemplate (component, config) {
-  const state = reactify.call(this, this.props || {})
-  if (!config.template) {
-    let htmlString
-    const html = (s) => { htmlString = s[0] }
-    component({ state, handle: this.handle, html, on: this.on })
+function buildTemplate (component) {
+  const $ = reactify.call(this, this.props || {})
+  const _ = {}
+  const handle = this.handle
+  const on = this.on
+  const refs = this.config.refs
+
+  const initComponent = () => {
+    $.__setDisableOnChange__(true)
+    $.__setInitiateMode__(true)
+    component({ $, handle, on, refs, _ })
+    $.__setInitiateMode__(false)
+    $.__setDisableOnChange__(false)
+  }
+
+  // if config.template is not created
+  if (!this.config.template) {
+    initComponent()
 
     // create a template node
     const template = document.createElement('template')
-    const commonStyle = `<style common-styles > ${window.commonCSS}</style>`
-    template.innerHTML = htmlString + commonStyle
+    const commonStyle = `<style common-styles > ${window.supersweet.commonCSS}</style>`
+    template.innerHTML = _.html + commonStyle
 
-    // console.log('content : ', template.content.childNodes.length)
+    // onetime processing
     processTemplate.call(this, template)
+
     // fetch needed JS for used components in the template
     fetchComponents(template)
-    config.template = template
+
+    this.config.template = template
   } else {
-    const f = () => {}
-    component({ state, handle: this.handle, html: f, on: this.on })
+    initComponent()
   }
-  this.state = state
+
+  // add state to component
+  this.$ = $
 }
 
 export default buildTemplate
