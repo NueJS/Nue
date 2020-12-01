@@ -1,4 +1,4 @@
-import fetchComponents from './fetchComponents.js'
+// import fetchComponents from './fetchComponents.js'
 import reactify from './reactivity/reactify.js'
 import processTemplate from './process/processTemplate.js'
 
@@ -23,14 +23,11 @@ function buildTemplate (component) {
 
     // create a template node
     const template = document.createElement('template')
-    const commonStyle = `<style common-styles > ${window.supersweet.commonCSS}</style>`
-    template.innerHTML = _.html + commonStyle
+    // const commonStyle = `<style common-styles > ${window.supersweet.commonCSS}</style>`
+    template.innerHTML = _.html
 
     // onetime processing
     processTemplate.call(this, template)
-
-    // fetch needed JS for used components in the template
-    fetchComponents(template)
 
     this.config.template = template
   } else {
