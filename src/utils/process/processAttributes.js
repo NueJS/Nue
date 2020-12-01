@@ -14,11 +14,15 @@ function processAttributes (node, context) {
 
   info.attributes.forEach(attribute => {
     if (attribute.eventName) { // @eventName={handler}
-      node.addEventListener(attribute.eventName, this.handle[attribute.handler])
+      const handler = this.handle[attribute.handler]
+      node.addEventListener(attribute.eventName, handler)
+      this.on.remove(() => {
+        node.removeEventListener(attribute.eventName, handler)
+      })
     } else if (attribute.bindProp) { // bind:bindProp={$.key}
-      if (node.nodeName === 'INPUT') bindInput.call(this, node, attribute.bindProp, attribute.stateChain)
+      if (node.nodeName === 'INPUT' || node.nodeName === 'TEXTAREA') bindInput.call(this, node, attribute.bindProp, attribute.stateChain)
       else {
-        console.log({ bindProp: attribute.bindProp, chain: attribute.stateChain })
+        // console.log({ bindProp: attribute.bindProp, chain: attribute.stateChain })
         // two way bind
         bindState.call(this, node, attribute.bindProp, true, attribute.stateChain, true)
       }

@@ -17,6 +17,9 @@ function bindInput (node, bindProp, stateChain) {
   })
 
   node.addEventListener('input', handler)
+  this.on.remove(() => {
+    node.removeEventListener('input', handler)
+  })
 }
 
 export default bindInput
