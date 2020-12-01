@@ -15,8 +15,13 @@ function processAttributes (node, context) {
   info.attributes.forEach(attribute => {
     if (attribute.eventName) { // @eventName={handler}
       node.addEventListener(attribute.eventName, this.handle[attribute.handler])
-    } else if (attribute.bindProp) { // bind:bindProp={state.key}
-      bindInput.call(this, node, attribute.bindProp, attribute.stateChain)
+    } else if (attribute.bindProp) { // bind:bindProp={$.key}
+      if (node.nodeName === 'INPUT') bindInput.call(this, node, attribute.bindProp, attribute.stateChain)
+      else {
+        console.log({ bindProp: attribute.bindProp, chain: attribute.stateChain })
+        // two way bind
+        bindState.call(this, node, attribute.bindProp, true, attribute.stateChain, true)
+      }
     } else if (attribute.propName) { // :name={var} or :name=value
       bindState.call(this, node, attribute.propName, attribute.isVar, attribute.stateChain)
     } else {
