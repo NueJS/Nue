@@ -1,5 +1,5 @@
 import getSlice from '../value.js'
-import addContextDependency from '../context.js'
+// import addContextDependency from '../context.js'
 import onStateChange from '../reactivity/onStateChange.js'
 import { splitText } from '../str.js'
 
@@ -12,7 +12,7 @@ function createReactiveTextNode (key) {
 
   const cb = () => {
     textNode.textContent = getSlice(this.$, stateChain)
-    if (window.supersweet.showUpdates) window.supersweet.nodeUpdated(textNode)
+    // if (window.supersweet.showUpdates) window.supersweet.nodeUpdated(textNode)
   }
 
   textNode.addStateListener = () => {

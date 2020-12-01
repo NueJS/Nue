@@ -39,5 +39,4 @@ function deepEqual (x, y) {
   }
 }
 
-window.deepEqual = deepEqual
 export default deepEqual
