@@ -17,19 +17,22 @@ function saveAttributes (node) {
     const [attrValue, isVar] = attributes[atrName]
     let attrInfo
 
-    // :propName={state.key} or :propName="value"
+    if (isVar) {
+      node.removeAttribute(atrName)
+    }
+
+    // :propName={$.key} or :propName="value"
     if (atrName[0] === ':') {
+      node.removeAttribute(atrName)
       attrInfo = {
-        propName: atrName[0].substr(1),
+        propName: atrName.substr(1),
         isVar,
-        stateChain: isVar ? attrValue.split('.') : null
+        stateChain: isVar ? attrValue.split('.') : attrValue
       }
     }
 
     else if (isVar) {
-      node.removeAttribute(atrName)
       const stateChain = attrValue.split('.')
-
       // @eventName={handler}
       if (atrName[0] === '@') {
         const atRemoved = atrName.substr(1)
@@ -39,7 +42,7 @@ function saveAttributes (node) {
         }
       }
 
-      // @bind:bindProp={state.key}
+      // @bind:bindProp={$.key}
       else if (atrName.startsWith('bind:')) {
         const bindProp = atrName.substr(5)
         attrInfo = {
@@ -48,7 +51,7 @@ function saveAttributes (node) {
         }
       }
 
-      // name={state.key}
+      // name={$.key}
       else {
         attrInfo = {
           stateChain,
