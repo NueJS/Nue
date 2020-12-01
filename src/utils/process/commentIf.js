@@ -47,7 +47,7 @@ function commentIf (commentNode, commentSplit) {
   const onConditionChange = () => {
     let trueFound = false
     conditional.forEach((group, i) => {
-      const conditionValue = group.type !== 'else' ? getSlice(this.state, group.stateChain) : true
+      const conditionValue = group.type !== 'else' ? getSlice(this.$, group.stateChain) : true
 
       // if condition becomes truthy and another one before it is not truthy
       // then show this if not already
@@ -69,6 +69,7 @@ function commentIf (commentNode, commentSplit) {
   }
 
   onConditionChange()
+
   stateDeps.forEach(stateChain => {
     onStateChange.call(this, stateChain, onConditionChange)
   })

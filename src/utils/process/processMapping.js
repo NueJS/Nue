@@ -25,15 +25,15 @@ function processMapping (template, context) {
 
   // key is a unique property of each child in array
   // if no unique property is given use the index
-  const getFragKey = (index) => key === null ? index : getSlice(this.state, chain)[key]
+  const getFragKey = (index) => key === null ? index : getSlice(this.$, chain)[key]
 
   const saveFrag = (frag, fragKey) => {
     frags[fragKey] = [...frag.children]
   }
 
-  const getArray = () => getSlice(this.state, chain)
+  const getArray = () => getSlice(this.$, chain)
 
-  const array = getSlice(this.state, chain)
+  const array = getSlice(this.$, chain)
   array.forEach((value, index) => {
     const frag = createFrag.call(this, value, index)
     const fragKey = getFragKey(index)
@@ -80,10 +80,10 @@ function processMapping (template, context) {
                   const newValue = ctx[usage.key]
                   if (currentValue !== newValue) { node.setAttribute(usage.name, newValue) }
                 }
-                else if (usage.type === 'state-attribute') {
+                else if (usage.type === '$-attribute') {
                   const currentValue = node.getAttribute(usage.name)
                   const newValue = ctx[usage.key]
-                  if (currentValue !== newValue) { node.state[usage.name] = newValue }
+                  if (currentValue !== newValue) { node.$[usage.name] = newValue }
                 }
               })
             }

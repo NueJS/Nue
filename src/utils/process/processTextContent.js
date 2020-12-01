@@ -3,25 +3,26 @@ import addContextDependency from '../context.js'
 import onStateChange from '../reactivity/onStateChange.js'
 import { splitText } from '../str.js'
 
-// create text node with given key as its dependency on state
+// create text node with given key as its dependency on $
 function createReactiveTextNode (key) {
+  // console.log({ d: this.$, key })
   const stateChain = key.split('.')
-  const value = getSlice(this.state, stateChain)
+  const value = getSlice(this.$, stateChain)
   const textNode = document.createTextNode(value)
 
   const cb = () => {
-    textNode.textContent = getSlice(this.state, stateChain)
+    textNode.textContent = getSlice(this.$, stateChain)
     if (window.supersweet.showUpdates) window.supersweet.nodeUpdated(textNode)
   }
 
   textNode.addStateListener = () => {
-    textNode.textContent = getSlice(this.state, stateChain)
+    textNode.textContent = getSlice(this.$, stateChain)
     textNode.removeStateListener = onStateChange.call(this, stateChain, cb)
   }
 
   textNode.addStateListener()
 
-  // if (chain[0] === 'state') {
+  // if (chain[0] === '$') {
 
   // }
 
@@ -36,6 +37,7 @@ function createReactiveTextNode (key) {
 }
 
 function processTextContent (element) {
+  // console.log({ element })
   const textArray = splitText.call(this, element.textContent)
   const textNodes = []
   textArray.forEach(t => {
