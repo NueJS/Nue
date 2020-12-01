@@ -7,13 +7,21 @@ const isObject = x => typeof x === 'object' && x !== null
 // if state.a.b and state.c.d.e is accessed it becomes [['a', 'b'], ['c', 'd', 'e']]
 let keyAccesses = []
 
-// flags
+// when detection mode is true, all key accessed in state is recorded in keyAccesses array
 let detectionMode = false
+
+// when disableOnChange is true any mutation in state does not trigger onChange function
 let disableOnChange = false
+
+// when initiateMode is true, setting a key in state which already exists does nothing
+// this is used so that default value of state does not override the value in props
+let initiateMode = false
+
+// functions to set the flags
 const setDisableOnChange = v => { disableOnChange = v }
+const setInitiateMode = v => { initiateMode = v }
 
 function reactify (state, chain = []) {
-  if (typeof state === 'function') return state
   if (!isObject(state)) return state
 
   const wrapper = Array.isArray(state) ? [] : {}
@@ -25,10 +33,11 @@ function reactify (state, chain = []) {
   return new Proxy(wrapper, {
 
     set (target, prop, newValue) {
+      if (initiateMode && target[prop]) return true
       let value = newValue
-      if (isObject(value)) value = reactify.call(_this, value, chain)
-      else if (prop === '$') return initializeState.call(_this, value, target)
-      else if (disableOnChange) return Reflect.set(target, prop, value)
+      if (typeof value === 'function') value = handleReactiveSlice.call(_this, value, prop)
+      else if (isObject(value)) value = reactify.call(_this, value, [...chain, prop])
+      if (disableOnChange) return Reflect.set(target, prop, value)
       else return onChange.call(_this, [...chain, prop], value, 'set')
     },
 
@@ -41,26 +50,32 @@ function reactify (state, chain = []) {
       if (detectionMode) {
         if (chain.length !== 0) keyAccesses[keyAccesses.length - 1] = [...chain, prop]
         else keyAccesses.push([...chain, prop])
-        return target[prop]
       }
 
       else if (prop === '__isRadioactive__') return true
+
+      // flag setting
       else if (prop === '__setDisableOnChange__') return setDisableOnChange
+      else if (prop === '__setInitiateMode__') return setInitiateMode
       return Reflect.get(target, prop)
     }
 
   })
 }
 
+// call the function and detect what keys it is using of this.$
 function detectStateKeysUsed (fn) {
   detectionMode = true
   const returnVal = fn()
   detectionMode = false
-  const deps = keyAccesses.map(key => key.join('.'))
+  const deps = [...keyAccesses]
   keyAccesses = [] // reset keyAccesses
   return [returnVal, deps]
 }
 
+// when initializing the state, if a function is given
+// call that function, detect the state keys it depends on, get the initial value
+// update its value whenever its deps changes
 function handleReactiveSlice (fn, k) {
   const [initValue, deps] = detectStateKeysUsed(fn)
   let prevValue = initValue
@@ -68,24 +83,15 @@ function handleReactiveSlice (fn, k) {
   const onDepUpdate = () => {
     const value = fn()
     if (prevValue !== value) { // only mutate if the value is actually changed
-      mutate(this.state, [k], value, 'set')
+      mutate(this.$, [k], value, 'set')
       prevValue = value
     }
   }
 
   // when any of its deps changes, update its value
-  this.on.update(onDepUpdate, deps)
+  // depend on the root key ???
+  this.on.update(onDepUpdate, deps.map(d => d[0]))
   return initValue
-}
-
-function initializeState (initState, target) {
-  Object.keys(initState).forEach(k => {
-    let value = initState[k]
-    if (typeof value === 'function') {
-      value = handleReactiveSlice.call(this, value, k)
-    }
-    target[k] = value
-  })
 }
 
 export default reactify
