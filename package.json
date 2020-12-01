@@ -2,7 +2,7 @@
   "name": "shadow",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "doc": "jsdoc -c jsdoc.json",
     "test": "jest"
@@ -13,6 +13,7 @@
   "devDependencies": {
     "@babel/core": "^7.12.9",
     "@babel/plugin-transform-modules-commonjs": "^7.12.1",
+    "@snowpack/plugin-optimize": "^0.2.9",
     "@types/jest": "^26.0.15",
     "babel-jest": "^26.6.3",
     "eslint": "^7.14.0",
@@ -22,6 +23,11 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.2.1",
     "jest": "^26.6.3",
-    "jsdoc": "^3.6.6"
+    "snowpack": "^2.17.1"
+  },
+  "dependencies": {
+    "-": "0.0.1",
+    "@snowpack/plugin-webpack": "^2.1.1",
+    "D": "^1.0.0"
   }
 }
