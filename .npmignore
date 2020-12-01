@@ -1,0 +1,11 @@
+__test__
+.cache
+.vscode
+cdn
+dist
+node_modules
+out
+test
+jest.config.js
+babel.config.js
+.eslintrc.js
