@@ -17,7 +17,7 @@ export function traverseTree (node, cb) {
 }
 
 /**
- * remove the state listeners from all children of the node
+ * remove the $ listeners from all children of the node
  * then remove the node from DOM
  * @param {Element} element - node which is to be removed from DOM
  */
@@ -29,12 +29,15 @@ export function removeTree (element) {
     }
   })
 
-  const remove = () => element.remove()
+  const remove = () => {
+    console.log('remove : ', element)
+    element.remove()
+  }
   handleAnimateExit(element, remove)
 }
 
 /**
- * add back the state change listeners to all child nodes of node
+ * add back the $ change listeners to all child nodes of node
  * and the then add the node to DOM
  * @param {Element} element
  * @param {Element} anchorNode
@@ -45,6 +48,7 @@ export function addTree (element, anchorNode) {
     if (node.addStateListener) node.addStateListener()
   })
 
+  console.log('add : ', element)
   anchorNode.after(element)
   handleAnimateEnter(element)
 }

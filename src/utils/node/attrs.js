@@ -3,7 +3,7 @@ import { isCurled, uncurl } from '../str.js'
 /**
  * returns an object of arrays which shows name, value and isVar property of an attribute
  * @param {Element} node - node for which attributes are to be returned
- * @returns {Object} - { id: ['cool', false], ':count': ['state.count', true]}
+ * @returns {Object} - { id: ['cool', false], ':count': ['$.count', true]}
  */
 
 function attrs (node) {
