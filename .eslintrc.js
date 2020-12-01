@@ -12,8 +12,9 @@ module.exports = {
     sourceType: 'module'
   },
   rules: {
-    'brace-style': 'off'
-  },
+    'brace-style': 'off',
+    camelcase: 'off'
+  }
   // globals: {
   //   supersweet: 'readonly'
   // }
