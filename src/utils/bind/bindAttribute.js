@@ -3,12 +3,12 @@ import onStateChange from '../reactivity/onStateChange.js'
 // import addContextDependency from '../context.js'
 
 function bindAttribute (node, name, stateChain) {
-  node.setAttribute(name, getSlice(this.state, stateChain))
+  node.setAttribute(name, getSlice(this.$, stateChain))
   onStateChange.call(this, stateChain, () => {
-    node.setAttribute(name, getSlice(this.state, stateChain))
+    node.setAttribute(name, getSlice(this.$, stateChain))
   })
 
-  // if (chain[0] === 'state') {
+  // if (chain[0] === '$') {
 
   // }
 
