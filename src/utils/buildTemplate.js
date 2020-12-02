@@ -2,39 +2,41 @@
 import reactify from './reactivity/reactify.js'
 import processTemplate from './process/processTemplate.js'
 
+function htmlTemplate (strings, ...exprs) {
+  let str = ''
+  let value
+  for (let i = 0; i < strings.length; i++) {
+    value = exprs[i]
+    // value = typeof value === 'function' ? value() : value
+    str += strings[i] + (value === undefined ? '' : value)
+  }
+
+  this.config.template.innerHTML = str
+}
+
 function buildTemplate (component) {
   const $ = reactify.call(this, this.props || {})
-  const _ = {}
   const handle = this.handle
   const on = this.on
   const refs = this.config.refs
 
-  const initComponent = () => {
+  const initialize = (processHTML) => {
     $.__setDisableOnChange__(true)
     $.__setInitiateMode__(true)
-    component({ $, handle, on, refs, _ })
+    const html = processHTML ? htmlTemplate.bind(this) : () => {}
+    component({ $, handle, on, refs, html })
     $.__setInitiateMode__(false)
     $.__setDisableOnChange__(false)
   }
 
-  // if config.template is not created
-  if (!this.config.template) {
-    initComponent()
-
-    // create a template node
-    const template = document.createElement('template')
-    // const commonStyle = `<style common-styles > ${window.supersweet.commonCSS}</style>`
-    template.innerHTML = _.html
-
-    // onetime processing
-    processTemplate.call(this, template)
-
-    this.config.template = template
+  if (this.config.template) {
+    initialize(false)
   } else {
-    initComponent()
+    this.config.template = document.createElement('template')
+    initialize(true)
+    processTemplate.call(this)
   }
 
-  // add state to component
   this.$ = $
 }
 
