@@ -8,34 +8,32 @@ import commentIf from './commentIf.js'
  * @param {Object} context
  */
 
+let i = 0
 function processNode (node, context) {
+  i++
+  const savedOn = this.config.templateInfo[i]
+
   // ignore if the node is processed
   if (node.processed) return
   node.processed = true
 
-  // ignore style node
-  if (node.nodeName === 'STYLE') return
-
-  if (node.nodeName === '#comment') {
-    const commentSplit = node.textContent.trim().split(' ')
-    if (commentSplit[0] === 'if') {
-      commentIf.call(this, node, commentSplit)
-    }
-    return
-  }
-
   if (node.nodeName === '#text') {
-    processTextContent.call(this, node, context)
-    return
+    processTextContent.call(this, node)
   }
 
-  // add sweetuid to get info from config.templateInfo
-  node.sweetuid = node.dataset.sweetuid
-  node.removeAttribute('data-sweetuid')
+  if (savedOn) {
+    console.log(node.nodeName, savedOn)
+    if (node.nodeName === '#comment') {
+      const commentSplit = node.textContent.trim().split(' ')
+      if (commentSplit[0] === 'if') {
+        commentIf.call(this, node, commentSplit, savedOn)
+      }
+    }
 
-  processAttributes.call(this, node, context)
-  if (node.hasChildNodes()) [...node.childNodes].forEach(n => processNode.call(this, n, context))
-  else processTextContent.call(this, node, context)
+    else {
+      processAttributes.call(this, node, savedOn)
+    }
+  }
 }
 
 export default processNode

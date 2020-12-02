@@ -1,16 +1,17 @@
 import { uid } from '../others.js'
 import attrs from './attrs.js'
+import saveNodeInfo from './saveNodeInfo.js'
 
 /**
  * process attributes of node and then memoize them in this.config.templateInfo
  * @param {HTMLElement} node
  */
-function saveAttributes (node) {
-  // add here
-  const sweetuid = uid()
-  node.dataset.sweetuid = sweetuid
-  this.config.templateInfo[sweetuid] = { attributes: [] }
-  const target = this.config.templateInfo[sweetuid]
+function saveAttributes (node, i) {
+  console.log(node.nodeName, i, node.textContent)
+  this.config.templateInfo[i] = {}
+  const saveOn = this.config.templateInfo[i]
+  saveOn.attributes = []
+  // console.log('save attributes for a node on', i)
 
   const attributes = attrs(node)
   Object.keys(attributes).forEach(atrName => {
@@ -60,7 +61,7 @@ function saveAttributes (node) {
       }
     }
 
-    if (attrInfo) target.attributes.push(attrInfo)
+    if (attrInfo) saveOn.attributes.push(attrInfo)
   })
 }
 

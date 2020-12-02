@@ -7,6 +7,8 @@ import { handleAnimateExit, handleAnimateEnter } from './animate.js'
  */
 
 export function traverseTree (node, cb) {
+  if (node.nodeName === 'STYLE') return
+  // if (node.nodeName === '#document-fragment') return
   cb(node)
   const hasChild = node.hasChildNodes()
   if (hasChild) {
