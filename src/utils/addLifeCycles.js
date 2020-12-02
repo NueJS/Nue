@@ -1,7 +1,7 @@
 import onStateChange from './reactivity/onStateChange.js'
 
 function update (fn, deps, type) {
-  if (!deps) this.stateDeps.$.push(fn)
+  if (!deps) this.stateDeps.$[type].push(fn)
   else {
     deps.forEach(d => {
       onStateChange.call(this, d.split('.'), fn, type)
