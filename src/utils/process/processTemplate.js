@@ -1,9 +1,10 @@
 import saveAttributes from '../node/saveAttributes.js'
 import { traverseTree } from '../node/tree.js'
 
-function processTemplate (template) {
+function processTemplate () {
   const removeNodes = []
-  traverseTree(template.content, node => {
+
+  traverseTree(this.config.template.content, node => {
     if (node.nodeName === '#text') {
       if (!node.textContent.trim()) removeNodes.push(node)
     }
