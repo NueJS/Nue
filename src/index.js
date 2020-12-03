@@ -1,4 +1,5 @@
 import defineComponent from './defineComponent.js'
+export { default as settings } from './settings.js'
 
 // define all the components
 
