@@ -26,7 +26,7 @@ function saveAttributes (node, i) {
       node.removeAttribute(atrName)
       const unAtName = uncurl(atrName)
       attrInfo = {
-        stateChain: [unAtName],
+        path: [unAtName],
         name: unAtName
       }
     }
@@ -37,12 +37,12 @@ function saveAttributes (node, i) {
       attrInfo = {
         propName: atrName.substr(1),
         isVar,
-        stateChain: isVar ? attrValue.split('.') : attrValue
+        path: isVar ? attrValue.split('.') : attrValue
       }
     }
 
     else if (isVar) {
-      const stateChain = attrValue.split('.')
+      const path = attrValue.split('.')
       // @eventName=[handler]
       if (atrName[0] === '@') {
         const atRemoved = atrName.substr(1)
@@ -57,14 +57,14 @@ function saveAttributes (node, i) {
         const bindProp = atrName.substr(5)
         attrInfo = {
           bindProp,
-          stateChain
+          path
         }
       }
 
       // name=[slice] or slice=[slice]'s shorthand -> [slice]
       else {
         attrInfo = {
-          stateChain,
+          path,
           name: atrName
         }
       }

@@ -17,17 +17,17 @@ function commentIf (commentNode, memo) {
   let node = commentNode.nextSibling
   // const ifStateChain = uncurl(commentSplit[1]).split('.')
   let cIndex = 0
-  conditional.push({ nodes: [], stateChain: memo.stateChain, commentNode, type: 'if' })
-  stateDeps.push(memo.stateChain)
+  conditional.push({ nodes: [], path: memo.path, commentNode, type: 'if' })
+  stateDeps.push(memo.path)
 
   while (true) {
     if (node.nodeName === '#comment') {
       const textSplit = spaceSplitter(node.textContent)
       // console.log({ textSplit })
       if (textSplit[0] === 'else-if') {
-        const stateChain = uncurl(textSplit[1]).split('.')
-        conditional.push({ nodes: [], stateChain, commentNode: node, type: 'else-if' })
-        stateDeps.push(stateChain)
+        const path = uncurl(textSplit[1]).split('.')
+        conditional.push({ nodes: [], path, commentNode: node, type: 'else-if' })
+        stateDeps.push(path)
         cIndex++
       } else if (textSplit[0] === 'else') {
         conditional.push({ nodes: [], commentNode: node, type: 'else' })
@@ -51,9 +51,9 @@ function commentIf (commentNode, memo) {
   const onConditionChange = () => {
     let trueFound = false
     conditional.forEach((group, i) => {
-      const conditionValue = group.type !== 'else' ? getSlice(this.$, group.stateChain) : true
+      const conditionValue = group.type !== 'else' ? getSlice(this.$, group.path) : true
 
-      // console.log(conditionValue, this.$.count, group.stateChain)
+      // console.log(conditionValue, this.$.count, group.path)
       // if condition becomes truthy and another one before it is not truthy
       // then show this if not already
       if (conditionValue && !trueFound) {
@@ -78,9 +78,9 @@ function commentIf (commentNode, memo) {
   onConditionChange()
 
   this.on.beforeUpdate(onConditionChange, deps)
-  // stateDeps.forEach(stateChain => {
+  // stateDeps.forEach(path => {
   //   this.on.beforeUpdate()
-  //   onStateChange.call(this, stateChain, onConditionChange)
+  //   onStateChange.call(this, path, onConditionChange)
   // })
 }
 

@@ -5,20 +5,20 @@ import { callCbOnce } from '../reactivity/cbs.js'
 import { splitText } from '../str.js'
 
 // create text node with given key as its dependency on $
-function createReactiveTextNode (stateChain, value) {
-  // const value = getSlice(this.$, stateChain)
+function createReactiveTextNode (path, value) {
+  // const value = getSlice(this.$, path)
   // if (value === undefined) throw new Error('placeholder is not a variable')
   const textNode = document.createTextNode(value)
 
   const cb = () => {
-    textNode.textContent = getSlice(this.$, stateChain)
+    textNode.textContent = getSlice(this.$, path)
     console.log('DOM: update text to ', textNode.textContent)
     // if (window.supersweet.showUpdates) window.supersweet.nodeUpdated(textNode)
   }
 
   textNode.addStateListener = () => {
-    textNode.textContent = getSlice(this.$, stateChain)
-    textNode.removeStateListener = onStateChange.call(this, stateChain, callCbOnce.call(this, cb, 'dom'))
+    textNode.textContent = getSlice(this.$, path)
+    textNode.removeStateListener = onStateChange.call(this, path, callCbOnce.call(this, cb, 'dom'))
   }
 
   textNode.addStateListener()
@@ -32,8 +32,8 @@ function processTextContent (element) {
   const textNodes = []
   textArray.forEach(t => {
     if (t.isVariable) {
-      // const stateChain = t.string.split('.')
-      const element = createReactiveTextNode.call(this, t.stateChain, t.value)
+      // const path = t.string.split('.')
+      const element = createReactiveTextNode.call(this, t.path, t.value)
 
       textNodes.push(element)
     } else {

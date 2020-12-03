@@ -11,7 +11,7 @@ function saveCommentInfo (node, i) {
 
   const saveChain = (type) => {
     saveOn.type = type
-    saveOn.stateChain = uncurl(textArr[1]).split('.')
+    saveOn.path = uncurl(textArr[1]).split('.')
   }
 
   switch (textArr[0]) {

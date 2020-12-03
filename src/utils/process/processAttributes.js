@@ -42,23 +42,23 @@ function processAttributes (node, memo) {
     // bind value on input nodes or bind a prop to custom component
     else if (attribute.bindProp) {
       if (node.nodeName === 'INPUT' || node.nodeName === 'TEXTAREA') {
-        bindInput.call(this, node, attribute.bindProp, attribute.stateChain)
+        bindInput.call(this, node, attribute.bindProp, attribute.path)
       }
 
       // bind:bindProp={key} on custom component
       else {
-        bindState.call(this, node, attribute.bindProp, true, attribute.stateChain, true)
+        bindState.call(this, node, attribute.bindProp, true, attribute.path, true)
       }
     }
 
     // :name={var} or :name=value set the state of component
     else if (attribute.propName) {
-      bindState.call(this, node, attribute.propName, attribute.isVar, attribute.stateChain)
+      bindState.call(this, node, attribute.propName, attribute.isVar, attribute.path)
     }
 
     // set value of simple attributes to state
     else {
-      bindAttribute.call(this, node, attribute.name, attribute.stateChain)
+      bindAttribute.call(this, node, attribute.name, attribute.path)
     }
   })
 }
