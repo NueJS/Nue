@@ -5,6 +5,7 @@ function onStateChange (chain, cb, type = 'dom') {
     if (!target[c]) {
       target[c] = {
         $: {
+          reactive: [],
           before: [],
           dom: [],
           after: []

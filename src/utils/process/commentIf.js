@@ -1,5 +1,5 @@
 import onStateChange from '../reactivity/onStateChange.js'
-import { uncurl } from '../str.js'
+import { spaceSplitter, uncurl } from '../str.js'
 import getSlice from '../value.js'
 import processNode from './processNode.js'
 import { addTree, removeTree } from '../node/tree.js'
@@ -10,18 +10,20 @@ import { reverseForEach } from '../others.js'
  * @param {Node} commentNode
  * @param {Array<string>} commentSplit
  */
-function commentIf (commentNode, commentSplit) {
+function commentIf (commentNode, savedOn) {
+  // console.log('found comment at', savedOn)
   const conditional = []
   const stateDeps = []
   let node = commentNode.nextSibling
-  const ifStateChain = uncurl(commentSplit[1]).split('.')
+  // const ifStateChain = uncurl(commentSplit[1]).split('.')
   let cIndex = 0
-  conditional.push({ nodes: [], stateChain: ifStateChain, commentNode, type: 'if' })
-  stateDeps.push(ifStateChain)
+  conditional.push({ nodes: [], stateChain: savedOn.stateChain, commentNode, type: 'if' })
+  stateDeps.push(savedOn.stateChain)
 
   while (true) {
     if (node.nodeName === '#comment') {
-      const textSplit = node.textContent.trim().split(' ')
+      const textSplit = spaceSplitter(node.textContent)
+      // console.log({ textSplit })
       if (textSplit[0] === 'else-if') {
         const stateChain = uncurl(textSplit[1]).split('.')
         conditional.push({ nodes: [], stateChain, commentNode: node, type: 'else-if' })
@@ -31,6 +33,7 @@ function commentIf (commentNode, commentSplit) {
         conditional.push({ nodes: [], commentNode: node, type: 'else' })
         cIndex++
       } else if (textSplit[0] === 'end-if') {
+        // console.log('break')
         break
       }
     } else {
@@ -38,6 +41,7 @@ function commentIf (commentNode, commentSplit) {
     }
 
     processNode.call(this, node)
+    // console.log({ node })
     node = node.nextSibling
     if (node === null) {
       this.showError('missing end-if comment')
@@ -45,10 +49,12 @@ function commentIf (commentNode, commentSplit) {
   }
 
   const onConditionChange = () => {
+    // console.log('conditions changed')
     let trueFound = false
     conditional.forEach((group, i) => {
       const conditionValue = group.type !== 'else' ? getSlice(this.$, group.stateChain) : true
 
+      // console.log(conditionValue, this.$.count, group.stateChain)
       // if condition becomes truthy and another one before it is not truthy
       // then show this if not already
       if (conditionValue && !trueFound) {
@@ -68,11 +74,15 @@ function commentIf (commentNode, commentSplit) {
     })
   }
 
+  const deps = stateDeps.map(d => d.join('.'))
+  // console.log({ deps })
   onConditionChange()
 
-  stateDeps.forEach(stateChain => {
-    onStateChange.call(this, stateChain, onConditionChange)
-  })
+  this.on.beforeUpdate(onConditionChange, deps)
+  // stateDeps.forEach(stateChain => {
+  //   this.on.beforeUpdate()
+  //   onStateChange.call(this, stateChain, onConditionChange)
+  // })
 }
 
 export default commentIf

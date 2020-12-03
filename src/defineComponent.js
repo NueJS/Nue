@@ -8,7 +8,7 @@ function defineComponent (compName, component) {
     constructor () {
       super()
       this.handle = {}
-      this.stateDeps = { $: { before: [], after: [], dom: [] } }
+      this.stateDeps = { $: { reactive: [], before: [], after: [], dom: [] } }
       this.mode = 'open'
       this.computedStateDeps = []
       this.compName = compName
@@ -16,6 +16,13 @@ function defineComponent (compName, component) {
       this.onRemoveCbs = []
       this.conditions = {}
       this.config = config
+      this.actions = {}
+      this.registeredCallbacks = {
+        before: {},
+        after: {},
+        reactive: {},
+        dom: {}
+      }
       this.getNodeInfo = (node) => this.config.templateInfo[node.sweetuid]
       addLifeCycles.call(this)
       buildTemplate.call(this, component)

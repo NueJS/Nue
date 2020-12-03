@@ -81,6 +81,7 @@ function handleReactiveSlice (fn, k) {
   let prevValue = initValue
 
   const onDepUpdate = () => {
+    console.log('update : ', k)
     const value = fn()
     if (prevValue !== value) { // only mutate if the value is actually changed
       mutate(this.$, [k], value, 'set')
@@ -90,7 +91,7 @@ function handleReactiveSlice (fn, k) {
 
   // when any of its deps changes, update its value
   // depend on the root key ???
-  this.on.beforeUpdate(onDepUpdate, deps.map(d => d[0]))
+  this.on.reactiveUpdate(onDepUpdate, deps.map(d => d[0]))
   return initValue
 }
 
