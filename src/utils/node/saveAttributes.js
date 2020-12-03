@@ -1,17 +1,16 @@
 // import { uid } from '../others.js'
+import { isCurled, uncurl } from '../str.js'
 import attrs from './attrs.js'
 // import saveNodeInfo from './saveNodeInfo.js'
 
 /**
- * process attributes of node and then memoize them in this.config.templateInfo
+ * process attributes of node and then memoize them in this.memo.nodes
  * @param {HTMLElement} node
  */
 function saveAttributes (node, i) {
-  // console.log(node.nodeName, i, node.textContent)
-  this.config.templateInfo[i] = {}
-  const saveOn = this.config.templateInfo[i]
+  this.memo.nodes[i] = {}
+  const saveOn = this.memo.nodes[i]
   saveOn.attributes = []
-  // console.log('save attributes for a node on', i)
 
   const attributes = attrs(node)
   Object.keys(attributes).forEach(atrName => {
@@ -22,8 +21,18 @@ function saveAttributes (node, i) {
       node.removeAttribute(atrName)
     }
 
-    // :propName={$.key} or :propName="value"
-    if (atrName[0] === ':') {
+    const isShorthand = isCurled(atrName) && attrValue === ''
+    if (isShorthand) {
+      node.removeAttribute(atrName)
+      const unAtName = uncurl(atrName)
+      attrInfo = {
+        stateChain: [unAtName],
+        name: unAtName
+      }
+    }
+
+    // :propName=[slice] or :propName='value'
+    else if (atrName[0] === ':') {
       node.removeAttribute(atrName)
       attrInfo = {
         propName: atrName.substr(1),
@@ -34,7 +43,7 @@ function saveAttributes (node, i) {
 
     else if (isVar) {
       const stateChain = attrValue.split('.')
-      // @eventName={handler}
+      // @eventName=[handler]
       if (atrName[0] === '@') {
         const atRemoved = atrName.substr(1)
         attrInfo = {
@@ -43,7 +52,7 @@ function saveAttributes (node, i) {
         }
       }
 
-      // @bind:bindProp={$.key}
+      // @bind:bindProp=[slice]
       else if (atrName.startsWith('bind:')) {
         const bindProp = atrName.substr(5)
         attrInfo = {
@@ -52,7 +61,7 @@ function saveAttributes (node, i) {
         }
       }
 
-      // name={$.key}
+      // name=[slice] or slice=[slice]'s shorthand -> [slice]
       else {
         attrInfo = {
           stateChain,
