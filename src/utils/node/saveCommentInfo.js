@@ -3,8 +3,8 @@ import { spaceSplitter, uncurl } from '../str.js'
 
 function saveCommentInfo (node, i) {
   // console.log(node.nodeName, i)
-  this.config.templateInfo[i] = {}
-  const saveOn = this.config.templateInfo[i]
+  this.memo.nodes[i] = {}
+  const saveOn = this.memo.nodes[i]
 
   const text = node.textContent
   const textArr = spaceSplitter(text)

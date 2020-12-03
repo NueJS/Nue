@@ -1,4 +1,4 @@
-import onStateChange from '../reactivity/onStateChange.js'
+// import onStateChange from '../reactivity/onStateChange.js'
 import { spaceSplitter, uncurl } from '../str.js'
 import getSlice from '../value.js'
 import processNode from './processNode.js'
@@ -10,15 +10,15 @@ import { reverseForEach } from '../others.js'
  * @param {Node} commentNode
  * @param {Array<string>} commentSplit
  */
-function commentIf (commentNode, savedOn) {
-  // console.log('found comment at', savedOn)
+function commentIf (commentNode, memo) {
+  // console.log('found comment at', memo)
   const conditional = []
   const stateDeps = []
   let node = commentNode.nextSibling
   // const ifStateChain = uncurl(commentSplit[1]).split('.')
   let cIndex = 0
-  conditional.push({ nodes: [], stateChain: savedOn.stateChain, commentNode, type: 'if' })
-  stateDeps.push(savedOn.stateChain)
+  conditional.push({ nodes: [], stateChain: memo.stateChain, commentNode, type: 'if' })
+  stateDeps.push(memo.stateChain)
 
   while (true) {
     if (node.nodeName === '#comment') {
@@ -49,7 +49,6 @@ function commentIf (commentNode, savedOn) {
   }
 
   const onConditionChange = () => {
-    // console.log('conditions changed')
     let trueFound = false
     conditional.forEach((group, i) => {
       const conditionValue = group.type !== 'else' ? getSlice(this.$, group.stateChain) : true

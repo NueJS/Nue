@@ -5,7 +5,7 @@ import { traverseTree } from '../node/tree.js'
 let i = 0
 function processTemplate () {
   const removeNodes = []
-  const childNodes = this.config.template.content.childNodes
+  const childNodes = this.memo.template.content.childNodes
 
   childNodes.forEach(childNode =>
     traverseTree(childNode, node => {

@@ -23,16 +23,17 @@ function processEventAttributes (node, attribute) {
   }
 }
 
-function processAttributes (node, savedOn) {
+function processAttributes (node, memo) {
   // console.log(node.nodeName, node.getAttribute)
   const ref = node.getAttribute('ref')
   if (ref) {
-    this.config.refs[ref] = node
+    this.memo.refs[ref] = node
   }
 
-  const info = savedOn
+  const info = memo
   if (!(info && info.attributes)) return
 
+  console.log(node, info.attributes)
   info.attributes.forEach(attribute => {
     // @eventName={handler}
     if (attribute.eventName) {

@@ -11,14 +11,14 @@ function htmlTemplate (strings, ...exprs) {
     str += strings[i] + (value === undefined ? '' : value)
   }
 
-  this.config.template.innerHTML = str
+  this.memo.template.innerHTML = str
 }
 
 function buildTemplate (component) {
   const $ = reactify.call(this, this.props || {})
   const handle = this.handle
   const on = this.on
-  const refs = this.config.refs
+  const refs = this.memo.refs
   const actions = this.actions
 
   const initialize = (processHTML) => {
@@ -30,10 +30,10 @@ function buildTemplate (component) {
     $.__setDisableOnChange__(false)
   }
 
-  if (this.config.template) {
+  if (this.memo.template) {
     initialize(false)
   } else {
-    this.config.template = document.createElement('template')
+    this.memo.template = document.createElement('template')
     initialize(true)
     processTemplate.call(this)
   }
