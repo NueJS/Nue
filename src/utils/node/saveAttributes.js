@@ -1,13 +1,13 @@
-import { uid } from '../others.js'
+// import { uid } from '../others.js'
 import attrs from './attrs.js'
-import saveNodeInfo from './saveNodeInfo.js'
+// import saveNodeInfo from './saveNodeInfo.js'
 
 /**
  * process attributes of node and then memoize them in this.config.templateInfo
  * @param {HTMLElement} node
  */
 function saveAttributes (node, i) {
-  console.log(node.nodeName, i, node.textContent)
+  // console.log(node.nodeName, i, node.textContent)
   this.config.templateInfo[i] = {}
   const saveOn = this.config.templateInfo[i]
   saveOn.attributes = []

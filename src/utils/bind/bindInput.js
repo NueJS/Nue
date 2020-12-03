@@ -16,6 +16,8 @@ function bindInput (node, bindProp, stateChain) {
     node[bindProp] = getSlice(this.$, stateChain)
   })
 
+  // console.log({ handler })
+
   node.addEventListener('input', handler)
   this.on.remove(() => {
     node.removeEventListener('input', handler)

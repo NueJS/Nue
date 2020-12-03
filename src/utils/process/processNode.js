@@ -21,12 +21,12 @@ function processNode (node, context) {
     processTextContent.call(this, node)
   }
 
-  if (savedOn) {
-    console.log(node.nodeName, savedOn)
+  else if (savedOn) {
+    // console.log(node.nodeName, savedOn)
     if (node.nodeName === '#comment') {
-      const commentSplit = node.textContent.trim().split(' ')
-      if (commentSplit[0] === 'if') {
-        commentIf.call(this, node, commentSplit, savedOn)
+      // const commentSplit = node.textContent.trim().split(' ')
+      if (savedOn.type === 'if') {
+        commentIf.call(this, node, savedOn)
       }
     }
 

@@ -13,7 +13,7 @@ function processTemplate () {
         if (!node.textContent.trim()) removeNodes.push(node)
         else {
           i++
-          console.log(node.nodeName, i)
+          // console.log(node.nodeName, i)
         }
       } else if (node.nodeName === '#comment') {
         i++
@@ -27,7 +27,7 @@ function processTemplate () {
 
       else {
         i++
-        console.log(node.nodeName, i)
+        // console.log(node.nodeName, i)
       }
     })
   )

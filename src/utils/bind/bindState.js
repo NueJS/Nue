@@ -13,7 +13,7 @@ function addProps (node, key, value, onNodeStateChange) {
 
 function bindState (node, propName, isVar, stateChain, isTwoWayBind) {
   const propNameSplit = propName.split('.')
-  console.log({ propName, isVar, stateChain })
+  // console.log({ propName, isVar, stateChain })
   let onNodeStateChange
 
   if (isVar) {

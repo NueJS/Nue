@@ -1,10 +1,9 @@
 {
-  "name": "shadow",
-  "version": "1.0.0",
+  "name": "supersweet",
+  "version": "0.0.2",
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "doc": "jsdoc -c jsdoc.json",
     "test": "jest"
   },
   "keywords": [],
