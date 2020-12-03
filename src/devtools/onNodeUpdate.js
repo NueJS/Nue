@@ -3,7 +3,7 @@
  * @param {HTMLElement} textNode
  */
 
-function nodeUpdated (textNode) {
+function onNodeUpdate (textNode) {
   const parentStyle = textNode.parentNode.style
   if (parentStyle) {
     parentStyle.background = '#55efc4'
@@ -13,4 +13,4 @@ function nodeUpdated (textNode) {
   }
 }
 
-export default nodeUpdated
+export default onNodeUpdate
