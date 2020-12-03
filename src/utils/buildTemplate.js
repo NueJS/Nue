@@ -19,12 +19,13 @@ function buildTemplate (component) {
   const handle = this.handle
   const on = this.on
   const refs = this.config.refs
+  const actions = this.actions
 
   const initialize = (processHTML) => {
     $.__setDisableOnChange__(true)
     $.__setInitiateMode__(true)
     const html = processHTML ? htmlTemplate.bind(this) : () => {}
-    component({ $, handle, on, refs, html })
+    component({ $, handle, on, refs, html, actions })
     $.__setInitiateMode__(false)
     $.__setDisableOnChange__(false)
   }

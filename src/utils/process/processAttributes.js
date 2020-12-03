@@ -3,7 +3,28 @@ import bindInput from '../bind/bindInput.js'
 import bindAttribute from '../bind/bindAttribute.js'
 import bindState from '../bind/bindState.js'
 
+function processEventAttributes (node, attribute) {
+  const action = this.actions[attribute.eventName]
+  const handler = this.handle[attribute.handler]
+
+  // @customEvent=[handler] action API
+  if (action) {
+    const cleanup = action(node, handler)
+    node.onRemove = cleanup
+    this.on.remove(cleanup)
+  }
+
+  // @nativeEvent=[handler]
+  else {
+    node.addEventListener(attribute.eventName, handler)
+    const cleanup = () => node.removeEventListener(attribute.eventName, handler)
+    this.on.remove(cleanup)
+    // node.onRemove(cleanup)
+  }
+}
+
 function processAttributes (node, savedOn) {
+  // console.log(node.nodeName, node.getAttribute)
   const ref = node.getAttribute('ref')
   if (ref) {
     this.config.refs[ref] = node
@@ -13,18 +34,12 @@ function processAttributes (node, savedOn) {
   if (!(info && info.attributes)) return
 
   info.attributes.forEach(attribute => {
-    // @eventName={handler} add event listener
+    // @eventName={handler}
     if (attribute.eventName) {
-      const handler = this.handle[attribute.handler]
-      node.addEventListener(attribute.eventName, handler)
-      this.on.remove(() => {
-        node.removeEventListener(attribute.eventName, handler)
-      })
+      processEventAttributes.call(this, node, attribute)
     }
     // bind value on input nodes or bind a prop to custom component
     else if (attribute.bindProp) {
-      // console.log('bindprop on', savedOn, node)
-      // bind:value={key} on input node
       if (node.nodeName === 'INPUT' || node.nodeName === 'TEXTAREA') {
         bindInput.call(this, node, attribute.bindProp, attribute.stateChain)
       }
