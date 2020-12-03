@@ -7,7 +7,7 @@ import buildTemplate from './utils/buildTemplate.js'
 function defineComponent (compName, component) {
   // information about component which are same among all the instances of the components
   // to improve performance these info will be calculated once and will be shared by all the instances
-  const config = { templateInfo: { }, refs: {}, mode: 'open', componentName: compName }
+  const memo = { nodes: { }, refs: {}, mode: 'open', componentName: compName }
 
   // define web component
   customElements.define(compName, class SuperSweet extends HTMLElement {
@@ -31,8 +31,8 @@ function defineComponent (compName, component) {
       this.onAddCbs = []
       this.onRemoveCbs = []
 
-      // config of the component which are same for all instances
-      this.config = config
+      // memo of the component which are same for all instances
+      this.memo = memo
 
       // actions API
       this.actions = {}
@@ -57,7 +57,7 @@ function defineComponent (compName, component) {
       buildTemplate.call(this, component)
 
       // create copy of template, process nodes using state, add event listeners, add nodes in DOM
-      buildShadowDOM.call(this, config.template)
+      buildShadowDOM.call(this, memo.template)
 
       // if this component has two way props - meaning that when state of this component changes we have to update the parent's state as well
       // add parent's state update callbacks in this component so that they are called when this component's state changes
