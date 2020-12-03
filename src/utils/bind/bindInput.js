@@ -2,26 +2,33 @@ import { mutate } from '../reactivity/mutate.js'
 import onStateChange from '../reactivity/onStateChange.js'
 import getSlice from '../value.js'
 
-// @eventName:prop={stateChain}
-function bindInput (node, bindProp, stateChain) {
+// bind:value=[path]
+// set the value from state
+// when input's value change set the value in state
+function bindInput (node, bindProp, path) {
   const isNumber = node.type === 'number' || node.type === 'range'
-  node[bindProp] = getSlice(this.$, stateChain)
+  node[bindProp] = getSlice(this.$, path)
 
+  // when input's value is changed, save the value in state
+  // convert the value from string to number if needed
   const handler = e => {
     const value = e.target[bindProp]
-    mutate(this.$, stateChain, isNumber ? Number(value) : value, 'set')
+    const converted = isNumber ? Number(value) : value
+    mutate(this.$, path, converted, 'set')
   }
 
-  onStateChange.call(this, stateChain, () => {
-    node[bindProp] = getSlice(this.$, stateChain)
+  // set the value of input from state
+  onStateChange.call(this, path, () => {
+    node[bindProp] = getSlice(this.$, path)
   })
 
-  // console.log({ handler })
-
+  // adding event listener
   node.addEventListener('input', handler)
-  this.on.remove(() => {
-    node.removeEventListener('input', handler)
-  })
+
+  // cleanup on node or component removal
+  const cleanup = () => node.removeEventListener('input', handler)
+  this.on.remove(cleanup)
+  node.onRemove(cleanup)
 }
 
 export default bindInput
