@@ -7,7 +7,7 @@ import { handleAnimateExit, handleAnimateEnter } from './animate.js'
  */
 
 export function traverseTree (node, cb) {
-  if (node.nodeName === 'STYLE') return
+  // if (node.nodeName === 'STYLE') return
   // if (node.nodeName === '#document-fragment') return
   cb(node)
   const hasChild = node.hasChildNodes()
@@ -29,10 +29,12 @@ export function removeTree (element) {
     if (node.removeStateListener) {
       node.removeStateListener()
     }
+
+    if (node.onRemove) node.onRemove()
   })
 
   const remove = () => {
-    console.log('remove : ', element)
+    // console.log('remove : ', element)
     element.remove()
   }
   handleAnimateExit(element, remove)
@@ -50,7 +52,7 @@ export function addTree (element, anchorNode) {
     if (node.addStateListener) node.addStateListener()
   })
 
-  console.log('add : ', element)
+  // console.log('add : ', element)
   anchorNode.after(element)
   handleAnimateEnter(element)
 }
