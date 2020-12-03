@@ -2,36 +2,34 @@ import processTextContent from './processTextContent.js'
 import processAttributes from './processAttributes.js'
 import commentIf from './commentIf.js'
 
-/**
- * process node
- * @param {import('../../typedefs.js').SweetNode} node - node to be processed
- * @param {Object} context
- */
-
+// this number is use to find memoized information from this.memo.nodes for a node
 let i = 0
 function processNode (node, context) {
   i++
-  const savedOn = this.config.templateInfo[i]
+  // get memoized info
+  const memo = this.memo.nodes[i]
 
   // ignore if the node is processed
   if (node.processed) return
+
+  // mark the node as processed to avoid processing the node again
+  // this might happen when processing conditional rendering, mapping etc
   node.processed = true
 
+  // process textContent only if it is text
   if (node.nodeName === '#text') {
     processTextContent.call(this, node)
   }
 
-  else if (savedOn) {
-    // console.log(node.nodeName, savedOn)
+  else if (memo) {
     if (node.nodeName === '#comment') {
-      // const commentSplit = node.textContent.trim().split(' ')
-      if (savedOn.type === 'if') {
-        commentIf.call(this, node, savedOn)
+      if (memo.type === 'if') {
+        commentIf.call(this, node, memo)
       }
     }
 
     else {
-      processAttributes.call(this, node, savedOn)
+      processAttributes.call(this, node, memo)
     }
   }
 }
