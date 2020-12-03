@@ -1,3 +1,5 @@
+import getSlice from './value.js'
+
 /**
  * removes curly braces from string
  * input: "{xxx}" output "xxx"
@@ -9,7 +11,7 @@ export const uncurl = str => str.substr(1, str.length - 2)
  * checks the the string is wrapped in braces
  * @param {String} str
  */
-export const isCurled = str => str[0] === '{' && str[str.length - 1] === '}'
+export const isCurled = str => str[0] === '[' && str[str.length - 1] === ']'
 
 /**
  * return attribute value of an element
@@ -40,23 +42,40 @@ export function splitText (text) {
   let str = ''
 
   for (let i = 0; i < text.length; i++) {
-    if (openBracketFound && text[i] !== '}') str += text[i]
-    else if (text[i] === '{') {
+    if (openBracketFound && text[i] !== ']') str += text[i]
+    else if (text[i] === '[') {
       openBracketFound = true
       if (str) {
         parts.push({ string: str })
-        str = ''
+        str = '['
       }
-    } else if (openBracketFound && text[i] === '}') {
-      parts.push({ string: str, isVariable: true })
-      openBracketFound = false
-      str = '' // reset
+    } else if (openBracketFound && text[i] === ']') {
+      const stateChain = str.substr(1).split('.')
+      console.log({ stateChain })
+      let value
+      try {
+        value = getSlice(this.$, stateChain)
+      } catch {
+        console.log('error : ', str)
+        // isVariable = false
+      }
+
+      if (value === undefined) {
+        openBracketFound = false
+        console.log(text[i])
+        str += text[i]
+      } else {
+        parts.push({ stateChain, isVariable: true, value })
+        openBracketFound = false
+        str = '' // reset
+      }
     } else {
       str += text[i]
     }
   }
 
-  if (openBracketFound) throw new Error(`"{" not closed in ${this.nodeName} either escape it using \\{ or add a closing bracket`)
   if (str) parts.push({ string: str })
   return parts
 }
+
+export const spaceSplitter = str => str.split(' ').filter(i => i)
