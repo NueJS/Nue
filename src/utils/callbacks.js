@@ -22,7 +22,7 @@ export function memoize_cb (fn, type) {
     if (!_this.memoized_callbacks[fnId]) {
       _this.memoized_callbacks[type][fnId] = { fn, args, type }
     } else {
-      console.log('already added =', fn)
+      console.log('duplicate', fn)
     }
   }
 }

@@ -1,4 +1,4 @@
-function add_slice_dependency (chain, cb, trap, type = 'dom') {
+function add_slice_dependency (chain, cb, type = 'dom') {
   let target = this.stateDeps
   const lastIndex = chain.length - 1
   chain.forEach((c, i) => {

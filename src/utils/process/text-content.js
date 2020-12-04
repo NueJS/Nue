@@ -9,7 +9,6 @@ function createReactiveTextNode (path, value) {
 
   const cb = () => {
     textNode.textContent = slice(this.$, path)
-    // console.log('DOM: update text to ', textNode.textContent)
     // if (window.supersweet.showUpdates) window.supersweet.nodeUpdated(textNode)
   }
 
@@ -23,12 +22,12 @@ function createReactiveTextNode (path, value) {
   return textNode
 }
 
+// @todo move this processing step from process node to in process template
 function processTextContent (element) {
-  // console.log({ element })
   const textArray = split.call(this, element.textContent)
   const textNodes = []
   textArray.forEach(t => {
-    if (t.isVariable) {
+    if (t.path) {
       const element = createReactiveTextNode.call(this, t.path, t.value)
       textNodes.push(element)
     } else {
@@ -36,10 +35,13 @@ function processTextContent (element) {
     }
   })
 
+  // if node is text content, replace new text nodes with this current one
   if (element.nodeName === '#text') {
     textNodes.forEach(n => element.before(n))
     element.remove()
-  } else {
+  }
+
+  else {
     element.innerHTML = ''
     textNodes.forEach(n => element.append(n))
   }

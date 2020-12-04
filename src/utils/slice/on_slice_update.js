@@ -34,8 +34,6 @@ function on_slice_update (chain, value, trap) {
     callObj.calls.push({ chain, value, trap })
   }
 
-  console.log({ $: this.$, chain, value, trap })
-
   // update the state object, but don't trigger on_slice_update to avoid infinite loop
   const success = silentMutate(this.$, chain, value, trap)
 

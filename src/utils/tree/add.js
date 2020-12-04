@@ -13,7 +13,6 @@ function add_node (element, anchorNode) {
     if (node.addStateListener) node.addStateListener()
   })
 
-  // console.log('add : ', element)
   anchorNode.after(element)
   animate_enter(element)
 }
