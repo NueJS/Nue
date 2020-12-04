@@ -1,4 +1,4 @@
-import { is_placeholder, unwrap } from '../str.js'
+import { is_placeholder, unwrap } from '../string/placeholder.js'
 
 /**
  * returns an object of arrays which shows name, value and isVar property of an attribute
@@ -20,18 +20,3 @@ function get_attributes (node) {
 }
 
 export default get_attributes
-
-/**
- * return attribute value of an element
- * return null if the value is null and  optional
- * throw error if value is null and not optional
- */
-// export function attr (element, attributeName, optional) {
-//   const str = element.getAttribute(attributeName)
-//   if (!str) {
-//     if (optional) return null
-//     else throw new Error(`missing "${attributeName}" attribute on <${element.nodeName}> in <${this.compName}>`)
-//   }
-
-//   return unwrap(str)
-// }

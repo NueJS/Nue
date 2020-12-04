@@ -1,6 +1,6 @@
 import processTextContent from './text-content.js'
 import processAttributes from './attributes/all.js'
-import commentIf from './condition.js'
+import process_condition from './condition.js'
 
 // this number is use to find memoized information from this.memo.nodes for a node
 let i = 0
@@ -25,7 +25,7 @@ function process_node (node, context) {
   else if (memo) {
     if (node.nodeName === '#comment') {
       if (memo.type === 'if') {
-        commentIf.call(this, node, memo)
+        process_condition.call(this, node, memo)
       }
     }
 

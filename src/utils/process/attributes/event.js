@@ -17,3 +17,5 @@ function process_event_attribute (node, attribute) {
     // node.onRemove(cleanup)
   }
 }
+
+export default process_event_attribute

@@ -1,5 +1,5 @@
-import add_slice_dependency from './reactivity/add_slice_dependency.js'
-import { memoize_cb } from './reactivity/callbacks.js'
+import add_slice_dependency from './slice/add_slice_dependency.js'
+import { memoize_cb } from './callbacks.js'
 
 function update (fn, deps, type, batching = true) {
   fn.lifecycle = type
@@ -17,8 +17,8 @@ function update (fn, deps, type, batching = true) {
 
 function add_lifecycle_hooks () {
   this.on = {
-    add: (fn) => this.onAddCbs.push(fn),
-    remove: (fn) => this.onRemoveCbs.push(fn),
+    add: (fn) => this.add_callbacks.push(fn),
+    remove: (fn) => this.remove_callbacks.push(fn),
     beforeUpdate: (fn, deps) => update.call(this, fn, deps, 'before'),
     reactiveUpdate: (fn, deps) => update.call(this, fn, deps, 'reactive', false),
     afterUpdate: (fn, deps) => update.call(this, fn, deps, 'after', this),

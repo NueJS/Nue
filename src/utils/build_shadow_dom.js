@@ -1,5 +1,5 @@
-import process_node from './process/process_node.js'
-import { traverse } from './node/tree.js'
+import process_node from './process/node.js'
+import traverse from './tree/traverse.js'
 
 function build_shadow_dom (template) {
   this.attachShadow({ mode: this.memo.mode })

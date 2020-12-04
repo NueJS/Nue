@@ -1,6 +1,6 @@
-import memoize_attributes from '../memoize/memoize_attributes.js'
-import saveCommentInfo from '../memoize/memoize_comments.js'
-import { traverse } from '../tree/traverse.js'
+import memoize_attributes from '../memoize/attributes.js'
+import memoize_comment from '../memoize/comment.js'
+import traverse from '../tree/traverse.js'
 
 // traverse all the nodes in the template
 // remove unnecessary nodes like empty text nodes which may cause issues when processing other things
@@ -24,7 +24,7 @@ function process_template () {
         remove_nodes.push(node)
         i--
       } else if (node.nodeName === '#comment') {
-        saveCommentInfo.call(this, node, i)
+        memoize_comment.call(this, node, i)
       } else if (node.attributes && node.attributes.length) {
         memoize_attributes.call(this, node, i)
       }

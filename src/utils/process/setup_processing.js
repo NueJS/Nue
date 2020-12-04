@@ -1,6 +1,8 @@
 // import fetchComponents from './fetchComponents.js'
+import modes from '../reactivity/modes.js'
 import reactify from '../reactivity/reactify.js'
-import processTemplate from './process/processTemplate.js'
+import html from '../string/html.js'
+import process_template from './template.js'
 
 function setup_processing (component) {
   const $ = reactify.call(this, this.props || {})
@@ -8,40 +10,30 @@ function setup_processing (component) {
   const on = this.on
   const refs = this.memo.refs
   const actions = this.actions
+  let _html
 
   const invoke_component = (processHTML) => {
-    $.__setDisableOnChange__(true)
-    $.__setInitiateMode__(true)
-    const _html = processHTML ? html.bind(this) : () => {}
+    modes.reactive = false
+    modes.no_overrides = true
     component({ $, handle, on, refs, html: _html, actions })
-    $.__setInitiateMode__(false)
-    $.__setDisableOnChange__(false)
+    modes.reactive = true
+    modes.no_overrides = false
   }
 
+  // if memoized already, don't process template
   if (this.memo.template) {
+    _html = () => {}
     invoke_component(false)
-  } else {
+  }
+
+  else {
+    _html = html.bind(this)
     this.memo.template = document.createElement('template')
     invoke_component(true)
-    processTemplate.call(this)
+    process_template.call(this)
   }
 
   this.$ = $
-}
-
-// process tagged template literal
-// does nothing extra, just concatenates the strings with expressions just like how it would be done
-// this is just for better DX ( clean syntax and code highlighting)
-// can add some feature in future where using an expression can do something special
-function html (strings, ...exprs) {
-  let str = ''
-  let value
-  for (let i = 0; i < strings.length; i++) {
-    value = exprs[i]
-    str += strings[i] + (value === undefined ? '' : value)
-  }
-
-  this.memo.template.innerHTML = str
 }
 
 export default setup_processing

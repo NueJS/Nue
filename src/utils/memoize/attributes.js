@@ -1,7 +1,6 @@
 // import { uid } from '../others.js'
-import { is_placeholder, unwrap } from '../str.js'
+import { is_placeholder, unwrap } from '../string/placeholder.js'
 import get_attributes from '../node/get_attributes.js'
-// import saveNodeInfo from './saveNodeInfo.js'
 
 /**
  * process attributes of node and then memoize them in this.memo.nodes

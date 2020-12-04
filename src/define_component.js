@@ -1,10 +1,10 @@
 import build_shadow_dom from './utils/build_shadow_dom.js'
 import add_lifecycle_hooks from './utils/add_lifecycle_hooks.js'
-import setup_processing from './utils/setup_processing.js'
+import setup_processing from './utils/process/setup_processing.js'
 
 // define a component using compName and a component function
 // component function will define html, css, state, life cycles, actions etc
-function defineComponent (compName, component) {
+function define_component (compName, component) {
   // information about component which are same among all the instances of the components
   // to improve performance these info will be calculated once and will be shared by all the instances
   const memo = { nodes: { }, refs: {}, mode: 'open', componentName: compName }
@@ -28,8 +28,8 @@ function defineComponent (compName, component) {
       this.compName = compName
 
       // callbacks that are to be called when the components is connected / disconnected to DOM
-      this.onAddCbs = []
-      this.onRemoveCbs = []
+      this.add_callbacks = []
+      this.remove_callbacks = []
 
       // memo of the component which are same for all instances
       this.memo = memo
@@ -66,15 +66,15 @@ function defineComponent (compName, component) {
 
     // when component is added in dom
     connectedCallback () {
-      this.onAddCbs.forEach(cb => cb())
+      this.add_callbacks.forEach(cb => cb())
     }
 
     // when the component is removed from dom
     // run cleanups
     disconnectedCallback () {
-      this.onRemoveCbs.forEach(cb => cb())
+      this.remove_callbacks.forEach(cb => cb())
     }
   })
 }
 
-export default defineComponent
+export default define_component

@@ -1,44 +1,47 @@
 // import get_attributes from '../get_attributes.js'
-import bind_input from './attributes/bind_input.js.js.js'
-import bind_attr from './attributes/bind_attr.js.js.js'
-import add_state from './attributes/add_state.js.js.js'
+import process_bind_attribute from './bind.js'
+import process_attribute from './value.js'
+import process_state_attribute from './state.js'
+import process_event_attributes from './event.js'
 
 function processAttributes (node, memo) {
-  // console.log(node.nodeName, node.getAttribute)
+  // @TODO move this to memo
+  // process ref attribute
   const ref = node.getAttribute('ref')
-  if (ref) {
-    this.memo.refs[ref] = node
-  }
+  if (ref) this.memo.refs[ref] = node
 
-  const info = memo
-  if (!(info && info.attributes)) return
+  // if not memo
+  if (!(memo && memo.attributes)) return
 
-  console.log(node, info.attributes)
-  info.attributes.forEach(attribute => {
+  memo.attributes.forEach(attribute => {
     // @eventName={handler}
     if (attribute.eventName) {
-      processEventAttributes.call(this, node, attribute)
+      process_event_attributes.call(this, node, attribute)
     }
     // bind value on input nodes or bind a prop to custom component
     else if (attribute.bindProp) {
+      const { bindProp, path } = attribute
+      // bind:value=[slice]
       if (node.nodeName === 'INPUT' || node.nodeName === 'TEXTAREA') {
-        bind_input.call(this, node, attribute.bindProp, attribute.path)
+        process_bind_attribute.call(this, node, bindProp, path)
       }
 
       // bind:bindProp={key} on custom component
       else {
-        add_state.call(this, node, attribute.bindProp, true, attribute.path, true)
+        process_state_attribute.call(this, node, bindProp, true, path, true)
       }
     }
 
     // :name={var} or :name=value set the state of component
     else if (attribute.propName) {
-      add_state.call(this, node, attribute.propName, attribute.isVar, attribute.path)
+      const { propName, isVar, path } = attribute
+      process_state_attribute.call(this, node, propName, isVar, path)
     }
 
     // set value of simple attributes to state
     else {
-      bind_attr.call(this, node, attribute.name, attribute.path)
+      const { name, path } = attribute
+      process_attribute.call(this, node, name, path)
     }
   })
 }

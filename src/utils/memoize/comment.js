@@ -1,8 +1,7 @@
 // import saveNodeInfo from './saveNodeInfo.js'
-import { ignore_space, unwrap } from '../str.js'
+import { ignore_space, unwrap } from '../string/placeholder.js'
 
-function saveCommentInfo (node, i) {
-  // console.log(node.nodeName, i)
+function memoize_comment (node, i) {
   this.memo.nodes[i] = {}
   const saveOn = this.memo.nodes[i]
 
@@ -22,4 +21,4 @@ function saveCommentInfo (node, i) {
   }
 }
 
-export default saveCommentInfo
+export default memoize_comment

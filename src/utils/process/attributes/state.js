@@ -1,6 +1,6 @@
-import slice from '../slice.js'
-import add_slice_dependency from '../reactivity/add_slice_dependency.js'
-import { mutate } from '../reactivity/mutate.js'
+import slice from '../../slice/slice.js'
+import add_slice_dependency from '../../slice/add_slice_dependency.js'
+import { mutate } from '../../reactivity/mutate.js'
 
 // props are a way to send data from parent state to child state
 // child component uses props to initialize its state
@@ -10,7 +10,7 @@ function add_props (node, key, value) {
   node.props[key] = value
 }
 
-function add_state (node, prop_name, is_variable, path, bind) {
+function process_state_attribute (node, prop_name, is_variable, path, bind) {
   const prop_name_split = prop_name.split('.')
 
   // if value is not variable, add props
@@ -44,4 +44,4 @@ function add_state (node, prop_name, is_variable, path, bind) {
   }
 }
 
-export default add_state
+export default process_state_attribute

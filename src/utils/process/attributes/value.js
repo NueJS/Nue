@@ -1,9 +1,9 @@
 import slice from '../../slice/slice.js'
-import add_slice_dependency from '../reactivity/add_slice_dependency.js'
+import add_slice_dependency from '../../slice/add_slice_dependency.js'
 
 // get the value of slice having the given path and set the attribute value
 // when the slice changes, update the value of attribute as well
-function update_attribute_value (node, name, path) {
+function process_attribute (node, name, path) {
   const set = () => {
     const value = slice(this.$, path)
     node.setAttribute(name, value)
@@ -13,4 +13,4 @@ function update_attribute_value (node, name, path) {
   add_slice_dependency.call(this, path, set)
 }
 
-export default update_attribute_value
+export default process_attribute

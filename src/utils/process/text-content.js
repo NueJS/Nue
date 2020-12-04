@@ -2,7 +2,7 @@ import slice from '../slice/slice.js'
 // import addContextDependency from '../context.js'
 import add_slice_dependency from '../slice/add_slice_dependency.js'
 import { memoize_cb } from '../callbacks.js'
-import { split } from '../str.js'
+import { split } from '../string/split.js'
 
 // create text node with given key as its dependency on $
 function createReactiveTextNode (path, value) {

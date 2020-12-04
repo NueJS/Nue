@@ -1,7 +1,7 @@
 // import add_slice_dependency from '../reactivity/add_slice_dependency.js'
-import { ignore_space, unwrap } from '../str.js'
+import { ignore_space, unwrap } from '../string/placeholder.js'
 import slice from '../slice/slice.js'
-import process_node from './process_node.js'
+import process_node from './node.js'
 import { add_node, remove_node } from '../tree/traverse.js'
 import { reverseForEach } from '../others.js'
 
@@ -10,38 +10,33 @@ import { reverseForEach } from '../others.js'
  * @param {Node} commentNode
  * @param {Array<string>} commentSplit
  */
-function commentIf (commentNode, memo) {
-  // console.log('found comment at', memo)
+function process_condition (commentNode, memo) {
   const conditional = []
   const stateDeps = []
   let node = commentNode.nextSibling
-  // const ifStateChain = unwrap(commentSplit[1]).split('.')
-  let cIndex = 0
+  let id = 0
   conditional.push({ nodes: [], path: memo.path, commentNode, type: 'if' })
   stateDeps.push(memo.path)
 
   while (true) {
     if (node.nodeName === '#comment') {
       const textSplit = ignore_space(node.textContent)
-      // console.log({ textSplit })
       if (textSplit[0] === 'else-if') {
         const path = unwrap(textSplit[1]).split('.')
         conditional.push({ nodes: [], path, commentNode: node, type: 'else-if' })
         stateDeps.push(path)
-        cIndex++
+        id++
       } else if (textSplit[0] === 'else') {
         conditional.push({ nodes: [], commentNode: node, type: 'else' })
-        cIndex++
+        id++
       } else if (textSplit[0] === 'end-if') {
-        // console.log('break')
         break
       }
     } else {
-      conditional[cIndex].nodes.push(node)
+      conditional[id].nodes.push(node)
     }
 
     process_node.call(this, node)
-    // console.log({ node })
     node = node.nextSibling
     if (node === null) {
       this.showError('missing end-if comment')
@@ -53,7 +48,6 @@ function commentIf (commentNode, memo) {
     conditional.forEach((group, i) => {
       const conditionValue = group.type !== 'else' ? slice(this.$, group.path) : true
 
-      // console.log(conditionValue, this.$.count, group.path)
       // if condition becomes truthy and another one before it is not truthy
       // then show this if not already
       if (conditionValue && !trueFound) {
@@ -64,7 +58,9 @@ function commentIf (commentNode, memo) {
           })
           group.isRemoved = false
         }
-      } else {
+      }
+
+      else {
         if (!group.isRemoved) {
           group.nodes.forEach(n => remove_node(n))
           group.isRemoved = true
@@ -74,10 +70,9 @@ function commentIf (commentNode, memo) {
   }
 
   const deps = stateDeps.map(d => d.join('.'))
-  // console.log({ deps })
   onConditionChange()
 
   this.on.beforeUpdate(onConditionChange, deps)
 }
 
-export default commentIf
+export default process_condition

@@ -1,4 +1,4 @@
-import defineComponent from './defineComponent.js'
+import define_component from './define_component.js'
 export { default as settings } from './settings.js'
 
 // define all the components
@@ -13,5 +13,5 @@ export { default as settings } from './settings.js'
 // if not, process it
 
 export const components = (comps) => {
-  Object.keys(comps).forEach(name => defineComponent(name, comps[name]))
+  Object.keys(comps).forEach(name => define_component(name, comps[name]))
 }

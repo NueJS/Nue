@@ -1,11 +1,11 @@
-import { mutate } from '../reactivity/mutate.js'
-import add_slice_dependency from '../reactivity/add_slice_dependency.js'
-import slice from '../slice.js'
+import { mutate } from '../../reactivity/mutate.js'
+import add_slice_dependency from '../../slice/add_slice_dependency.js'
+import slice from '../../slice/slice.js'
 
 // bind:value=[path], bind:checked=[path] etc
 // set the value from state
 // when input's value change set the value in state
-function bind_input (node, bindProp, path) {
+function process_bind_attribute (node, bindProp, path) {
   const isNumber = node.type === 'number' || node.type === 'range'
   node[bindProp] = slice(this.$, path)
 
@@ -31,4 +31,4 @@ function bind_input (node, bindProp, path) {
   node.onRemove(cleanup)
 }
 
-export default bind_input
+export default process_bind_attribute
