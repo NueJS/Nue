@@ -1,4 +1,4 @@
-import add_slice_dependency from '../slice/add_slice_dependency.js'
+import on_slice_update from '../slice/on_slice_update.js'
 import modes from './modes.js'
 import functional_slices from '../slice/functional_slice.js'
 import { accessed } from '../slice/slices_used.js'
@@ -15,19 +15,20 @@ function reactify (state, chain = []) {
   })
 
   const _this = this
-  const $ = new Proxy(wrapper, {
+  return new Proxy(wrapper, {
     set (target, prop, newValue) {
+      // if no overrides are allowed and trying to override
       if (modes.no_overrides && target[prop]) return true
       let value = newValue
       if (typeof value === 'function') value = functional_slices.call(_this, value, prop)
       else if (isObject(value)) value = reactify.call(_this, value, [...chain, prop])
-      if (modes.reactive) return Reflect.set(target, prop, value)
-      else return add_slice_dependency.call(_this, [...chain, prop], value, 'set')
+      if (!modes.reactive) return Reflect.set(target, prop, value)
+      else return on_slice_update.call(_this, [...chain, prop], value, 'set')
     },
 
     deleteProperty (target, prop) {
-      if (modes.reactive) return Reflect.deleteProperty(target, prop)
-      else return add_slice_dependency.call(_this, [...chain, prop], undefined, 'deleteProperty')
+      if (!modes.reactive) return Reflect.deleteProperty(target, prop)
+      else return on_slice_update.call(_this, [...chain, prop], undefined, 'deleteProperty')
     },
 
     get (target, prop) {
@@ -41,8 +42,6 @@ function reactify (state, chain = []) {
     }
 
   })
-
-  return $
 }
 
 export default reactify
