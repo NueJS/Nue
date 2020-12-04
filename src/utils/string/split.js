@@ -1,4 +1,4 @@
-import slice from '../slice'
+import slice from '../slice/slice.js'
 
 // split the text into placeholders and strings
 // if the text inside the placeholder is not a valid path of slice of state, treat it as string

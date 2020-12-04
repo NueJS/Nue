@@ -1,5 +1,6 @@
 // import saveNodeInfo from './saveNodeInfo.js'
-import { ignore_space, unwrap } from '../string/placeholder.js'
+import { unwrap } from '../string/placeholder.js'
+import ignore_space from '../string/ignore_space.js'
 
 function memoize_comment (node, i) {
   this.memo.nodes[i] = {}

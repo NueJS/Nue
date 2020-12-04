@@ -1,8 +1,10 @@
 // import add_slice_dependency from '../reactivity/add_slice_dependency.js'
-import { ignore_space, unwrap } from '../string/placeholder.js'
+import { unwrap } from '../string/placeholder.js'
+import ignore_space from '../string/ignore_space.js'
 import slice from '../slice/slice.js'
 import process_node from './node.js'
-import { add_node, remove_node } from '../tree/traverse.js'
+import add from '../tree/add.js'
+import remove from '../tree/remove.js'
 import { reverseForEach } from '../others.js'
 
 /**
@@ -54,7 +56,7 @@ function process_condition (commentNode, memo) {
         trueFound = true
         if (group.isRemoved) {
           reverseForEach(group.nodes, (n) => {
-            add_node(n, group.commentNode)
+            add(n, group.commentNode)
           })
           group.isRemoved = false
         }
@@ -62,7 +64,7 @@ function process_condition (commentNode, memo) {
 
       else {
         if (!group.isRemoved) {
-          group.nodes.forEach(n => remove_node(n))
+          group.nodes.forEach(n => remove(n))
           group.isRemoved = true
         }
       }

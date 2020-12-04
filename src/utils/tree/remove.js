@@ -1,5 +1,5 @@
 import traverse from './traverse.js'
-import animate_exit from '../node/animate.js'
+import { animate_exit } from '../node/animate.js'
 
 /**
  * remove the $ listeners from all children of the node
@@ -7,7 +7,7 @@ import animate_exit from '../node/animate.js'
  * @param {Element} element - node which is to be removed from DOM
  */
 
-export function remove_node (element) {
+function remove_node (element) {
   traverse(element, node => {
     if (node.removeStateListener) node.removeStateListener()
     if (node.onRemove) node.onRemove()
@@ -16,3 +16,5 @@ export function remove_node (element) {
   const remove = () => element.remove()
   animate_exit(element, remove)
 }
+
+export default remove_node

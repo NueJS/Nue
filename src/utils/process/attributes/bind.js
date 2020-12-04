@@ -28,7 +28,7 @@ function process_bind_attribute (node, bindProp, path) {
   // cleanup on node or component removal
   const cleanup = () => node.removeEventListener('input', handler)
   this.on.remove(cleanup)
-  node.onRemove(cleanup)
+  node.onRemove = cleanup
 }
 
 export default process_bind_attribute

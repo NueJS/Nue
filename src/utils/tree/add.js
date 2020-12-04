@@ -8,7 +8,7 @@ import { animate_enter } from '../node/animate.js'
  * @param {Element} anchorNode
  */
 
-export function add_node (element, anchorNode) {
+function add_node (element, anchorNode) {
   traverse(element, node => {
     if (node.addStateListener) node.addStateListener()
   })
@@ -17,3 +17,5 @@ export function add_node (element, anchorNode) {
   anchorNode.after(element)
   animate_enter(element)
 }
+
+export default add_node

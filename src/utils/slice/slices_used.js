@@ -7,7 +7,7 @@ export const accessed = {
 }
 
 // call the function and detect what keys it is using of this.$
-export const slices_used = (fn) => {
+const slices_used = (fn) => {
   modes.detect_slices = true
   const returnVal = fn()
   modes.detect_slices = false
@@ -15,3 +15,5 @@ export const slices_used = (fn) => {
   accessed.paths = []
   return [returnVal, deps]
 }
+
+export default slices_used

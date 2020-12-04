@@ -1,8 +1,7 @@
 import slice from '../slice/slice.js'
-// import addContextDependency from '../context.js'
 import add_slice_dependency from '../slice/add_slice_dependency.js'
 import { memoize_cb } from '../callbacks.js'
-import { split } from '../string/split.js'
+import split from '../string/split.js'
 
 // create text node with given key as its dependency on $
 function createReactiveTextNode (path, value) {
@@ -10,7 +9,7 @@ function createReactiveTextNode (path, value) {
 
   const cb = () => {
     textNode.textContent = slice(this.$, path)
-    console.log('DOM: update text to ', textNode.textContent)
+    // console.log('DOM: update text to ', textNode.textContent)
     // if (window.supersweet.showUpdates) window.supersweet.nodeUpdated(textNode)
   }
 
