@@ -19,15 +19,15 @@ function process_template () {
 
   childNodes.forEach(childNode =>
     traverse(childNode, node => {
-      i++
       if (node.nodeName === '#text' && !node.textContent.trim()) {
         remove_nodes.push(node)
-        i--
       } else if (node.nodeName === '#comment') {
+        i++
         memoize_comment.call(this, node, i)
       } else if (node.attributes && node.attributes.length) {
+        i++
         memoize_attributes.call(this, node, i)
-      }
+      } else { i++ }
     })
   )
 
