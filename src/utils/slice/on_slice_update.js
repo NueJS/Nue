@@ -1,7 +1,7 @@
 import { silentMutate } from '../reactivity/mutate.js'
 import { call_$_cbs, call_all_cbs } from '../callbacks.js'
 
-let startedCollecting
+let collect
 const callObj = { calls: [] }
 
 function call_memoized_callbacks (obj) {
@@ -11,14 +11,14 @@ function call_memoized_callbacks (obj) {
   })
 }
 
-function on_update (chain, value, trap) {
+function on_slice_update (chain, value, trap) {
   if (this.ignore_chain === chain[0]) return true
 
-  if (!startedCollecting) {
-    startedCollecting = true
+  if (!collect) {
+    collect = true
     // wait for all the callbacks to complete
     setTimeout(() => {
-      startedCollecting = false
+      collect = false
       callObj.call = []
       const { before, after, reactive, dom } = this.memoized_callbacks
 
@@ -34,7 +34,9 @@ function on_update (chain, value, trap) {
     callObj.calls.push({ chain, value, trap })
   }
 
-  // update the state object, but don't trigger on_update to avoid infinite loop
+  console.log({ $: this.$, chain, value, trap })
+
+  // update the state object, but don't trigger on_slice_update to avoid infinite loop
   const success = silentMutate(this.$, chain, value, trap)
 
   // ignore .length updates on array
@@ -60,4 +62,4 @@ function on_update (chain, value, trap) {
   return success
 }
 
-export default on_update
+export default on_slice_update
