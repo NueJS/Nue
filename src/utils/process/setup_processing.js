@@ -5,7 +5,7 @@ import html from '../string/html.js'
 import process_template from './template.js'
 
 function setup_processing (component) {
-  const $ = reactify.call(this, this.props || {})
+  this.$ = reactify.call(this, this.props || {})
   const handle = this.handle
   const on = this.on
   const refs = this.memo.refs
@@ -15,7 +15,7 @@ function setup_processing (component) {
   const invoke_component = (processHTML) => {
     modes.reactive = false
     modes.no_overrides = true
-    component({ $, handle, on, refs, html: _html, actions })
+    component({ $: this.$, handle, on, refs, html: _html, actions })
     modes.reactive = true
     modes.no_overrides = false
   }
@@ -32,8 +32,6 @@ function setup_processing (component) {
     invoke_component(true)
     process_template.call(this)
   }
-
-  this.$ = $
 }
 
 export default setup_processing
