@@ -1,11 +1,12 @@
-import processTextContent from './processTextContent.js'
-import processAttributes from './processAttributes.js'
-import commentIf from './commentIf.js'
+import processTextContent from './text-content.js'
+import processAttributes from './attributes/all.js'
+import commentIf from './condition.js'
 
 // this number is use to find memoized information from this.memo.nodes for a node
 let i = 0
-function processNode (node, context) {
+function process_node (node, context) {
   i++
+  node.id = i
   // get memoized info
   const memo = this.memo.nodes[i]
 
@@ -34,4 +35,4 @@ function processNode (node, context) {
   }
 }
 
-export default processNode
+export default process_node

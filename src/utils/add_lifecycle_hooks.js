@@ -1,5 +1,5 @@
-import onStateChange from './reactivity/onStateChange.js'
-import { callCbOnce } from './reactivity/cbs.js'
+import add_slice_dependency from './reactivity/add_slice_dependency.js'
+import { memoize_cb } from './reactivity/callbacks.js'
 
 function update (fn, deps, type, batching = true) {
   fn.lifecycle = type
@@ -8,14 +8,14 @@ function update (fn, deps, type, batching = true) {
     // this.stateDeps.$[type].push(fn)
   }
   else {
-    const cb = batching ? callCbOnce.call(this, fn, type) : fn
+    const cb = batching ? memoize_cb.call(this, fn, type) : fn
     deps.forEach(d => {
-      onStateChange.call(this, d.split('.'), cb, type)
+      add_slice_dependency.call(this, d.split('.'), cb, type)
     })
   }
 }
 
-function addLifeCycles () {
+function add_lifecycle_hooks () {
   this.on = {
     add: (fn) => this.onAddCbs.push(fn),
     remove: (fn) => this.onRemoveCbs.push(fn),
@@ -26,4 +26,4 @@ function addLifeCycles () {
   }
 }
 
-export default addLifeCycles
+export default add_lifecycle_hooks

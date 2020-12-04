@@ -1,8 +1,8 @@
-// import onStateChange from '../reactivity/onStateChange.js'
-import { spaceSplitter, uncurl } from '../str.js'
-import getSlice from '../value.js'
-import processNode from './processNode.js'
-import { addTree, removeTree } from '../node/tree.js'
+// import add_slice_dependency from '../reactivity/add_slice_dependency.js'
+import { ignore_space, unwrap } from '../str.js'
+import slice from '../slice/slice.js'
+import process_node from './process_node.js'
+import { add_node, remove_node } from '../tree/traverse.js'
 import { reverseForEach } from '../others.js'
 
 /**
@@ -15,17 +15,17 @@ function commentIf (commentNode, memo) {
   const conditional = []
   const stateDeps = []
   let node = commentNode.nextSibling
-  // const ifStateChain = uncurl(commentSplit[1]).split('.')
+  // const ifStateChain = unwrap(commentSplit[1]).split('.')
   let cIndex = 0
   conditional.push({ nodes: [], path: memo.path, commentNode, type: 'if' })
   stateDeps.push(memo.path)
 
   while (true) {
     if (node.nodeName === '#comment') {
-      const textSplit = spaceSplitter(node.textContent)
+      const textSplit = ignore_space(node.textContent)
       // console.log({ textSplit })
       if (textSplit[0] === 'else-if') {
-        const path = uncurl(textSplit[1]).split('.')
+        const path = unwrap(textSplit[1]).split('.')
         conditional.push({ nodes: [], path, commentNode: node, type: 'else-if' })
         stateDeps.push(path)
         cIndex++
@@ -40,7 +40,7 @@ function commentIf (commentNode, memo) {
       conditional[cIndex].nodes.push(node)
     }
 
-    processNode.call(this, node)
+    process_node.call(this, node)
     // console.log({ node })
     node = node.nextSibling
     if (node === null) {
@@ -51,7 +51,7 @@ function commentIf (commentNode, memo) {
   const onConditionChange = () => {
     let trueFound = false
     conditional.forEach((group, i) => {
-      const conditionValue = group.type !== 'else' ? getSlice(this.$, group.path) : true
+      const conditionValue = group.type !== 'else' ? slice(this.$, group.path) : true
 
       // console.log(conditionValue, this.$.count, group.path)
       // if condition becomes truthy and another one before it is not truthy
@@ -60,13 +60,13 @@ function commentIf (commentNode, memo) {
         trueFound = true
         if (group.isRemoved) {
           reverseForEach(group.nodes, (n) => {
-            addTree(n, group.commentNode)
+            add_node(n, group.commentNode)
           })
           group.isRemoved = false
         }
       } else {
         if (!group.isRemoved) {
-          group.nodes.forEach(n => removeTree(n))
+          group.nodes.forEach(n => remove_node(n))
           group.isRemoved = true
         }
       }
@@ -78,10 +78,6 @@ function commentIf (commentNode, memo) {
   onConditionChange()
 
   this.on.beforeUpdate(onConditionChange, deps)
-  // stateDeps.forEach(path => {
-  //   this.on.beforeUpdate()
-  //   onStateChange.call(this, path, onConditionChange)
-  // })
 }
 
 export default commentIf

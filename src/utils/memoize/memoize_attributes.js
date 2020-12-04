@@ -1,18 +1,18 @@
 // import { uid } from '../others.js'
-import { isCurled, uncurl } from '../str.js'
-import attrs from './attrs.js'
+import { is_placeholder, unwrap } from '../str.js'
+import get_attributes from '../node/get_attributes.js'
 // import saveNodeInfo from './saveNodeInfo.js'
 
 /**
  * process attributes of node and then memoize them in this.memo.nodes
  * @param {HTMLElement} node
  */
-function saveAttributes (node, i) {
+function memoize_attributes (node, i) {
   this.memo.nodes[i] = {}
   const saveOn = this.memo.nodes[i]
   saveOn.attributes = []
 
-  const attributes = attrs(node)
+  const attributes = get_attributes(node)
   Object.keys(attributes).forEach(atrName => {
     const [attrValue, isVar] = attributes[atrName]
     let attrInfo
@@ -21,10 +21,10 @@ function saveAttributes (node, i) {
       node.removeAttribute(atrName)
     }
 
-    const isShorthand = isCurled(atrName) && attrValue === ''
+    const isShorthand = is_placeholder(atrName) && attrValue === ''
     if (isShorthand) {
       node.removeAttribute(atrName)
-      const unAtName = uncurl(atrName)
+      const unAtName = unwrap(atrName)
       attrInfo = {
         path: [unAtName],
         name: unAtName
@@ -74,4 +74,4 @@ function saveAttributes (node, i) {
   })
 }
 
-export default saveAttributes
+export default memoize_attributes

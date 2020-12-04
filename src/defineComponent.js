@@ -1,6 +1,6 @@
-import buildShadowDOM from './utils/buildShadowDOM.js'
-import addLifeCycles from './utils/addLifeCycles.js'
-import buildTemplate from './utils/buildTemplate.js'
+import build_shadow_dom from './utils/build_shadow_dom.js'
+import add_lifecycle_hooks from './utils/add_lifecycle_hooks.js'
+import setup_processing from './utils/setup_processing.js'
 
 // define a component using compName and a component function
 // component function will define html, css, state, life cycles, actions etc
@@ -40,7 +40,7 @@ function defineComponent (compName, component) {
       // callbacks that should be called when a state changes
       // this is for calling callbacks in proper order
       // order: 1.reactive 2. before 3. dom 4. after
-      this.registeredCallbacks = {
+      this.memoized_callbacks = {
         before: {},
         after: {},
         reactive: {},
@@ -49,19 +49,19 @@ function defineComponent (compName, component) {
 
       // add methods to add life cycles callbacks in the component
       // on.add, on.beforeUpdate, on.afterUpdate, on.remove, on.reactive, on.dom
-      addLifeCycles.call(this)
+      add_lifecycle_hooks.call(this)
 
       // process the template - one times only
       // memoize template info to reuse in other instances
       // if memoized already, set up state
-      buildTemplate.call(this, component)
+      setup_processing.call(this, component)
 
       // create copy of template, process nodes using state, add event listeners, add nodes in DOM
-      buildShadowDOM.call(this, memo.template)
+      build_shadow_dom.call(this, memo.template)
 
       // if this component has two way props - meaning that when state of this component changes we have to update the parent's state as well
       // add parent's state update callbacks in this component so that they are called when this component's state changes
-      if (this.twoWayProps) this.twoWayProps.forEach(p => p())
+      if (this.two_way_props) this.two_way_props.forEach(p => p())
     }
 
     // when component is added in dom

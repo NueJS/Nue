@@ -6,7 +6,7 @@
  * @param {Function} cb - callback which removes the element
  */
 
-export const handleAnimateExit = (el, cb) => {
+export const animate_exit = (el, cb) => {
   if (el.getAttribute('animate') !== null) {
     el.setAttribute('exit', '')
     el.addEventListener('animationend', () => {
@@ -23,7 +23,7 @@ export const handleAnimateExit = (el, cb) => {
  * @param {Element} el - element which is added in DOM
  */
 
-export function handleAnimateEnter (el) {
+export function animate_enter (el) {
   if (el.getAttribute('animate') !== null) {
     el.setAttribute('enter', '')
     const onAnimationEnd = () => {

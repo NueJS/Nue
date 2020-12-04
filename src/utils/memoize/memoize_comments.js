@@ -1,5 +1,5 @@
 // import saveNodeInfo from './saveNodeInfo.js'
-import { spaceSplitter, uncurl } from '../str.js'
+import { ignore_space, unwrap } from '../str.js'
 
 function saveCommentInfo (node, i) {
   // console.log(node.nodeName, i)
@@ -7,11 +7,11 @@ function saveCommentInfo (node, i) {
   const saveOn = this.memo.nodes[i]
 
   const text = node.textContent
-  const textArr = spaceSplitter(text)
+  const textArr = ignore_space(text)
 
   const saveChain = (type) => {
     saveOn.type = type
-    saveOn.path = uncurl(textArr[1]).split('.')
+    saveOn.path = unwrap(textArr[1]).split('.')
   }
 
   switch (textArr[0]) {
