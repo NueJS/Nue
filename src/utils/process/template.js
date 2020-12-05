@@ -1,5 +1,6 @@
 import memoize_attributes from '../memoize/attributes.js'
 import memoize_comment from '../memoize/comment.js'
+import memoize_text_content from '../memoize/text-content.js'
 import traverse from '../tree/traverse.js'
 
 // traverse all the nodes in the template
@@ -12,26 +13,30 @@ import traverse from '../tree/traverse.js'
 // doing this allows us to reuse this information when a component create a clone of template
 
 // @TODO, save text content info
-let i = 0
 function process_template () {
   const remove_nodes = []
   const childNodes = this.memo.template.content.childNodes
 
   childNodes.forEach(childNode =>
     traverse(childNode, node => {
-      if (node.nodeName === '#text' && !node.textContent.trim()) {
-        remove_nodes.push(node)
+      if (node.nodeName === '#text') {
+        if (!node.textContent.trim()) remove_nodes.push(node)
+        else {
+          this.memoId++
+          memoize_text_content.call(this, node)
+        }
       } else if (node.nodeName === '#comment') {
-        i++
-        memoize_comment.call(this, node, i)
+        this.memoId++
+        memoize_comment.call(this, node)
       } else if (node.attributes && node.attributes.length) {
-        i++
-        memoize_attributes.call(this, node, i)
-      } else { i++ }
+        this.memoId++
+        memoize_attributes.call(this, node)
+      } else { this.memoId++ }
     })
   )
 
   remove_nodes.forEach(n => n.remove())
+  this.memoId = 0
 }
 
 export default process_template
