@@ -1,6 +1,7 @@
 import slice from '../../slice/slice.js'
 import add_slice_dependency from '../../slice/add_slice_dependency.js'
 import { mutate } from '../../reactivity/mutate.js'
+import { BIND } from '../../constants.js'
 // import modes from '../../reactivity/modes.js'
 
 // props are a way to send data from parent state to child state
@@ -11,25 +12,26 @@ function add_props (node, key, value) {
   node.props[key] = value
 }
 
-// :prop_name=[path]
-function process_state_attribute (node, prop_name, is_variable, path, bind) {
-  const prop_name_split = prop_name.split('.')
+// :name=[path]
+function process_state_attribute (node, info) {
+  const { name, is_placeholder, path } = info
+  const prop_name_split = name.split('.')
 
   // if value is not variable, add props
-  if (!is_variable) {
-    add_props(node, prop_name, path)
+  if (!is_placeholder) {
+    add_props(node, name, path)
     return
   }
 
   // if variable - change the state of node when parent's state changes
-  add_props(node, prop_name, slice(this.$, path))
+  add_props(node, name, slice(this.$, path))
   const flow_down = () => {
     mutate(node.$, prop_name_split, slice(this.$, path), 'set')
   }
   add_slice_dependency.call(this, path, flow_down)
 
   // if attribute is a binding, change the state of parent when node's state changes
-  if (bind) {
+  if (info.type === BIND) {
     // to avoid infinite loop
     // disable slice change in child which triggered the change in parent
     const flow_up = () => {
@@ -39,7 +41,7 @@ function process_state_attribute (node, prop_name, is_variable, path, bind) {
       node.ignore_chain = undefined
     }
 
-    // when this function is called parent's callbacks are added in stateDeps of node
+    // when this function is called parent's callbacks are added in slice_deps of node
     const on_node_state_change = () => add_slice_dependency.call(node, prop_name_split, flow_up)
     if (!node.two_way_props) node.two_way_props = []
 

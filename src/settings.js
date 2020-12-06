@@ -1,5 +1,3 @@
-import onNodeUpdate from './devtools/onNodeUpdate.js'
-
 const settings = {
   showUpdates: false,
 
@@ -9,7 +7,7 @@ const settings = {
 
   // this function will usually be called by a textNode
   // you can not show highlights on a text node, so target its parent instead
-  onNodeUpdate,
+  onNodeUpdate: null,
   commonCSS: ':host {display: block;}'
 }
 

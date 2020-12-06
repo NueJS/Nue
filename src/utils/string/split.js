@@ -1,7 +1,9 @@
 // split the text into placeholders and strings
 // if the text inside the placeholder is not a valid path of slice of state, treat it as string
 
-import { add_fn_deps } from './fn.js'
+import { TEXT, REACTIVE, FN } from '../constants.js'
+// import { add_fn_deps } from './fn.js'
+import { process_placeholder } from './placeholder.js'
 
 // returns parts array of object
 // input: 'name is [name.first]'
@@ -21,8 +23,8 @@ function split (text) {
       in_placeholder = true
       // if str is not empty, add string
       if (str) {
-        parts.push({ string: str })
-        str = '['
+        parts.push({ string: str, type: TEXT })
+        str = ''
       }
     }
 
@@ -30,14 +32,7 @@ function split (text) {
     else if (in_placeholder && text[i] === ']') {
       // remove [ then split to get the placeholder content
       // then split to get the path array
-      const content = str.substr(1)
-      const has_parens = content.includes('(') && content.includes('(')
-      if (has_parens) {
-        parts.push(add_fn_deps.call(this, content))
-      } else {
-        const path = content.split('.')
-        parts.push({ path, string: str + ']', content })
-      }
+      parts.push(process_placeholder(str, true))
 
       // check for function call
       in_placeholder = false
@@ -51,7 +46,7 @@ function split (text) {
   }
 
   // remaining text is string
-  if (str) parts.push({ string: str })
+  if (str) parts.push({ string: str, type: TEXT })
   return parts
 }
 

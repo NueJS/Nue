@@ -69,8 +69,8 @@ function process_if (if_node) {
     })
   }
 
-  // console.log({ stateDeps })
-  const condition_deps = stateDeps.map(d => d.join('.'))
+  // console.log({ slice_deps })
+  const condition_deps = slice_deps.map(d => d.join('.'))
 
   on_conditions_change()
   this.on.beforeUpdate(on_conditions_change, condition_deps)

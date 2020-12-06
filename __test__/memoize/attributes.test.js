@@ -1,12 +1,12 @@
-const { attribute_type } = require('../../src/utils/constants')
-const { default: memoize_attributes } = require('../../src/utils/memoize/attributes')
+const { BIND, SHORTHAND, NORMAL, EVENT, STATE, FN } = require('../../src/utils/constants.js')
+const { default: memoize_attributes } = require('../../src/utils/memoize/attributes.js')
 
 // name=[path]
-let element, _this
+let div, _this
 const memo_id = 0
 
 beforeEach(() => {
-  element = document.createElement('div')
+  div = document.createElement('div')
 
   _this = {
     memo: {
@@ -15,25 +15,126 @@ beforeEach(() => {
   }
 })
 
-test('SHORTHAND', () => {
-  // i was not able not add '[count]' as attribute name directly, that's why i added on p
-  element.innerHTML = '<div>  <p [count]> </p> </div>'
-  const para_element = element.querySelector('p')
-  memoize_attributes.call(_this, para_element, memo_id)
-  const { name, type, is_placeholder } = _this.memo.nodes[memo_id].attributes[0]
-  expect(name).toBe('count')
-  expect(type).toBe(attribute_type.SHORTHAND)
-  expect(is_placeholder).toBe(true)
+describe('REACTIVE placeholder type', () => {
+  test('SHORTHAND', () => {
+    // i was not able not add '[count]' as attribute name directly, that's why i added on p
+    div.innerHTML = '<p [count]> </p>'
+    const element = div.querySelector('p')
+    memoize_attributes.call(_this, element, memo_id)
+    const { name, type, is_placeholder } = _this.memo.nodes[memo_id].attributes[0]
+    expect(name).toBe('count')
+    expect(type).toBe(SHORTHAND)
+    expect(is_placeholder).toBe(true)
+  })
+
+  test('NORMAL', () => {
+    div.innerHTML = '<p data-count=[a.b.c]> </p>'
+    const element = div.querySelector('p')
+    memoize_attributes.call(_this, element, memo_id)
+    const { name, path, type, content, is_placeholder, fn_info } = _this.memo.nodes[memo_id].attributes[0]
+    expect(path).toEqual(['a', 'b', 'c'])
+    expect(name).toBe('data-count')
+    expect(content).toBe('a.b.c')
+    expect(type).toBe(NORMAL)
+    expect(is_placeholder).toBe(true)
+    expect(fn_info).toBe(undefined)
+  })
+
+  test('EVENT', () => {
+    div.innerHTML = '<p @click=[increment]> </p>'
+    const element = div.querySelector('p')
+    memoize_attributes.call(_this, element, memo_id)
+    const { name, type, content } = _this.memo.nodes[memo_id].attributes[0]
+    expect(name).toBe('click')
+    expect(content).toBe('increment')
+    expect(type).toBe(EVENT)
+  })
+
+  test('STATE', () => {
+    div.innerHTML = '<p :title=[a.b.c]> </p>'
+    const element = div.querySelector('p')
+    memoize_attributes.call(_this, element, memo_id)
+    const { name, type, content, path } = _this.memo.nodes[memo_id].attributes[0]
+    expect(name).toBe('title')
+    expect(content).toBe('a.b.c')
+    expect(path).toEqual(['a', 'b', 'c'])
+    expect(type).toBe(STATE)
+  })
+
+  test('BIND', () => {
+    div.innerHTML = '<p bind:foo=[a.b.c]> </p>'
+    const element = div.querySelector('p')
+    memoize_attributes.call(_this, element, memo_id)
+    const { name, type, content, path } = _this.memo.nodes[memo_id].attributes[0]
+    expect(name).toBe('foo')
+    expect(content).toBe('a.b.c')
+    expect(path).toEqual(['a', 'b', 'c'])
+    expect(type).toBe(BIND)
+  })
 })
 
-test('NORMAL', () => {
-  element.setAttribute('data-count', '[count]')
-  memoize_attributes.call(_this, element, memo_id)
-  const { name, path, type, content, is_placeholder, fn_info } = _this.memo.nodes[memo_id].attributes[0]
-  expect(path).toEqual(['count'])
-  expect(name).toBe('data-count')
-  expect(content).toBe('count')
-  expect(type).toBe(attribute_type.NORMAL)
-  expect(is_placeholder).toBe(true)
-  expect(fn_info).toBe(undefined)
+describe('FN placeholder type', () => {
+  test('NORMAL', () => {
+    div.innerHTML = '<p> </p>'
+    const element = div.querySelector('p')
+    // add attribute like this because its not working otherwise in jest
+    element.setAttribute('data-count', '[sum( a, b, c.d )]')
+    memoize_attributes.call(_this, element, memo_id)
+    const { name, type, is_placeholder, fn_info } = _this.memo.nodes[memo_id].attributes[0]
+
+    expect(name).toBe('data-count')
+    expect(type).toBe(NORMAL)
+    expect(is_placeholder).toBe(true)
+    expect(fn_info).toEqual({
+      type: FN,
+      value: {
+        fn_name: 'sum',
+        args: [
+          ['a'],
+          ['b'],
+          ['c', 'd']
+        ]
+      }
+    })
+  })
+
+  test('STATE', () => {
+    div.innerHTML = '<p> </p>'
+    const element = div.querySelector('p')
+    element.setAttribute(':title', '[foo(bar, buzz.fizz)]')
+    memoize_attributes.call(_this, element, memo_id)
+    const { name, type, fn_info } = _this.memo.nodes[memo_id].attributes[0]
+    expect(name).toBe('title')
+    expect(type).toBe(STATE)
+    expect(fn_info).toEqual({
+      type: FN,
+      value: {
+        fn_name: 'foo',
+        args: [
+          ['bar'],
+          ['buzz', 'fizz']
+        ]
+      }
+    })
+  })
+
+  test('BIND', () => {
+    div.innerHTML = '<p bind:foo=[a.b.c]> </p>'
+    const element = div.querySelector('p')
+    element.setAttribute('bind:foo', '[foo(bar, buzz.fizz)]')
+    memoize_attributes.call(_this, element, memo_id)
+    const { name, type, fn_info } = _this.memo.nodes[memo_id].attributes[0]
+    expect(name).toBe('foo')
+    expect(type).toBe(BIND)
+    expect(fn_info).toEqual({
+      type: FN,
+      value: {
+        fn_name: 'foo',
+        args: [
+          ['bar'],
+          ['buzz', 'fizz']
+        ]
+      }
+    })
+  })
 })

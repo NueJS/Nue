@@ -23,7 +23,7 @@ function define_component (compName, component) {
       // before callbacks are added by component which will be called before the DOM is updated
       // after callbacks are added by component which will be called after the DOM is updated
       // dom callbacks are added by nodes which updates text/attributes/state on dom nodes
-      this.stateDeps = { $: { reactive: [], before: [], after: [], dom: [] } }
+      this.slice_deps = { $: { reactive: [], before: [], after: [], dom: [] } }
 
       // tag name of the component
       this.compName = compName

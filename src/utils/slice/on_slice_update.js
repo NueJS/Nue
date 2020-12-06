@@ -43,13 +43,13 @@ function on_slice_update (chain, value, trap) {
   // console.log({ chain })
 
   // call cbs which deps on any change in $
-  // this.stateDeps.$.reactive.forEach(cb => cb())
-  // this.stateDeps.$.before.forEach(cb => cb())
-  // this.stateDeps.$.dom.forEach(cb => cb())
-  // this.stateDeps.$.after.forEach(cb => cb())
+  // this.slice_deps.$.reactive.forEach(cb => cb())
+  // this.slice_deps.$.before.forEach(cb => cb())
+  // this.slice_deps.$.dom.forEach(cb => cb())
+  // this.slice_deps.$.after.forEach(cb => cb())
 
   // call cbs which need to be called
-  let target = this.stateDeps
+  let target = this.slice_deps
   chain.forEach((c, i) => {
     if (typeof target !== 'object') return
     target = target[c]

@@ -3,7 +3,7 @@ import modes from '../reactivity/modes.js'
 import reactify from '../reactivity/reactify.js'
 import html from '../string/html.js'
 // import process_fn from '../string/fn.js'
-import process_template from './template.js'
+import memoize_template from '../memoize/template.js'
 
 function setup_processing (component) {
   this.$ = reactify.call(this, this.props || {})
@@ -31,7 +31,7 @@ function setup_processing (component) {
     _html = html.bind(this)
     this.memo.template = document.createElement('template')
     invoke_component(true)
-    process_template.call(this)
+    memoize_template.call(this)
   }
 }
 

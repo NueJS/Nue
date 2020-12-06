@@ -15,7 +15,7 @@ import { reverseForEach } from '../others.js'
 function process_condition (comment_node, memo) {
   // const memo = this.memo.nodes[memo_id]
   const conditional = []
-  const stateDeps = []
+  const slice_deps = []
 
   const { path, fn_name, type, deps, call_fn } = memo
   console.log({ memo })
@@ -23,11 +23,11 @@ function process_condition (comment_node, memo) {
   if (fn_name) {
     console.log('save fn-name', deps)
     conditional.push({ nodes: [], fn_name, comment_node, type, call_fn })
-    stateDeps.push(...deps)
+    slice_deps.push(...deps)
   }
   else {
     conditional.push({ nodes: [], path: memo.path, comment_node, type: 'if' })
-    stateDeps.push(path)
+    slice_deps.push(path)
   }
 
   let node = comment_node.nextSibling
@@ -42,11 +42,11 @@ function process_condition (comment_node, memo) {
         if (fn_name) {
           console.log('save fn-name')
           conditional.push({ nodes: [], fn_name, args, comment_node: node, type })
-          stateDeps.push(...deps)
+          slice_deps.push(...deps)
         }
         else {
           conditional.push({ nodes: [], path, comment_node: node, type })
-          stateDeps.push(path)
+          slice_deps.push(path)
         }
         id++
       }
@@ -104,8 +104,8 @@ function process_condition (comment_node, memo) {
     })
   }
 
-  // console.log({ stateDeps })
-  const condition_deps = stateDeps.map(d => d.join('.'))
+  // console.log({ slice_deps })
+  const condition_deps = slice_deps.map(d => d.join('.'))
 
   on_conditions_change()
   this.on.beforeUpdate(on_conditions_change, condition_deps)

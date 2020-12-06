@@ -1,6 +1,8 @@
-function process_event_attribute (node, attribute) {
-  const action = this.actions[attribute.eventName]
-  const handler = this.fn[attribute.handler]
+function process_event_attribute (node, info) {
+  const { name, value } = info
+  const action = this.actions[name]
+  const handler = this.fn[value]
+  //
   if (handler === undefined) return
 
   // @customEvent=[handler] action API
@@ -12,8 +14,8 @@ function process_event_attribute (node, attribute) {
 
   // @nativeEvent=[handler]
   else {
-    node.addEventListener(attribute.eventName, handler)
-    const cleanup = () => node.removeEventListener(attribute.eventName, handler)
+    node.addEventListener(name, handler)
+    const cleanup = () => node.removeEventListener(name, handler)
     this.on.remove(cleanup)
     // node.onRemove(cleanup)
   }

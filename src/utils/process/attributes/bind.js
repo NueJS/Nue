@@ -5,23 +5,24 @@ import slice from '../../slice/slice.js'
 // bind:value=[path], bind:checked=[path] etc
 // set the value from state
 // when input's value change set the value in state
-function process_bind_attribute (node, bindProp, path) {
+function process_bind_attribute (node, info) {
   const isNumber = node.type === 'number' || node.type === 'range'
+  const { name, path } = info
   const value = slice(this.$, path)
   if (value === undefined) return
-  node[bindProp] = value
+  node[name] = value
 
   // when input's value is changed, save the value in state
   // convert the value from string to number if needed
   const handler = e => {
-    const value = e.currentTarget[bindProp]
+    const value = e.currentTarget[name]
     const converted = isNumber ? Number(value) : value
     mutate(this.$, path, converted, 'set')
   }
 
   // set the value of input from state
   add_slice_dependency.call(this, path, () => {
-    node[bindProp] = slice(this.$, path)
+    node[name] = slice(this.$, path)
   })
 
   // adding event listener

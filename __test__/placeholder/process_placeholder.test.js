@@ -1,11 +1,12 @@
-const { placeholder_type } = require('../../src/utils/constants')
-const { process_placeholder } = require('../../src/utils/string/placeholder')
+// const { FN, REACTIVE } = require('../../src/utils/constant.js')
+const { REACTIVE, FN } = require('../../src/utils/constants.js')
+const { process_placeholder } = require('../../src/utils/string/placeholder.js')
 
 describe('reactive placeholder', () => {
   test('simple', () => {
     const output = process_placeholder('[cool]')
     expect(output).toEqual({
-      type: placeholder_type.REACTIVE,
+      type: REACTIVE,
       value: ['cool'],
       content: 'cool'
     })
@@ -14,7 +15,7 @@ describe('reactive placeholder', () => {
   test('deep', () => {
     const output = process_placeholder('[foo.bar.bazz]')
     expect(output).toEqual({
-      type: placeholder_type.REACTIVE,
+      type: REACTIVE,
       value: ['foo', 'bar', 'bazz'],
       content: 'foo.bar.bazz'
     })
@@ -23,7 +24,7 @@ describe('reactive placeholder', () => {
   test('with spaces', () => {
     const output = process_placeholder('[ foo.bar.bazz ]')
     expect(output).toEqual({
-      type: placeholder_type.REACTIVE,
+      type: REACTIVE,
       value: ['foo', 'bar', 'bazz'],
       content: 'foo.bar.bazz'
     })
@@ -34,7 +35,7 @@ describe('functional placeholder', () => {
   test('without spaces and simple arguments', () => {
     const output = process_placeholder('[foo(bar, bazz)]')
     expect(output).toEqual({
-      type: placeholder_type.FN,
+      type: FN,
       value: {
         fn_name: 'foo',
         args: [
@@ -48,7 +49,7 @@ describe('functional placeholder', () => {
   test('with spaces and simple arguments', () => {
     const output = process_placeholder('[ foo( bar, bazz ) ]')
     expect(output).toEqual({
-      type: placeholder_type.FN,
+      type: FN,
       value: {
         fn_name: 'foo',
         args: [
@@ -62,7 +63,7 @@ describe('functional placeholder', () => {
   test('complex arguments', () => {
     const output = process_placeholder('[ foo( a.a1.a2, b.b1, c.c1.c2 ) ]')
     expect(output).toEqual({
-      type: placeholder_type.FN,
+      type: FN,
       value: {
         fn_name: 'foo',
         args: [
