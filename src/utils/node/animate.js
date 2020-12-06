@@ -1,34 +1,26 @@
-/**
- * if element has animate attribute, add exit attribute
- * - when the animation ends, remove the exit attribute and call the cb
- * else call it directly
- * @param {Element} el - element which will be removed from DOM
- * @param {Function} cb - callback which removes the element
- */
+// if element has animate attribute, add exit attribute
+// when the animation ends, remove the exit attribute and call the cb
+// else call it directly
 
 export const animate_exit = (el, cb) => {
   if (el.getAttribute('animate') !== null) {
     el.setAttribute('exit', '')
-    el.addEventListener('animationend', () => {
+    const on_animation_end = () => {
       cb()
       el.removeAttribute('exit')
-    }, { once: true })
+    }
+    el.addEventListener('animationend', on_animation_end, { once: true })
   }
   else cb()
 }
 
-/**
- * if the node as animate attribute, add 'enter' attribute
- * and when the animation ends, remove the enter attribute
- * @param {Element} el - element which is added in DOM
- */
+// if the node as animate attribute, add 'enter' attribute
+// and when the animation ends, remove the enter attribute
 
 export function animate_enter (el) {
   if (el.getAttribute('animate') !== null) {
     el.setAttribute('enter', '')
-    const onAnimationEnd = () => {
-      el.removeAttribute('enter')
-    }
-    el.addEventListener('animationend', onAnimationEnd, { once: true })
+    const on_animation_end = () => el.removeAttribute('enter')
+    el.addEventListener('animationend', on_animation_end, { once: true })
   }
 }

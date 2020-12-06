@@ -1,22 +1,25 @@
 import { is_placeholder, unwrap } from '../string/placeholder.js'
 
-/**
- * returns an object of arrays which shows name, value and isVar property of an attribute
- * @param {Element} node - node for which attributes are to be returned
- * @returns {Object} - { id: ['cool', false], ':count': ['$.count', true]}
- */
+// <div id='cool' data-count=[count]> </div>
+// returns
+/* [
+    { id: ['cool', false] },
+    { data-count: ['count', true] }
+  ]
+*/
 
-function get_attributes (node) {
-  const attributes = {}
-  for (let i = 0; i < node.attributes.length; i++) {
-    const attribute = node.attributes[i]
-    let value = attribute.value
-    const isVariable = is_placeholder(value)
-    if (isVariable) value = unwrap(value)
-    attributes[attribute.name] = [value, isVariable]
-  }
+// function get_attributes (element) {
+//   const names = element.getAttributeNames()
+//   const attributes = []
 
-  return attributes
-}
+//   for (const name of names) {
+//     let value = element.getAttribute(name)
+//     const is = is_placeholder(value)
+//     if (is) value = unwrap(value)
+//     attributes.push({ name, value, is_placeholder: is })
+//   }
+
+//   return attributes
+// }
 
 export default get_attributes

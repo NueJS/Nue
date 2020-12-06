@@ -1,6 +1,7 @@
 function process_event_attribute (node, attribute) {
   const action = this.actions[attribute.eventName]
-  const handler = this.handle[attribute.handler]
+  const handler = this.fn[attribute.handler]
+  if (handler === undefined) return
 
   // @customEvent=[handler] action API
   if (action) {

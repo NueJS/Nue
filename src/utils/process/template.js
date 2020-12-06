@@ -1,5 +1,5 @@
 import memoize_attributes from '../memoize/attributes.js'
-import memoize_comment from '../memoize/comment.js'
+// import memoize_comment from '../memoize/comment.js'
 import memoize_text_content from '../memoize/text-content.js'
 import traverse from '../tree/traverse.js'
 
@@ -12,31 +12,35 @@ import traverse from '../tree/traverse.js'
 // when memoizing and reusing same traversal is used thats why we can just use int++ as an id
 // doing this allows us to reuse this information when a component create a clone of template
 
-// @TODO, save text content info
 function process_template () {
+  console.group('process_template')
   const remove_nodes = []
-  const childNodes = this.memo.template.content.childNodes
 
-  childNodes.forEach(childNode =>
-    traverse(childNode, node => {
-      if (node.nodeName === '#text') {
-        if (!node.textContent.trim()) remove_nodes.push(node)
-        else {
-          this.memoId++
-          memoize_text_content.call(this, node)
-        }
-      } else if (node.nodeName === '#comment') {
-        this.memoId++
-        memoize_comment.call(this, node)
-      } else if (node.attributes && node.attributes.length) {
-        this.memoId++
-        memoize_attributes.call(this, node)
-      } else { this.memoId++ }
-    })
-  )
+  // visit each node in template and memoize information
+  let memo_id = 0
+  const on_visit = node => {
+    // memoize text content
+    if (node.nodeName === Node.TEXT_NODE) {
+      if (!node.textContent.trim()) remove_nodes.push(node)
+      else memoize_text_content.call(this, node, ++memo_id)
+    }
 
+    // memoize attributes
+    else if (node.hasAttributes && node.hasAttributes()) {
+      memoize_attributes.call(this, node, ++memo_id)
+    }
+
+    // no memoization needed
+    else {
+      memo_id++
+      // console.log(node.nodeName, memo_id)
+    }
+  }
+
+  traverse(this.memo.template.content, on_visit, true)
+  // remove redundant nodes
   remove_nodes.forEach(n => n.remove())
-  this.memoId = 0
+  console.groupEnd('process_template')
 }
 
 export default process_template

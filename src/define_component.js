@@ -5,17 +5,18 @@ import setup_processing from './utils/process/setup_processing.js'
 // define a component using compName and a component function
 // component function will define html, css, state, life cycles, actions etc
 function define_component (compName, component) {
+  // define web component
+
   // information about component which are same among all the instances of the components
   // to improve performance these info will be calculated once and will be shared by all the instances
   const memo = { nodes: { }, refs: {}, mode: 'open', componentName: compName }
-
-  // define web component
-  customElements.define(compName, class SuperSweet extends HTMLElement {
+  class SuperSweet extends HTMLElement {
     constructor () {
       super()
 
       // event handlers defined in component
       this.handle = {}
+      this.fn = {} // replace handle API with this
 
       // callbacks which are to be called when state changes
       // reactive callbacks are for updating state slices which depend on other state slices
@@ -32,7 +33,14 @@ function define_component (compName, component) {
       this.remove_callbacks = []
 
       // memo of the component which are same for all instances
+      this.memo_id = 0
       this.memo = memo
+      this.collecting_cbs = false
+      this.changed_slices = []
+
+      this.on_processing_done = []
+
+      this.memo_of = (node) => this.memo.nodes[node.memo_id]
 
       // actions API
       this.actions = {}
@@ -40,12 +48,17 @@ function define_component (compName, component) {
       // callbacks that should be called when a state changes
       // this is for calling callbacks in proper order
       // order: 1.reactive 2. before 3. dom 4. after
-      this.memoized_callbacks = {
-        before: {},
-        after: {},
-        reactive: {},
-        dom: {}
+
+      this.clear_memoized_callbacks = () => {
+        this.memoized_callbacks = {
+          before: {},
+          after: {},
+          reactive: {},
+          dom: {}
+        }
       }
+
+      this.clear_memoized_callbacks()
 
       // add methods to add life cycles callbacks in the component
       // on.add, on.beforeUpdate, on.afterUpdate, on.remove, on.reactive, on.dom
@@ -57,7 +70,7 @@ function define_component (compName, component) {
       setup_processing.call(this, component)
 
       // create copy of template, process nodes using state, add event listeners, add nodes in DOM
-      build_shadow_dom.call(this, memo.template)
+      build_shadow_dom.call(this, this.memo.template)
 
       // if this component has two way props - meaning that when state of this component changes we have to update the parent's state as well
       // add parent's state update callbacks in this component so that they are called when this component's state changes
@@ -74,7 +87,9 @@ function define_component (compName, component) {
     disconnectedCallback () {
       this.remove_callbacks.forEach(cb => cb())
     }
-  })
+  }
+
+  customElements.define(compName, SuperSweet)
 }
 
 export default define_component

@@ -5,8 +5,8 @@
  * @param {Function} cb - callback function
  */
 
-function traverse (node, cb) {
-  cb(node)
+function traverse (node, cb, ignore = false) {
+  if (!ignore) cb(node)
   const hasChild = node.hasChildNodes()
   if (hasChild) {
     node.childNodes.forEach(n => {

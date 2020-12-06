@@ -1,9 +1,6 @@
 import { silentMutate } from '../reactivity/mutate.js'
 import { call_$_cbs, call_all_cbs } from '../callbacks.js'
 
-let collect
-const callObj = { calls: [] }
-
 function call_memoized_callbacks (obj) {
   Object.keys(obj).forEach(k => {
     const { fn, args } = obj[k]
@@ -14,12 +11,11 @@ function call_memoized_callbacks (obj) {
 function on_slice_update (chain, value, trap) {
   if (this.ignore_chain === chain[0]) return true
 
-  if (!collect) {
-    collect = true
+  if (!this.collecting_cbs) {
+    this.collecting_cbs = true
     // wait for all the callbacks to complete
     setTimeout(() => {
-      collect = false
-      callObj.call = []
+      this.collecting_cbs = false
       const { before, after, reactive, dom } = this.memoized_callbacks
 
       // order should be exactly this
@@ -27,11 +23,15 @@ function on_slice_update (chain, value, trap) {
       call_memoized_callbacks(before)
       call_memoized_callbacks(dom)
       call_memoized_callbacks(after)
+
+      // reset all callbacks
+      // this.changed_slices = []
+      this.clear_memoized_callbacks()
     }, 0)
   }
 
   else {
-    callObj.calls.push({ chain, value, trap })
+    // this.changed_slices.push({ chain, value, trap })
   }
 
   // update the state object, but don't trigger on_slice_update to avoid infinite loop
@@ -39,6 +39,8 @@ function on_slice_update (chain, value, trap) {
 
   // ignore .length updates on array
   if (chain[chain.length - 1] === 'length') return success
+
+  // console.log({ chain })
 
   // call cbs which deps on any change in $
   // this.stateDeps.$.reactive.forEach(cb => cb())
@@ -53,7 +55,10 @@ function on_slice_update (chain, value, trap) {
     target = target[c]
     if (target) {
       if (i !== chain.length - 1) call_$_cbs.call(this, target, chain)
-      else call_all_cbs.call(this, target, chain)
+      else {
+        // console.log('call all of ', c)
+        call_all_cbs.call(this, target, chain)
+      }
     }
   })
 

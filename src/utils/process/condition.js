@@ -9,54 +9,87 @@ import { reverseForEach } from '../others.js'
 
 /**
  * process if, else-if, else-if, else conditional rendering
- * @param {Node} commentNode
+ * @param {Node} comment_node
  * @param {Array<string>} commentSplit
  */
-function process_condition (commentNode, memo) {
+function process_condition (comment_node, memo) {
+  // const memo = this.memo.nodes[memo_id]
   const conditional = []
   const stateDeps = []
-  let node = commentNode.nextSibling
-  let id = 0
-  conditional.push({ nodes: [], path: memo.path, commentNode, type: 'if' })
-  stateDeps.push(memo.path)
 
+  const { path, fn_name, type, deps, call_fn } = memo
+  console.log({ memo })
+  let id = 0
+  if (fn_name) {
+    console.log('save fn-name', deps)
+    conditional.push({ nodes: [], fn_name, comment_node, type, call_fn })
+    stateDeps.push(...deps)
+  }
+  else {
+    conditional.push({ nodes: [], path: memo.path, comment_node, type: 'if' })
+    stateDeps.push(path)
+  }
+
+  let node = comment_node.nextSibling
   while (true) {
-    if (node.nodeName === '#comment') {
-      const textSplit = ignore_space(node.textContent)
-      if (textSplit[0] === 'else-if') {
-        const path = unwrap(textSplit[1]).split('.')
-        conditional.push({ nodes: [], path, commentNode: node, type: 'else-if' })
-        stateDeps.push(path)
+    process_node.call(this, node)
+
+    // if condition node
+    if (node.nodeName === Node.COMMENT_NODE) {
+      const { path, type, fn_name, deps, args } = this.memo_of(node)
+
+      if (type === 'else-if') {
+        if (fn_name) {
+          console.log('save fn-name')
+          conditional.push({ nodes: [], fn_name, args, comment_node: node, type })
+          stateDeps.push(...deps)
+        }
+        else {
+          conditional.push({ nodes: [], path, comment_node: node, type })
+          stateDeps.push(path)
+        }
         id++
-      } else if (textSplit[0] === 'else') {
-        conditional.push({ nodes: [], commentNode: node, type: 'else' })
+      }
+
+      else if (type === 'else') {
+        conditional.push({ nodes: [], comment_node: node, type })
         id++
-      } else if (textSplit[0] === 'end-if') {
+      }
+
+      else if (type === 'end-if') {
         break
       }
-    } else {
+    }
+
+    // if node inside condition
+    else {
       conditional[id].nodes.push(node)
     }
 
-    process_node.call(this, node)
     node = node.nextSibling
-    if (node === null) {
-      this.showError('missing end-if comment')
-    }
+    if (node === null) throw new Error('missing end-if comment')
   }
 
-  const onConditionChange = () => {
+  const on_conditions_change = () => {
     let trueFound = false
     conditional.forEach((group, i) => {
-      const conditionValue = group.type !== 'else' ? slice(this.$, group.path) : true
+      const { fn_name, path, call_fn } = group
+      let condition_value = true // else is true if all else fail
+
+      if (fn_name) {
+        condition_value = call_fn.call(this)
+        console.log('value is ', condition_value)
+      } else if (path) {
+        condition_value = slice(this.$, path)
+      }
 
       // if condition becomes truthy and another one before it is not truthy
       // then show this if not already
-      if (conditionValue && !trueFound) {
+      if (condition_value && !trueFound) {
         trueFound = true
         if (group.isRemoved) {
           reverseForEach(group.nodes, (n) => {
-            add(n, group.commentNode)
+            add(n, group.comment_node)
           })
           group.isRemoved = false
         }
@@ -71,10 +104,11 @@ function process_condition (commentNode, memo) {
     })
   }
 
-  const deps = stateDeps.map(d => d.join('.'))
-  onConditionChange()
+  // console.log({ stateDeps })
+  const condition_deps = stateDeps.map(d => d.join('.'))
 
-  this.on.beforeUpdate(onConditionChange, deps)
+  on_conditions_change()
+  this.on.beforeUpdate(on_conditions_change, condition_deps)
 }
 
 export default process_condition

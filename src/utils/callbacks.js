@@ -16,13 +16,12 @@ export function call_all_cbs (target, chain) {
 
 // convert consecutive calls to single call
 export function memoize_cb (fn, type) {
+  // create a unique id
   const fnId = '' + Math.random()
-  const _this = this
   return (...args) => {
-    if (!_this.memoized_callbacks[fnId]) {
-      _this.memoized_callbacks[type][fnId] = { fn, args, type }
-    } else {
-      console.log('duplicate', fn)
+    // if this function is already going to be called, no need to call it again
+    if (!this.memoized_callbacks[type][fnId]) {
+      this.memoized_callbacks[type][fnId] = { fn, args }
     }
   }
 }

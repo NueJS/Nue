@@ -1,76 +1,63 @@
 // import { uid } from '../others.js'
-import { is_placeholder, unwrap } from '../string/placeholder.js'
-import get_attributes from '../node/get_attributes.js'
+import { is_placeholder, unwrap, process_placeholder } from '../string/placeholder.js'
+import { attribute_type, placeholder_type } from '../constants.js'
 
-/**
- * process attributes of node and then memoize them in this.memo.nodes
- * @param {HTMLElement} node
- */
-function memoize_attributes (node, i) {
-  this.memo.nodes[i] = {}
-  const saveOn = this.memo.nodes[i]
-  saveOn.attributes = []
+function memoize_attributes (element, memo_id) {
+  // console.log(element.nodeName, memo_id)
+  const node_memo = this.memo.nodes[memo_id] = { attributes: [] }
 
-  const attributes = get_attributes(node)
-  Object.keys(attributes).forEach(atrName => {
-    const [attrValue, isVar] = attributes[atrName]
-    let attrInfo
+  // loop over each attribute
+  for (const attribute_name of element.getAttributeNames()) {
+    // console.log('attribute name is ', attribute_name)
+    //
+    const attribute_value = element.getAttribute(attribute_name)
+    let is_ph = is_placeholder(attribute_value)
+    const info = process_placeholder(attribute_value)
 
-    if (isVar) {
-      node.removeAttribute(atrName)
+    let name, type, path, content, fn_info
+    if (info.type === placeholder_type.REACTIVE) {
+      path = info.value
+      content = info.content
+    } else {
+      fn_info = info
     }
 
-    const isShorthand = is_placeholder(atrName) && attrValue === ''
-    if (isShorthand) {
-      node.removeAttribute(atrName)
-      const unAtName = unwrap(atrName)
-      attrInfo = {
-        path: [unAtName],
-        name: unAtName
-      }
+    // [path]
+    if (attribute_value === '' && is_placeholder(attribute_name)) {
+      type = attribute_type.SHORTHAND
+      name = unwrap(attribute_name)
+      is_ph = true
     }
 
-    // :propName=[slice] or :propName='value'
-    else if (atrName[0] === ':') {
-      node.removeAttribute(atrName)
-      attrInfo = {
-        propName: atrName.substr(1),
-        isVar,
-        path: isVar ? attrValue.split('.') : attrValue
-      }
+    // :prop=[path] or :prop='value'
+    else if (attribute_name[0] === ':') {
+      type = attribute_type.STATE
+      name = attribute_name.substr(1)
     }
 
-    else if (isVar) {
-      const path = attrValue.split('.')
-      // @eventName=[handler]
-      if (atrName[0] === '@') {
-        const atRemoved = atrName.substr(1)
-        attrInfo = {
-          handler: attrValue,
-          eventName: atRemoved
-        }
+    else if (is_ph) {
+      // @event-name=[handler]
+      if (attribute_name[0] === '@') {
+        type = attribute_type.EVENT
+        name = attribute_name.substr(1)
       }
 
-      // @bind:bindProp=[slice]
-      else if (atrName.startsWith('bind:')) {
-        const bindProp = atrName.substr(5)
-        attrInfo = {
-          bindProp,
-          path
-        }
+      // bind:prop=[path]
+      else if (attribute_name.startsWith('bind:')) {
+        type = attribute_type.BIND
+        name = attribute_name.substr(5)
       }
 
-      // name=[slice] or slice=[slice]'s shorthand -> [slice]
+      // name=[path]
       else {
-        attrInfo = {
-          path,
-          name: atrName
-        }
+        type = attribute_type.NORMAL
+        name = attribute_name
       }
     }
 
-    if (attrInfo) saveOn.attributes.push(attrInfo)
-  })
+    if (is_ph) element.removeAttribute(attribute_name)
+    if (name) node_memo.attributes.push({ path, name, type, content, is_placeholder: is_ph, fn_info })
+  }
 }
 
 export default memoize_attributes

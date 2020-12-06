@@ -3,10 +3,7 @@ import { memoize_cb } from './callbacks.js'
 
 function update (fn, deps, type, batching = true) {
   fn.lifecycle = type
-  if (!deps) {
-    throw new Error(`No Dependency array given in ${fn.name}`)
-    // this.stateDeps.$[type].push(fn)
-  }
+  if (!deps) throw new Error(`No Dependency array given in ${fn.name}`)
   else {
     const cb = batching ? memoize_cb.call(this, fn, type) : fn
     deps.forEach(d => {

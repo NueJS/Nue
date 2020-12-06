@@ -7,12 +7,14 @@ import slice from '../../slice/slice.js'
 // when input's value change set the value in state
 function process_bind_attribute (node, bindProp, path) {
   const isNumber = node.type === 'number' || node.type === 'range'
-  node[bindProp] = slice(this.$, path)
+  const value = slice(this.$, path)
+  if (value === undefined) return
+  node[bindProp] = value
 
   // when input's value is changed, save the value in state
   // convert the value from string to number if needed
   const handler = e => {
-    const value = e.target[bindProp]
+    const value = e.currentTarget[bindProp]
     const converted = isNumber ? Number(value) : value
     mutate(this.$, path, converted, 'set')
   }
