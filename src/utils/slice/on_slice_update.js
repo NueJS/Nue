@@ -1,11 +1,10 @@
 import { silentMutate } from '../reactivity/mutate.js'
 import { call_$_cbs, call_all_cbs } from '../callbacks.js'
 
-function call_memoized_callbacks (obj) {
-  Object.keys(obj).forEach(k => {
-    const { fn, args } = obj[k]
-    fn(...args)
-  })
+function call_lifecycle_methods (lifecycle) {
+  for (const [fn, args] of lifecycle) {
+    fn(args)
+  }
 }
 
 function on_slice_update (chain, value, trap) {
@@ -16,37 +15,26 @@ function on_slice_update (chain, value, trap) {
     // wait for all the callbacks to complete
     setTimeout(() => {
       this.collecting_cbs = false
-      const { before, after, reactive, dom } = this.memoized_callbacks
+      const { before, after, reactive, dom } = this.registered_callbacks
 
       // order should be exactly this
-      call_memoized_callbacks(reactive)
-      call_memoized_callbacks(before)
-      call_memoized_callbacks(dom)
-      call_memoized_callbacks(after)
+      call_lifecycle_methods(reactive)
+      call_lifecycle_methods(before)
+      call_lifecycle_methods(dom)
+      call_lifecycle_methods(after)
 
-      // reset all callbacks
-      // this.changed_slices = []
       this.clear_memoized_callbacks()
+      // console.log('callbacks called : ', this.registered_callbacks)
     }, 0)
   }
 
-  else {
-    // this.changed_slices.push({ chain, value, trap })
-  }
-
   // update the state object, but don't trigger on_slice_update to avoid infinite loop
-  const success = silentMutate(this.$, chain, value, trap)
+  // const success = silentMutate(this.$, chain, value, trap)
 
   // ignore .length updates on array
-  if (chain[chain.length - 1] === 'length') return success
+  // if (chain[chain.length - 1] === 'length') return success
 
-  // console.log({ chain })
-
-  // call cbs which deps on any change in $
-  // this.slice_deps.$.reactive.forEach(cb => cb())
-  // this.slice_deps.$.before.forEach(cb => cb())
-  // this.slice_deps.$.dom.forEach(cb => cb())
-  // this.slice_deps.$.after.forEach(cb => cb())
+  console.log('chain', chain)
 
   // call cbs which need to be called
   let target = this.slice_deps
@@ -55,14 +43,11 @@ function on_slice_update (chain, value, trap) {
     target = target[c]
     if (target) {
       if (i !== chain.length - 1) call_$_cbs.call(this, target, chain)
-      else {
-        // console.log('call all of ', c)
-        call_all_cbs.call(this, target, chain)
-      }
+      else call_all_cbs.call(this, target, chain)
     }
   })
 
-  return success
+  // return success
 }
 
 export default on_slice_update

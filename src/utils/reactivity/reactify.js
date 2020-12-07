@@ -19,11 +19,14 @@ function reactify (state, chain = []) {
     set (target, prop, newValue) {
       // if no overrides are allowed and trying to override
       if (modes.no_overrides && target[prop]) return true
+      //
       let value = newValue
       if (typeof value === 'function') value = functional_slices.call(_this, value, prop)
       else if (isObject(value)) value = reactify.call(_this, value, [...chain, prop])
-      if (!modes.reactive) return Reflect.set(target, prop, value)
-      else return on_slice_update.call(_this, [...chain, prop], value, 'set')
+      //
+      const success = Reflect.set(target, prop, value)
+      if (modes.reactive) on_slice_update.call(_this, [...chain, prop], value, 'set')
+      return success
     },
 
     deleteProperty (target, prop) {
