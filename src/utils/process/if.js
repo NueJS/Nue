@@ -1,79 +1,111 @@
+import slice from '../slice/slice.js'
 import process_node from './node.js'
+import { reverseForEach } from '../others.js'
+import add_node from '../tree/add.js'
+import remove_node from '../tree/remove.js'
+import { FN, REACTIVE } from '../constants.js'
 
 function process_if (if_node) {
-  // [ { type: 'if', condition: ['is_even'], conditional: [] }, ...]
-  const conditional = []
-  const deps = []
+  // nodes that are to be conditionally rendered
+  const groups = []
+  // array of strings, combination of all the state deps used in conditions
+  let deps = []
 
-  const collect_nodes = (parent_node) => {
-    const memo = this.memo_of(parent_node)
-    console.log({ memo_collection: memo })
+  // previous node of if_node, after which all the nodes will be added
+  const anchor_node = if_node.previousSibling
 
-    const c = {
-      type: parent_node.nodeName,
-      condition: memo ? memo.attributes[0].path : null,
-      nodes: []
+  const collectNodes = (conditionNode) => {
+    const memo = this.memo_of(conditionNode)
+    // else node will not have memo
+    if (memo) {
+      const placeholder = memo.attributes[0].placeholder
+      // console.log({ placeholder })
+      if (placeholder.type === FN) {
+        console.log('push deps from fn placeholder')
+        deps = [...deps, ...placeholder.deps]
+      } else {
+        deps.push(memo.attributes[0].name)
+      }
     }
 
-    conditional.push(c)
+    const group = {
+      type: conditionNode.nodeName,
+      placeholder: memo ? memo.attributes[0].placeholder : null,
+      nodes: [],
+      // @TODO optimize this
+      added: false, // by default all conditional things is rendered,
+      processed: false
+    }
 
-    parent_node.childNodes.forEach(node => {
-      if (node.nodeName === 'ELSIF' || node.nodeName === 'ELSE') {
-        collect_nodes(node)
+    // must add first and then move on
+    groups.push(group)
+
+    conditionNode.childNodes.forEach(node => {
+      if (node.nodeName === 'ELSIF' || node.nodeName === 'ELSE' || node.nodeName === 'IF') {
+        collectNodes(node)
         if_node.after(node)
       }
       else {
-        process_node.call(this, node)
-        c.nodes.push(node)
-        console.log({ node, id: node.memo_id, memo: this.memo_of(node) })
-        const { path } = this.memo_of(node).attributes
-        deps.push(path)
+        // don't directly process this node
+        // only process if its in a group that is to be shown
+        // process_node.call(this, node)
+        // console.log('remove node : ', node)
+        // node.remove() // remove node from DOM
+        group.nodes.push(node)
       }
     })
   }
 
-  collect_nodes(if_node)
-  console.log({ conditional })
+  collectNodes(if_node)
+  groups.forEach(g => g.nodes.forEach(n => n.remove()))
 
   const on_conditions_change = () => {
-    let trueFound = false
-    conditional.forEach((group, i) => {
-      const { fn_name, path, call_fn } = group
-      let condition_value = true // else is true if all else fail
+    // console.log('changed')
+    // if a group's condition is truthy, all other groups after it should not be rendered even if they are true
+    let true_found = false
+    groups.forEach((group, i) => {
+      const { placeholder } = group
+      let condition_value = true // default for else
 
-      if (fn_name) {
-        condition_value = call_fn.call(this)
-        console.log('value is ', condition_value)
-      } else if (path) {
-        condition_value = slice(this.$, path)
+      // if true is found already no need to check the value
+      if (!true_found && placeholder) {
+        if (placeholder.type === FN) {
+          condition_value = placeholder.get_value()
+        } else if (placeholder.type === REACTIVE) {
+          condition_value = slice(this.$, placeholder.path)
+        }
       }
+
+      // console.log({ true_found, condition_value })
 
       // if condition becomes truthy and another one before it is not truthy
       // then show this if not already
-      if (condition_value && !trueFound) {
-        trueFound = true
-        if (group.isRemoved) {
+      if (!true_found && condition_value) { // ADD
+        true_found = true
+        if (!group.added) {
+          if (!group.processed) {
+            console.log('process group', group)
+            group.nodes.forEach(n => process_node.call(this, n))
+            group.processed = true
+          }
           reverseForEach(group.nodes, (n) => {
-            add(n, group.comment_node)
+            add_node(n, anchor_node)
           })
-          group.isRemoved = false
+          group.added = true
         }
       }
 
       else {
-        if (!group.isRemoved) {
-          group.nodes.forEach(n => remove(n))
-          group.isRemoved = true
+        if (group.added) {
+          group.nodes.forEach(n => remove_node(n))
+          group.added = false
         }
       }
     })
   }
 
-  // console.log({ slice_deps })
-  const condition_deps = slice_deps.map(d => d.join('.'))
-
   on_conditions_change()
-  this.on.beforeUpdate(on_conditions_change, condition_deps)
+  this.on.domUpdate(on_conditions_change, deps)
 }
 
 export default process_if

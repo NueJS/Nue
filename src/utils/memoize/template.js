@@ -34,7 +34,7 @@ function memoize_template () {
     // no memoization needed
     else {
       memo_id++
-      console.log(node.nodeName, memo_id)
+      // console.log(node.nodeName, memo_id)
     }
   }
 

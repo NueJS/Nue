@@ -46,7 +46,8 @@ function memoize_attributes (element, memo_id) {
     }
 
     if (is_placeholder) {
-      placeholder = process_placeholder.call(this, attribute_value)
+      const placeholder_text = type === SHORTHAND ? attribute_name : attribute_value
+      placeholder = process_placeholder.call(this, placeholder_text)
       element.removeAttribute(attribute_name)
     }
     if (name) node_memo.attributes.push({ name, type, placeholder })

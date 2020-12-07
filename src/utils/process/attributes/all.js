@@ -26,6 +26,7 @@ function process_attributes (node, context) {
     }
     // bind value on input nodes or bind a prop to custom component
     else if (info.type === BIND) {
+      console.log('bind --', info, node.nodeName)
       // bind:value=[slice]
       if (node.nodeName === 'INPUT' || node.nodeName === 'TEXTAREA') {
         process_bind_attribute.call(this, node, info)

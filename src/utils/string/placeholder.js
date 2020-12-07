@@ -10,6 +10,8 @@ export const unwrap = str => str.substr(1, str.length - 2)
 // '[xyz]' -> true
 export const is_in_brackets = str => str[0] === '[' && str[str.length - 1] === ']'
 
+// process the reactive or functional place holder
+// if functional placeholder's function name is not valid, make it not a placeholder
 export function process_placeholder (str, unwrapped = false) {
   let unwrapped_str = str
   if (!unwrapped) unwrapped_str = unwrap(str)
@@ -20,7 +22,7 @@ export function process_placeholder (str, unwrapped = false) {
   // if function is used inside the placeholder
   if (is_fn_placeholder) {
     const [fn_name, args_str] = content.split('(')
-    console.log({ dis: this })
+    // console.log({ dis: this })
     const fn = this.fn[fn_name]
     if (fn) {
       const remove_closing_paren = args_str.substr(0, args_str.length - 1)
@@ -28,13 +30,18 @@ export function process_placeholder (str, unwrapped = false) {
       const args = deps.map(a => a.split('.'))
 
       // when args change call the callback function with the new value
-      const on_args_change = (cb) => () => {
+
+      const get_value = () => {
         const arg_values = args.map(a => slice(this.$, a))
-        const value = fn(...arg_values)
+        return fn(...arg_values)
+      }
+
+      const on_args_change = (cb) => () => {
+        const value = get_value()
         cb(value)
       }
 
-      return { type: FN, deps, on_args_change }
+      return { type: FN, deps, on_args_change, get_value }
     }
 
     else return { type: TEXT, string: content }

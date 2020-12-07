@@ -8,10 +8,11 @@ import { animate_exit } from '../node/animate.js'
  */
 
 function remove_node (element) {
-  traverse(element, node => {
-    if (node.removeStateListener) node.removeStateListener()
-    if (node.onRemove) node.onRemove()
-  })
+  // console.log('remove node : ', element)
+  // traverse(element, node => {
+  //   if (node.removeStateListener) node.removeStateListener()
+  //   if (node.onRemove) node.onRemove()
+  // })
 
   const remove = () => element.remove()
   animate_exit(element, remove)
