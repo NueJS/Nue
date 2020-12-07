@@ -1,4 +1,4 @@
-import modes from './modes.js'
+// import modes from './modes.js'
 
 // mutate the object using chain to find target,
 // value to to change the value on target
@@ -17,9 +17,9 @@ export const mutate = ($, chain, value, trap) => {
 
 // mutate the $ but don't call add_slice_dependency
 // use silentMutate when you want to make the change but
-export const silentMutate = ($, ...args) => {
-  modes.reactive = false
-  const success = mutate($, ...args)
-  modes.reactive = true
-  return success
-}
+// export const silentMutate = ($, ...args) => {
+//   modes.reactive = false
+//   const success = mutate($, ...args)
+//   modes.reactive = true
+//   return success
+// }
