@@ -17,16 +17,11 @@ export function call_all_cbs (target, chain) {
 }
 
 // convert consecutive calls to single call
-// instead of using a flag, function is saved in memoized_callbacks
+// instead of using a flag, function is saved in registered_callbacks
 // because it should be called once batching is completed
 export function memoize_cb (fn, type) {
-  // create a unique id
-  const fnId = '' + Math.random()
+  const lifecycle = this.registered_callbacks[type]
   return (...args) => {
-    // if not added in callbacks, add it
-    // else ignore
-    if (!this.memoized_callbacks[type][fnId]) {
-      this.memoized_callbacks[type][fnId] = { fn, args }
-    }
+    if (!lifecycle.has(fn)) lifecycle.set(fn, args)
   }
 }
