@@ -25,7 +25,11 @@ function reactify (state, chain = []) {
       else if (isObject(value)) value = reactify.call(_this, value, [...chain, prop])
       //
       const success = Reflect.set(target, prop, value)
-      if (modes.reactive) on_slice_update.call(_this, [...chain, prop], value, 'set')
+      if (modes.reactive) {
+        if (!(prop === 'length' && Array.isArray(target))) {
+          on_slice_update.call(_this, [...chain, prop], value, 'set')
+        }
+      }
       return success
     },
 
