@@ -23,7 +23,7 @@ function split (text) {
       in_placeholder = true
       // if str is not empty, add string
       if (str) {
-        parts.push({ string: str, type: TEXT })
+        parts.push({ text: str, type: TEXT })
         str = ''
       }
     }
@@ -45,8 +45,8 @@ function split (text) {
     }
   }
 
-  // remaining text is string
-  if (str) parts.push({ string: str, type: TEXT })
+  // remaining text is text
+  if (str) parts.push({ text: str, type: TEXT })
   return parts
 }
 
