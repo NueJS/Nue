@@ -32,7 +32,7 @@ function split (text) {
     else if (in_placeholder && text[i] === ']') {
       // remove [ then split to get the placeholder content
       // then split to get the path array
-      parts.push(process_placeholder(str, true))
+      parts.push(process_placeholder.call(this, str, true))
 
       // check for function call
       in_placeholder = false

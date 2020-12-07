@@ -1,64 +1,56 @@
 // import { uid } from '../others.js'
-import { is_placeholder, unwrap, process_placeholder } from '../string/placeholder.js'
-import { STATE, REACTIVE, FN, SHORTHAND, EVENT, BIND, NORMAL } from '../constants.js'
+import { is_in_brackets, unwrap, process_placeholder } from '../string/placeholder.js'
+import { STATE, SHORTHAND, EVENT, BIND, NORMAL } from '../constants.js'
 
 function memoize_attributes (element, memo_id) {
-  console.log(element.nodeName, memo_id)
   const node_memo = this.memo.nodes[memo_id] = { attributes: [] }
 
   // loop over each attribute
   for (const attribute_name of element.getAttributeNames()) {
     //
     const attribute_value = element.getAttribute(attribute_name)
-    let is_var = is_placeholder(attribute_value)
+    let is_placeholder = is_in_brackets(attribute_value)
+    let name, type, placeholder
 
-    let name, type, path, content, fn_info
-
-    if (is_var) {
-      const info = process_placeholder(attribute_value)
-      if (info.type === REACTIVE) {
-        path = info.value
-        content = info.content
-      } else if (info.type === FN) {
-        fn_info = info
-      }
-    }
-
-    // [path]
-    if (attribute_value === '' && is_placeholder(attribute_name)) {
+    // SHORTHAND [path]
+    if (attribute_value === '' && is_in_brackets(attribute_name)) {
       type = SHORTHAND
       name = unwrap(attribute_name)
-      is_var = true
+      is_placeholder = true
     }
 
-    // :prop=[path] or :prop='value'
+    // STATE :prop=[path] or :prop='value'
     else if (attribute_name[0] === ':') {
       type = STATE
       name = attribute_name.substr(1)
     }
 
-    else if (is_var) {
-      // @event-name=[handler]
+    else if (is_placeholder) {
+      // EVENT @event-name=[handler]
       if (attribute_name[0] === '@') {
         type = EVENT
         name = attribute_name.substr(1)
       }
 
-      // bind:prop=[path]
+      // BIND bind:prop=[path]
       else if (attribute_name.startsWith('bind:')) {
         type = BIND
         name = attribute_name.substr(5)
       }
 
-      // name=[path]
+      // NORMAL name=[path]
       else {
         type = NORMAL
         name = attribute_name
       }
     }
 
-    if (is_var) element.removeAttribute(attribute_name)
-    if (name) node_memo.attributes.push({ path, name, type, content, is_placeholder: is_var, fn_info })
+    if (is_placeholder) {
+      placeholder = process_placeholder.call(this, attribute_value)
+      element.removeAttribute(attribute_name)
+    }
+    if (name) node_memo.attributes.push({ name, type, placeholder })
+    // console.log(element.nodeName, memo_id, node_memo)
   }
 }
 

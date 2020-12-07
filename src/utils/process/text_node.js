@@ -59,7 +59,8 @@ function process_text_node (text_node, context) {
       })
 
       update_text_on_change()
-      this.on.reactiveUpdate(update_text_on_change, part.deps)
+      this.on.domUpdate(update_text_on_change, part.deps)
+      prev_node_is_text_node = false
     }
   })
 

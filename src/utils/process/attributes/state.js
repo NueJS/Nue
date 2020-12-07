@@ -14,11 +14,11 @@ function add_props (node, key, value) {
 
 // :name=[path]
 function process_state_attribute (node, info) {
-  const { name, is_placeholder, path } = info
+  const { name, placeholder, path } = info
   const prop_name_split = name.split('.')
 
   // if value is not variable, add props
-  if (!is_placeholder) {
+  if (!placeholder) {
     add_props(node, name, path)
     return
   }

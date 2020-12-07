@@ -1,5 +1,5 @@
-import processTextContent from './text_node.js'
-import processAttributes from './attributes/all.js'
+import process_text_node from './text_node.js'
+import process_attributes from './attributes/all.js'
 // import process_condition from './condition.js'
 // import process_map from './map.js'
 import process_if from './if.js'
@@ -12,17 +12,9 @@ function process_node (node, context) {
     if (node.processed) return
     node.processed = true
 
-    if (node.nodeType === Node.TEXT_NODE) {
-      processTextContent.call(this, node, context)
-    }
-
-    else if (node.nodeName === 'IF') {
-      process_if.call(this, node)
-    }
-
-    else {
-      processAttributes.call(this, node, context)
-    }
+    if (node.nodeType === Node.TEXT_NODE) process_text_node.call(this, node, context)
+    else if (node.nodeName === 'IF') process_if.call(this, node)
+    else process_attributes.call(this, node, context)
   }
 
   if (node.hasChildNodes()) {

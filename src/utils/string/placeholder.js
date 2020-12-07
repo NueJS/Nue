@@ -8,9 +8,9 @@ export const unwrap = str => str.substr(1, str.length - 2)
 
 // return true if the string is wrapped in brackets
 // '[xyz]' -> true
-export const is_placeholder = str => str[0] === '[' && str[str.length - 1] === ']'
+export const is_in_brackets = str => str[0] === '[' && str[str.length - 1] === ']'
 
-export const process_placeholder = (str, unwrapped = false) => {
+export function process_placeholder (str, unwrapped = false) {
   let unwrapped_str = str
   if (!unwrapped) unwrapped_str = unwrap(str)
   const remove_spaces = unwrapped_str.replace(/ /g, '')
@@ -20,6 +20,7 @@ export const process_placeholder = (str, unwrapped = false) => {
   // if function is used inside the placeholder
   if (is_fn_placeholder) {
     const [fn_name, args_str] = content.split('(')
+    console.log({ dis: this })
     const fn = this.fn[fn_name]
     if (fn) {
       const remove_closing_paren = args_str.substr(0, args_str.length - 1)

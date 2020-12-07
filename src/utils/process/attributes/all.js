@@ -3,13 +3,13 @@ import process_bind_attribute from './bind.js'
 import process_attribute from './value.js'
 import process_state_attribute from './state.js'
 import process_event_attributes from './event.js'
-import { EVENT, BIND } from '../../constants.js'
+import { EVENT, BIND, STATE } from '../../constants.js'
 
 function process_attributes (node, context) {
   // @TODO move this to memo
   // process ref attribute
   const node_memo = this.memo_of(node)
-  console.log({ node, node_memo })
+  // console.log({ node, node_memo, id: node.memo_id })
 
   // refs API
   if (node.hasAttribute('ref')) {
@@ -38,15 +38,13 @@ function process_attributes (node, context) {
     }
 
     // :name={var} or :name=value set the state of component
-    else if (attribute.propName) {
-      const { propName, isVar, path } = attribute
-      process_state_attribute.call(this, node, propName, isVar, path)
+    else if (info.type === STATE) {
+      process_state_attribute.call(this, node, info)
     }
 
     // set value of simple attributes to state
     else {
-      const { name, path } = attribute
-      process_attribute.call(this, node, name, path)
+      process_attribute.call(this, node, info)
     }
   })
 }
