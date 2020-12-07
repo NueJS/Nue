@@ -49,16 +49,18 @@ function define_component (compName, component) {
       // this is for calling callbacks in proper order
       // order: 1.reactive 2. before 3. dom 4. after
 
-      this.clear_memoized_callbacks = () => {
-        this.memoized_callbacks = {
-          before: {},
-          after: {},
-          reactive: {},
-          dom: {}
-        }
+      this.registered_callbacks = {
+        before: new Map(),
+        after: new Map(),
+        reactive: new Map(),
+        dom: new Map()
       }
 
-      this.clear_memoized_callbacks()
+      this.clear_memoized_callbacks = () => {
+        for (const key in this.registered_callbacks) {
+          this.registered_callbacks[key].clear()
+        }
+      }
 
       // add methods to add life cycles callbacks in the component
       // on.add, on.beforeUpdate, on.afterUpdate, on.remove, on.reactive, on.dom
