@@ -13,8 +13,6 @@ function process_bind_attribute (node, info) {
   if (value === undefined) return
   node[name] = value
 
-  console.log({ name, value })
-
   // when input's value is changed, save the value in state
   // convert the value from string to number if needed
   const handler = e => {

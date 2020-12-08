@@ -42,5 +42,9 @@ export function process_placeholder (str, unwrapped = false) {
   }
 
   // if slice is used
-  else return { type: REACTIVE, path: content.split('.'), content }
+  else {
+    const path = content.split('.')
+    const get_value = () => slice(this.$, path)
+    return { type: REACTIVE, path, content, get_value }
+  }
 }

@@ -19,9 +19,8 @@ function update (fn, deps, type) {
   else {
     // batch if not reactive update
     const cb = (type !== 'reactive') ? memoize_cb.call(this, fn, type) : fn
-    deps.forEach(d => {
-      add_slice_dependency.call(this, d.split('.'), cb, type)
-    })
+    // return array of cleanups
+    return deps.map(d => add_slice_dependency.call(this, d.split('.'), cb, type))
   }
 }
 

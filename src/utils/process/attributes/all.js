@@ -1,6 +1,6 @@
 // import get_attributes from '../get_attributes.js'
 import process_bind_attribute from './bind.js'
-import process_attribute from './value.js'
+import process_attribute from './name.js'
 import process_state_attribute from './state.js'
 import process_event_attributes from './event.js'
 import { EVENT, BIND, STATE } from '../../constants.js'
@@ -9,7 +9,6 @@ function process_attributes (node, context) {
   // @TODO move this to memo
   // process ref attribute
   const node_memo = this.memo_of(node)
-  // console.log({ node, node_memo, id: node.memo_id })
 
   // refs API
   if (node.hasAttribute('ref')) {
@@ -26,7 +25,6 @@ function process_attributes (node, context) {
     }
     // bind value on input nodes or bind a prop to custom component
     else if (info.type === BIND) {
-      console.log('bind --', info, node.nodeName)
       // bind:value=[slice]
       if (node.nodeName === 'INPUT' || node.nodeName === 'TEXTAREA') {
         process_bind_attribute.call(this, node, info)

@@ -17,7 +17,6 @@ function reactify (state, chain = []) {
   const _this = this
   return new Proxy(wrapper, {
     set (target, prop, newValue) {
-      // if no overrides are allowed and trying to override
       if (modes.no_overrides && target[prop]) return true
       //
       let value = newValue
@@ -34,8 +33,10 @@ function reactify (state, chain = []) {
     },
 
     deleteProperty (target, prop) {
-      if (!modes.reactive) return Reflect.deleteProperty(target, prop)
-      else return on_slice_update.call(_this, [...chain, prop], undefined, 'deleteProperty')
+      if (modes.reactive) {
+        on_slice_update.call(_this, [...chain, prop], undefined, 'deleteProperty')
+      }
+      return Reflect.deleteProperty(target, prop)
     },
 
     get (target, prop) {

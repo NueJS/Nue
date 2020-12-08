@@ -19,9 +19,7 @@ function process_if (if_node) {
     // else node will not have memo
     if (memo) {
       const placeholder = memo.attributes[0].placeholder
-      // console.log({ placeholder })
       if (placeholder.type === FN) {
-        console.log('push deps from fn placeholder')
         deps = [...deps, ...placeholder.deps]
       } else {
         deps.push(memo.attributes[0].name)
@@ -32,9 +30,9 @@ function process_if (if_node) {
       type: conditionNode.nodeName,
       placeholder: memo ? memo.attributes[0].placeholder : null,
       nodes: [],
-      // @TODO optimize this
-      added: false, // by default all conditional things is rendered,
-      processed: false
+      added: false,
+      processed: false,
+      conditionNode
     }
 
     // must add first and then move on
@@ -46,23 +44,25 @@ function process_if (if_node) {
         if_node.after(node)
       }
       else {
-        // don't directly process this node
-        // only process if its in a group that is to be shown
-        // process_node.call(this, node)
-        // console.log('remove node : ', node)
-        // node.remove() // remove node from DOM
         group.nodes.push(node)
+        node.processed = true
       }
     })
   }
 
   collectNodes(if_node)
-  groups.forEach(g => g.nodes.forEach(n => n.remove()))
+  groups.forEach(g => {
+    g.conditionNode.remove()
+    g.nodes.forEach(n => n.remove())
+  })
 
   const on_conditions_change = () => {
-    // console.log('changed')
-    // if a group's condition is truthy, all other groups after it should not be rendered even if they are true
+    console.log('condition changed')
+    // if a group's condition is truthy,
+    // all other groups after it should not be rendered even if they are true
     let true_found = false
+
+    // for each group check if it should be rendered or not based on new condition value
     groups.forEach((group, i) => {
       const { placeholder } = group
       let condition_value = true // default for else
@@ -76,22 +76,23 @@ function process_if (if_node) {
         }
       }
 
-      // console.log({ true_found, condition_value })
-
       // if condition becomes truthy and another one before it is not truthy
       // then show this if not already
       if (!true_found && condition_value) { // ADD
         true_found = true
+
         if (!group.added) {
-          if (!group.processed) {
-            console.log('process group', group)
-            group.nodes.forEach(n => process_node.call(this, n))
-            group.processed = true
-          }
-          reverseForEach(group.nodes, (n) => {
-            add_node(n, anchor_node)
-          })
           group.added = true
+
+          if (!group.processed) {
+            group.processed = true
+            group.nodes.forEach(n => {
+              n.processed = false
+              process_node.call(this, n)
+            })
+          }
+
+          reverseForEach(group.nodes, (n) => add_node(n, anchor_node))
         }
       }
 
@@ -105,7 +106,8 @@ function process_if (if_node) {
   }
 
   on_conditions_change()
-  this.on.domUpdate(on_conditions_change, deps)
+  // why before update is not working here ?
+  this.on.reactiveUpdate(on_conditions_change, deps)
 }
 
 export default process_if

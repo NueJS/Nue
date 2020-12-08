@@ -1,10 +1,9 @@
-// split the text into placeholders and strings
-// if the text inside the placeholder is not a valid path of slice of state, treat it as string
 
-import { TEXT, REACTIVE, FN } from '../constants.js'
-// import { add_fn_deps } from './fn.js'
+import { TEXT } from '../constants.js'
 import { process_placeholder } from './placeholder.js'
 
+// split the text into placeholders and strings
+// if the text inside the placeholder is not a valid path of slice of state, treat it as string
 // returns parts array of object
 // input: 'name is [name.first]'
 // output: [ { string : 'name is' }, { path: ['name', 'first'], value: 'Manan' }]

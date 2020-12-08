@@ -12,6 +12,7 @@ function memoize_attributes (element, memo_id) {
     let is_placeholder = is_in_brackets(attribute_value)
     let name, type, placeholder
 
+    // debugger
     // SHORTHAND [path]
     if (attribute_value === '' && is_in_brackets(attribute_name)) {
       type = SHORTHAND
@@ -47,6 +48,7 @@ function memoize_attributes (element, memo_id) {
 
     if (is_placeholder) {
       const placeholder_text = type === SHORTHAND ? attribute_name : attribute_value
+      // debugger
       placeholder = process_placeholder.call(this, placeholder_text)
       element.removeAttribute(attribute_name)
     }

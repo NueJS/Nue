@@ -8,7 +8,6 @@ import process_if from './if.js'
 // when cloning the node, ids are removed from the node
 // that's why
 function process_node (node, context) {
-  console.log('process : ', node.nodeName)
   if (node.nodeType !== Node.DOCUMENT_FRAGMENT_NODE) {
     if (node.processed) return
     node.processed = true

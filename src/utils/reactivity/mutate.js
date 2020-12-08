@@ -14,12 +14,3 @@ export const mutate = ($, chain, value, trap) => {
   const prop = chain[chain.length - 1]
   return Reflect[trap](target, prop, value)
 }
-
-// mutate the $ but don't call add_slice_dependency
-// use silentMutate when you want to make the change but
-// export const silentMutate = ($, ...args) => {
-//   modes.reactive = false
-//   const success = mutate($, ...args)
-//   modes.reactive = true
-//   return success
-// }

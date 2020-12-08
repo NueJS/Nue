@@ -5,23 +5,26 @@ function add_slice_dependency (chain, cb, type = 'dom') {
     if (!target[c]) {
       target[c] = {
         $: {
-          reactive: [],
-          before: [],
-          dom: [],
-          after: []
+          reactive: new Map(),
+          before: new Map(),
+          dom: new Map(),
+          after: new Map()
         }
       }
     }
+
     target = target[c]
     if (i === lastIndex) {
-      target.$[type].push(cb)
+      target.$[type].set(cb, '')
     }
   })
 
   // remove the added cb to avoid memory leak
   const removeCb = () => {
-    const index = target.$[type].findIndex(cb)
-    target.$[type].splice(index, 1)
+    const exists = target.$[type].has(cb)
+    if (exists) {
+      target.$[type].delete(cb)
+    }
   }
 
   return removeCb

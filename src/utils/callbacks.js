@@ -1,12 +1,16 @@
 // call only the cbs in $ array in target
-export function call_$_cbs (target, chain) {
-  for (const k in target.$) {
-    target.$[k].forEach(cb => cb.call(this, chain))
+function call_cb_map (map, chain) {
+  for (const [cb] of map) {
+    cb.call(this, chain)
   }
-  // target.$.reactive.forEach(call)
-  // target.$.before.forEach(call)
-  // target.$.dom.forEach(call)
-  // target.$.after.forEach(call)
+}
+
+export function call_$_cbs (target, chain) {
+  const { reactive, dom, before, after } = target.$
+  call_cb_map.call(this, reactive, chain)
+  call_cb_map.call(this, before, chain)
+  call_cb_map.call(this, dom, chain)
+  call_cb_map.call(this, after, chain)
 }
 
 export function call_all_cbs (target, chain) {

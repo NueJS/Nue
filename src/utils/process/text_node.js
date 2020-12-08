@@ -3,64 +3,58 @@ import add_slice_dependency from '../slice/add_slice_dependency.js'
 import { memoize_cb } from '../callbacks.js'
 import settings from '../../settings.js'
 import { FN, REACTIVE, TEXT } from '../constants.js'
-
-// create text node with given key as its dependency on $
-function create_reactive_text_node (path, value) {
-  const textNode = document.createTextNode(value)
-
-  const cb = () => {
-    textNode.textContent = slice(this.$, path)
-    if (settings.showUpdates) settings.onNodeUpdate(textNode)
-  }
-
-  const mcb = memoize_cb.call(this, cb, 'dom')
-  textNode.removeStateListener = add_slice_dependency.call(this, path, mcb)
-  return textNode
-}
+import { add_connects } from '../node/connections.js'
 
 // @todo move this processing step from process node to in process template
-function process_text_node (text_node, context) {
-  // console.log({ text_node, id: text_node.memo_id, text: text_node.textContent })
+function process_text_node (text_node) {
   const parts = this.memo_of(text_node).parts
   const text_nodes = []
   let prev_node_is_text_node = true
 
-  // if the previous node is text node, join the string - don't create a new text node
-  const add_text_node = (t) => {
+  // if the previous node is text node
+  // join the string - don't create a new text node
+  const add_text_node = (text) => {
     if (text_nodes.length && prev_node_is_text_node) {
       const prev_node = text_nodes[text_nodes.length - 1]
-      prev_node.textContent += t.string
+      prev_node.textContent += text
     } else {
-      text_nodes.push(document.createTextNode(t.string))
+      text_nodes.push(document.createTextNode(text))
     }
   }
 
   parts.forEach(part => {
-    if (part.type === TEXT) add_text_node(part)
-    //
-    else if (part.type === REACTIVE) {
-      // get the value from path, to check if the placeholder is valid or not
-      // path is invalid if slice() throws or undefined value is got from slice
+    const { type, get_value, path, text, content, deps } = part
+
+    if (type === TEXT) add_text_node(text)
+
+    else if (type === REACTIVE) {
       let value
-      try { value = slice(this.$, part.path) } catch { /**/ }
-      if (value === undefined) add_text_node(part)
+      try { value = get_value() } catch { /**/ }
+      if (value === undefined) add_text_node('[' + content + ']')
       else {
-        const node = create_reactive_text_node.call(this, part.path, value)
-        text_nodes.push(node)
+        const textNode = document.createTextNode(value)
+
+        const cb = () => {
+          textNode.textContent = slice(this.$, path)
+          if (settings.showUpdates) settings.onNodeUpdate(textNode)
+        }
+
+        add_connects(textNode, () => this.on.domUpdate(cb, deps))
+        text_nodes.push(textNode)
         prev_node_is_text_node = false
       }
     }
-    //
-    else if (part.type === FN) {
-      const node = document.createTextNode('')
-      text_nodes.push(node)
-      const update_text_on_change = part.on_args_change(v => {
-        node.textContent = v
-      })
 
-      update_text_on_change()
-      this.on.domUpdate(update_text_on_change, part.deps)
+    else if (part.type === FN) {
       prev_node_is_text_node = false
+      const node = document.createTextNode('')
+      const update = () => {
+        if (settings.showUpdates) settings.onNodeUpdate(node)
+        node.textContent = part.get_value()
+      }
+      update()
+      add_connects(node, () => this.on.domUpdate(update, deps))
+      text_nodes.push(node)
     }
   })
 

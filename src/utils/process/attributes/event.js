@@ -1,9 +1,11 @@
 function process_event_attribute (node, info) {
-  const { name, value } = info
+  // console.log({ info })
+  const { name, placeholder } = info
   const action = this.actions[name]
-  const handler = this.fn[value]
+  const handler = this.fn[placeholder.content]
+
   //
-  if (handler === undefined) return
+  if (handler === undefined) throw new Error(`function "${placeholder.content}" is not defined`)
 
   // @customEvent=[handler] action API
   if (action) {

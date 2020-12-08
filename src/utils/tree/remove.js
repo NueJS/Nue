@@ -1,5 +1,6 @@
 import traverse from './traverse.js'
 import { animate_exit } from '../node/animate.js'
+import { disconnect } from '../node/connections.js'
 
 /**
  * remove the $ listeners from all children of the node
@@ -8,13 +9,11 @@ import { animate_exit } from '../node/animate.js'
  */
 
 function remove_node (element) {
-  // console.log('remove node : ', element)
-  // traverse(element, node => {
-  //   if (node.removeStateListener) node.removeStateListener()
-  //   if (node.onRemove) node.onRemove()
-  // })
+  traverse(element, node => disconnect(node))
 
-  const remove = () => element.remove()
+  const remove = () => {
+    element.style.background = 'red'
+  }
   animate_exit(element, remove)
 }
 

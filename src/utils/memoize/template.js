@@ -13,13 +13,12 @@ import traverse from '../tree/traverse.js'
 // doing this allows us to reuse this information when a component create a clone of template
 
 function memoize_template () {
-  console.group('memoize_template')
+  // console.group('memoize_template')
   const remove_nodes = []
 
   // visit each node in template and memoize information
   let memo_id = 0
   const on_visit = node => {
-    // console.log('visit : ', node)
     // memoize text content
     if (node.nodeType === Node.TEXT_NODE) {
       if (!node.textContent.trim()) remove_nodes.push(node)
@@ -41,7 +40,7 @@ function memoize_template () {
   traverse(this.memo.template.content, on_visit, true)
   // remove redundant nodes
   remove_nodes.forEach(n => n.remove())
-  console.groupEnd('memoize_template')
+  // console.groupEnd('memoize_template')
 }
 
 export default memoize_template
