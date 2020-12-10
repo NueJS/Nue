@@ -1,9 +1,12 @@
 // import { uid } from '../others.js'
 import { is_in_brackets, unwrap, process_placeholder } from '../string/placeholder.js'
 import { STATE, SHORTHAND, EVENT, BIND, NORMAL } from '../constants.js'
+import { components } from '../../index.js'
 
-function memoize_attributes (element, memo_id) {
-  const node_memo = this.memo.nodes[memo_id] = { attributes: [] }
+function memoize_attributes (element) {
+  this.memo_id++
+  // console.log(element.nodeName, this.memo_id)
+  const node_memo = this.memo.nodes[this.memo_id] = { attributes: [] }
 
   // loop over each attribute
   for (const attribute_name of element.getAttributeNames()) {
@@ -12,18 +15,16 @@ function memoize_attributes (element, memo_id) {
     let is_placeholder = is_in_brackets(attribute_value)
     let name, type, placeholder
 
+    const is_sweet_component = components[element.nodeName.toLowerCase()]
+    let placeholder_text = attribute_value
+
     // debugger
     // SHORTHAND [path]
     if (attribute_value === '' && is_in_brackets(attribute_name)) {
-      type = SHORTHAND
       name = unwrap(attribute_name)
+      placeholder_text = attribute_name
       is_placeholder = true
-    }
-
-    // STATE :prop=[path] or :prop='value'
-    else if (attribute_name[0] === ':') {
-      type = STATE
-      name = attribute_name.substr(1)
+      type = is_sweet_component ? STATE : NORMAL
     }
 
     else if (is_placeholder) {
@@ -33,27 +34,24 @@ function memoize_attributes (element, memo_id) {
         name = attribute_name.substr(1)
       }
 
-      // BIND bind:prop=[path]
-      else if (attribute_name.startsWith('bind:')) {
+      // BIND :prop=[path]
+      else if (attribute_name[0] === ':') {
         type = BIND
-        name = attribute_name.substr(5)
+        name = attribute_name.substr(1)
       }
 
       // NORMAL name=[path]
       else {
-        type = NORMAL
         name = attribute_name
+        type = is_sweet_component ? STATE : NORMAL
       }
     }
 
     if (is_placeholder) {
-      const placeholder_text = type === SHORTHAND ? attribute_name : attribute_value
-      // debugger
       placeholder = process_placeholder.call(this, placeholder_text)
       element.removeAttribute(attribute_name)
     }
     if (name) node_memo.attributes.push({ name, type, placeholder })
-    // console.log(element.nodeName, memo_id, node_memo)
   }
 }
 
