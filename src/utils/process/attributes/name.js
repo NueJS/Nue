@@ -18,7 +18,7 @@ function process_attribute (node, info) {
   }
 
   const set_value = () => node.setAttribute(name, get_value())
-  add_connects(node, () => this.on.domUpdate(set_value, dependency))
+  add_connects(node, () => this.on.domUpdate(set_value, ...dependency))
 }
 
 export default process_attribute
