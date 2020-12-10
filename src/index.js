@@ -12,6 +12,16 @@ export { default as settings } from './settings.js'
 // if the component becomes unhidden check if has been processed or not
 // if not, process it
 
-export const components = (comps) => {
-  Object.keys(comps).forEach(name => define_component(name, comps[name]))
+export const components = { }
+
+export const define = (comps) => {
+  // components = comps
+
+  Object.keys(comps).forEach(name => {
+    components[name] = true
+  })
+
+  Object.keys(comps).forEach(name => {
+    define_component(name, comps[name])
+  })
 }

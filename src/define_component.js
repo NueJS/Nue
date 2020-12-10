@@ -35,10 +35,11 @@ function define_component (compName, component) {
       // memo of the component which are same for all instances
       this.memo_id = 0
       this.memo = memo
-      this.collecting_cbs = false
+      this.add_to_queue = false
       this.changed_slices = []
 
-      this.on_processing_done = []
+      // array of processing functions that should be run after all the nodes have been processed
+      this.delayed_processes = []
 
       this.memo_of = (node) => this.memo.nodes[node.memo_id]
 
@@ -49,16 +50,16 @@ function define_component (compName, component) {
       // this is for calling callbacks in proper order
       // order: 1.reactive 2. before 3. dom 4. after
 
-      this.registered_callbacks = {
+      this.queue = {
         before: new Map(),
         after: new Map(),
         reactive: new Map(),
         dom: new Map()
       }
 
-      this.clear_memoized_callbacks = () => {
-        for (const key in this.registered_callbacks) {
-          this.registered_callbacks[key].clear()
+      this.clear_queue = () => {
+        for (const key in this.queue) {
+          this.queue[key].clear()
         }
       }
 
