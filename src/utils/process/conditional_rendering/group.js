@@ -7,8 +7,9 @@ export const add_group = (group, anchor_node) => {
   reverseForEach(group.nodes, (node, i) => {
     anchor_node.after(node)
     traverse(node, connect)
-    node.setAttribute('enter', '')
+    if (group.prev_added !== undefined) node.setAttribute('enter', '')
   })
+  group.prev_added = group.added
   group.added = true
 }
 

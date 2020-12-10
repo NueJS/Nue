@@ -21,11 +21,11 @@ function create_groups (conditionNode, deps, groups, anchor_node) {
     placeholder: memo && memo.attributes.length ? memo.attributes[0].placeholder : null,
     nodes: [],
     added: false,
+    prev_added: undefined,
     processed: false,
     conditionNode,
     compareWith,
-    animate: conditionNode.getAttribute('animate'),
-    first_render: true
+    animate: conditionNode.getAttribute('animate')
   }
 
   // console.log({ group })
