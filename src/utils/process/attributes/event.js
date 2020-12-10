@@ -1,5 +1,5 @@
 function process_event_attribute (node, info) {
-  // console.log({ info })
+  // // console.log({ info })
   const { name, placeholder } = info
   const action = this.actions[name]
   const handler = this.fn[placeholder.content]

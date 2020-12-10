@@ -1,7 +1,7 @@
-function add_slice_dependency (chain, cb, type = 'dom') {
+function add_slice_dependency (path, cb, type = 'dom') {
   let target = this.slice_deps
-  const lastIndex = chain.length - 1
-  chain.forEach((c, i) => {
+  const lastIndex = path.length - 1
+  path.forEach((c, i) => {
     if (!target[c]) {
       target[c] = {
         $: {
@@ -19,15 +19,8 @@ function add_slice_dependency (chain, cb, type = 'dom') {
     }
   })
 
-  // remove the added cb to avoid memory leak
-  const removeCb = () => {
-    const exists = target.$[type].has(cb)
-    if (exists) {
-      target.$[type].delete(cb)
-    }
-  }
-
-  return removeCb
+  // cleanup - remove the added dep from slice_deps
+  return () => target.$[type].delete(cb)
 }
 
 export default add_slice_dependency
