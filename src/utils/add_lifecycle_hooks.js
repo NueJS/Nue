@@ -5,15 +5,16 @@ import { memoize_cb } from './callbacks.js'
 function add_lifecycle_hooks () {
   this.on = {
     add: (fn) => this.add_callbacks.push(fn),
-    reactiveUpdate: (fn, deps) => update.call(this, fn, deps, 'reactive'),
-    beforeUpdate: (fn, deps) => update.call(this, fn, deps, 'before'),
-    domUpdate: (fn, deps) => update.call(this, fn, deps, 'dom'),
-    afterUpdate: (fn, deps) => update.call(this, fn, deps, 'after'),
+    reactiveUpdate: (fn, ...deps) => update.call(this, fn, deps, 'reactive'),
+    beforeUpdate: (fn, ...deps) => update.call(this, fn, deps, 'before'),
+    domUpdate: (fn, ...deps) => update.call(this, fn, deps, 'dom'),
+    afterUpdate: (fn, ...deps) => update.call(this, fn, deps, 'after'),
     remove: (fn) => this.remove_callbacks.push(fn)
   }
 }
 
 function update (fn, deps, type) {
+  // // console.log({ deps })
   // fn.lifecycle = type
   if (!deps) throw new Error(`No Dependency array given in ${fn.name}`)
   else {
