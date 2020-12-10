@@ -9,13 +9,14 @@ function define_component (compName, component) {
 
   // information about component which are same among all the instances of the components
   // to improve performance these info will be calculated once and will be shared by all the instances
-  const memo = { nodes: { }, refs: {}, mode: 'open', componentName: compName }
+  const memo = { nodes: { }, mode: 'open', componentName: compName }
   class SuperSweet extends HTMLElement {
     constructor () {
       super()
 
       // event handlers defined in component
-      this.handle = {}
+      // this.handle = {}
+      this.refs = {}
       this.fn = {} // replace handle API with this
 
       // callbacks which are to be called when state changes
