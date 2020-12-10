@@ -4,7 +4,6 @@ import traverse from './tree/traverse.js'
 const add_memo_ids = (fragment) => {
   let memo_id = 0
   traverse(fragment, (node) => {
-    // if (node.nodeName === '')
     node.memo_id = ++memo_id
   }, true)
 }
