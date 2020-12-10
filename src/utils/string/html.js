@@ -16,7 +16,12 @@ function html (strings, ...exprs) {
     str += strings[i] + (value === undefined ? '' : value)
   }
 
-  this.memo.template.innerHTML = str
+  this.memo.template.innerHTML += str
 }
+
+// export function css (strings, ...exprs) {
+//   const arr = ['<style> ', ...strings, '</style>']
+//   html.call(this, arr, ...exprs)
+// }
 
 export default html
