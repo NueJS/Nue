@@ -14,21 +14,23 @@ function add_props (node, key, value) {
 
 // :name=[path]
 function process_state_attribute (node, info) {
-  const { name, placeholder, path } = info
+  const { name, placeholder } = info
   const prop_name_split = name.split('.')
 
   // if value is not variable, add props
   if (!placeholder) {
-    add_props(node, name, path)
+    add_props(node, name, placeholder.path)
     return
   }
 
+  // console.log({ path: placeholder.path })
+
   // if variable - change the state of node when parent's state changes
-  add_props(node, name, slice(this.$, path))
+  add_props(node, name, slice(this.$, placeholder.path))
   const flow_down = () => {
-    mutate(node.$, prop_name_split, slice(this.$, path), 'set')
+    mutate(node.$, prop_name_split, slice(this.$, placeholder.path), 'set')
   }
-  add_slice_dependency.call(this, path, flow_down)
+  add_slice_dependency.call(this, placeholder.path, flow_down)
 
   // if attribute is a binding, change the state of parent when node's state changes
   if (info.type === BIND) {
@@ -36,9 +38,9 @@ function process_state_attribute (node, info) {
     // disable slice change in child which triggered the change in parent
     const flow_up = () => {
       const value = slice(node.$, prop_name_split)
-      node.ignore_chain = prop_name_split[0]
-      mutate(this.$, path, value, 'set')
-      node.ignore_chain = undefined
+      node.ignore_path = prop_name_split[0]
+      mutate(this.$, placeholder.path, value, 'set')
+      node.ignore_path = undefined
     }
 
     // when this function is called parent's callbacks are added in slice_deps of node
