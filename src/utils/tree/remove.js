@@ -9,11 +9,8 @@ import { disconnect } from '../node/connections.js'
  */
 
 function remove_node (element) {
-  traverse(element, node => disconnect(node))
-
-  const remove = () => {
-    element.style.background = 'red'
-  }
+  traverse(element, disconnect)
+  const remove = () => element.remove()
   animate_exit(element, remove)
 }
 

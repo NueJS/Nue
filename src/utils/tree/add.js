@@ -11,8 +11,8 @@ import { connect } from '../node/connections.js'
  */
 
 function add_node (element, anchorNode) {
-  element.style.background = 'green'
-  traverse(element, node => connect(node))
+  // element.style.background = 'green'
+  traverse(element, connect)
 
   anchorNode.after(element)
   if (settings.showUpdates) settings.onNodeUpdate(element)
