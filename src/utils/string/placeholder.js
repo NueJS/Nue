@@ -45,6 +45,6 @@ export function process_placeholder (str, unwrapped = false) {
   else {
     const path = content.split('.')
     const get_value = () => slice(this.$, path)
-    return { type: REACTIVE, path, content, get_value }
+    return { type: REACTIVE, path, content, get_value, deps: [content], text: str }
   }
 }
