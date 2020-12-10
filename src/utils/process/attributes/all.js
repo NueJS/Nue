@@ -13,7 +13,7 @@ function process_attributes (node, context) {
   // refs API
   if (node.hasAttribute('ref')) {
     const key = node.getAttribute('ref')
-    this.memo.refs[key] = node
+    this.refs[key] = node
   }
 
   // if not memo
