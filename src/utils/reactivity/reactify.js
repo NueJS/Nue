@@ -1,4 +1,4 @@
-import on_slice_update from '../slice/on_slice_update.js'
+import on_state_mutation from '../slice/on_state_mutation.js'
 import modes from './modes.js'
 import functional_slices from '../slice/functional_slice.js'
 import { accessed } from '../slice/slices_used.js'
@@ -6,12 +6,12 @@ import { accessed } from '../slice/slices_used.js'
 const isObject = x => typeof x === 'object' && x !== null
 
 // create a reactive object which when mutated calls the on_change function
-function reactify (state, chain = []) {
+function reactify (state, path = []) {
   if (!isObject(state)) return state
 
   const wrapper = Array.isArray(state) ? [] : {}
   Object.keys(state).forEach(key => {
-    wrapper[key] = reactify.call(this, state[key], [...chain, key])
+    wrapper[key] = reactify.call(this, state[key], [...path, key])
   })
 
   const _this = this
@@ -21,12 +21,14 @@ function reactify (state, chain = []) {
       //
       let value = newValue
       if (typeof value === 'function') value = functional_slices.call(_this, value, prop)
-      else if (isObject(value)) value = reactify.call(_this, value, [...chain, prop])
+      else if (isObject(value)) value = reactify.call(_this, value, [...path, prop])
       //
+      const old = target[prop]
+      // // console.log('old is ', old)
       const success = Reflect.set(target, prop, value)
       if (modes.reactive) {
         if (!(prop === 'length' && Array.isArray(target))) {
-          on_slice_update.call(_this, [...chain, prop], value, 'set')
+          on_state_mutation.call(_this, [...path, prop], old)
         }
       }
       return success
@@ -34,15 +36,15 @@ function reactify (state, chain = []) {
 
     deleteProperty (target, prop) {
       if (modes.reactive) {
-        on_slice_update.call(_this, [...chain, prop], undefined, 'deleteProperty')
+        on_state_mutation.call(_this, [...path, prop])
       }
       return Reflect.deleteProperty(target, prop)
     },
 
     get (target, prop) {
       if (modes.detect_slices) {
-        if (chain.length !== 0) accessed.paths[accessed.paths.length - 1] = [...chain, prop]
-        else accessed.paths.push([...chain, prop])
+        if (path.length !== 0) accessed.paths[accessed.paths.length - 1] = [...path, prop]
+        else accessed.paths.push([...path, prop])
       }
 
       // else if (prop === '__isRadioactive__') return true
