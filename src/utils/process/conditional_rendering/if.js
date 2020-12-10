@@ -1,8 +1,5 @@
 import slice from '../../slice/slice.js'
-import process_node from '../node.js'
-import { reverseForEach } from '../../others.js'
-import add_node from '../../tree/add.js'
-import remove_node from '../../tree/remove.js'
+import { add_group, remove_group, process_group } from './group.js'
 import { FN, REACTIVE } from '../../constants.js'
 import create_groups from './create_groups.js'
 import satisfies from './comparison.js'
@@ -16,22 +13,26 @@ function process_if (if_node) {
   // node which will be used as anchor after which all the group nodes will be appended
   const anchor_node = if_node.previousSibling
 
+  let active_group
+
   create_groups.call(this, if_node, deps, groups, anchor_node)
+
+  // add nodes to dom
+  // add enter attributes
 
   const on_conditions_change = () => {
     // debugger
-    // console.log('condition changed')
     // if a group's condition is truthy,
     // all other groups after it should not be rendered even if they are true
     let true_found = false
 
     // for each group check if it should be rendered or not based on new condition value
-    groups.forEach((group, i) => {
+    groups.forEach((group) => {
       const { placeholder } = group
       let condition_value = true // default for else
 
-      // if true is found already no need to check the value
-
+      // compute condition value
+      // if true is found already no need to check the value, assume its true
       if (!true_found && placeholder) {
         if (placeholder.type === FN) {
           condition_value = placeholder.get_value()
@@ -40,30 +41,39 @@ function process_if (if_node) {
         }
       }
 
-      // if condition becomes truthy and another one before it is not truthy
-      // then show this if not already
+      // show group
+      // if previous active group is animating its exit, wait for it to complete
+      // and then add the group
+      // add enter attribute on node
       if (!true_found && satisfies(condition_value, group.compareWith)) { // ADD
         true_found = true
 
         if (!group.added) {
-          group.added = true
+          if (!group.processed) process_group.call(this, group)
 
-          if (!group.processed) {
-            group.processed = true
-            group.nodes.forEach(n => {
-              n.processed = false
-              process_node.call(this, n)
-            })
+          if (active_group && active_group.animate && group !== active_group) {
+            const lastIndex = active_group.nodes.length - 1
+            active_group.nodes[lastIndex].addEventListener('animationend', () => add_group(group, anchor_node), { once: true })
+          } else {
+            add_group(group, anchor_node)
           }
 
-          reverseForEach(group.nodes, (n) => add_node(n, anchor_node))
+          active_group = group
         }
       }
 
-      else {
-        if (group.added) {
-          group.nodes.forEach(n => remove_node(n))
-          group.added = false
+      // remove the group
+      // if group should have animated exit
+      // add exit attribute on all the nodes to start the animation
+      // once the last animation completes, remove all the nodes
+      else if (group.added) {
+        if (group.animate) {
+          group.nodes.forEach(node => node.setAttribute('exit', ''))
+          const lastIndex = group.nodes.length - 1
+          const lastNode = group.nodes[lastIndex]
+          lastNode.addEventListener('animationend', () => remove_group(group), { once: true })
+        } else {
+          remove_group(group)
         }
       }
     })
@@ -71,7 +81,6 @@ function process_if (if_node) {
 
   this.delayed_processes.push(() => {
     groups.forEach(g => {
-      // console.log('remove conditional node : ', g.conditionNode.nodeName)
       g.conditionNode.remove()
       g.nodes.forEach(n => n.remove())
     })
@@ -79,12 +88,7 @@ function process_if (if_node) {
     on_conditions_change()
   })
 
-  // console.log({ deps })
-  // WHY TF THIS IS NOT WORKING !!!
   this.on.beforeUpdate(on_conditions_change, ...deps)
-
-  // THIS SHIT WORKS, BUT IT IS EXPENSIVE AS HELL !
-  // this.on.reactiveUpdate(on_conditions_change, ...deps)
 }
 
 export default process_if

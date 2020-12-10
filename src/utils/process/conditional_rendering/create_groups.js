@@ -5,7 +5,8 @@ function create_groups (conditionNode, deps, groups, anchor_node) {
   let compareWith
   // else node will not have memo
 
-  if (memo) {
+  if (memo && memo.attributes.length) {
+    // console.log({ memo, conditionNode })
     const placeholder = memo.attributes[0].placeholder
     compareWith = memo.attributes[0].name
     if (placeholder.type === FN) {
@@ -17,13 +18,17 @@ function create_groups (conditionNode, deps, groups, anchor_node) {
 
   const group = {
     type: conditionNode.nodeName,
-    placeholder: memo ? memo.attributes[0].placeholder : null,
+    placeholder: memo && memo.attributes.length ? memo.attributes[0].placeholder : null,
     nodes: [],
     added: false,
     processed: false,
     conditionNode,
-    compareWith
+    compareWith,
+    animate: conditionNode.getAttribute('animate'),
+    first_render: true
   }
+
+  // console.log({ group })
 
   // must add first and then move on
   groups.push(group)
@@ -36,6 +41,9 @@ function create_groups (conditionNode, deps, groups, anchor_node) {
     else {
       group.nodes.push(node)
       node.processed = true
+      if (group.animate) {
+        node.setAttribute('animate', group.animate)
+      }
     }
   })
 }
