@@ -9,7 +9,7 @@ function setup_processing (component) {
   this.$ = reactify.call(this, this.props || {})
   const handle = this.handle
   const on = this.on
-  const refs = this.memo.refs
+  const refs = this.refs
   const actions = this.actions
   let _html
   // _css
