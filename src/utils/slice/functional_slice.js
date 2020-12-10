@@ -20,7 +20,7 @@ function functional_slices (fn, k) {
 
   // when any of its deps changes, update its value
   // depend on the root key ???
-  this.on.reactiveUpdate(onDepUpdate, deps.map(d => d[0]))
+  this.on.reactiveUpdate(onDepUpdate, ...deps.map(d => d[0]))
   return initValue
 }
 
