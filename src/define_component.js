@@ -32,8 +32,10 @@ function define_component (compName, component) {
       this.state_deps = { $: { reactive: [], before: [], after: [], dom: [] } }
 
       // callbacks that are to be called when the components is connected / disconnected to DOM
-      this.add_callbacks = []
-      this.remove_callbacks = []
+      this.is_added_cbs = []
+      this.is_removed_cbs = []
+      this.will_update_cbs = []
+      this.is_updated_cbs = []
 
       // memo of the component which are same for all instances
       this.memo = memo
@@ -78,13 +80,13 @@ function define_component (compName, component) {
 
     // when component is added in dom
     connectedCallback () {
-      this.add_callbacks.forEach(cb => cb())
+      this.is_added_cbs.forEach(cb => cb())
     }
 
     // when the component is removed from dom
     // run cleanups
     disconnectedCallback () {
-      this.remove_callbacks.forEach(cb => cb())
+      this.is_removed_cbs.forEach(cb => cb())
     }
   }
 
