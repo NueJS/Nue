@@ -2,6 +2,7 @@ import slice from '../slice/slice.js'
 import settings from '../../settings.js'
 import { FN, REACTIVE } from '../constants.js'
 import { add_connects } from '../node/connections.js'
+import add_state_dep from '../slice/add_state_dep.js'
 
 // @todo move this processing step from process node to in process template
 function process_text_node (text_node) {
@@ -38,7 +39,7 @@ function process_text_node (text_node) {
     }
   }
 
-  const connect = () => this.on.domUpdate(update, ...deps)
+  const connect = () => add_state_dep.call(this, path, update, 'dom')
   add_connects(text_node, connect)
   text_node.update_value = update
 }
