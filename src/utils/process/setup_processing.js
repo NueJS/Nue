@@ -17,7 +17,7 @@ function setup_processing (component) {
   const invoke_component = () => {
     modes.reactive = false
     modes.no_overrides = true
-    component({ _: this.$, handle, on, refs, html: _html, actions, fn: this.fn })
+    component({ $: this.$, handle, on, refs, html: _html, actions, fn: this.fn })
     modes.reactive = true
     modes.no_overrides = false
   }
