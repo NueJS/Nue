@@ -1,6 +1,6 @@
 // call this function only once per node
-// connects array is static and does not need to be changed because it only adds the callback in slice_deps
-// disconnects array functions removes the added fn from slice_deps, since each time it can be added in different place
+// connects array is static and does not need to be changed because it only adds the callback in state_deps
+// disconnects array functions removes the added fn from state_deps, since each time it can be added in different place
 // it has to be updated when a fn from connects array is ran
 // IS THIS RIGHT ? THINK ABOUT IT
 
@@ -24,7 +24,7 @@ export function connect (node) {
   if (node.connects) {
     const disconnects = []
 
-    // calling connect adds deps to slice_deps which also returns new disconnects
+    // calling connect adds deps to state_deps which also returns new disconnects
     node.connects.forEach(connect => {
       const disconnect = connect()
       if (Array.isArray(disconnect)) disconnect.forEach(dc => disconnects.push(dc))

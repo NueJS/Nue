@@ -43,7 +43,7 @@ function process_state_attribute (node, info) {
       node.ignore_path = undefined
     }
 
-    // when this function is called parent's callbacks are added in slice_deps of node
+    // when this function is called parent's callbacks are added in state_deps of node
     const on_node_state_change = () => add_slice_dependency.call(node, prop_name_split, flow_up)
     if (!node.two_way_props) node.two_way_props = []
 

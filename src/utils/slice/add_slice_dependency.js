@@ -1,5 +1,5 @@
 function add_slice_dependency (path, cb, type = 'dom') {
-  let target = this.slice_deps
+  let target = this.state_deps
   const lastIndex = path.length - 1
   path.forEach((c, i) => {
     if (!target[c]) {
@@ -19,7 +19,7 @@ function add_slice_dependency (path, cb, type = 'dom') {
     }
   })
 
-  // cleanup - remove the added dep from slice_deps
+  // cleanup - remove the added dep from state_deps
   return () => target.$[type].delete(cb)
 }
 

@@ -43,7 +43,7 @@ function invoke_cbs (lifecycle) {
 
 // call cbs which need to be called
 function build_queue (path, info) {
-  let target = this.slice_deps
+  let target = this.state_deps
   path.forEach((c, i) => {
     if (typeof target !== 'object') return
     target = target[c]
