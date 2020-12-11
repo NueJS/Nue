@@ -1,13 +1,14 @@
 import { mutate } from '../../reactivity/mutate.js'
-import add_slice_dependency from '../../slice/add_slice_dependency.js'
+// import add_slice_dependency from '../../slice/add_slice_dependency.js'
 import slice from '../../slice/slice.js'
+import { add_connects } from '../../node/connections.js'
 
 // bind:value=[path], bind:checked=[path] etc
 // set the value from state
 // when input's value change set the value in state
 function process_bind_attribute (node, info) {
   const isNumber = node.type === 'number' || node.type === 'range'
-  const { path } = info.placeholder
+  const { path, content } = info.placeholder
   const { name } = info
   const value = slice(this.$, path)
   if (value === undefined) return
@@ -21,18 +22,17 @@ function process_bind_attribute (node, info) {
     mutate(this.$, path, converted, 'set')
   }
 
-  // set the value of input from state
-  add_slice_dependency.call(this, path, () => {
-    node[name] = slice(this.$, path)
-  })
-
   // adding event listener
   node.addEventListener('input', handler)
 
-  // cleanup on node or component removal
-  const cleanup = () => node.removeEventListener('input', handler)
-  this.on.remove(cleanup)
-  node.onRemove = cleanup
+  const set_value = () => { node[name] = slice(this.$, path) }
+  add_connects(node, () => {
+    const disconnect = this.on.domUpdate(set_value, content)
+    return () => {
+      disconnect()
+      node.removeEventListener('input', handler)
+    }
+  })
 }
 
 export default process_bind_attribute
