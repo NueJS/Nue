@@ -9,48 +9,42 @@ function define_component (compName, component) {
 
   // information about component which are same among all the instances of the components
   // to improve performance these info will be calculated once and will be shared by all the instances
-  const memo = { nodes: { }, mode: 'open', componentName: compName }
+  const memo = { nodes: { }, mode: 'open', compName }
   class SuperSweet extends HTMLElement {
     constructor () {
       super()
 
-      // event handlers defined in component
-      // this.handle = {}
+      // references to DOM nodes
       this.refs = {}
-      this.fn = {} // replace handle API with this
+
+      // functions added in component or given by parent component
+      this.fn = {}
+
+      // function that call the cb when a certain action is performed in application
+      // similar to svelte actions API
+      this.actions = {}
 
       // callbacks which are to be called when state changes
-      // reactive callbacks are for updating state slices which depend on other state slices
-      // before callbacks are added by component which will be called before the DOM is updated
-      // after callbacks are added by component which will be called after the DOM is updated
+      // reactive callbacks are for updating functional state when the state it deps on is changed
+      // before callbacks are be called before the DOM is updated
+      // after callbacks are called after the DOM is updated
       // dom callbacks are added by nodes which updates text/attributes/state on dom nodes
-      this.slice_deps = { $: { reactive: [], before: [], after: [], dom: [] } }
-
-      // tag name of the component
-      this.compName = compName
+      this.state_deps = { $: { reactive: [], before: [], after: [], dom: [] } }
 
       // callbacks that are to be called when the components is connected / disconnected to DOM
       this.add_callbacks = []
       this.remove_callbacks = []
 
       // memo of the component which are same for all instances
-      this.memo_id = 0
       this.memo = memo
-      this.add_to_queue = false
-      this.changed_slices = []
 
       // array of processing functions that should be run after all the nodes have been processed
       this.delayed_processes = []
 
       this.memo_of = (node) => this.memo.nodes[node.memo_id]
 
-      // actions API
-      this.actions = {}
-
-      // callbacks that should be called when a state changes
-      // this is for calling callbacks in proper order
-      // order: 1.reactive 2. before 3. dom 4. after
-
+      // queue holds all the callbacks that should be called
+      // queue is useful to avoid calling the callback more than once and in correct order
       this.queue = {
         before: new Map(),
         after: new Map(),
@@ -58,6 +52,7 @@ function define_component (compName, component) {
         dom: new Map()
       }
 
+      // once all the callbacks are called, clear the queue for the next interaction
       this.clear_queue = () => {
         for (const key in this.queue) {
           this.queue[key].clear()
