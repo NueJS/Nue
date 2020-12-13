@@ -1,13 +1,11 @@
-import { addConnects } from '../../node/connections.js'
-import addDep from '../../slice/addDep.js'
+import { setupConnection } from '../../node/connections.js'
 
 // get the value of slice having the given path and set the attribute value
 // when the slice changes, update the value of attribute as well
 function process_attribute (node, info) {
-  const { placeholder, name } = info
-  const set_value = () => node.setAttribute(name, placeholder.get_value())
-  const connect = () => placeholder.deps.map(path => addDep.call(this, path, set_value, 'dom'))
-  addConnects(node, connect)
+  const { deps, get_value } = info.placeholder
+  const update = () => node.setAttribute(info.name, get_value())
+  setupConnection.call(this, node, deps, update)
 }
 
 export default process_attribute
