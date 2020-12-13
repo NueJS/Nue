@@ -2,10 +2,9 @@
 import modes from '../reactivity/modes.js'
 import reactify from '../reactivity/reactify.js'
 import html from '../string/html.js'
-// import process_fn from '../string/fn.js'
 import memoTemplate from '../memoize/template.js'
 
-function setup_processing (component) {
+function init (component) {
   this.$ = reactify.call(this, this.props || {})
 
   let _html
@@ -18,7 +17,6 @@ function setup_processing (component) {
       on: this.on,
       refs: this.refs,
       html: _html,
-      // actions: this.actions,
       fn: this.fn,
       component: this
     })
@@ -40,4 +38,4 @@ function setup_processing (component) {
   }
 }
 
-export default setup_processing
+export default init

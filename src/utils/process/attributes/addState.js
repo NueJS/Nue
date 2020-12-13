@@ -12,7 +12,7 @@ function add_props (node, key, value) {
 }
 
 // :name=[path]
-function process_state_attribute (node, attributeMemo) {
+function addState (node, attributeMemo) {
   const { name, placeholder } = attributeMemo
   const prop_name_split = name.split('.')
 
@@ -49,4 +49,4 @@ function process_state_attribute (node, attributeMemo) {
   }
 }
 
-export default process_state_attribute
+export default addState

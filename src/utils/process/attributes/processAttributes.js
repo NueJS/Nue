@@ -1,11 +1,11 @@
 // import get_attributes from '../get_attributes.js'
-import process_bind_attribute from './bind.js'
-import addNormalAttribute from './normal.js'
-import process_state_attribute from './state.js'
-import process_event_attributes from './event.js'
+import bindInput from './bindInput.js'
+import addAttribute from './addAttribute.js'
+import addState from './addState.js'
+import addEvent from './addEvent.js'
 import { EVENT, BIND, STATE } from '../../constants.js'
 
-function process_attributes (node) {
+function processAttributes (node) {
   // refs API
   if (node.hasAttribute('ref')) this.refs[node.getAttribute('ref')] = node
 
@@ -14,30 +14,30 @@ function process_attributes (node) {
 
   node.sweet.attributes.forEach(attribute => {
     if (attribute.type === EVENT) {
-      process_event_attributes.call(this, node, attribute)
+      addEvent.call(this, node, attribute)
     }
     // bind value on input nodes or bind a prop to custom component
     else if (attribute.type === BIND) {
       // bind:value=[slice]
       if (node.nodeName === 'INPUT' || node.nodeName === 'TEXTAREA' || node.nodeName === 'SELECT') {
-        process_bind_attribute.call(this, node, attribute)
+        bindInput.call(this, node, attribute)
       }
 
       // bind:bindProp={key} on custom component
       // @TODO : check if the node is custom component
-      else process_state_attribute.call(this, node, attribute)
+      else addState.call(this, node, attribute)
     }
 
     // :name={var} or :name=value set the state of component
     else if (attribute.type === STATE) {
-      process_state_attribute.call(this, node, attribute)
+      addState.call(this, node, attribute)
     }
 
     // set value of simple attributes to state
     else {
-      addNormalAttribute.call(this, node, attribute)
+      addAttribute.call(this, node, attribute)
     }
   })
 }
 
-export default process_attributes
+export default processAttributes

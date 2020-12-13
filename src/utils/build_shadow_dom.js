@@ -1,4 +1,4 @@
-import process_node from './process/node.js'
+import process_node from './process/processNode.js'
 
 const sweetify = (node1, node2) => {
   if (node1.sweet) node2.sweet = node1.sweet

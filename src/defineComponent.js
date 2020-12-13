@@ -1,6 +1,6 @@
 import build_shadow_dom from './utils/build_shadow_dom.js'
 import createLifecycleHooks from './utils/createLifecycleHooks.js'
-import setup_processing from './utils/process/setup_processing.js'
+import preprocess from './utils/process/preprocess.js'
 
 // define a component using compName and a component function
 // component function will define html, css, state, life cycles, actions etc
@@ -66,7 +66,7 @@ function define_component (compName, component) {
       // process the template - one times only
       // memoize template info to reuse in other instances
       // if memoized already, set up state
-      setup_processing.call(this, component)
+      preprocess.call(this, component)
 
       // create copy of template, process nodes using state, add event listeners, add nodes in DOM
       build_shadow_dom.call(this, this.memo.template)

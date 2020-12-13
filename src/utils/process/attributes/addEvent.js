@@ -1,7 +1,7 @@
 import { supersweet } from '../../../index.js'
 import { addConnects } from '../../node/connections.js'
 
-function process_event_attribute (node, info) {
+function addEvent (node, info) {
   const { name, placeholder } = info
   const action = supersweet.actions[name]
   const handler = this.fn[placeholder.content]
@@ -26,4 +26,4 @@ function process_event_attribute (node, info) {
   }
 }
 
-export default process_event_attribute
+export default addEvent
