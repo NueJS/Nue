@@ -1,7 +1,7 @@
-import memoize_attributes from './attributes.js'
+import memoAttributes from './attributes.js'
 // import memoize_comment from '../memoize/comment.js'
-import memoize_text_content from './text-content.js'
-import traverse from '../tree/traverse.js'
+import memoText from './text.js'
+import traverse from '../node/traverse.js'
 
 // traverse all the nodes in the template
 // remove unnecessary nodes like empty text nodes which may cause issues when processing other things
@@ -12,37 +12,30 @@ import traverse from '../tree/traverse.js'
 // when memoizing and reusing same traversal is used thats why we can just use int++ as an id
 // doing this allows us to reuse this information when a component create a clone of template
 
-function memoize_template () {
-  // // console.group('memoize_template')
+function memoTemplate () {
   const remove_nodes = []
   this.delayed_memoizations = []
 
   // visit each node in template and memoize information
-  this.memo_id = 0
-  const on_visit = node => {
+  const onVisit = node => {
+    node.supersweet = {}
     // memoize text content
     if (node.nodeType === Node.TEXT_NODE) {
       if (!node.textContent.trim()) remove_nodes.push(node)
-      else memoize_text_content.call(this, node)
+      else memoText.call(this, node)
     }
 
     // memoize attributes
     else if (node.hasAttributes && node.hasAttributes()) {
-      memoize_attributes.call(this, node)
-    }
-    // no memoization needed
-    else {
-      this.memo_id++
-      console.log(node.nodeName, this.memo_id)
+      memoAttributes.call(this, node)
     }
   }
 
-  traverse(this.memo.template.content, on_visit, true)
+  traverse(this.memo.template.content, onVisit, true)
 
   // remove redundant nodes
   this.delayed_memoizations.forEach(m => m())
   remove_nodes.forEach(n => n.remove())
-  // // console.groupEnd('memoize_template')
 }
 
-export default memoize_template
+export default memoTemplate

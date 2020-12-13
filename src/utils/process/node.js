@@ -4,15 +4,16 @@ import process_if from './conditional_rendering/if.js'
 
 function process_node (node, context) {
   if (node.nodeType !== Node.DOCUMENT_FRAGMENT_NODE) {
-    // console.log(node.nodeName, node.memo_id)
+    // console.log(node.nodeName, node.sweetId)
     if (node.processed) return
     node.processed = true
 
-    if (this.memo_of(node)) {
-      if (node.nodeType === Node.TEXT_NODE) process_text_node.call(this, node, context)
-      else if (node.nodeName === 'IF') process_if.call(this, node)
-      else if (node.hasAttribute) process_attributes.call(this, node, context)
-    }
+    // const nodeMemo = this.memo_of(node)
+
+    // console.log('--- > ', node.nodeName)
+    if (node.supersweet.placeholder && node.nodeType === Node.TEXT_NODE) process_text_node.call(this, node)
+    else if (node.nodeName === 'IF') process_if.call(this, node)
+    else if (node.hasAttribute) process_attributes.call(this, node)
   }
 
   if (node.hasChildNodes()) {

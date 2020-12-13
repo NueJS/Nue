@@ -1,20 +1,19 @@
 import { TEXT } from '../constants.js'
 import split from '../string/split.js'
 
-function memoize_text_content (node) {
+function memoText (node) {
   const placeholders = split.call(this, node.textContent.trim())
   const textNodes = []
 
   placeholders.forEach(placeholder => {
-    this.memo_id++
     let textNode
 
     if (placeholder.type === TEXT) {
       textNode = document.createTextNode(placeholder.text)
+      textNode.supersweet = {}
     } else {
-      // check if the node is empty string, remove it then
-      this.memo.nodes[this.memo_id] = placeholder
       textNode = document.createTextNode('')
+      textNode.supersweet = { placeholder }
     }
 
     textNodes.push(textNode)
@@ -27,4 +26,4 @@ function memoize_text_content (node) {
   })
 }
 
-export default memoize_text_content
+export default memoText

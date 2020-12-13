@@ -5,45 +5,39 @@ import process_state_attribute from './state.js'
 import process_event_attributes from './event.js'
 import { EVENT, BIND, STATE } from '../../constants.js'
 
-function process_attributes (node, context) {
-  // @TODO move this to memo
-  // process ref attribute
-  const node_memo = this.memo_of(node)
-
+function process_attributes (node) {
   // refs API
-  if (node.hasAttribute('ref')) {
-    const key = node.getAttribute('ref')
-    this.refs[key] = node
-  }
+  if (node.hasAttribute('ref')) this.refs[node.getAttribute('ref')] = node
 
-  // if not memo
-  if (!(node_memo && node_memo.attributes)) return
+  // console.log('attributes: ', node.supersweet)
+  // if no attributes memo available for node
+  if (!node.supersweet.attributes) return
 
-  node_memo.attributes.forEach(info => {
-    if (info.type === EVENT) {
-      process_event_attributes.call(this, node, info)
+  node.supersweet.attributes.forEach(attributeMemo => {
+    console.log('at memo: ', attributeMemo)
+    if (attributeMemo.type === EVENT) {
+      process_event_attributes.call(this, node, attributeMemo)
     }
     // bind value on input nodes or bind a prop to custom component
-    else if (info.type === BIND) {
+    else if (attributeMemo.type === BIND) {
       // bind:value=[slice]
       if (node.nodeName === 'INPUT' || node.nodeName === 'TEXTAREA' || node.nodeName === 'SELECT') {
-        process_bind_attribute.call(this, node, info)
+        process_bind_attribute.call(this, node, attributeMemo)
       }
 
       // bind:bindProp={key} on custom component
-      else {
-        process_state_attribute.call(this, node, info)
-      }
+      // @TODO : check if the node is custom component
+      else process_state_attribute.call(this, node, attributeMemo)
     }
 
     // :name={var} or :name=value set the state of component
-    else if (info.type === STATE) {
-      process_state_attribute.call(this, node, info)
+    else if (attributeMemo.type === STATE) {
+      process_state_attribute.call(this, node, attributeMemo)
     }
 
     // set value of simple attributes to state
     else {
-      process_attribute.call(this, node, info)
+      process_attribute.call(this, node, attributeMemo)
     }
   })
 }

@@ -1,12 +1,10 @@
 // import { uid } from '../others.js'
 import { is_in_brackets, unwrap, process_placeholder } from '../string/placeholder.js'
-import { STATE, SHORTHAND, EVENT, BIND, NORMAL } from '../constants.js'
-import { components } from '../../index.js'
+import { STATE, EVENT, BIND, NORMAL } from '../constants.js'
+import { components, render } from '../../index.js'
 
-function memoize_attributes (element) {
-  this.memo_id++
-  // console.log(element.nodeName, this.memo_id)
-  const node_memo = this.memo.nodes[this.memo_id] = { attributes: [] }
+function memoAttributes (element) {
+  element.supersweet.attributes = []
 
   // loop over each attribute
   for (const attribute_name of element.getAttributeNames()) {
@@ -15,16 +13,20 @@ function memoize_attributes (element) {
     let is_placeholder = is_in_brackets(attribute_value)
     let name, type, placeholder
 
-    const is_sweet_component = components[element.nodeName.toLowerCase()]
+    const nodeName = element.nodeName.toLowerCase()
+    const isSweet = components[nodeName]
+    if (isSweet) {
+      render(nodeName)
+    }
+
     let placeholder_text = attribute_value
 
-    // debugger
-    // SHORTHAND [path]
+    // handle Shorthand
     if (attribute_value === '' && is_in_brackets(attribute_name)) {
       name = unwrap(attribute_name)
       placeholder_text = attribute_name
       is_placeholder = true
-      type = is_sweet_component ? STATE : NORMAL
+      type = isSweet ? STATE : NORMAL
     }
 
     else if (is_placeholder) {
@@ -43,7 +45,7 @@ function memoize_attributes (element) {
       // NORMAL name=[path]
       else {
         name = attribute_name
-        type = is_sweet_component ? STATE : NORMAL
+        type = isSweet ? STATE : NORMAL
       }
     }
 
@@ -51,8 +53,10 @@ function memoize_attributes (element) {
       placeholder = process_placeholder.call(this, placeholder_text)
       element.removeAttribute(attribute_name)
     }
-    if (name) node_memo.attributes.push({ name, type, placeholder })
+    if (name) {
+      element.supersweet.attributes.push({ name, type, placeholder })
+    }
   }
 }
 
-export default memoize_attributes
+export default memoAttributes
