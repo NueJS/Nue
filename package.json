@@ -1,12 +1,12 @@
 {
   "name": "supersweet",
   "version": "0.0.3",
-  "description": "",
+  "description": "Sweetest JS Framework To Create Reactive UIs Using Web Components",
   "main": "src/index.js",
   "scripts": {
     "test": "jest"
   },
-  "keywords": [],
+  "keywords": ["ui-library", "framework", "reactive", "web components"],
   "author": "Manan Tank",
   "license": "ISC",
   "devDependencies": {
