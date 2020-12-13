@@ -9,7 +9,7 @@ function onMutate (path, old) {
   // to avoid infinite loop
   // if this component triggered state change in parent and as a result component's own state is again mutated
   // this would create infinite loop, to prevent that, do not process such state mutation
-  if (this.ignore_path === path[0]) return true
+  if (this.ignoredRoot === path[0]) return true
 
   // if queue is being built, don't invoke, invoke once the building is stopped
   if (!this.batching) invokeQueue.call(this)

@@ -1,4 +1,3 @@
-// import get_attributes from '../get_attributes.js'
 import bindInput from './bindInput.js'
 import addAttribute from './addAttribute.js'
 import addState from './addState.js'

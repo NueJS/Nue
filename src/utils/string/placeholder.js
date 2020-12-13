@@ -3,6 +3,8 @@ import slice from '../state/slice.js'
 
 export const unBracket = str => str.substr(1, str.length - 2)
 
+export const bracketify = str => `[${str}]`
+
 export const isBracketed = str => str[0] === '[' && str[str.length - 1] === ']'
 
 // process the reactive or functional place holder
@@ -50,7 +52,7 @@ export function handleInvalidPlaceholder (node, placeholder) {
   let value
   try { value = getValue() } catch { /**/ }
   if (value === undefined) {
-    node.textContent = '[' + text + ']'
+    node.textContent = bracketify(text)
     return true // show that it is invalid
   }
 

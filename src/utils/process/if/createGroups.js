@@ -1,4 +1,4 @@
-function create_groups (conditionNode, deps, groups, anchor_node) {
+function createGroups (conditionNode, deps, groups, anchorNode) {
   const { sweet } = conditionNode
 
   const group = {
@@ -22,10 +22,9 @@ function create_groups (conditionNode, deps, groups, anchor_node) {
 
   conditionNode.childNodes.forEach(node => {
     if (node.nodeName === 'ELSIF' || node.nodeName === 'ELSE' || node.nodeName === 'IF') {
-      create_groups.call(this, node, deps, groups, anchor_node)
-      this.delayed_processes.push(() => anchor_node.after(node))
-    }
-    else {
+      createGroups.call(this, node, deps, groups, anchorNode)
+      this.delayed_processes.push(() => anchorNode.after(node))
+    } else {
       group.nodes.push(node)
       node.processed = true
       if (group.animate) node.setAttribute('animate', group.animate)
@@ -33,4 +32,4 @@ function create_groups (conditionNode, deps, groups, anchor_node) {
   })
 }
 
-export default create_groups
+export default createGroups

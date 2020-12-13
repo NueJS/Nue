@@ -1,7 +1,7 @@
 import slice from '../../state/slice.js'
 import { addGroup, removeGroup, processGroup } from './group.js'
 import { FN, REACTIVE } from '../../constants.js'
-import create_groups from './create_groups.js'
+import createGroups from './createGroups.js'
 import satisfies from './comparison.js'
 import addDep from '../../state/addDep.js'
 
@@ -15,9 +15,9 @@ function process_if (if_node) {
 
   // node which will be used as anchor after which all the group nodes will be appended
   // @TODO improve this - use comment node
-  const anchor_node = if_node.previousSibling
+  const anchorNode = if_node.previousSibling
 
-  create_groups.call(this, if_node, deps, groups, anchor_node)
+  createGroups.call(this, if_node, deps, groups, anchorNode)
 
   // group that is currently rendered
   let activeGroup
@@ -55,9 +55,9 @@ function process_if (if_node) {
 
           if (activeGroup && activeGroup.animate && group !== activeGroup) {
             const lastIndex = activeGroup.nodes.length - 1
-            activeGroup.nodes[lastIndex].addEventListener('animationend', () => addGroup(group, anchor_node), { once: true })
+            activeGroup.nodes[lastIndex].addEventListener('animationend', () => addGroup(group, anchorNode), { once: true })
           } else {
-            addGroup(group, anchor_node)
+            addGroup(group, anchorNode)
           }
 
           activeGroup = group

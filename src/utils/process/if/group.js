@@ -3,9 +3,9 @@ import { disconnect, connect } from '../../node/connections.js'
 import traverse from '../../node/traverse.js'
 import process_node from '../processNode.js'
 
-export function addGroup (group, anchor_node) {
+export function addGroup (group, anchorNode) {
   reverseForEach(group.nodes, node => {
-    anchor_node.after(node)
+    anchorNode.after(node)
     traverse(node, connect)
     if (group.prevAdded !== undefined) node.setAttribute('enter', '')
   })

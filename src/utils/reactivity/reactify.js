@@ -1,4 +1,4 @@
-import on_state_mutation from '../state/onMutate.js'
+import onMutate from '../state/onMutate.js'
 import modes from './modes.js'
 import computedState from '../state/computedState.js'
 import { accessed } from '../state/detectStateUsage.js'
@@ -30,7 +30,7 @@ function reactify (state, path = []) {
         if (!(prop === 'length' && Array.isArray(target))) {
           if (target[prop] !== value) {
             success = Reflect.set(target, prop, value)
-            on_state_mutation.call(_this, [...path, prop])
+            onMutate.call(_this, [...path, prop])
           }
         }
       }
@@ -39,9 +39,7 @@ function reactify (state, path = []) {
     },
 
     deleteProperty (target, prop) {
-      if (modes.reactive) {
-        on_state_mutation.call(_this, [...path, prop])
-      }
+      if (modes.reactive) onMutate.call(_this, [...path, prop])
       return Reflect.deleteProperty(target, prop)
     },
 

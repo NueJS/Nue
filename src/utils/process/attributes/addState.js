@@ -6,42 +6,42 @@ import { BIND } from '../../constants.js'
 // props are a way to send data from parent state to child state
 // child component uses props to initialize its state
 // props override the default state defined in the component blueprint
-function add_props (node, key, value) {
+function addProps (node, key, value) {
   if (!node.props) node.props = {}
   node.props[key] = value
 }
 
 // :name=[path]
-function addState (node, attributeMemo) {
-  const { name, placeholder } = attributeMemo
+function addState (node, attribute) {
+  const { name, placeholder } = attribute
   const prop_name_split = name.split('.')
 
   // if value is not variable, add props
   if (!placeholder) {
-    add_props(node, name, placeholder.path)
+    addProps(node, name, placeholder.path)
     return
   }
 
   // if variable - change the state of node when parent's state changes
-  add_props(node, name, slice(this.$, placeholder.path))
-  const flow_down = () => {
+  addProps(node, name, slice(this.$, placeholder.path))
+  const flowDown = () => {
     mutate(node.$, prop_name_split, slice(this.$, placeholder.path), 'set')
   }
-  addDep.call(this, placeholder.path, flow_down)
+  addDep.call(this, placeholder.path, flowDown)
 
   // if attribute is a binding, change the state of parent when node's state changes
-  if (attributeMemo.type === BIND) {
+  if (attribute.type === BIND) {
     // to avoid infinite loop
     // disable slice change in child which triggered the change in parent
-    const flow_up = () => {
+    const flowUp = () => {
       const value = slice(node.$, prop_name_split)
-      node.ignore_path = prop_name_split[0]
+      node.ignoredRoot = prop_name_split[0]
       mutate(this.$, placeholder.path, value, 'set')
-      node.ignore_path = undefined
+      node.ignoredRoot = undefined
     }
 
     // when this function is called parent's callbacks are added in deps of node
-    const on_node_state_change = () => addDep.call(node, prop_name_split, flow_up)
+    const on_node_state_change = () => addDep.call(node, prop_name_split, flowUp)
     if (!node.two_way_props) node.two_way_props = []
 
     // add these functions on node in two_way_props array, call this array when node is added on dom
