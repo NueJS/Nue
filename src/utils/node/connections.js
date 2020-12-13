@@ -1,11 +1,8 @@
-// call this function only once per node
-// .sweet.connects array is static and does not need to be changed because it only adds the callback in deps
-// .sweet.disconnects array functions removes the added fn from deps, since each time it can be added in different place
-// it has to be updated when a fn from.sweet.connects array is ran
-// IS THIS RIGHT ? THINK ABOUT IT
-
 import addDep from '../slice/addDep.js'
 
+// connect the node to state using deps
+// update the node when these deps change
+// remove connections when node is removed
 export function setupConnection (node, deps, update) {
   const connect = () => deps.map(path => addDep.call(this, path, update, 'dom'))
   addConnects(node, connect)
@@ -13,25 +10,33 @@ export function setupConnection (node, deps, update) {
   update()
 }
 
+// add connects and disconnects on node
+// this is only called when the node is first processed, not as response to any user action
+// this is different from connect and disconnect which may be called as node is added and removed from DOM
 export function addConnects (node, connect) {
-  if (!node.sweet.connects) node.sweet.connects = []
-  if (!node.sweet.disconnects) node.sweet.disconnects = []
+  const { sweet } = node
+  if (!sweet.connects) sweet.connects = []
+  if (!sweet.disconnects) sweet.disconnects = []
 
-  node.sweet.connects.push(connect)
-  node.sweet.isConnected = true
+  sweet.connects.push(connect)
+  sweet.isConnected = true
 
   const disconnect = connect()
-  if (Array.isArray(disconnect)) disconnect.forEach(dc => node.sweet.disconnects.push(dc))
-  else node.sweet.disconnects.push(disconnect)
+  if (Array.isArray(disconnect)) disconnect.forEach(dc => sweet.disconnects.push(dc))
+  else sweet.disconnects.push(disconnect)
 }
 
+// connect the node to state
+// add the node's deps in this.deps
+// invoke update to update the node
 export function connect (node) {
   const { sweet } = node
   // if node is connected, do nothing
   if (sweet.isConnected) return
 
-  // if node has.sweet.connects
+  // if node can be connected
   if (sweet.connects) {
+    // collect disconnects which is returned when calling connects
     const disconnects = []
 
     // calling connect creates new disconnects which needs to be replaced
@@ -41,21 +46,27 @@ export function connect (node) {
       else disconnects.push(disconnect)
     })
 
+    // set the new disconnects
     sweet.disconnects = disconnects
 
-    // update will/should not work unless isConnected is set to true
+    // update() will/should not work unless isConnected is set to true
+    // so set it to true first and then update
     sweet.isConnected = true
     sweet.update && sweet.update()
   }
 }
 
+// disconnect the node from state
+// after disconnecting, no state mutation should affect the node
+// disconnecting involves removing its dep from this.deps map
 export function disconnect (node) {
+  const { sweet } = node
   // if node is disconnected from state already, do nothing
-  if (!node.sweet.isConnected) return
+  if (!sweet.isConnected) return
 
-  // if node has.sweet.disconnects
-  if (node.sweet.disconnects) {
-    node.sweet.disconnects.forEach(dc => dc())
-    node.sweet.isConnected = false
+  // if the node can be disconnected
+  if (sweet.disconnects) {
+    sweet.disconnects.forEach(dc => dc())
+    sweet.isConnected = false
   }
 }
