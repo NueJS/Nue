@@ -4,6 +4,15 @@
 // it has to be updated when a fn from.supersweet.connects array is ran
 // IS THIS RIGHT ? THINK ABOUT IT
 
+import addDep from '../slice/addDep.js'
+
+export function setupConnection (node, deps, update) {
+  const connect = () => deps.map(path => addDep.call(this, path, update, 'dom'))
+  addConnects(node, connect)
+  node.supersweet.update = update
+  update()
+}
+
 export function addConnects (node, connect) {
   if (!node.supersweet.connects) node.supersweet.connects = []
   if (!node.supersweet.disconnects) node.supersweet.disconnects = []
