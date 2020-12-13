@@ -3,6 +3,7 @@ import { add_group, remove_group, process_group } from './group.js'
 import { FN, REACTIVE } from '../../constants.js'
 import create_groups from './create_groups.js'
 import satisfies from './comparison.js'
+import addDep from '../../slice/addDep.js'
 
 function process_if (if_node) {
   // nodes that are to be conditionally rendered
@@ -88,7 +89,10 @@ function process_if (if_node) {
     on_conditions_change()
   })
 
-  this.on.beforeUpdate(on_conditions_change, ...deps)
+  console.log({ deps })
+  deps.forEach(dep => {
+    addDep.call(this, dep, on_conditions_change, 'stateReady')
+  })
 }
 
 export default process_if
