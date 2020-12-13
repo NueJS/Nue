@@ -25,11 +25,11 @@ export function process_placeholder (str, unwrapped = false) {
     const fn = this.fn[fn_name]
     if (fn) {
       const remove_closing_paren = args_str.substr(0, args_str.length - 1)
-      const deps = remove_closing_paren.split(',')
-      const args = deps.map(a => a.split('.'))
+      const slices = remove_closing_paren.split(',')
+      const deps = slices.map(a => a.split('.'))
 
       const get_value = () => {
-        const arg_values = args.map(a => slice(this.$, a))
+        const arg_values = deps.map(a => slice(this.$, a))
         return fn(...arg_values)
       }
 
@@ -45,6 +45,6 @@ export function process_placeholder (str, unwrapped = false) {
   else {
     const path = content.split('.')
     const get_value = () => slice(this.$, path)
-    return { type: REACTIVE, path, content, get_value, deps: [content], text: str }
+    return { type: REACTIVE, path, content, get_value, deps: [path], text: str }
   }
 }
