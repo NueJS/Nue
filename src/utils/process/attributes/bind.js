@@ -1,38 +1,33 @@
 import { mutate } from '../../reactivity/mutate.js'
-import add_state_dep from '../../slice/add_state_dep.js'
-import slice from '../../slice/slice.js'
-import { add_connects } from '../../node/connections.js'
+import addDep from '../../slice/addDep.js'
+import { addConnects } from '../../node/connections.js'
 
-// bind:value=[path], bind:checked=[path] etc
-// set the value from state
-// when input's value change set the value in state
-function process_bind_attribute (node, info) {
+// :prop=[...]
+// initialize the value of prop from state
+// when the input changes, set the prop's value in state
+
+function bindInput (node, attributeMemo) {
+  // if input type is number convert the value to number
   const isNumber = node.type === 'number' || node.type === 'range'
-  const { path, content } = info.placeholder
-  const { name } = info
-  const value = slice(this.$, path)
-  if (value === undefined) return
-  node[name] = value
 
-  // when input's value is changed, save the value in state
-  // convert the value from string to number if needed
-  const handler = e => {
-    const value = e.currentTarget[name]
-    const converted = isNumber ? Number(value) : value
-    mutate(this.$, path, converted, 'set')
+  const { path, get_value } = attributeMemo.placeholder
+  const { name } = attributeMemo
+
+  const handler = () => {
+    let value = node[name]
+    value = isNumber ? Number(value) : value
+    mutate(this.$, path, value, 'set')
   }
 
-  // adding event listener
   node.addEventListener('input', handler)
 
-  const set_value = () => { node[name] = slice(this.$, path) }
-  add_connects(node, () => {
-    const remove_state_dep = add_state_dep.call(this, path, set_value, 'dom')
-    return () => {
-      remove_state_dep()
-      node.removeEventListener('input', handler)
-    }
-  })
+  const set_value = () => {
+    node[name] = get_value()
+  }
+
+  set_value()
+  // should I remove event listener when this node is removed ?
+  addConnects(node, () => addDep.call(this, path, set_value, 'dom'))
 }
 
-export default process_bind_attribute
+export default bindInput
