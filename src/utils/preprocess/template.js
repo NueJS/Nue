@@ -14,7 +14,7 @@ import traverse from '../node/traverse.js'
 
 function memoTemplate () {
   const remove_nodes = []
-  this.delayed_memoizations = []
+  this.delayedPreprocesses = []
 
   // visit each node in template and memoize information
   const onVisit = node => {
@@ -34,7 +34,7 @@ function memoTemplate () {
   traverse(this.memo.template.content, onVisit, true)
 
   // remove redundant nodes
-  this.delayed_memoizations.forEach(m => m())
+  this.delayedPreprocesses.forEach(m => m())
   remove_nodes.forEach(n => n.remove())
 }
 

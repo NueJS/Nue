@@ -2,9 +2,9 @@
 import modes from '../reactivity/modes.js'
 import reactify from '../reactivity/reactify.js'
 import html from '../string/html.js'
-import memoTemplate from '../memoize/template.js'
+import memoTemplate from '../template.js'
 
-function init (component) {
+function preprocess (component) {
   this.$ = reactify.call(this, this.props || {})
 
   let _html
@@ -38,4 +38,4 @@ function init (component) {
   }
 }
 
-export default init
+export default preprocess

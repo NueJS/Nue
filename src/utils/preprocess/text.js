@@ -20,7 +20,7 @@ function memoText (node) {
   })
 
   // after all memoization is done, replace the node with textNodes
-  this.delayed_memoizations.push(() => {
+  this.delayedPreprocesses.push(() => {
     textNodes.forEach(t => node.before(t))
     node.remove()
   })
