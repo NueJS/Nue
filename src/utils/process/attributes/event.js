@@ -1,23 +1,29 @@
 import { supersweet } from '../../../index.js'
+import { addConnects } from '../../node/connections.js'
 
 function process_event_attribute (node, info) {
   const { name, placeholder } = info
   const action = supersweet.actions[name]
   const handler = this.fn[placeholder.content]
 
-  // check if the function is valid
   // @TODO move this in dev condition
   if (!handler) throw new Error(`"ERROR in <${this.nodeName}>'s <${node.nodeName}> : "${placeholder.content}" is not defined`)
 
-  // @customAction=[handler]
+  // ex: @swipe-left=[moveLeft]
   if (action) {
-    const cleanup = action(node, handler)
-    if (!node.sweet.connects) node.sweet.connects = []
-    else node.sweet.connects.push(cleanup)
+    const connect = () => action(node, handler)
+    addConnects(node, connect)
   }
 
-  // @nativeEvent=[handler]
-  else node.addEventListener(name, handler)
+  // ex: @click=[increment]
+  else {
+    const connect = () => {
+      node.addEventListener(name, handler)
+      return () => node.removeEventListener(name, handler)
+    }
+
+    addConnects(node, connect)
+  }
 }
 
 export default process_event_attribute
