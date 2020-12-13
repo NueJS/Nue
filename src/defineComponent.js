@@ -9,7 +9,7 @@ function define_component (compName, component) {
 
   // information about component which are same among all the instances of the components
   // to improve performance these info will be calculated once and will be shared by all the instances
-  const memo = { mode: component.mode || 'open', compName }
+  const memo = { mode: component.mode || 'open', compName, template: undefined }
   class SuperSweet extends HTMLElement {
     constructor () {
       super()
