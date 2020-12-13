@@ -26,27 +26,26 @@ export function addConnects (node, connect) {
 }
 
 export function connect (node) {
+  const { sweet } = node
   // if node is connected, do nothing
-  if (node.sweet.isConnected) return
+  if (sweet.isConnected) return
 
   // if node has.sweet.connects
-  if (node.sweet.connects) {
+  if (sweet.connects) {
     const disconnects = []
 
-    // calling connect adds deps to deps which also returns new.sweet.disconnects
-    node.sweet.connects.forEach(connect => {
+    // calling connect creates new disconnects which needs to be replaced
+    sweet.connects.forEach(connect => {
       const disconnect = connect()
-
       if (Array.isArray(disconnect)) disconnect.forEach(dc => disconnects.push(dc))
       else disconnects.push(disconnect)
     })
 
-    // console.log({ disconnects })
-    node.sweet.disconnects = disconnects
-    // when connecting to state, update its value to keep itself in sync with new state
-    // make it connected, and THEN attempt to update it
-    node.sweet.isConnected = true
-    node.sweet.update()
+    sweet.disconnects = disconnects
+
+    // update will/should not work unless isConnected is set to true
+    sweet.isConnected = true
+    sweet.update && sweet.update()
   }
 }
 
