@@ -18,7 +18,7 @@ function memoTemplate () {
 
   // visit each node in template and memoize information
   const onVisit = node => {
-    node.supersweet = {}
+    node.sweet = {}
     // memoize text content
     if (node.nodeType === Node.TEXT_NODE) {
       if (!node.textContent.trim()) remove_nodes.push(node)

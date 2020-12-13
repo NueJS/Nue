@@ -1,7 +1,7 @@
 import { FN } from '../../constants.js'
 
 function create_groups (conditionNode, deps, groups, anchor_node) {
-  const memo = conditionNode.supersweet
+  const memo = conditionNode.sweet
   let compareWith
   // else node will not have memo
 

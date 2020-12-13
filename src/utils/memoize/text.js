@@ -10,10 +10,10 @@ function memoText (node) {
 
     if (placeholder.type === TEXT) {
       textNode = document.createTextNode(placeholder.text)
-      textNode.supersweet = {}
+      textNode.sweet = {}
     } else {
       textNode = document.createTextNode('')
-      textNode.supersweet = { placeholder }
+      textNode.sweet = { placeholder }
     }
 
     textNodes.push(textNode)

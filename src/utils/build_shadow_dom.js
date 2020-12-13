@@ -1,12 +1,7 @@
 import process_node from './process/node.js'
-// import traverse from './tree/traverse.js'
 
 const sweetify = (node1, node2) => {
-  if (node1.supersweet) {
-    // console.log('save sweet info to', node2)
-    node2.supersweet = node1.supersweet
-  }
-
+  if (node1.sweet) node2.sweet = node1.sweet
   if (node1.hasChildNodes()) {
     node1.childNodes.forEach((n1, i) => {
       sweetify(n1, node2.childNodes[i])

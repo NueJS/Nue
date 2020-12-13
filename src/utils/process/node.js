@@ -11,7 +11,7 @@ function process_node (node, context) {
     // const nodeMemo = this.memo_of(node)
 
     // console.log('--- > ', node.nodeName)
-    if (node.supersweet.placeholder && node.nodeType === Node.TEXT_NODE) process_text_node.call(this, node)
+    if (node.sweet.placeholder && node.nodeType === Node.TEXT_NODE) process_text_node.call(this, node)
     else if (node.nodeName === 'IF') process_if.call(this, node)
     else if (node.hasAttribute) process_attributes.call(this, node)
   }

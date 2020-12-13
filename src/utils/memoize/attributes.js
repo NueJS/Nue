@@ -4,7 +4,7 @@ import { STATE, EVENT, BIND, NORMAL } from '../constants.js'
 import { components } from '../../index.js'
 
 function memoAttributes (element) {
-  element.supersweet.attributes = []
+  element.sweet.attributes = []
 
   // loop over each attribute
   for (const attribute_name of element.getAttributeNames()) {
@@ -16,8 +16,8 @@ function memoAttributes (element) {
     const nodeName = element.nodeName.toLowerCase()
     const isSweet = components[nodeName]
     if (isSweet) {
-      element.supersweet.isSweet = true
-      element.supersweet.compName = nodeName
+      element.sweet.isSweet = true
+      element.sweet.compName = nodeName
     }
 
     let placeholder_text = attribute_value
@@ -55,7 +55,7 @@ function memoAttributes (element) {
       element.removeAttribute(attribute_name)
     }
     if (name) {
-      element.supersweet.attributes.push({ name, type, placeholder })
+      element.sweet.attributes.push({ name, type, placeholder })
     }
   }
 }

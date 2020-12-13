@@ -12,8 +12,8 @@ function process_event_attribute (node, info) {
   // @customAction=[handler]
   if (action) {
     const cleanup = action(node, handler)
-    if (!node.di.supersweet.connects) node.di.supersweet.connects = cleanup
-    else node.di.supersweet.connects.push(cleanup)
+    if (!node.sweet.connects) node.sweet.connects = []
+    else node.sweet.connects.push(cleanup)
   }
 
   // @nativeEvent=[handler]
