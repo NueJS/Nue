@@ -2,7 +2,7 @@
 import modes from '../reactivity/modes.js'
 import reactify from '../reactivity/reactify.js'
 import html from '../string/html.js'
-import memoTemplate from '../template.js'
+import sweetifyTemplate from './sweetifyTemplate.js'
 
 function preprocess (component) {
   this.$ = reactify.call(this, this.props || {})
@@ -12,6 +12,7 @@ function preprocess (component) {
   const invoke_component = () => {
     modes.reactive = false
     modes.noOverride = true
+
     component({
       $: this.$,
       on: this.on,
@@ -20,11 +21,12 @@ function preprocess (component) {
       fn: this.fn,
       component: this
     })
+
     modes.reactive = true
     modes.noOverride = false
   }
 
-  // if memoized already, don't process template
+  // if template is processed already
   if (this.memo.template) {
     _html = () => {}
     invoke_component(false)
@@ -34,7 +36,7 @@ function preprocess (component) {
     _html = html.bind(this)
     this.memo.template = document.createElement('template')
     invoke_component(true)
-    memoTemplate.call(this)
+    sweetifyTemplate.call(this)
   }
 }
 

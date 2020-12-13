@@ -1,5 +1,5 @@
-import slice from '../../slice/slice.js'
-import addDep from '../../slice/addDep.js'
+import slice from '../../state/slice.js'
+import addDep from '../../state/addDep.js'
 import { mutate } from '../../reactivity/mutate.js'
 import { BIND } from '../../constants.js'
 

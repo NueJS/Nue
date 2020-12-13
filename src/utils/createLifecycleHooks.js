@@ -1,4 +1,4 @@
-import addDep from './slice/addDep.js'
+import addDep from './state/addDep.js'
 
 function createLifecycleHooks () {
   this.on = {

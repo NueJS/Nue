@@ -1,16 +1,16 @@
 // import { uid } from '../others.js'
-import { is_in_brackets, unwrap, process_placeholder } from '../string/placeholder.js'
+import { isBracketed, unBracket, process_placeholder } from '../string/placeholder.js'
 import { STATE, EVENT, BIND, NORMAL } from '../constants.js'
 import { components } from '../../index.js'
 
-function memoAttributes (element) {
+function sweetifyAttributes (element) {
   element.sweet.attributes = []
 
   // loop over each attribute
   for (const attribute_name of element.getAttributeNames()) {
     //
     const attribute_value = element.getAttribute(attribute_name)
-    let is_placeholder = is_in_brackets(attribute_value)
+    let is_placeholder = isBracketed(attribute_value)
     let name, type, placeholder
 
     const nodeName = element.nodeName.toLowerCase()
@@ -23,8 +23,8 @@ function memoAttributes (element) {
     let placeholder_text = attribute_value
 
     // handle Shorthand
-    if (attribute_value === '' && is_in_brackets(attribute_name)) {
-      name = unwrap(attribute_name)
+    if (attribute_value === '' && isBracketed(attribute_name)) {
+      name = unBracket(attribute_name)
       placeholder_text = attribute_name
       is_placeholder = true
       type = isSweet ? STATE : NORMAL
@@ -60,4 +60,4 @@ function memoAttributes (element) {
   }
 }
 
-export default memoAttributes
+export default sweetifyAttributes

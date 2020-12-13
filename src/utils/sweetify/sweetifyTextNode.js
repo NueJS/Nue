@@ -1,7 +1,7 @@
 import { TEXT } from '../constants.js'
 import split from '../string/split.js'
 
-function memoText (node) {
+function sweetifyTextNode (node) {
   const placeholders = split.call(this, node.textContent.trim())
   const textNodes = []
 
@@ -26,4 +26,4 @@ function memoText (node) {
   })
 }
 
-export default memoText
+export default sweetifyTextNode

@@ -1,10 +1,5 @@
-
-/**
- * recursively traverse the node and call cb for each of its child
- * @param {Node} node - node for which we want to traverse its tree
- * @param {Function} cb - callback function
- */
-
+// recursively traverse the node and call cb for each of its child
+// if ignore is true, ignore the root node
 function traverse (node, cb, ignore = false) {
   if (!ignore) cb(node)
   const hasChild = node.hasChildNodes()

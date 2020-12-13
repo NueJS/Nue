@@ -19,9 +19,4 @@ function html (strings, ...exprs) {
   this.memo.template.innerHTML += str
 }
 
-// export function css (strings, ...exprs) {
-//   const arr = ['<style> ', ...strings, '</style>']
-//   html.call(this, arr, ...exprs)
-// }
-
 export default html

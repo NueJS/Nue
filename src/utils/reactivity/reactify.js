@@ -1,7 +1,7 @@
-import on_state_mutation from '../slice/onMutate.js'
+import on_state_mutation from '../state/onMutate.js'
 import modes from './modes.js'
-import computedState from '../slice/computedState.js'
-import { accessed } from '../slice/detectStateUsage.js'
+import computedState from '../state/computedState.js'
+import { accessed } from '../state/detectStateUsage.js'
 
 const isObject = x => typeof x === 'object' && x !== null
 

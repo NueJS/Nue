@@ -7,36 +7,27 @@ import { EVENT, BIND, STATE } from '../../constants.js'
 
 function processAttributes (node) {
   // refs API
-  if (node.hasAttribute('ref')) this.refs[node.getAttribute('ref')] = node
+  if (node.hasAttribute('ref')) {
+    this.refs[node.getAttribute('ref')] = node
+    node.removeAttribute('ref')
+  }
+
+  const { sweet } = node
 
   // if no attributes memo available for node
-  if (!node.sweet.attributes) return
+  if (!sweet.attributes) return
 
-  node.sweet.attributes.forEach(attribute => {
-    if (attribute.type === EVENT) {
-      addEvent.call(this, node, attribute)
-    }
+  sweet.attributes.forEach(attribute => {
+    if (attribute.type === EVENT) addEvent.call(this, node, attribute)
     // bind value on input nodes or bind a prop to custom component
     else if (attribute.type === BIND) {
-      // bind:value=[slice]
-      if (node.nodeName === 'INPUT' || node.nodeName === 'TEXTAREA' || node.nodeName === 'SELECT') {
-        bindInput.call(this, node, attribute)
-      }
-
-      // bind:bindProp={key} on custom component
-      // @TODO : check if the node is custom component
-      else addState.call(this, node, attribute)
+      if (sweet.isSweet) addState.call(this, node, attribute)
+      else bindInput.call(this, node, attribute)
     }
 
-    // :name={var} or :name=value set the state of component
-    else if (attribute.type === STATE) {
-      addState.call(this, node, attribute)
-    }
-
-    // set value of simple attributes to state
-    else {
-      addAttribute.call(this, node, attribute)
-    }
+    // prop=[value] on sweet component
+    else if (attribute.type === STATE) addState.call(this, node, attribute)
+    else addAttribute.call(this, node, attribute)
   })
 }
 

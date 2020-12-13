@@ -1,6 +1,6 @@
 import build_shadow_dom from './utils/build_shadow_dom.js'
 import createLifecycleHooks from './utils/createLifecycleHooks.js'
-import preprocess from './utils/process/preprocess.js'
+import preprocess from './utils/sweetify/preprocess.js'
 
 // define a component using compName and a component function
 // component function will define html, css, state, life cycles, actions etc

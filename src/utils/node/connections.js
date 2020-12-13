@@ -1,4 +1,4 @@
-import addDep from '../slice/addDep.js'
+import addDep from '../state/addDep.js'
 
 // connect the node to state using deps
 // update the node when these deps change

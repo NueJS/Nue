@@ -1,16 +1,10 @@
 import { mutate } from '../../reactivity/mutate.js'
-import addDep from '../../slice/addDep.js'
-import { addConnects } from '../../node/connections.js'
+import { setupConnection } from '../../node/connections.js'
 
-// :prop=[...]
-// initialize the value of prop from state
-// when the input changes, set the prop's value in state
-
+// ex: :value=[count]
 function bindInput (node, attributeMemo) {
-  // if input type is number convert the value to number
   const isNumber = node.type === 'number' || node.type === 'range'
-
-  const { path, get_value } = attributeMemo.placeholder
+  const { path, getValue, deps } = attributeMemo.placeholder
   const { name } = attributeMemo
 
   const handler = () => {
@@ -20,14 +14,8 @@ function bindInput (node, attributeMemo) {
   }
 
   node.addEventListener('input', handler)
-
-  const set_value = () => {
-    node[name] = get_value()
-  }
-
-  set_value()
-  // should I remove event listener when this node is removed ?
-  addConnects(node, () => addDep.call(this, path, set_value, 'dom'))
+  const update = () => { node[name] = getValue() }
+  setupConnection.call(this, node, deps, update)
 }
 
 export default bindInput

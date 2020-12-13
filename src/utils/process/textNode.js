@@ -1,13 +1,13 @@
 import { setupConnection } from '../node/connections.js'
-import handleInvalidPlaceholder from '../node/handleInvalidPlaceholder.js'
+import { handleInvalidPlaceholder } from '../string/placeholder.js'
 
 function processTextNode (node) {
-  const { get_value, deps } = node.sweet.placeholder
+  const { getValue, deps } = node.sweet.placeholder
   const invalidPlaceholder = handleInvalidPlaceholder(node, node.sweet.placeholder)
 
   if (!invalidPlaceholder) {
     const update = () => {
-      if (node.sweet.isConnected) node.textContent = get_value()
+      if (node.sweet.isConnected) node.textContent = getValue()
     }
     setupConnection.call(this, node, deps, update)
   }
