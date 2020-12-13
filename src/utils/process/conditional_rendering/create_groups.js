@@ -1,18 +1,18 @@
 import { FN } from '../../constants.js'
 
 function create_groups (conditionNode, deps, groups, anchor_node) {
-  const memo = this.memo_of(conditionNode)
+  const memo = conditionNode.supersweet
   let compareWith
   // else node will not have memo
 
-  if (memo && memo.attributes.length) {
+  if (memo.attributes.length) {
     // console.log({ memo, conditionNode })
     const placeholder = memo.attributes[0].placeholder
     compareWith = memo.attributes[0].name
     if (placeholder.type === FN) {
       deps = [...deps, ...placeholder.deps]
     } else {
-      deps.push(placeholder.content)
+      deps.push(placeholder.path)
     }
   }
 
