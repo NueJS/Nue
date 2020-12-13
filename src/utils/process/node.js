@@ -1,4 +1,4 @@
-import process_text_node from './text_node.js'
+import process_text_node from './text.js'
 import process_attributes from './attributes/all.js'
 import process_if from './conditional_rendering/if.js'
 
