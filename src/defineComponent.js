@@ -1,5 +1,5 @@
 import build_shadow_dom from './utils/build_shadow_dom.js'
-import add_lifecycle_hooks from './utils/add_lifecycle_hooks.js'
+import createLifecycleHooks from './utils/createLifecycleHooks.js'
 import setup_processing from './utils/process/setup_processing.js'
 
 // define a component using compName and a component function
@@ -13,6 +13,7 @@ function define_component (compName, component) {
   class SuperSweet extends HTMLElement {
     constructor () {
       super()
+      this.component = component
 
       // references to DOM nodes
       this.refs = {}
@@ -29,30 +30,27 @@ function define_component (compName, component) {
       // before callbacks are be called before the DOM is updated
       // after callbacks are called after the DOM is updated
       // dom callbacks are added by nodes which updates text/attributes/state on dom nodes
-      this.state_deps = { $: { reactive: [], before: [], after: [], dom: [] } }
+      this.deps = { $: { computed: [], stateReady: [], dom: [] } }
+
+      // queue holds all the callbacks that should be called
+      // queue is useful to avoid calling the callback more than once and in correct order
+      this.queue = {
+        stateReady: new Map(),
+        computed: new Map(),
+        dom: new Map()
+      }
 
       // callbacks that are to be called when the components is connected / disconnected to DOM
-      this.is_added_cbs = []
-      this.is_removed_cbs = []
-      this.will_update_cbs = []
-      this.is_updated_cbs = []
+      this.mountCbs = []
+      this.destroyCbs = []
+      this.beforeUpdateCbs = []
+      this.afterUpdateCbs = []
 
       // memo of the component which are same for all instances
       this.memo = memo
 
       // array of processing functions that should be run after all the nodes have been processed
       this.delayed_processes = []
-
-      this.memo_of = (node) => this.memo.nodes[node.memo_id]
-
-      // queue holds all the callbacks that should be called
-      // queue is useful to avoid calling the callback more than once and in correct order
-      this.queue = {
-        before: new Map(),
-        after: new Map(),
-        reactive: new Map(),
-        dom: new Map()
-      }
 
       // once all the callbacks are called, clear the queue for the next interaction
       this.clear_queue = () => {
@@ -63,7 +61,7 @@ function define_component (compName, component) {
 
       // add methods to add life cycles callbacks in the component
       // on.add, on.beforeUpdate, on.afterUpdate, on.remove, on.reactive, on.dom
-      add_lifecycle_hooks.call(this)
+      createLifecycleHooks.call(this)
 
       // process the template - one times only
       // memoize template info to reuse in other instances
@@ -80,13 +78,13 @@ function define_component (compName, component) {
 
     // when component is added in dom
     connectedCallback () {
-      this.is_added_cbs.forEach(cb => cb())
+      this.mountCbs.forEach(cb => cb())
     }
 
     // when the component is removed from dom
     // run cleanups
     disconnectedCallback () {
-      this.is_removed_cbs.forEach(cb => cb())
+      this.destroyCbs.forEach(cb => cb())
     }
   }
 
