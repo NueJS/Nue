@@ -1,6 +1,6 @@
 import { reverseForEach } from '../../others.js'
 import { disconnect, connect } from '../../node/connections.js'
-import traverse from '../../tree/traverse.js'
+import traverse from '../../node/traverse.js'
 import process_node from '../node.js'
 
 export const add_group = (group, anchor_node) => {

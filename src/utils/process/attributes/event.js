@@ -1,26 +1,23 @@
+import { supersweet } from '../../../index.js'
+
 function process_event_attribute (node, info) {
-  // // console.log({ info })
   const { name, placeholder } = info
-  const action = this.actions[name]
+  const action = supersweet.actions[name]
   const handler = this.fn[placeholder.content]
 
-  //
-  if (handler === undefined) throw new Error(`function "${placeholder.content}" is not defined`)
+  // check if the function is valid
+  // @TODO move this in dev condition
+  if (!handler) throw new Error(`"ERROR in <${this.nodeName}>'s <${node.nodeName}> : "${placeholder.content}" is not defined`)
 
-  // @customEvent=[handler] action API
+  // @customAction=[handler]
   if (action) {
     const cleanup = action(node, handler)
-    node.onRemove = cleanup
-    this.on.remove(cleanup)
+    if (!node.di.supersweet.connects) node.di.supersweet.connects = cleanup
+    else node.di.supersweet.connects.push(cleanup)
   }
 
   // @nativeEvent=[handler]
-  else {
-    node.addEventListener(name, handler)
-    const cleanup = () => node.removeEventListener(name, handler)
-    this.on.remove(cleanup)
-    // node.onRemove(cleanup)
-  }
+  else node.addEventListener(name, handler)
 }
 
 export default process_event_attribute

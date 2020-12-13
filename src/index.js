@@ -1,27 +1,20 @@
-import define_component from './define_component.js'
+import defineComponent from './defineComponent.js'
 export { default as settings } from './settings.js'
 
-// define all the components
+export const supersweet = {
+  components: {},
+  actions: {},
+  processedComponents: {}
+}
 
-// @TODO : do not define components all at once
-// start from root - when processing template of app
-// go through nodes, if a custom component is used, process that first
-// do the same in that component
+export const actions = (obj) => {
+  supersweet.actions = obj
+}
 
-// if a component is hidden, do not process it
-// if the component becomes unhidden check if has been processed or not
-// if not, process it
+export const components = (obj) => {
+  supersweet.components = obj
+}
 
-export const components = { }
-
-export const define = (comps) => {
-  // components = comps
-
-  Object.keys(comps).forEach(name => {
-    components[name] = true
-  })
-
-  Object.keys(comps).forEach(name => {
-    define_component(name, comps[name])
-  })
+export const render = (name) => {
+  defineComponent(name, supersweet.components[name])
 }
