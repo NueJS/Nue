@@ -9,12 +9,10 @@ function process_attributes (node) {
   // refs API
   if (node.hasAttribute('ref')) this.refs[node.getAttribute('ref')] = node
 
-  // console.log('attributes: ', node.supersweet)
   // if no attributes memo available for node
   if (!node.supersweet.attributes) return
 
   node.supersweet.attributes.forEach(attributeMemo => {
-    console.log('at memo: ', attributeMemo)
     if (attributeMemo.type === EVENT) {
       process_event_attributes.call(this, node, attributeMemo)
     }

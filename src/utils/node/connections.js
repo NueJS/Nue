@@ -12,7 +12,6 @@ export function addConnects (node, connect) {
   node.supersweet.isConnected = true
 
   const disconnect = connect()
-  console.log('connected : ', node, disconnect)
   if (Array.isArray(disconnect)) disconnect.forEach(dc => node.supersweet.disconnects.push(dc))
   else node.supersweet.disconnects.push(disconnect)
 }
@@ -48,7 +47,6 @@ export function disconnect (node) {
 
   // if node has.supersweet.disconnects
   if (node.supersweet.disconnects) {
-    console.log('disconnected: ', node)
     node.supersweet.disconnects.forEach(dc => dc())
     node.supersweet.isConnected = false
   }

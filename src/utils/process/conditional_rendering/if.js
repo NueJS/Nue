@@ -89,7 +89,6 @@ function process_if (if_node) {
     on_conditions_change()
   })
 
-  console.log({ deps })
   deps.forEach(dep => {
     addDep.call(this, dep, on_conditions_change, 'stateReady')
   })
