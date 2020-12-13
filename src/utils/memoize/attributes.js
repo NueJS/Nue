@@ -1,7 +1,7 @@
 // import { uid } from '../others.js'
 import { is_in_brackets, unwrap, process_placeholder } from '../string/placeholder.js'
 import { STATE, EVENT, BIND, NORMAL } from '../constants.js'
-import { components, render } from '../../index.js'
+import { components } from '../../index.js'
 
 function memoAttributes (element) {
   element.supersweet.attributes = []
@@ -16,7 +16,8 @@ function memoAttributes (element) {
     const nodeName = element.nodeName.toLowerCase()
     const isSweet = components[nodeName]
     if (isSweet) {
-      render(nodeName)
+      element.supersweet.isSweet = true
+      element.supersweet.compName = nodeName
     }
 
     let placeholder_text = attribute_value
