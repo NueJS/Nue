@@ -1,6 +1,6 @@
 // import get_attributes from '../get_attributes.js'
 import process_bind_attribute from './bind.js'
-import process_attribute from './name.js'
+import addNormalAttribute from './normal.js'
 import process_state_attribute from './state.js'
 import process_event_attributes from './event.js'
 import { EVENT, BIND, STATE } from '../../constants.js'
@@ -10,32 +10,32 @@ function process_attributes (node) {
   if (node.hasAttribute('ref')) this.refs[node.getAttribute('ref')] = node
 
   // if no attributes memo available for node
-  if (!node.supersweet.attributes) return
+  if (!node.sweet.attributes) return
 
-  node.supersweet.attributes.forEach(attributeMemo => {
-    if (attributeMemo.type === EVENT) {
-      process_event_attributes.call(this, node, attributeMemo)
+  node.sweet.attributes.forEach(attribute => {
+    if (attribute.type === EVENT) {
+      process_event_attributes.call(this, node, attribute)
     }
     // bind value on input nodes or bind a prop to custom component
-    else if (attributeMemo.type === BIND) {
+    else if (attribute.type === BIND) {
       // bind:value=[slice]
       if (node.nodeName === 'INPUT' || node.nodeName === 'TEXTAREA' || node.nodeName === 'SELECT') {
-        process_bind_attribute.call(this, node, attributeMemo)
+        process_bind_attribute.call(this, node, attribute)
       }
 
       // bind:bindProp={key} on custom component
       // @TODO : check if the node is custom component
-      else process_state_attribute.call(this, node, attributeMemo)
+      else process_state_attribute.call(this, node, attribute)
     }
 
     // :name={var} or :name=value set the state of component
-    else if (attributeMemo.type === STATE) {
-      process_state_attribute.call(this, node, attributeMemo)
+    else if (attribute.type === STATE) {
+      process_state_attribute.call(this, node, attribute)
     }
 
     // set value of simple attributes to state
     else {
-      process_attribute.call(this, node, attributeMemo)
+      addNormalAttribute.call(this, node, attribute)
     }
   })
 }
