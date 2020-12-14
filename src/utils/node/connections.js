@@ -6,8 +6,9 @@ import addDep from '../state/addDep.js'
 export function setupConnection (node, deps, update) {
   const connect = () => deps.map(path => addDep.call(this, path, update, 'dom'))
   addConnects(node, connect)
-  node.sweet.update = update
   update()
+  if (!node.sweet.updates) node.sweet.updates = []
+  node.sweet.updates.push(update)
 }
 
 // add connects and disconnects on node
@@ -52,7 +53,8 @@ export function connect (node) {
     // update() will/should not work unless isConnected is set to true
     // so set it to true first and then update
     sweet.isConnected = true
-    sweet.update && sweet.update()
+    console.log('updates :', sweet.updates)
+    sweet.updates && sweet.updates.forEach(u => u())
   }
 }
 
