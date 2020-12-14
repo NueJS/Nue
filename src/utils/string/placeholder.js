@@ -1,4 +1,4 @@
-import { REACTIVE, FN } from '../constants.js'
+import { REACTIVE, FN, TEXT } from '../constants.js'
 import slice from '../state/slice.js'
 
 export const unBracket = str => str.substr(1, str.length - 2)
@@ -31,11 +31,9 @@ export function process_placeholder (str, unwrapped = false) {
       }
 
       return { type: FN, deps, getValue, content }
-    } else {
-      throw new Error(`invalid function ${fn_name} used in ${this.memo.compName}`)
     }
 
-    // else return { type: TEXT, text: content }
+    else return { type: TEXT, text: content }
   }
 
   // if slice is used
