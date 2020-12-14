@@ -1,4 +1,4 @@
-import build_shadow_dom from './utils/build_shadow_dom.js'
+import buildShadowDOM from './utils/buildShadowDOM.js'
 import createLifecycleHooks from './utils/createLifecycleHooks.js'
 import preprocess from './utils/sweetify/preprocess.js'
 
@@ -70,7 +70,7 @@ function define_component (compName, component) {
       preprocess.call(this, component)
 
       // create copy of template, process nodes using state, add event listeners, add nodes in DOM
-      build_shadow_dom.call(this, this.memo.template)
+      buildShadowDOM.call(this, this.memo.template)
 
       // if this component has two way props - meaning that when state of this component changes we have to update the parent's state as well
       // add parent's state update callbacks in this component so that they are called when this component's state changes
