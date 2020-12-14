@@ -30,7 +30,7 @@ export function process_placeholder (str, unwrapped = false) {
         return this.fn[fn_name](...arg_values)
       }
 
-      return { type: FN, deps, getValue }
+      return { type: FN, deps, getValue, content }
     } else {
       throw new Error(`invalid function ${fn_name} used in ${this.memo.compName}`)
     }
