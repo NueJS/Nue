@@ -5,7 +5,7 @@ import html from '../string/html.js'
 import sweetifyTemplate from './sweetifyTemplate.js'
 
 function preprocess (component) {
-  this.$ = reactify.call(this, this.props || {})
+  this.$ = reactify.call(this, this.stateProps || {})
 
   let _html
 
@@ -19,7 +19,8 @@ function preprocess (component) {
       refs: this.refs,
       html: _html,
       fn: this.fn,
-      component: this
+      component: this,
+      props: { ...this.stateProps, ...this.fnProps }
     })
 
     modes.reactive = true
