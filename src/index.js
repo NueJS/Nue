@@ -7,14 +7,16 @@ export const supersweet = {
   processedComponents: {}
 }
 
-export const actions = (obj) => {
+export const defineActions = (obj) => {
   supersweet.actions = obj
 }
 
-export const components = (obj) => {
+export const defineComponents = (obj) => {
   supersweet.components = obj
 }
 
 export const render = (name) => {
+  console.log('render : ', name)
+  supersweet.processedComponents[name] = true
   defineComponent(name, supersweet.components[name])
 }
