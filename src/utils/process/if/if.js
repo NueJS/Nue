@@ -13,11 +13,8 @@ function process_if (if_node) {
   // when any of the conditions change, check for re-render
   const deps = []
 
-  // node which will be used as anchor after which all the group nodes will be appended
-  // @TODO improve this - use comment node
-  const anchorNode = if_node.previousSibling
-
-  createGroups.call(this, if_node, deps, groups, anchorNode)
+  // divide the nodes in groups and after delay, add the nodes in DOM
+  createGroups.call(this, if_node, deps, groups, if_node)
 
   // group that is currently rendered
   let activeGroup
@@ -55,9 +52,9 @@ function process_if (if_node) {
 
           if (activeGroup && activeGroup.animate && group !== activeGroup) {
             const lastIndex = activeGroup.nodes.length - 1
-            activeGroup.nodes[lastIndex].addEventListener('animationend', () => addGroup(group, anchorNode), { once: true })
+            activeGroup.nodes[lastIndex].addEventListener('animationend', () => addGroup(group), { once: true })
           } else {
-            addGroup(group, anchorNode)
+            addGroup(group, groups.anchorNode)
           }
 
           activeGroup = group

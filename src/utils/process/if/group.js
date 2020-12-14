@@ -3,19 +3,30 @@ import { disconnect, connect } from '../../node/connections.js'
 import traverse from '../../node/traverse.js'
 import process_node from '../processNode.js'
 
-export function addGroup (group, anchorNode) {
+const updateAnchor = (anchorNode, c) => {
+// update anchor node
+  const len = anchorNode.textContent.length - c.length
+  anchorNode.textContent = anchorNode.textContent.substr(0, len) + c
+}
+
+export function addGroup (group) {
+  const { anchorNode } = group
   reverseForEach(group.nodes, node => {
     anchorNode.after(node)
     if (node.nodeType !== Node.TEXT_NODE) {
-      if (group.animate)node.setAttribute('enter', '')
+      if (group.animate) node.setAttribute('enter', '')
       traverse(node, connect)
     }
   })
   group.prevAdded = group.added
   group.added = true
+
+  // update anchor node
+  updateAnchor(anchorNode, ' ✅ ')
 }
 
 export function removeGroup (group) {
+  const { anchorNode } = group
   group.nodes.forEach(node => {
     if (node.nodeType !== Node.TEXT_NODE) {
       if (group.animate) node.removeAttribute('exit')
@@ -25,6 +36,8 @@ export function removeGroup (group) {
     node.remove()
   })
   group.added = false
+
+  updateAnchor(anchorNode, ' ❌ ')
 }
 
 export function processGroup (group) {
