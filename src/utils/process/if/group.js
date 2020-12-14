@@ -6,8 +6,10 @@ import process_node from '../processNode.js'
 export function addGroup (group, anchorNode) {
   reverseForEach(group.nodes, node => {
     anchorNode.after(node)
-    traverse(node, connect)
-    if (group.prevAdded !== undefined) node.setAttribute('enter', '')
+    if (node.nodeType !== Node.TEXT_NODE) {
+      if (group.animate)node.setAttribute('enter', '')
+      traverse(node, connect)
+    }
   })
   group.prevAdded = group.added
   group.added = true
@@ -15,8 +17,11 @@ export function addGroup (group, anchorNode) {
 
 export function removeGroup (group) {
   group.nodes.forEach(node => {
-    node.removeAttribute('exit')
-    traverse(node, disconnect)
+    if (node.nodeType !== Node.TEXT_NODE) {
+      if (group.animate) node.removeAttribute('exit')
+      traverse(node, disconnect)
+    }
+
     node.remove()
   })
   group.added = false
