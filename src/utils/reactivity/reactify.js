@@ -2,6 +2,7 @@ import onMutate from '../state/onMutate.js'
 import modes from './modes.js'
 import computedState from '../state/computedState.js'
 import { accessed } from '../state/detectStateUsage.js'
+import deepEqual from '../deepEqual.js'
 
 const isObject = x => typeof x === 'object' && x !== null
 
@@ -28,7 +29,10 @@ function reactify (state, path = []) {
       let success
       if (modes.reactive) {
         if (!(prop === 'length' && Array.isArray(target))) {
-          if (target[prop] !== value) {
+          // if the value has changed
+          // @TODO - do deep compare here
+
+          if (!deepEqual(target[prop], value)) {
             success = Reflect.set(target, prop, value)
             onMutate.call(_this, [...path, prop])
           }
