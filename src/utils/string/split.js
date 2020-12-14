@@ -19,6 +19,12 @@ function split (text) {
 
     // if found the start of new placeholder
     else if (text[i] === '[') {
+      // mark the bracket content as string
+      if (text[i - 1] === '!') {
+        str = str.substr(0, str.length - 1) + '['
+        continue
+      }
+
       in_placeholder = true
       // if str is not empty, add string
       if (str) {
