@@ -7,8 +7,8 @@ import { BIND } from '../../constants.js'
 // child component uses props to initialize its state
 // props override the default state defined in the component blueprint
 function addProps (node, key, value) {
-  if (!node.props) node.props = {}
-  node.props[key] = value
+  if (!node.stateProps) node.stateProps = {}
+  node.stateProps[key] = value
 }
 
 // :name=[path]
@@ -27,7 +27,7 @@ function addState (node, attribute) {
   const flowDown = () => {
     mutate(node.$, prop_name_split, slice(this.$, placeholder.path), 'set')
   }
-  addDep.call(this, placeholder.path, flowDown)
+  addDep.call(this, placeholder.path, flowDown, 'dom')
 
   // if attribute is a binding, change the state of parent when node's state changes
   if (attribute.type === BIND) {
@@ -41,7 +41,7 @@ function addState (node, attribute) {
     }
 
     // when this function is called parent's callbacks are added in deps of node
-    const on_node_state_change = () => addDep.call(node, prop_name_split, flowUp)
+    const on_node_state_change = () => addDep.call(node, prop_name_split, flowUp, 'dom')
     if (!node.two_way_props) node.two_way_props = []
 
     // add these functions on node in two_way_props array, call this array when node is added on dom
