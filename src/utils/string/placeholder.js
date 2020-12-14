@@ -19,15 +19,15 @@ export function process_placeholder (str, unwrapped = false) {
   // if function is used inside the placeholder
   if (is_fn_placeholder) {
     const [fn_name, args_str] = content.split('(')
-    const fn = this.fn[fn_name]
-    if (fn) {
+
+    if (this.fn[fn_name]) {
       const remove_closing_paren = args_str.substr(0, args_str.length - 1)
       const slices = remove_closing_paren.split(',')
       const deps = slices.map(a => a.split('.'))
 
-      const getValue = () => {
+      function getValue () {
         const arg_values = deps.map(a => slice(this.$, a))
-        return fn(...arg_values)
+        return this.fn[fn_name](...arg_values)
       }
 
       return { type: FN, deps, getValue }
@@ -41,7 +41,9 @@ export function process_placeholder (str, unwrapped = false) {
   // if slice is used
   else {
     const path = content.split('.')
-    const getValue = () => slice(this.$, path)
+    function getValue () {
+      return slice(this.$, path)
+    }
     return { type: REACTIVE, path, content, getValue, deps: [path], text: str }
   }
 }
@@ -50,7 +52,7 @@ export function process_placeholder (str, unwrapped = false) {
 export function handleInvalidPlaceholder (node, placeholder) {
   const { text, getValue } = placeholder
   let value
-  try { value = getValue() } catch { /**/ }
+  try { value = getValue.call(this) } catch { /**/ }
   if (value === undefined) {
     node.textContent = bracketify(text)
     return true // show that it is invalid
