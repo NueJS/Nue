@@ -6,8 +6,10 @@ function createLifecycleHooks () {
     destroy: (cb) => this.destroyCbs.push(cb),
     beforeUpdate: (cb) => this.beforeUpdateCbs.push(cb),
     afterUpdate: (cb) => this.afterUpdateCbs.push(cb),
-    mutate: (dep, cb) => {
-      addDep.call(this, dep.split('.'), cb, 'computed')
+    mutate: (cb, ...deps) => {
+      deps.forEach(dep => {
+        addDep.call(this, dep.split('.'), cb, 'computed')
+      })
     }
   }
 }
