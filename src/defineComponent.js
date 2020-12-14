@@ -18,8 +18,9 @@ function define_component (compName, component) {
       // references to DOM nodes
       this.refs = {}
 
+      // console.log('prev fn : ', this.fnProps)
       // functions added in component or given by parent component
-      this.fn = {}
+      this.fn = this.fnProps || {}
 
       // function that call the cb when a certain action is performed in application
       // similar to svelte actions API
