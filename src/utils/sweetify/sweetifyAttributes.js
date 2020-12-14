@@ -1,7 +1,7 @@
 // import { uid } from '../others.js'
 import { isBracketed, unBracket, process_placeholder } from '../string/placeholder.js'
-import { STATE, EVENT, BIND, NORMAL } from '../constants.js'
-import { components } from '../../index.js'
+import { STATE, EVENT, BIND, NORMAL, FN_PROP } from '../constants.js'
+// import { components } from '../../index.js'
 
 function sweetifyAttributes (element) {
   element.sweet.attributes = []
@@ -13,13 +13,6 @@ function sweetifyAttributes (element) {
     let is_placeholder = isBracketed(attribute_value)
     let name, type, placeholder
 
-    const nodeName = element.nodeName.toLowerCase()
-    const isSweet = components[nodeName]
-    if (isSweet) {
-      element.sweet.isSweet = true
-      element.sweet.compName = nodeName
-    }
-
     let placeholder_text = attribute_value
 
     // handle Shorthand
@@ -27,13 +20,14 @@ function sweetifyAttributes (element) {
       name = unBracket(attribute_name)
       placeholder_text = attribute_name
       is_placeholder = true
-      type = isSweet ? STATE : NORMAL
+      type = element.sweet.isSweet ? STATE : NORMAL
     }
 
     else if (is_placeholder) {
       // EVENT @event-name=[handler]
       if (attribute_name[0] === '@') {
-        type = EVENT
+        // console.log({ sweet: element.sweet })
+        type = element.sweet.isSweet ? FN_PROP : EVENT
         name = attribute_name.substr(1)
       }
 
@@ -46,7 +40,7 @@ function sweetifyAttributes (element) {
       // NORMAL name=[path]
       else {
         name = attribute_name
-        type = isSweet ? STATE : NORMAL
+        type = element.sweet.isSweet ? STATE : NORMAL
       }
     }
 

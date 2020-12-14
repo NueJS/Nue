@@ -1,6 +1,7 @@
 import memoAttributes from './sweetifyAttributes.js'
 import memoText from './sweetifyTextNode.js'
 import traverse from '../node/traverse.js'
+import { supersweet } from '../../index.js'
 
 function sweetifyTemplate () {
   const remove_nodes = []
@@ -15,8 +16,16 @@ function sweetifyTemplate () {
       else memoText.call(this, node)
     }
 
+    // console.log({ comps: supersweet.components })
+    const compName = node.nodeName.toLowerCase()
+    const isSweet = supersweet.components[compName]
+    if (isSweet) {
+      node.sweet.isSweet = true
+      node.sweet.compName = compName
+    }
+
     // memoize attributes
-    else if (node.hasAttributes && node.hasAttributes()) {
+    if (node.hasAttributes && node.hasAttributes()) {
       memoAttributes.call(this, node)
     }
   }
