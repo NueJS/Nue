@@ -6,14 +6,16 @@ import { bracketify } from './placeholder.js'
 
 function html (strings, ...exprs) {
   let str = ''
-  let value
   for (let i = 0; i < strings.length; i++) {
-    value = exprs[i]
-    if (typeof value === 'function') {
-      const name = 'sweet' + i
-      this.$[name] = bracketify(name)
+    const value = exprs[i]
+    if (value) {
+      if (typeof value === 'function') {
+        const name = 'sweet' + i
+        this.$[name] = value
+        str += strings[i] + bracketify(name)
+      } else str += strings[i] + value
     }
-    str += strings[i] + (value === undefined ? '' : value)
+    else str += strings[i]
   }
 
   this.memo.template.innerHTML += str
