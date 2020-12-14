@@ -14,7 +14,7 @@ function build_shadow_dom (template) {
   const fragment = template.content.cloneNode(true)
   sweetify(template.content, fragment)
   process_node.call(this, fragment)
-  this.delayed_processes.forEach(p => p());
+  this.delayedProcesses.forEach(p => p());
   [...fragment.childNodes].forEach(node => this.shadowRoot.append(node))
 }
 

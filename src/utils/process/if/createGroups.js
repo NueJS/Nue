@@ -23,7 +23,7 @@ function createGroups (conditionNode, deps, groups, anchorNode) {
   conditionNode.childNodes.forEach(node => {
     if (node.nodeName === 'ELSIF' || node.nodeName === 'ELSE' || node.nodeName === 'IF') {
       createGroups.call(this, node, deps, groups, anchorNode)
-      this.delayed_processes.push(() => anchorNode.after(node))
+      this.delayedProcesses.push(() => anchorNode.after(node))
     } else {
       group.nodes.push(node)
       node.processed = true

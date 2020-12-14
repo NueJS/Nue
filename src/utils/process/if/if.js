@@ -81,7 +81,7 @@ function process_if (if_node) {
     })
   }
 
-  this.delayed_processes.push(() => {
+  this.delayedProcesses.push(() => {
     groups.forEach(g => {
       g.conditionNode.remove()
       g.nodes.forEach(n => n.remove())
