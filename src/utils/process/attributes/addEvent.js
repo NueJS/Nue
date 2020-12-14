@@ -7,7 +7,7 @@ function addEvent (node, info) {
   const handler = this.fn[placeholder.content]
 
   // @TODO move this in dev condition
-  if (!handler) throw new Error(`"ERROR in <${this.nodeName}>'s <${node.nodeName}> : "${placeholder.content}" is not defined`)
+  if (!handler) throw new Error(`"ERROR in <${this.nodeName}>'s <${node.nodeName}> : "${placeholder.content}" function is not defined`)
 
   // ex: @swipe-left=[moveLeft]
   if (action) {

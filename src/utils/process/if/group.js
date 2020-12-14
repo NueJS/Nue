@@ -4,7 +4,6 @@ import traverse from '../../node/traverse.js'
 import process_node from '../processNode.js'
 
 const updateAnchor = (anchorNode, c) => {
-// update anchor node
   const len = anchorNode.textContent.length - c.length
   anchorNode.textContent = anchorNode.textContent.substr(0, len) + c
 }
