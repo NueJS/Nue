@@ -4,7 +4,7 @@ import { setupConnection } from '../../node/connections.js'
 function addAttribute (node, attribute) {
   const { deps, getValue } = attribute.placeholder
   const update = () => {
-    if (node.sweet.isConnected) node.setAttribute(attribute.name, getValue.call(this))
+    if (node.sweet.isConnected) node.setAttribute(attribute.name, getValue.call(this, node))
   }
   setupConnection.call(this, node, deps, update)
 }

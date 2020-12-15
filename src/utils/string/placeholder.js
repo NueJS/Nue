@@ -7,6 +7,16 @@ export const bracketify = str => `[${str}]`
 
 export const isBracketed = str => str[0] === '[' && str[str.length - 1] === ']'
 
+export const contextValue = (state, context, path) => {
+  let value
+  try { value = slice(state, path) } catch { }
+  if (value === undefined) {
+    try { value = slice(context, path) } catch { }
+  }
+
+  return value
+}
+
 // process the reactive or functional place holder
 // if functional placeholder's function name is not valid, make it not a placeholder
 export function process_placeholder (str, unwrapped = false) {
@@ -18,16 +28,16 @@ export function process_placeholder (str, unwrapped = false) {
 
   // if function is used inside the placeholder
   if (is_fn_placeholder) {
-    const [fn_name, args_str] = content.split('(')
+    const [fnName, args_str] = content.split('(')
 
-    if (this.fn[fn_name]) {
+    if (this.fn[fnName]) {
       const remove_closing_paren = args_str.substr(0, args_str.length - 1)
       const slices = remove_closing_paren.split(',')
       const deps = slices.map(a => a.split('.'))
 
-      function getValue () {
-        const arg_values = deps.map(a => slice(this.$, a))
-        return this.fn[fn_name](...arg_values)
+      function getValue (node) {
+        const values = deps.map(path => contextValue(this.$, node.sweet.context, path))
+        return this.fn[fnName](...values)
       }
 
       return { type: FN, deps, getValue, content }
@@ -39,8 +49,10 @@ export function process_placeholder (str, unwrapped = false) {
   // if slice is used
   else {
     const path = content.split('.')
-    function getValue () {
-      return slice(this.$, path)
+    function getValue (node) {
+      const v = contextValue(this.$, node.sweet.context, path)
+      // console.log('get value for ', path, v)
+      return v
     }
     return { type: REACTIVE, path, content, getValue, deps: [path], text: str }
   }
@@ -50,7 +62,7 @@ export function process_placeholder (str, unwrapped = false) {
 export function handleInvalidPlaceholder (node, placeholder) {
   const { text, getValue } = placeholder
   let value
-  try { value = getValue.call(this) } catch { /**/ }
+  try { value = getValue.call(this, node) } catch { /**/ }
   if (value === undefined) {
     node.textContent = bracketify(text)
     return true // show that it is invalid

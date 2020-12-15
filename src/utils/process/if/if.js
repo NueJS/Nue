@@ -33,7 +33,7 @@ function process_if (if_node) {
       // if true is found already no need to check the value, assume its true
       if (!true_found && placeholder) {
         if (placeholder.type === FN) {
-          condition_value = placeholder.getValue.call(this)
+          condition_value = placeholder.getValue.call(this, group.conditionNode)
         } else if (placeholder.type === REACTIVE) {
           condition_value = slice(this.$, placeholder.path)
         }

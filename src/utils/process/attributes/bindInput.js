@@ -15,7 +15,7 @@ function bindInput (node, attributeMemo) {
 
   node.addEventListener('input', handler)
   const update = () => {
-    node[name] = getValue.call(this)
+    node[name] = getValue.call(this, node)
   }
   setupConnection.call(this, node, deps, update)
 }

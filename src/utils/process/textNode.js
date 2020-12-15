@@ -7,7 +7,7 @@ function processTextNode (node) {
 
   if (!invalidPlaceholder) {
     const update = () => {
-      if (node.sweet.isConnected) node.textContent = getValue.call(this)
+      if (node.sweet.isConnected) node.textContent = getValue.call(this, node)
     }
     setupConnection.call(this, node, deps, update)
   }
