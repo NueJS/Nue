@@ -5,7 +5,8 @@ import { render, supersweet } from '../../index.js'
 import processFor from './for/processFor.js'
 
 function processNode (node, context) {
-  if (node.nodeType !== Node.DOCUMENT_FRAGMENT_NODE) {
+  if (node.nodeType !== Node.DOCUMENT_FRAGMENT_NODE && node.sweet) {
+    // if (!node.sweet) return
     if (node.sweet.isProcessed) return
     node.sweet.isProcessed = true
 

@@ -10,7 +10,6 @@ function sweetifyTextNode (node) {
 
     if (placeholder.type === TEXT) {
       textNode = document.createTextNode(placeholder.text)
-      textNode.sweet = {}
     } else {
       textNode = document.createTextNode('')
       textNode.sweet = { placeholder }
