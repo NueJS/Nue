@@ -35,7 +35,7 @@ function createGroups (conditionNode, deps, groups, ifNode) {
     } else {
       group.nodes.push(node)
       // pretend as if this is processed to avoid the traverse function from processing this node
-      node.processed = true
+      node.sweet.isProcessed = true
 
       // if group has animate, add animate attribute on all the nodes in the group
       if (group.animate) node.setAttribute('animate', group.animate)
