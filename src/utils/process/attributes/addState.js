@@ -23,30 +23,31 @@ function addState (node, attribute) {
   }
 
   // if variable - change the state of node when parent's state changes
-  addProps(node, name, slice(this.$, placeholder.path))
+  addProps(node, name, placeholder.getValue.call(this, node))
   const flowDown = () => {
-    mutate(node.$, prop_name_split, slice(this.$, placeholder.path), 'set')
+    mutate(node.$, prop_name_split, placeholder.getValue.call(this, node), 'set')
   }
+
   addDep.call(this, placeholder.path, flowDown, 'dom')
 
   // if attribute is a binding, change the state of parent when node's state changes
-  if (attribute.type === BIND) {
-    // to avoid infinite loop
-    // disable slice change in child which triggered the change in parent
-    const flowUp = () => {
-      const value = slice(node.$, prop_name_split)
-      node.ignoredRoot = prop_name_split[0]
-      mutate(this.$, placeholder.path, value, 'set')
-      node.ignoredRoot = undefined
-    }
+  // if (attribute.type === BIND) {
+  //   // to avoid infinite loop
+  //   // disable slice change in child which triggered the change in parent
+  //   const flowUp = () => {
+  //     const value = slice(node.$, prop_name_split)
+  //     node.ignoredRoot = prop_name_split[0]
+  //     mutate(this.$, placeholder.path, value, 'set')
+  //     node.ignoredRoot = undefined
+  //   }
 
-    // when this function is called parent's callbacks are added in deps of node
-    const on_node_state_change = () => addDep.call(node, prop_name_split, flowUp, 'dom')
-    if (!node.two_way_props) node.two_way_props = []
+  //   // when this function is called parent's callbacks are added in deps of node
+  //   const on_node_state_change = () => addDep.call(node, prop_name_split, flowUp, 'dom')
+  //   if (!node.two_way_props) node.two_way_props = []
 
-    // add these functions on node in two_way_props array, call this array when node is added on dom
-    node.two_way_props.push(on_node_state_change)
-  }
+  //   // add these functions on node in two_way_props array, call this array when node is added on dom
+  //   node.two_way_props.push(on_node_state_change)
+  // }
 }
 
 export default addState
