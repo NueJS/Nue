@@ -54,9 +54,8 @@ function sweetifyAttributes (element) {
   }
 
   if (attributes.length) {
-    element.sweet = {
-      attributes
-    }
+    if (!element.sweet) element.sweet = {}
+    element.sweet.attributes = attributes
   }
 }
 

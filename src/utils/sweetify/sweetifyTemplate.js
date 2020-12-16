@@ -17,6 +17,7 @@ function sweetifyTemplate () {
 
     const compName = node.nodeName.toLowerCase()
     const isSweet = supersweet.components[compName]
+
     if (isSweet) {
       node.sweet = {
         isSweet: true,

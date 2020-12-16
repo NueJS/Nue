@@ -6,18 +6,17 @@ import processFor from './for/processFor.js'
 
 function processNode (node, context) {
   if (node.nodeType !== Node.DOCUMENT_FRAGMENT_NODE && node.sweet) {
-    // if (!node.sweet) return
     if (node.sweet.isProcessed) return
     node.sweet.isProcessed = true
+
+    if (node.sweet.isSweet && !supersweet.processedComponents[node.sweet.compName]) {
+      render(node.sweet.compName)
+    }
 
     if (node.sweet.placeholder && node.nodeType === Node.TEXT_NODE) processTextNode.call(this, node)
     else if (node.nodeName === 'IF') processIf.call(this, node)
     else if (node.nodeName === 'FOR') processFor.call(this, node)
     else if (node.hasAttribute) processAttributes.call(this, node)
-
-    if (node.sweet.isSweet && !supersweet.processedComponents[node.sweet.compName]) {
-      render(node.sweet.compName)
-    }
   }
 
   if (node.hasChildNodes()) {
