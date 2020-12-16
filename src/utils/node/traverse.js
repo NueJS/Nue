@@ -2,7 +2,7 @@
 // if ignore is true, ignore the root node
 function traverse (node, cb, ignore = false) {
   if (!ignore) cb(node)
-  if (node.hasChildNodes()) node.childNodes.forEach(n => traverse(n, cb))
+  if (node.nodeName !== 'FOR' && node.hasChildNodes()) node.childNodes.forEach(n => traverse(n, cb))
 }
 
 export default traverse

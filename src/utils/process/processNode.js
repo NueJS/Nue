@@ -5,6 +5,7 @@ import { render, supersweet } from '../../index.js'
 import processFor from './for/processFor.js'
 
 function processNode (node, context) {
+  // console.log('process node : ', node.nodeName)
   if (node.nodeType !== Node.DOCUMENT_FRAGMENT_NODE && node.sweet) {
     if (node.sweet.isProcessed) return
     node.sweet.isProcessed = true
@@ -19,7 +20,7 @@ function processNode (node, context) {
     else if (node.hasAttribute) processAttributes.call(this, node)
   }
 
-  if (node.hasChildNodes()) {
+  if (node.hasChildNodes() && node.nodeName !== 'FOR') {
     node.childNodes.forEach(n => processNode.call(this, n, context))
   }
 }
