@@ -5,7 +5,12 @@ import html from '../string/html.js'
 import sweetifyTemplate from './sweetifyTemplate.js'
 
 function preprocess (component) {
-  this.$ = reactify.call(this, this.stateProps || {})
+  let parentState
+  if (this.parentNode && this.parentNode.host) {
+    parentState = this.parentNode.host.$
+  }
+
+  this.$ = reactify.call(this, this.stateProps || {}, [], parentState)
 
   let _html
 
@@ -37,7 +42,7 @@ function preprocess (component) {
     _html = html.bind(this)
     this.memo.template = document.createElement('template')
     invoke_component(true)
-    sweetifyTemplate.call(this)
+    if (!component.noSweetify) sweetifyTemplate.call(this)
   }
 }
 

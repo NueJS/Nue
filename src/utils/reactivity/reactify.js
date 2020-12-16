@@ -7,9 +7,10 @@ import deepEqual from '../deepEqual.js'
 const isObject = x => typeof x === 'object' && x !== null
 
 // create a reactive object which when mutated calls the on_change function
-function reactify (state, path = []) {
+function reactify (state, path = [], proto) {
   if (!isObject(state)) return state
 
+  // const wrapper = Object.create(proto)
   const wrapper = Array.isArray(state) ? [] : {}
   Object.keys(state).forEach(key => {
     wrapper[key] = reactify.call(this, state[key], [...path, key])
@@ -18,9 +19,27 @@ function reactify (state, path = []) {
   const _this = this
   return new Proxy(wrapper, {
     set (target, prop, newValue) {
+      // if the prop is not available in target
+      // try and find it in parent
+      // if found in parent return it
+      // else set it in this state
+      if (!(prop in target) && !modes.noOverride) {
+        // console.log('prop', prop, 'not in', target)
+        if (proto) {
+          const status = Reflect.set(proto, prop, newValue)
+          if (status) {
+            // console.log('prop', prop, 'in', proto)
+            return status
+          }
+        }
+      }
+
       let value = newValue
       if (modes.noOverride) {
-        if (target[prop]) return true
+        if (target.hasOwnProperty(prop)) {
+          console.log(prop, 'is in ', target)
+          return true
+        }
         if (typeof value === 'function') value = computedState.call(_this, value, prop)
       }
 
@@ -29,9 +48,6 @@ function reactify (state, path = []) {
       let success
       if (modes.reactive) {
         if (!(prop === 'length' && Array.isArray(target))) {
-          // if the value has changed
-          // @TODO - do deep compare here
-
           if (!deepEqual(target[prop], value)) {
             success = Reflect.set(target, prop, value)
             onMutate.call(_this, [...path, prop])
@@ -53,7 +69,11 @@ function reactify (state, path = []) {
         else accessed.paths.push([...path, prop])
       }
 
-      return Reflect.get(target, prop)
+      if (prop === '__parent__') return proto
+      if (prop === '__host__') return _this
+
+      if (prop in target) return Reflect.get(target, prop)
+      else return Reflect.get(proto, prop)
     }
 
   })
