@@ -6,7 +6,6 @@ import addDep from '../state/addDep.js'
 export function setupConnection (node, deps, update) {
   const connect = () => deps.map(path => addDep.call(this, path, update, 'dom'))
   addConnects(node, connect)
-  update()
   if (!node.sweet.updates) node.sweet.updates = []
   node.sweet.updates.push(update)
 }
@@ -18,19 +17,14 @@ export function addConnects (node, connect) {
   const { sweet } = node
   if (!sweet.connects) sweet.connects = []
   if (!sweet.disconnects) sweet.disconnects = []
-
   sweet.connects.push(connect)
-  sweet.isConnected = true
-
-  const disconnect = connect()
-  if (Array.isArray(disconnect)) disconnect.forEach(dc => sweet.disconnects.push(dc))
-  else sweet.disconnects.push(disconnect)
 }
 
 // connect the node to state
 // add the node's deps in this.deps
 // invoke update to update the node
 export function connect (node) {
+  if (!node.sweet) return
   const { sweet } = node
   // if node is connected, do nothing
   if (sweet.isConnected) return
@@ -53,7 +47,6 @@ export function connect (node) {
     // update() will/should not work unless isConnected is set to true
     // so set it to true first and then update
     sweet.isConnected = true
-    console.log('updates :', sweet.updates)
     sweet.updates && sweet.updates.forEach(u => u())
   }
 }
@@ -62,6 +55,7 @@ export function connect (node) {
 // after disconnecting, no state mutation should affect the node
 // disconnecting involves removing its dep from this.deps map
 export function disconnect (node) {
+  if (!node.sweet) return
   const { sweet } = node
   // if node is disconnected from state already, do nothing
   if (!sweet.isConnected) return

@@ -1,11 +1,21 @@
+import { supersweet } from './index.js'
 import buildShadowDOM from './utils/buildShadowDOM.js'
 import createLifecycleHooks from './utils/createLifecycleHooks.js'
+import traverse from './utils/node/traverse.js'
 import preprocess from './utils/sweetify/preprocess.js'
+import { connect, disconnect } from './utils/node/connections.js'
 
 // define a component using compName and a component function
 // component function will define html, css, state, life cycles, actions etc
 function define_component (compName, component) {
   // define web component
+
+  // uses API
+  if (component.uses) {
+    for (const name in component.uses) {
+      supersweet.components[name] = component.uses[name]
+    }
+  }
 
   // information about component which are same among all the instances of the components
   // to improve performance these info will be calculated once and will be shared by all the instances
@@ -31,7 +41,7 @@ function define_component (compName, component) {
       // before callbacks are be called before the DOM is updated
       // after callbacks are called after the DOM is updated
       // dom callbacks are added by nodes which updates text/attributes/state on dom nodes
-      this.deps = { $: { computed: [], stateReady: [], dom: [] } }
+      this.deps = { $: new Map() }
 
       // queue holds all the callbacks that should be called
       // queue is useful to avoid calling the callback more than once and in correct order
@@ -79,6 +89,8 @@ function define_component (compName, component) {
 
     // when component is added in dom
     connectedCallback () {
+      traverse(this.shadowRoot, connect, true)
+
       this.mountCbs.forEach(cb => cb())
     }
 
@@ -86,6 +98,8 @@ function define_component (compName, component) {
     // run cleanups
     disconnectedCallback () {
       this.destroyCbs.forEach(cb => cb())
+
+      traverse(this.shadowRoot, disconnect, true)
     }
   }
 
