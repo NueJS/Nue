@@ -7,16 +7,6 @@ export const bracketify = str => `[${str}]`
 
 export const isBracketed = str => str[0] === '[' && str[str.length - 1] === ']'
 
-export const contextValue = (state, context, path) => {
-  let value
-  try { value = slice(state, path) } catch { }
-  if (value === undefined) {
-    try { value = slice(context, path) } catch { }
-  }
-
-  return value
-}
-
 // process the reactive or functional place holder
 // if functional placeholder's function name is not valid, make it not a placeholder
 export function process_placeholder (str, unwrapped = false) {
@@ -36,7 +26,7 @@ export function process_placeholder (str, unwrapped = false) {
       const deps = slices.map(a => a.split('.'))
 
       function getValue (node) {
-        const values = deps.map(path => contextValue(this.$, node.sweet.context, path))
+        const values = deps.map(path => slice(this, path))
         return this.fn[fnName](...values)
       }
 
@@ -50,9 +40,7 @@ export function process_placeholder (str, unwrapped = false) {
   else {
     const path = content.split('.')
     function getValue (node) {
-      const v = contextValue(this.$, node.sweet.context, path)
-      // console.log('get value for ', path, v)
-      return v
+      return slice(this.$, path)
     }
     return { type: REACTIVE, path, content, getValue, deps: [path], text: str }
   }
