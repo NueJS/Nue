@@ -1,16 +1,10 @@
-// import fetchComponents from './fetchComponents.js'
 import modes from '../reactivity/modes.js'
 import reactify from '../reactivity/reactify.js'
 import html from '../string/html.js'
 import sweetifyTemplate from './sweetifyTemplate.js'
 
 function preprocess (component) {
-  let parentState
-  if (this.parentNode && this.parentNode.host) {
-    parentState = this.parentNode.host.$
-  }
-
-  this.$ = reactify.call(this, this.stateProps || {}, [], parentState)
+  [this.$, this.$Target] = reactify.call(this, this.stateProps || {})
 
   let _html
 

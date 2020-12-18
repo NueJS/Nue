@@ -1,33 +1,22 @@
 import { cbQueuer } from '../callbacks.js'
+import { hasSlice } from './slice.js'
 
-// add the callback in queue when data in the given path in state is mutated
-// call the callback when queue is executed
-
-function hasPath (obj, path) {
-  let target = obj
-
-  for (const p of path) {
-    if (target.hasOwnProperty(p)) target = target[p]
-    else return false
+// get the origin component where the value of the path is coming from
+function origin (comp, path) {
+  let target = comp
+  while (!hasSlice(target.$Target, path)) {
+    if (!target.sweet) return undefined
+    target = target.sweet.closure.component
   }
-
-  return true
+  return target
 }
 
-// find from which host the value is coming from in the prototype chain
-function getHost (obj, path) {
-  let target = obj
-  while (!hasPath(target, path)) {
-    target = target.__parent__
-  }
-  return target.__host__
-}
-
+// add Dep for given path on its origin
 function addDep (path, cb, type) {
-  const dis = getHost(this.$, path)
-  const qcb = cbQueuer.call(dis, cb, type)
-  // console.log(path, 'depends on : ', dis)
-  let target = dis.deps
+  const comp = origin(this, path)
+  if (!comp) throw new Error('DOM can not depend on $.', path.join('.'), ' it is not valid')
+  const qcb = cbQueuer.call(comp, cb, type)
+  let target = comp.deps
   const lastIndex = path.length - 1
 
   path.forEach((c, i) => {

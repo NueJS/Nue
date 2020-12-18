@@ -7,17 +7,17 @@ import deepEqual from '../deepEqual.js'
 const isObject = x => typeof x === 'object' && x !== null
 
 // create a reactive object which when mutated calls the on_change function
-function reactify (state, path = [], proto) {
+function reactify (state, path = []) {
+  const closure$ = this.sweet && this.sweet.closure.$
   if (!isObject(state)) return state
 
-  // const wrapper = Object.create(proto)
   const wrapper = Array.isArray(state) ? [] : {}
   Object.keys(state).forEach(key => {
-    wrapper[key] = reactify.call(this, state[key], [...path, key])
+    [wrapper[key]] = reactify.call(this, state[key], [...path, key])
   })
 
   const _this = this
-  return new Proxy(wrapper, {
+  const reactive = new Proxy(wrapper, {
     set (target, prop, newValue) {
       // if the prop is not available in target
       // try and find it in parent
@@ -25,10 +25,9 @@ function reactify (state, path = [], proto) {
       // else set it in this state
       if (!(prop in target) && !modes.noOverride) {
         // console.log('prop', prop, 'not in', target)
-        if (proto) {
-          const status = Reflect.set(proto, prop, newValue)
+        if (closure$) {
+          const status = Reflect.set(closure$, prop, newValue)
           if (status) {
-            // console.log('prop', prop, 'in', proto)
             return status
           }
         }
@@ -69,14 +68,17 @@ function reactify (state, path = [], proto) {
         else accessed.paths.push([...path, prop])
       }
 
-      if (prop === '__parent__') return proto
+      if (prop === '__target__') return wrapper
+      if (prop === '__parent__') return closure$
       if (prop === '__host__') return _this
 
       if (prop in target) return Reflect.get(target, prop)
-      else return Reflect.get(proto, prop)
+      else return Reflect.get(closure$, prop)
     }
 
   })
+
+  return [reactive, wrapper]
 }
 
 export default reactify

@@ -10,8 +10,13 @@ function processNode (node, context) {
     if (node.sweet.isProcessed) return
     node.sweet.isProcessed = true
 
-    if (node.sweet.isSweet && !supersweet.processedComponents[node.sweet.compName]) {
-      render(node.sweet.compName)
+    if (node.sweet.isSweet) {
+      node.sweet.closure = {
+        $: this.$,
+        fn: this.fn,
+        component: this
+      }
+      if (!supersweet.processedComponents[node.sweet.compName]) render(node.sweet.compName)
     }
 
     if (node.sweet.placeholder && node.nodeType === Node.TEXT_NODE) processTextNode.call(this, node)
