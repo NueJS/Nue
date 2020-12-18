@@ -1,12 +1,12 @@
 // attribute type
-export const SHORTHAND = 'SHORTHAND'
-export const NORMAL = 'NORMAL'
-export const EVENT = 'EVENT'
-export const STATE = 'STATE'
-export const BIND = 'BIND'
+export const SHORTHAND = Symbol('SHORTHAND')
+export const NORMAL = Symbol('NORMAL')
+export const EVENT = Symbol('EVENT')
+export const STATE = Symbol('STATE')
+export const BIND = Symbol('BIND')
 
 // placeholder or split type
-export const REACTIVE = 'REACTIVE'
-export const FN = 'FN'
-export const TEXT = 'TEXT'
-export const FN_PROP = 'FN_PROP'
+export const REACTIVE = Symbol('REACTIVE')
+export const FN = Symbol('FN')
+export const TEXT = Symbol('TEXT')
+export const FN_PROP = Symbol('FN_PROP')
