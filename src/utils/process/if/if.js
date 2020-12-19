@@ -1,25 +1,25 @@
-import slice from '../../state/slice.js'
+// import slice from '../../state/slice.js'
 import { addGroup, removeGroup, processGroup } from './group.js'
-import { FN, REACTIVE } from '../../constants.js'
+// import { FN, REACTIVE } from '../../constants.js'
 import createGroups from './createGroups.js'
 import satisfies from './comparison.js'
 import addDep from '../../state/addDep.js'
 
-function process_if (if_node) {
+function process_if (ifNode) {
   // nodes inside conditional nodes are divided into groups
   const groups = []
 
-  // combinations of deps of all the condition node's deps
+  // combinations of groupDeps of all the condition node's groupDeps
   // when any of the conditions change, check for re-render
-  const deps = []
+  const groupDeps = []
 
   // divide the nodes in groups and after delay, add the nodes in DOM
-  createGroups.call(this, if_node, deps, groups, if_node)
+  createGroups.call(this, ifNode, groupDeps, groups, ifNode)
 
   // group that is currently rendered
   let activeGroup
 
-  const on_conditions_change = () => {
+  const handleConditionChange = () => {
     // if a group's condition is truthy,
     // all other groups after it should not be rendered even if they are true
     let true_found = false
@@ -32,11 +32,7 @@ function process_if (if_node) {
       // compute condition value
       // if true is found already no need to check the value, assume its true
       if (!true_found && placeholder) {
-        if (placeholder.type === FN) {
-          condition_value = placeholder.getValue.call(this, group.conditionNode)
-        } else if (placeholder.type === REACTIVE) {
-          condition_value = slice(this.$, placeholder.path)
-        }
+        condition_value = placeholder.getValue.call(this)
       }
 
       // show group
@@ -84,11 +80,11 @@ function process_if (if_node) {
       g.nodes.forEach(n => n.remove())
     })
 
-    on_conditions_change()
+    handleConditionChange()
   })
 
-  deps.forEach(dep => {
-    addDep.call(this, dep, on_conditions_change, 'stateReady')
+  groupDeps.forEach(dep => {
+    addDep.call(this, dep, handleConditionChange, 'stateReady')
   })
 }
 
