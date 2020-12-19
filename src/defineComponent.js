@@ -6,10 +6,7 @@ import preprocess from './utils/sweetify/preprocess.js'
 import { connect, disconnect } from './utils/node/connections.js'
 
 // define a component using compName and a component function
-// component function will define html, css, state, life cycles, actions etc
 function define_component (compName, component) {
-  // define web component
-
   // uses API
   if (component.uses) {
     for (const name in component.uses) {
@@ -37,10 +34,6 @@ function define_component (compName, component) {
       this.actions = {}
 
       // callbacks which are to be called when state changes
-      // reactive callbacks are for updating functional state when the state it deps on is changed
-      // before callbacks are be called before the DOM is updated
-      // after callbacks are called after the DOM is updated
-      // dom callbacks are added by nodes which updates text/attributes/state on dom nodes
       this.deps = { $: new Map() }
 
       // queue holds all the callbacks that should be called
@@ -84,22 +77,20 @@ function define_component (compName, component) {
 
       // if this component has two way props - meaning that when state of this component changes we have to update the parent's state as well
       // add parent's state update callbacks in this component so that they are called when this component's state changes
-      if (this.two_way_props) this.two_way_props.forEach(p => p())
+      // if (this.two_way_props) this.two_way_props.forEach(p => p())
     }
 
     // when component is added in dom
     connectedCallback () {
       traverse(this.shadowRoot, connect, true)
-
       this.mountCbs.forEach(cb => cb())
     }
 
     // when the component is removed from dom
     // run cleanups
     disconnectedCallback () {
-      this.destroyCbs.forEach(cb => cb())
-
       traverse(this.shadowRoot, disconnect, true)
+      this.destroyCbs.forEach(cb => cb())
     }
   }
 
