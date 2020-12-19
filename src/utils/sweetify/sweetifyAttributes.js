@@ -1,5 +1,6 @@
 // import { uid } from '../others.js'
-import { isBracketed, unBracket, process_placeholder } from '../string/placeholder.js'
+import { isBracketed, unBracket } from '../string/bracket.js'
+import processPlaceholder from '../string/placeholder/processPlaceholder.js'
 import { STATE, EVENT, BIND, NORMAL, FN_PROP } from '../constants.js'
 // import { components } from '../../index.js'
 
@@ -45,7 +46,7 @@ function sweetifyAttributes (element) {
     }
 
     if (is_placeholder) {
-      placeholder = process_placeholder.call(this, placeholder_text)
+      placeholder = processPlaceholder.call(this, placeholder_text)
       element.removeAttribute(attribute_name)
     }
     if (name) {

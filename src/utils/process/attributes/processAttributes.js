@@ -15,6 +15,7 @@ function addFnProp (comp, attribute) {
 }
 
 function processAttributes (node) {
+  // console.log('process attributes of ', node.nodeName)
   // refs API
   if (node.hasAttribute('ref')) {
     this.refs[node.getAttribute('ref')] = node

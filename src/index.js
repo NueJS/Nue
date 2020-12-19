@@ -16,7 +16,6 @@ export const defineComponents = (obj) => {
 }
 
 export const render = (name) => {
-  console.log('render : ', name)
   supersweet.processedComponents[name] = true
   defineComponent(name, supersweet.components[name])
 }

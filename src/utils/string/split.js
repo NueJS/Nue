@@ -1,6 +1,6 @@
 
 import { TEXT } from '../constants.js'
-import { process_placeholder } from './placeholder.js'
+import processPlaceholder from './placeholder/processPlaceholder.js'
 
 // split the text into placeholders and strings
 // if the text inside the placeholder is not a valid path of slice of state, treat it as string
@@ -37,7 +37,7 @@ function split (text) {
     else if (in_placeholder && text[i] === ']') {
       // remove [ then split to get the placeholder content
       // then split to get the path array
-      parts.push(process_placeholder.call(this, str, true))
+      parts.push(processPlaceholder.call(this, str, true))
 
       // check for function call
       in_placeholder = false

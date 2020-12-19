@@ -6,9 +6,7 @@ import sweetifyTemplate from './sweetifyTemplate.js'
 function preprocess (component) {
   [this.$, this.$Target] = reactify.call(this, this.stateProps || {})
 
-  let _html
-
-  const invoke_component = () => {
+  const invoke_component = (processed) => {
     modes.reactive = false
     modes.noOverride = true
 
@@ -16,7 +14,7 @@ function preprocess (component) {
       $: this.$,
       on: this.on,
       refs: this.refs,
-      html: _html,
+      html: processed ? () => {} : html.bind(this),
       fn: this.fn,
       component: this,
       props: { ...this.stateProps, ...this.fnProps }
@@ -28,15 +26,13 @@ function preprocess (component) {
 
   // if template is processed already
   if (this.memo.template) {
-    _html = () => {}
-    invoke_component(false)
+    invoke_component(true)
   }
 
   else {
-    _html = html.bind(this)
     this.memo.template = document.createElement('template')
-    invoke_component(true)
-    if (!component.noSweetify) sweetifyTemplate.call(this)
+    invoke_component(false)
+    sweetifyTemplate.call(this)
   }
 }
 
