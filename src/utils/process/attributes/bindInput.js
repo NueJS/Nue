@@ -1,23 +1,25 @@
 import { mutate } from '../../reactivity/mutate.js'
-import { setupConnection } from '../../node/connections.js'
+import { wire } from '../../node/connections.js'
 
 // ex: :value=[count]
-function bindInput (node, attributeMemo) {
+function bindInput (node, attribute) {
   const isNumber = node.type === 'number' || node.type === 'range'
-  const { path, getValue, deps } = attributeMemo.placeholder
-  const { name } = attributeMemo
+  const { getValue, deps } = attribute.placeholder
+  const { name } = attribute
 
   const handler = () => {
     let value = node[name]
     value = isNumber ? Number(value) : value
-    mutate(this.$, path, value, 'set')
+    mutate(this.$, deps[0], value, 'set')
   }
 
   node.addEventListener('input', handler)
-  const update = () => {
+
+  const cb = () => {
     node[name] = getValue.call(this, node)
   }
-  setupConnection.call(this, node, deps, update)
+
+  wire.call(this, node, deps, cb)
 }
 
 export default bindInput
