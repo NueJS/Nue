@@ -1,12 +1,16 @@
-import { setupConnection } from '../../node/connections.js'
+import { wire } from '../../node/connections.js'
 
 // example: data-count=[XXX]
 function addAttribute (node, attribute) {
-  const { deps, getValue } = attribute.placeholder
+  const { placeholder, name } = attribute
+  const { deps, getValue } = placeholder
+
+  // update attribute value when called with latest from state
   const update = () => {
-    if (node.sweet.isConnected) node.setAttribute(attribute.name, getValue.call(this, node))
+    node.setAttribute(name, getValue.call(this))
   }
-  setupConnection.call(this, node, deps, update)
+
+  wire.call(this, node, deps, update)
 }
 
 export default addAttribute
