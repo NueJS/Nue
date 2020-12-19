@@ -12,7 +12,7 @@ function createGroups (conditionNode, deps, groups, ifNode) {
 
   }
 
-  if (sweet.attributes && sweet.attributes.length) {
+  if (sweet && sweet.attributes) {
     const { placeholder } = sweet.attributes[0]
     group.placeholder = placeholder
     group.compareWith = sweet.attributes[0].name
@@ -35,7 +35,7 @@ function createGroups (conditionNode, deps, groups, ifNode) {
     } else {
       group.nodes.push(node)
       // pretend as if this is processed to avoid the traverse function from processing this node
-      node.sweet.isProcessed = true
+      if (node.sweet) node.sweet.isProcessed = true
 
       // if group has animate, add animate attribute on all the nodes in the group
       if (group.animate) node.setAttribute('animate', group.animate)
