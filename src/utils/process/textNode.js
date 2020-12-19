@@ -7,9 +7,7 @@ function processTextNode (node) {
 
   if (!notPlaceholder) {
     const update = () => {
-      if (node.sweet.isConnected) {
-        node.textContent = getValue.call(this, node)
-      }
+      node.textContent = getValue.call(this, node)
     }
     wire.call(this, node, deps, update)
   } else {

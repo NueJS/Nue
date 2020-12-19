@@ -8,7 +8,9 @@ export function triggerMapCbs (map) {
 // only trigger cbs in $ Map
 export function trigger$Cbs (target, info) {
   for (const [cb] of target.$) {
-    cb.call(this, info)
+    if ((cb.node && cb.node.sweet.isConnected) || !cb.node) {
+      cb.call(this, info)
+    }
   }
 }
 
@@ -23,11 +25,14 @@ export function triggerAllCbs (target, info) {
 // convert consecutive calls to single call
 // instead of using a flag, function is saved in queue
 // because it should be called once batching is completed
-export function cbQueuer (fn, type) {
+export function cbQueuer (cb, type) {
   const lifecycle = this.queue[type]
-  return (...args) => {
-    if (!lifecycle.has(fn)) lifecycle.set(fn, ...args)
+  const qcb = (...args) => {
+    if (!lifecycle.has(cb)) lifecycle.set(cb, ...args)
   }
+
+  qcb.node = cb.node
+  return qcb
 }
 
 // find deps that needs to be called for given path update and trigger them
