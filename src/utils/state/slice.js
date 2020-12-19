@@ -1,11 +1,17 @@
 // get the slice at given path in given obj
 // for example: slice(obj, ['a', 'b', 'c']) returns obj.a.b.c
 
-const slice = (obj, path) => {
-  if (path.length === 1) return obj[path[0]]
-  let value = obj
-  path.forEach(p => { value = value[p] })
-  return value
+// const slice = (obj, path) => {
+//   if (path.length === 1) return obj[path[0]]
+//   let value = obj
+//   path.forEach(p => { value = value[p] })
+//   return value
+// }
+
+export const targetProp = (obj, path) => {
+  const target = path.slice(0, -1).reduce((target, key) => target[key], obj)
+  const prop = path[path.length - 1]
+  return [target, prop]
 }
 
 export const hasSlice = (obj, path) => {
@@ -19,4 +25,4 @@ export const hasSlice = (obj, path) => {
   return target !== undefined
 }
 
-export default slice
+// export default slice
