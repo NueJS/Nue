@@ -1,15 +1,20 @@
-import { setupConnection } from '../node/connections.js'
-import { handleInvalidPlaceholder } from '../string/placeholder.js'
+import { wire } from '../node/connections.js'
+import isInvalidPlaceholder from '../string/placeholder/isInvalidPlaceholder.js'
 
 function processTextNode (node) {
-  const { getValue, deps } = node.sweet.placeholder
-  const invalidPlaceholder = handleInvalidPlaceholder.call(this, node, node.sweet.placeholder)
+  const { getValue, deps, text } = node.sweet.placeholder
+  const notPlaceholder = isInvalidPlaceholder(this, getValue)
 
-  if (!invalidPlaceholder) {
+  if (!notPlaceholder) {
     const update = () => {
-      if (node.sweet.isConnected) node.textContent = getValue.call(this, node)
+      if (node.sweet.isConnected) {
+        node.textContent = getValue.call(this, node)
+      }
     }
-    setupConnection.call(this, node, deps, update)
+    wire.call(this, node, deps, update)
+  } else {
+    node.textContent = text
+    node.sweet = undefined
   }
 }
 
