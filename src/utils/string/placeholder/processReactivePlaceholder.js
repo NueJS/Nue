@@ -16,7 +16,8 @@ const processReactivePlaceholder = (content, str) => {
     type: REACTIVE,
     getValue,
     deps: [path],
-    text: bracketify(str)
+    text: bracketify(str),
+    content
   }
 }
 
