@@ -1,9 +1,8 @@
 import addDep from '../state/addDep.js'
 
-// connect the node to state using deps
-// update the node when these deps change
-// remove connections when node is removed
-export function setupConnection (node, deps, update) {
+// lay wiring for node updates
+export function wire (node, deps, update) {
+  update.node = node
   const connect = () => deps.map(path => addDep.call(this, path, update, 'dom'))
   addConnects(node, connect)
   if (!node.sweet.updates) node.sweet.updates = []
