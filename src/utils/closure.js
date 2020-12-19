@@ -1,8 +1,8 @@
-function findFN (comp, fnName) {
+function getFn (comp, fnName) {
   let target = comp
   while (!target.fn[fnName]) {
-    if (comp.parentNode) {
-      target = comp.parentNode.host
+    if (comp.sweet) {
+      target = comp.sweet.closure.component
     }
     else return undefined
   }
@@ -10,4 +10,4 @@ function findFN (comp, fnName) {
   return target.fn[fnName]
 }
 
-export default findFN
+export default getFn
