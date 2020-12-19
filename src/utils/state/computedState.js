@@ -7,23 +7,12 @@ import detectStateUsage from './detectStateUsage.js'
 // update its value whenever its deps changes
 
 function computedState (fn, k) {
-  const [initValue, deps] = detectStateUsage(fn)
-  let prevValue = initValue
+  const [initValue, paths] = detectStateUsage(fn)
 
-  const onDepUpdate = () => {
-    const value = fn()
-    // only mutate if the value is actually changed
-    if (prevValue !== value) {
-      mutate(this.$, [k], value, 'set')
-      prevValue = value
-    }
-  }
+  const compute = () => mutate(this.$, [k], fn(), 'set')
 
-  // when any of its deps changes, update its value
-  // depend on the root key only
-
-  const paths = deps.map(d => d[0].split('.'))
-  paths.forEach(path => addDep.call(this, path, onDepUpdate, 'computed'))
+  // when root of path changes value, recompute
+  paths.forEach(path => addDep.call(this, [path[0]], compute, 'computed'))
 
   return initValue
 }
