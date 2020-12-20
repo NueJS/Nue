@@ -24,22 +24,20 @@ function reactify (obj, path = []) {
 
     set (target, prop, newValue) {
       let success
-      // if the prop is not available in target
-      // try and find it in parent
-      // if found in parent return it
-      // else set it in this obj
-      if (!modes.noOverride && !(prop in target)) {
-        // console.log('prop', prop, 'not in', target)
-        if (closure$) {
-          const success = Reflect.set(closure$, prop, newValue)
-          if (success) return success
-        }
-      }
+      const propInTarget = prop in target
 
       let value = newValue
       if (modes.noOverride) {
-        if (prop in target) return true
+        // ignore set
+        if (propInTarget) return true
         if (typeof value === 'function') value = computedState.call(_this, value, prop)
+      }
+
+      else {
+        if (closure$ && !propInTarget) {
+          const success = Reflect.set(closure$, prop, newValue)
+          if (success) return success
+        }
       }
 
       if (isObject(value)) [value] = reactify.call(_this, value, [...path, prop])
@@ -67,9 +65,7 @@ function reactify (obj, path = []) {
         else accessed.paths.push([...path, prop])
       }
 
-      if (prop === '__parent__') return closure$
-      if (prop === '__host__') return _this
-
+      // closure state API
       if (prop in target) return Reflect.get(target, prop)
       if (closure$) return Reflect.get(closure$, prop)
       return undefined
