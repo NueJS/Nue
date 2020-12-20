@@ -1,4 +1,4 @@
-import addDep from './state/addDep.js'
+import { addDeps } from './state/addDep.js'
 
 function createLifecycleHooks () {
   this.on = {
@@ -6,10 +6,10 @@ function createLifecycleHooks () {
     destroy: (cb) => this.destroyCbs.push(cb),
     beforeUpdate: (cb) => this.beforeUpdateCbs.push(cb),
     afterUpdate: (cb) => this.afterUpdateCbs.push(cb),
-    mutate: (cb, ...deps) => {
-      deps.forEach(dep => {
-        addDep.call(this, dep.split('.'), cb, 'computed')
-      })
+    mutate: (cb, ...slices) => {
+      if (!slices.length) throw new Error('on.mutate expects one or more dependencies')
+      const deps = slices.map(slice => slice.split('.'))
+      addDeps.call(this, deps, cb, 'computed')
     }
   }
 }

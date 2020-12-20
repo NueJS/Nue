@@ -14,7 +14,7 @@ function origin (comp, path) {
 // add Dep for given path on its origin
 function addDep (path, cb, type) {
   const comp = origin(this, path)
-  if (!comp) throw new Error('DOM can not depend on $.', path.join('.'), ' it is not valid')
+  if (!comp) throw new Error(`invalid state used: $.${path.join('.')} in <${this.memo.compName}> on ${cb.node.nodeName}`)
   const qcb = cbQueuer.call(comp, cb, type)
   let target = comp.deps
   const lastIndex = path.length - 1
@@ -27,6 +27,10 @@ function addDep (path, cb, type) {
 
   // return cleanup to stop DOM updates when node is removed
   if (type === 'dom') return () => target.$.delete(qcb)
+}
+
+export function addDeps (deps, cb, type) {
+  deps.forEach(dep => addDep.call(this, dep, cb, type))
 }
 
 export default addDep
