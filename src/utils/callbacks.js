@@ -1,16 +1,16 @@
 
 export function triggerMapCbs (map) {
-  for (const [fn, args] of map) {
-    fn(args)
+  for (const [cb, args] of map) {
+    if ((cb.node && cb.node.sweet.isConnected) || !cb.node) {
+      cb(args)
+    }
   }
 }
 
 // only trigger cbs in $ Map
 export function trigger$Cbs (target, info) {
   for (const [cb] of target.$) {
-    if ((cb.node && cb.node.sweet.isConnected) || !cb.node) {
-      cb.call(this, info)
-    }
+    cb.call(this, info)
   }
 }
 
