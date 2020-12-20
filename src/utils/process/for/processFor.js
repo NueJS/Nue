@@ -1,59 +1,52 @@
-// import sweetify from '../../node/sweetify.js'
-// import traverse from '../../node/traverse.js'
 import addDep from '../../state/addDep.js'
-// import processNode from '../processNode.js'
-// import slice from '../../state/slice.js'
 import { render, supersweet } from '../../../index.js'
-// import { STATE } from '../../constants.js'
 
 function processFor (forNode) {
-  const forNodes = []
-  const groups = []
+  const loopComps = []
 
-  let $each, $of, $at, $hash
+  const loopInfo = {}
 
-  if (!forNode.hasAttribute('name')) throw new Error('for loop must have a name')
+  if (!forNode.hasAttribute('name')) throw new Error('for loopInfo must have a name')
   const name = forNode.getAttribute('name') + '-'
 
   forNode.sweet.attributes.forEach(attribute => {
-    if (attribute.name === 'each') $each = attribute.placeholder
-    else if (attribute.name === 'of') $of = attribute.placeholder
-    else if (attribute.name === '#') $hash = attribute.placeholder
-    else if (attribute.name === 'at') $at = attribute.placeholder
+    const { name, placeholder } = attribute
+    loopInfo[name] = placeholder
   })
 
-  function loopComponent ({ html, on }) {
-    on.destroy(() => console.log('loop component removed'))
+  function loopComp ({ html, on }) {
+    on.destroy(() => console.log('loopInfo component removed'))
     html(forNode.innerHTML)
   }
 
-  supersweet.components[name] = loopComponent
+  supersweet.components[name] = loopComp
 
-  const renderLoop = () => {
-    const array = $of.getValue.call(this, forNode)
+  const init = () => {
+    const array = loopInfo.of.getValue.call(this)
 
     array.forEach((value, i) => {
-      const loopComponentInstance = document.createElement(name)
+      const loopCompInstance = document.createElement(name)
+      loopComps.push(loopComp)
 
-      loopComponentInstance.stateProps = {
-        [$each.content]: value,
-        [$at.content]: i
+      loopCompInstance.stateProps = {
+        [loopInfo.each.content]: value,
+        [loopInfo.at.content]: i
       }
 
       this.delayedProcesses.push(() => {
-        forNode.before(loopComponentInstance)
+        forNode.before(loopCompInstance)
       })
     })
   }
 
-  renderLoop()
+  init()
   render(name)
 
   const onArrayChange = () => {
     console.log('array changed')
   }
 
-  addDep.call(this, $of.path, onArrayChange, 'dom')
+  addDep.call(this, loopInfo.of.deps[0], onArrayChange, 'dom')
 
   this.delayedProcesses.push(() => {
     forNode.remove()
