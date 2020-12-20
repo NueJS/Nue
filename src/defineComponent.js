@@ -22,6 +22,9 @@ function define_component (compName, component) {
       super()
       this.component = component
 
+      // key is path joined by dot
+      this.tpMemo = {}
+
       // references to DOM nodes
       this.refs = {}
 
