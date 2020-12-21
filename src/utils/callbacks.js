@@ -1,4 +1,3 @@
-
 export function triggerMapCbs (map) {
   for (const [cb, args] of map) {
     if ((cb.node && cb.node.sweet.isConnected) || !cb.node) {

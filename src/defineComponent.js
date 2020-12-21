@@ -5,7 +5,7 @@ import preprocess from './utils/sweetify/preprocess.js'
 import { connect, disconnect } from './utils/node/connections.js'
 
 // define a component using compName and a component function
-function define_component (compName, component) {
+function defineComponent (compName, component) {
   // uses API
   if (component.uses) {
     for (const name in component.uses) {
@@ -99,4 +99,4 @@ function define_component (compName, component) {
   customElements.define(compName, SuperSweet)
 }
 
-export default define_component
+export default defineComponent

@@ -10,12 +10,12 @@ import processPlaceholder from './placeholder/processPlaceholder.js'
 
 function split (text) {
   const parts = []
-  let in_placeholder = false
+  let cursorInBracket = false
   let str = ''
 
   for (let i = 0; i < text.length; i++) {
     // if not the end of placeholder
-    if (in_placeholder && text[i] !== ']') str += text[i]
+    if (cursorInBracket && text[i] !== ']') str += text[i]
 
     // if found the start of new placeholder
     else if (text[i] === '[') {
@@ -25,7 +25,7 @@ function split (text) {
         continue
       }
 
-      in_placeholder = true
+      cursorInBracket = true
       // if str is not empty, add string
       if (str) {
         parts.push({ text: str, type: TEXT })
@@ -34,13 +34,13 @@ function split (text) {
     }
 
     // if end of placeholder, check for path validity
-    else if (in_placeholder && text[i] === ']') {
+    else if (cursorInBracket && text[i] === ']') {
       // remove [ then split to get the placeholder content
       // then split to get the path array
       parts.push(processPlaceholder.call(this, str, true))
 
       // check for function call
-      in_placeholder = false
+      cursorInBracket = false
       str = '' // reset
     }
 

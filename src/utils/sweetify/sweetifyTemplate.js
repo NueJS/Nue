@@ -3,17 +3,16 @@ import sweetifyTextNode from './sweetifyTextNode.js'
 import traverse from '../node/traverse.js'
 import { supersweet } from '../../index.js'
 import processPlaceholder from '../string/placeholder/processPlaceholder.js'
-import { hasSlice } from '../state/slice.js'
 
 function sweetifyTemplate () {
-  const remove_nodes = []
+  const uselessNodes = []
   this.delayedPreprocesses = []
 
   // visit each node in template and memoize information
   const onVisit = node => {
     // memoize text content
     if (node.nodeType === Node.TEXT_NODE) {
-      if (!node.textContent.trim()) remove_nodes.push(node)
+      if (!node.textContent.trim()) uselessNodes.push(node)
       else sweetifyTextNode.call(this, node)
       return
     }
@@ -54,7 +53,7 @@ function sweetifyTemplate () {
 
   // remove redundant nodes
   this.delayedPreprocesses.forEach(m => m())
-  remove_nodes.forEach(n => n.remove())
+  uselessNodes.forEach(n => n.remove())
 }
 
 export default sweetifyTemplate

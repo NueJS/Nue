@@ -7,7 +7,7 @@ import sweetifyTemplate from './sweetifyTemplate.js'
 function preprocess (component) {
   [this.$, this.$Target] = reactify.call(this, this.stateProps || {})
 
-  const invoke_component = (processed) => {
+  const invokeComp = (processed) => {
     modes.reactive = false
     modes.noOverride = true
 
@@ -27,12 +27,12 @@ function preprocess (component) {
 
   // if template is processed already
   if (this.memo.template) {
-    invoke_component(true)
+    invokeComp(true)
   }
 
   else {
     this.memo.template = document.createElement('template')
-    invoke_component(false)
+    invokeComp(false)
     populateSlots.call(this)
     sweetifyTemplate.call(this)
   }

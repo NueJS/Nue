@@ -6,7 +6,6 @@ import { removeGroup } from './group.js'
 function createGroups (ifNode, conditionNode = ifNode, groupDeps = [], groups = []) {
   const { sweet } = conditionNode
   const { type } = sweet
-  let lastNode
 
   // group creation ---------------------------
   const group = {
@@ -74,7 +73,7 @@ function createGroups (ifNode, conditionNode = ifNode, groupDeps = [], groups = 
     }
   }
 
-  lastNode = group.nodes[group.nodes.length - 1]
+  const lastNode = group.nodes[group.nodes.length - 1]
 
   return { groups, groupDeps }
 }

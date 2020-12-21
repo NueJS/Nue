@@ -2,7 +2,7 @@ import { addGroup, processGroup } from './group.js'
 import createGroups from './createGroups.js'
 import { addDeps } from '../../state/addDep.js'
 
-function process_if (ifNode) {
+function processIf (ifNode) {
   // binding
   const _createGroups = createGroups.bind(this)
   const _processGroup = processGroup.bind(this)
@@ -55,4 +55,4 @@ function process_if (ifNode) {
   })
 }
 
-export default process_if
+export default processIf

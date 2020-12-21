@@ -8,51 +8,51 @@ function sweetifyAttributes (element) {
   const attributes = []
 
   // loop over each attribute
-  for (const attribute_name of element.getAttributeNames()) {
+  for (const attributeName of element.getAttributeNames()) {
     //
-    const attribute_value = element.getAttribute(attribute_name)
-    let is_placeholder = isBracketed(attribute_value)
+    const attributeValue = element.getAttribute(attributeName)
+    let isPlaceholder = isBracketed(attributeValue)
     let name, type, placeholder
 
-    let placeholder_text = attribute_value
+    let placeholderText = attributeValue
 
-    if (attribute_name.endsWith(':if')) {
-      name = attribute_name.substr(0, attribute_name.length - 1 - 2)
+    if (attributeName.endsWith(':if')) {
+      name = attributeName.substr(0, attributeName.length - 1 - 2)
       type = CONDITIONAL
     }
 
     // handle Shorthand
-    else if (attribute_value === '' && isBracketed(attribute_name)) {
-      name = unBracket(attribute_name)
-      placeholder_text = attribute_name
-      is_placeholder = true
+    else if (attributeValue === '' && isBracketed(attributeName)) {
+      name = unBracket(attributeName)
+      placeholderText = attributeName
+      isPlaceholder = true
       type = element.sweet && element.sweet.isSweet ? STATE : NORMAL
     }
 
-    else if (is_placeholder) {
+    else if (isPlaceholder) {
       // EVENT @event-name=[handler]
-      if (attribute_name[0] === '@') {
+      if (attributeName[0] === '@') {
         // console.log({ sweet: element.sweet })
         type = element.sweet && element.sweet.isSweet ? FN_PROP : EVENT
-        name = attribute_name.substr(1)
+        name = attributeName.substr(1)
       }
 
       // BIND :prop=[path]
-      else if (attribute_name[0] === ':') {
+      else if (attributeName[0] === ':') {
         type = BIND
-        name = attribute_name.substr(1)
+        name = attributeName.substr(1)
       }
 
       // NORMAL name=[path]
       else {
-        name = attribute_name
+        name = attributeName
         type = element.sweet && element.sweet.isSweet ? STATE : NORMAL
       }
     }
 
-    if (is_placeholder) {
-      placeholder = processPlaceholder.call(this, placeholder_text)
-      element.removeAttribute(attribute_name)
+    if (isPlaceholder) {
+      placeholder = processPlaceholder.call(this, placeholderText)
+      element.removeAttribute(attributeName)
     }
     if (name) {
       attributes.push({ name, type, placeholder })
