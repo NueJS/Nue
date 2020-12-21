@@ -25,6 +25,7 @@ function processNode (node, context) {
     else if (node.hasAttribute) processAttributes.call(this, node)
   }
 
+  // const isSweet = node.sweet && node.sweet.isSweet
   if (node.hasChildNodes() && node.nodeName !== 'FOR') {
     node.childNodes.forEach(n => processNode.call(this, n, context))
   }

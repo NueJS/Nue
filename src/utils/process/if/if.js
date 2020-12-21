@@ -31,7 +31,6 @@ function process_if (ifNode) {
           if (prevRenderedGroup && prevRenderedGroup.animate && group !== prevRenderedGroup) {
             prevRenderedGroup.onRemove(() => addGroup(group))
           } else {
-            console.log('render : ', group)
             addGroup(group, groups.anchorNode)
           }
 
