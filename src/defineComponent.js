@@ -6,13 +6,6 @@ import { connect, disconnect } from './utils/node/connections.js'
 
 // define a component using compName and a component function
 function defineComponent (compName, component) {
-  // uses API
-  if (component.uses) {
-    for (const name in component.uses) {
-      supersweet.components[name] = component.uses[name]
-    }
-  }
-
   // information about component which are same among all the instances of the components
   // to improve performance these info will be calculated once and will be shared by all the instances
   const memo = { mode: component.mode || 'open', compName, template: undefined }
