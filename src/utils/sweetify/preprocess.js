@@ -1,6 +1,7 @@
 import modes from '../reactivity/modes.js'
 import reactify from '../reactivity/reactify.js'
 import html from '../string/html.js'
+import populateSlots from './populateSlots.js'
 import sweetifyTemplate from './sweetifyTemplate.js'
 
 function preprocess (component) {
@@ -32,6 +33,7 @@ function preprocess (component) {
   else {
     this.memo.template = document.createElement('template')
     invoke_component(false)
+    populateSlots.call(this)
     sweetifyTemplate.call(this)
   }
 }
