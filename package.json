@@ -1,6 +1,6 @@
 {
   "name": "supersweet",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Sweetest JS Framework To Create Reactive UIs Using Web Components",
   "main": "src/index.js",
   "scripts": {
