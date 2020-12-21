@@ -1,7 +1,6 @@
 import { supersweet } from './index.js'
 import buildShadowDOM from './utils/buildShadowDOM.js'
 import createLifecycleHooks from './utils/createLifecycleHooks.js'
-import traverse from './utils/node/traverse.js'
 import preprocess from './utils/sweetify/preprocess.js'
 import { connect, disconnect } from './utils/node/connections.js'
 
@@ -85,14 +84,14 @@ function define_component (compName, component) {
 
     // when component is added in dom
     connectedCallback () {
-      traverse(this.shadowRoot, connect, true)
+      connect(this.shadowRoot, true)
       this.mountCbs.forEach(cb => cb())
     }
 
     // when the component is removed from dom
     // run cleanups
     disconnectedCallback () {
-      traverse(this.shadowRoot, disconnect, true)
+      disconnect(this.shadowRoot, true)
       this.destroyCbs.forEach(cb => cb())
     }
   }
