@@ -2,13 +2,14 @@ function populateSlots () {
   // if we need nodes in slot
   if (this.sweet && this.sweet.childNodes) {
     this.sweet.childNodes.forEach(node => {
-      let slotSelector = 'slot'
+      let slotSelector = 'slot:not([name])'
       if (node.nodeType !== Node.TEXT_NODE) {
+        // slotSelector = 'slot'
         const slotName = node.getAttribute('slot')
         node.removeAttribute('slot')
 
         if (slotName) {
-          slotSelector += `[name=${slotName}]`
+          slotSelector = `slot[name=${slotName}]`
         }
       }
 
