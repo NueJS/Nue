@@ -1,7 +1,7 @@
 import { reverseForEach } from '../../others.js'
-import { disconnect, connect } from '../../node/connections.js'
+import { connect, connectNode, disconnect } from '../../node/connections.js'
 import traverse from '../../node/traverse.js'
-import process_node from '../processNode.js'
+import processNode from '../processNode.js'
 
 const updateAnchor = (anchorNode, c) => {
   const len = anchorNode.textContent.length - c.length
@@ -10,11 +10,10 @@ const updateAnchor = (anchorNode, c) => {
 
 export function addGroup (group) {
   const { anchorNode } = group
-  console.log('anchor: ', anchorNode)
   reverseForEach(group.nodes, node => {
     anchorNode.after(node)
     if (group.animate) node.setAttribute('enter', '')
-    traverse(node, connect)
+    connect(node)
   })
 
   group.isRendered = true
@@ -28,10 +27,9 @@ export function removeGroup (group) {
 
   group.nodes.forEach(node => {
     node.removeAttribute('exit')
+    disconnect(node)
     node.remove()
   })
-
-  group.nodes.forEach(node => traverse(node, disconnect))
 
   group.isRendered = false
   updateAnchor(anchorNode, ' ❌ ')
@@ -39,8 +37,8 @@ export function removeGroup (group) {
 
 export function processGroup (group) {
   group.nodes.forEach(node => {
-    node.isProcessed = false
-    process_node.call(this, node)
+    if (node.sweet) node.sweet.isProcessed = false
+    processNode.call(this, node)
   })
   group.isProcessed = true
 }
