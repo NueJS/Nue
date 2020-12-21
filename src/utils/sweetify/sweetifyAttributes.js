@@ -1,7 +1,7 @@
 // import { uid } from '../others.js'
 import { isBracketed, unBracket } from '../string/bracket.js'
 import processPlaceholder from '../string/placeholder/processPlaceholder.js'
-import { STATE, EVENT, BIND, NORMAL, FN_PROP } from '../constants.js'
+import { STATE, EVENT, BIND, NORMAL, FN_PROP, CONDITIONAL } from '../constants.js'
 // import { components } from '../../index.js'
 
 function sweetifyAttributes (element) {
@@ -16,8 +16,13 @@ function sweetifyAttributes (element) {
 
     let placeholder_text = attribute_value
 
+    if (attribute_name.endsWith(':if')) {
+      name = attribute_name.substr(0, attribute_name.length - 1 - 2)
+      type = CONDITIONAL
+    }
+
     // handle Shorthand
-    if (attribute_value === '' && isBracketed(attribute_name)) {
+    else if (attribute_value === '' && isBracketed(attribute_name)) {
       name = unBracket(attribute_name)
       placeholder_text = attribute_name
       is_placeholder = true
