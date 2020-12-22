@@ -1,68 +1,53 @@
+const swap = (arr, i, j) => {
+  const temp = arr[i]
+  arr[i] = arr[j]
+  arr[j] = temp
+}
 
-const swap = (newArr, i, j) => {
-  [newArr[i], newArr[j]] = [newArr[j], newArr[i]]
+const insert = (arr, i, value) => {
+  arr.splice(i, 0, value)
 }
 
 function reconcile (oldArr, newArr) {
   const steps = []
-  let syncArr = [...oldArr]
+  const arr = [...oldArr]
 
-  // remove and swap oldArr
-  // find where the old array moved to
-  for (let i = 0, x = 0; i < syncArr.length; i++, x++) {
-    // console.log(syncArr)
-    if (syncArr[i] !== newArr[i]) {
-      // node should be at index =  shouldBe
-      // console.log('find : ', syncArr[i], 'in: ', newArr)
-      const shouldBe = newArr.findIndex(n => n === syncArr[i])
-      const shouldBeRemoved = shouldBe === -1
-      // console.log({ target: syncArr[i], syncArr, newArr, shouldBe })
-      // if can not find shouldBe, it means node should be removed
-      if (shouldBeRemoved) {
-        // console.log('should be removed')
-        // syncArr[i] = undefined
-        syncArr.splice(i, 1)
-        steps.push({ type: 'remove', index: x })
-        i--
-      } else {
-        // console.log('not removed, swapped', syncArr[i], newArr)
-        steps.push({ type: 'swap', indexes: [i, shouldBe] })
-        swap(syncArr, i, shouldBe)
-      }
+  // order must be : remove - add - swap
+
+  // remove, removed values in newArr from arr
+  for (let i = 0; i < arr.length; i++) {
+    const j = newArr.findIndex(x => x === arr[i])
+    if (j === -1) {
+      steps.push({ type: 'remove', index: i })
+      arr.splice(i, 1)
+      i--
     }
   }
 
-  syncArr = syncArr.filter(i => i !== undefined)
-  // console.log(syncArr)
-
-  // add syncArr
-  for (let i = syncArr.length; i < newArr.length; i++) {
-    // if (syncArr[i] !== newArr[i]) {
-    // }
-    // console.log('different : ', syncArr[i], newArr[i], i)
-    steps.push({ type: 'create', index: i, value: newArr[i] })
-    // syncArr.push(newArr[i])
-    // console.log(syncArr)
-    syncArr[i] = newArr[i]
+  // insert, new values in newArr to arr at its position
+  for (let i = 0; i < newArr.length; i++) {
+    const value = newArr[i]
+    const j = arr.findIndex(x => x === value)
+    if (j === -1) {
+      steps.push({ type: 'create', index: i, value })
+      insert(arr, i, value)
+    }
   }
 
-  // remove all the syncArr beyond this length
-  if (syncArr.length > newArr.length) {
-    // syncArr.length = newArr.length
-    newArr.slice(syncArr.length - 1).forEach((_, i) => {
-      steps.push({ type: 'remove', i })
-    })
+  // console.log('before swapping : ', arr)
+
+  // swap, swapped values in newArr in arr
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i] !== newArr[i]) {
+      // find where its position in new array
+      const iShouldBe = newArr.findIndex(n => n === arr[i])
+      steps.push({ type: 'swap', indexes: [i, iShouldBe] })
+      swap(arr, i, iShouldBe)
+    }
   }
 
-  return [steps, syncArr]
+  return [steps, arr]
 }
 
-// const oldArr = [10, 20, 30, 40]
-// const newArr = [30, 10, 40, 20]
-// const [steps, syncArr] = reconcile(oldArr, newArr)
-
-// console.log(steps)
-
-// console.log({ syncArr, newArr })
-
-export default reconcile
+module.exports = reconcile
+// export default reconcile
