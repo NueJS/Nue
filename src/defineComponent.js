@@ -1,4 +1,4 @@
-import { supersweet } from './index.js'
+// import { supersweet } from './index.js'
 import buildShadowDOM from './utils/buildShadowDOM.js'
 import createLifecycleHooks from './utils/createLifecycleHooks.js'
 import preprocess from './utils/sweetify/preprocess.js'
