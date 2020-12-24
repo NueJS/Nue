@@ -4,6 +4,9 @@
   "description": "Sweetest JS Framework To Create Reactive UIs Using Web Components",
   "main": "src/index.js",
   "scripts": {
+    "webpack": "webpack",
+    "dev": "npm run webpack -- --env mode=development",
+    "prod": "npm run webpack -- --env mode=production",
     "test": "jest"
   },
   "keywords": [
@@ -25,7 +28,10 @@
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.2.1",
-    "jest": "^26.6.3"
+    "jest": "^26.6.3",
+    "path": "^0.12.7",
+    "webpack": "^5.11.0",
+    "webpack-cli": "^4.2.0"
   },
   "dependencies": {}
 }
