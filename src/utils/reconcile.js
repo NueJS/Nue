@@ -12,11 +12,11 @@ function reconcile (oldArr, newArr) {
   const steps = []
   const arr = [...oldArr]
 
-  // order must be : remove - add - swap
+  // order must be : 1. remove  2. add  3. swap
 
   // remove, removed values in newArr from arr
   for (let i = 0; i < arr.length; i++) {
-    const j = newArr.findIndex(x => x === arr[i])
+    const j = newArr.indexOf(arr[i])
     if (j === -1) {
       steps.push({ type: 'remove', index: i })
       arr.splice(i, 1)
@@ -27,20 +27,18 @@ function reconcile (oldArr, newArr) {
   // insert, new values in newArr to arr at its position
   for (let i = 0; i < newArr.length; i++) {
     const value = newArr[i]
-    const j = arr.findIndex(x => x === value)
+    const j = arr.indexOf(value)
     if (j === -1) {
       steps.push({ type: 'create', index: i, value })
       insert(arr, i, value)
     }
   }
 
-  // console.log('before swapping : ', arr)
-
   // swap, swapped values in newArr in arr
   for (let i = 0; i < arr.length; i++) {
     if (arr[i] !== newArr[i]) {
       // find where its position in new array
-      const iShouldBe = newArr.findIndex(n => n === arr[i])
+      const iShouldBe = newArr.indexOf(arr[i])
       steps.push({ type: 'swap', indexes: [i, iShouldBe] })
       swap(arr, i, iShouldBe)
     }
@@ -49,5 +47,4 @@ function reconcile (oldArr, newArr) {
   return [steps, arr]
 }
 
-module.exports = reconcile
-// export default reconcile
+export default reconcile
