@@ -1,6 +1,4 @@
 import { disconnect } from '../../node/connections.js'
-// import traverse from '../../node/traverse.js'
-// import satisfies from './comparison.js'
 import { removeGroup } from './group.js'
 
 function createGroups (ifNode, conditionNode = ifNode, groupDeps = [], groups = []) {
@@ -20,16 +18,19 @@ function createGroups (ifNode, conditionNode = ifNode, groupDeps = [], groups = 
   }
 
   groups.push(group)
+  let text = ''
 
   if (sweet.type !== 'ELSE') {
     const { getValue, deps, text } = sweet.condition
     deps.forEach(d => groupDeps.push(d))
-    group.anchorNode = document.createComment(` ${type} := ${text} ❌ `)
+    if (DEV) text = ` ${type} := ${text} ❌ `
+    group.anchorNode = document.createComment(text)
     group.isSatisfied = () => getValue.call(this)
   }
 
   else {
-    group.anchorNode = document.createComment(` ${type} ❌ `)
+    if (DEV) text = ` ${type} ❌ `
+    group.anchorNode = document.createComment(text)
     group.isSatisfied = () => true
   }
 

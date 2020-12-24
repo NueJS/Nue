@@ -19,7 +19,7 @@ export function addGroup (group) {
   group.isRendered = true
 
   // update anchor node
-  updateAnchor(anchorNode, ' ✅ ')
+  DEV && updateAnchor(anchorNode, ' ✅ ')
 }
 
 export function removeGroup (group) {
@@ -32,7 +32,7 @@ export function removeGroup (group) {
   })
 
   group.isRendered = false
-  updateAnchor(anchorNode, ' ❌ ')
+  DEV && updateAnchor(anchorNode, ' ❌ ')
 }
 
 export function processGroup (group) {
