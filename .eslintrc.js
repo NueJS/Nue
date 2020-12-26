@@ -13,6 +13,5 @@ module.exports = {
   },
   rules: {
     'brace-style': 'off'
-  },
-  globals: ['DEV']
+  }
 }
