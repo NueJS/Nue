@@ -11,7 +11,7 @@ function createLifecycleHooks (comp) {
     mutate: (cb, ...slices) => {
       if (DEV) {
         if (!slices.length) {
-          throw err({
+          err({
             message: 'on.mutate expects one or more dependencies',
             link: '',
             code: 2,

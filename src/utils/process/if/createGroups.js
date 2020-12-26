@@ -60,7 +60,7 @@ function createGroups (comp, ifNode, conditionNode = ifNode, groupDeps = [], gro
   for (const node of conditionNode.childNodes) {
     // if comp node is text node
     if (DEV && node.nodeType === Node.TEXT_NODE) {
-      throw err({
+      err({
         comp: comp,
         code: -1,
         link: '',

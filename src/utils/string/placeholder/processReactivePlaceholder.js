@@ -2,7 +2,7 @@ import { REACTIVE } from '../../constants.js'
 import { targetProp } from '../../state/slice.js'
 import { bracketify } from '../bracket.js'
 
-const processReactivePlaceholder = (comp, content, str, noBrackets) => {
+const processReactivePlaceholder = (comp, content, str, noBrackets = true) => {
   const path = content.split('.')
 
   // memoize target and prop after getting it for the first time

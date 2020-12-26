@@ -1,5 +1,6 @@
 import { supersweet } from '../../../index.js'
 import getFn from '../../closure.js'
+import DEV from '../../dev/DEV.js'
 import err from '../../dev/error.js'
 import { addConnects } from '../../node/connections.js'
 
@@ -10,10 +11,9 @@ function addEvent (comp, node, info) {
   const fnName = placeholder.content
   const handler = getFn(comp, fnName)
 
-  if (process.env.NODE_ENV !== 'production') {
-  // @TODO move this in dev condition
+  if (DEV) {
     if (!handler) {
-      throw err({
+      err({
         message: `"ERROR in <${comp.nodeName}>'s <${node.nodeName}> : "${placeholder.content}" function is not defined`,
         link: '',
         code: -1,

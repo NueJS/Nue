@@ -1,6 +1,3 @@
-// process tagged template literal
-// does nothing extra, just concatenates the strings with expressions just like how it would be done
-// this is just for better DX ( clean syntax and code highlighting)
 
 import { bracketify } from './bracket.js'
 

@@ -19,7 +19,7 @@ function processFor (comp, forNode) {
 
   if (DEV) {
     if (!forName) {
-      throw err({
+      err({
         message: 'for loop is missing "name" attribute',
         code: 3,
         link: ''
@@ -27,7 +27,7 @@ function processFor (comp, forNode) {
     }
 
     if (!each) {
-      throw err({
+      err({
         message: 'for loop is missing "each" attribute',
         code: 1,
         link: ''
@@ -35,7 +35,7 @@ function processFor (comp, forNode) {
     }
 
     if (!of) {
-      throw err({
+      err({
         message: 'for loop is missing "of" attribute',
         code: 2,
         link: ''

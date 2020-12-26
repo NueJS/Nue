@@ -19,7 +19,7 @@ function addDep (baseComp, path, cb, type) {
 
   if (DEV) {
     if (!comp) {
-      throw err({
+      err({
         message: `invalid state used: $.${path.join('.')} in <${baseComp.memo.compName}> on ${cb.node.nodeName}`,
         link: '',
         code: -1,

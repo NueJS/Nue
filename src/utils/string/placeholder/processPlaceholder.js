@@ -12,7 +12,7 @@ function processPlaceholder (comp, str, noBrackets = false) {
   // check for parens in content
   const isFnPlaceholder = content.includes('(') && content.includes(')')
 
-  return isFnPlaceholder ? processFnPlaceholder(comp, content, str, noBrackets) : processReactivePlaceholder(content, str, noBrackets)
+  return isFnPlaceholder ? processFnPlaceholder(comp, content, str, noBrackets) : processReactivePlaceholder(comp, content, str, noBrackets)
 }
 
 export default processPlaceholder

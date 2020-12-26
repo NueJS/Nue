@@ -1,14 +1,17 @@
 function handleErrors (e) {
   document.body.innerHTML = /* html */`
 
+  <div class='sweet-error-panel'>
   <div class='sweet-card'>
     <div class='title error'> <span id='emoji'>😰</span> Whoops ! </div>
-    <pre class='msg error'>${e.message}</pre>
-    <a href="${e.sweet.link}" target='_blank'> Learn More </a>
+    <pre class='msg error'> </pre>
+    <a href="${e.link}" target='_blank'> Learn More </a>
   </div>
 
   <div class='sweet-card'>
     <div class='subtitle'> Not Fluent in supersweet ? </div>
+  </div>
+
   </div>
 
   <style>
@@ -102,7 +105,8 @@ function handleErrors (e) {
   </style>
         `
 
-  throw e
+  const msg = document.querySelector('.sweet-error-panel .msg')
+  msg.textContent = e.message
 }
 
 export default handleErrors
