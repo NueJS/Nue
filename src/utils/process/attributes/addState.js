@@ -1,7 +1,7 @@
 // import slice from '../../state/slice.js'
-import addDep from '../../state/addDep.js'
-import { mutate } from '../../reactivity/mutate.js'
-import { wire } from '../../node/connections.js'
+// import addDep from '../../state/addDep.js'
+// import { mutate } from '../../reactivity/mutate.js'
+// import { wire } from '../../node/connections.js'
 // import { BIND } from '../../constants.js'
 
 // props are a way to send data from parent state to child state

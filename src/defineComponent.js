@@ -20,7 +20,6 @@ function defineComponent (compName, component) {
       // references to DOM nodes
       this.refs = {}
 
-      // console.log('prev fn : ', this.fnProps)
       // functions added in component or given by parent component
       this.fn = this.fnProps || {}
 

@@ -16,6 +16,9 @@ function buildShadowDOM (template) {
 
   // add fragment to shadow DOM
   this.attachShadow({ mode: this.memo.mode });
+
+  // must use spread here even though childNodes is an array
+  // because, appending node to shadowRoot, removes it from childNodes array
   [...fragment.childNodes].forEach(node => this.shadowRoot.append(node))
 }
 
