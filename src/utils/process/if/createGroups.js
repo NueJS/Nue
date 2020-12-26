@@ -1,7 +1,10 @@
+import err from '../../dev/error.js'
 import { disconnect } from '../../node/connections.js'
 import { removeGroup } from './group.js'
 
-function createGroups (ifNode, conditionNode = ifNode, groupDeps = [], groups = []) {
+const DEV = process.env.NODE_ENV !== 'production'
+
+function createGroups (comp, ifNode, conditionNode = ifNode, groupDeps = [], groups = []) {
   const { sweet } = conditionNode
   const { type } = sweet
 
@@ -18,19 +21,19 @@ function createGroups (ifNode, conditionNode = ifNode, groupDeps = [], groups = 
   }
 
   groups.push(group)
-  let text = ''
+  let commentText = ''
 
   if (sweet.type !== 'ELSE') {
     const { getValue, deps, text } = sweet.condition
     deps.forEach(d => groupDeps.push(d))
-    if (DEV) text = ` ${type} := ${text} ❌ `
-    group.anchorNode = document.createComment(text)
-    group.isSatisfied = () => getValue.call(this)
+    if (DEV) commentText = ` ${type} := ${text} ❌ `
+    group.anchorNode = document.createComment(commentText)
+    group.isSatisfied = () => getValue(comp)
   }
 
   else {
-    if (DEV) text = ` ${type} ❌ `
-    group.anchorNode = document.createComment(text)
+    if (DEV) commentText = ` ${type} ❌ `
+    group.anchorNode = document.createComment(commentText)
     group.isSatisfied = () => true
   }
 
@@ -49,20 +52,25 @@ function createGroups (ifNode, conditionNode = ifNode, groupDeps = [], groups = 
   // after processed
   // remove conditionNode, and all the nodes
   // add comment anchorNode
-  this.delayedProcesses.push(() => {
+  comp.delayedProcesses.push(() => {
     ifNode.before(group.anchorNode)
     group.nodes.forEach(n => n.remove())
   })
 
   for (const node of conditionNode.childNodes) {
-    // if this node is text node
-    if (node.nodeType === Node.TEXT_NODE) {
-      throw new Error('text node is not direct child of <if> when animate attribute is added. wrap the textNode in span')
+    // if comp node is text node
+    if (DEV && node.nodeType === Node.TEXT_NODE) {
+      throw err({
+        comp: comp,
+        code: -1,
+        link: '',
+        message: 'text node is not direct child of <if> when animate attribute is added. wrap the textNode in span'
+      })
     }
 
     // if is is condition node
     else if (node.nodeName === 'ELSIF' || node.nodeName === 'ELSE' || node.nodeName === 'IF') {
-      createGroups.call(this, ifNode, node, groupDeps, groups)
+      createGroups(comp, ifNode, node, groupDeps, groups)
     }
 
     else {

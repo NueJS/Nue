@@ -1,5 +1,4 @@
 function handleErrors (e) {
-  if (!DEV) return
   document.body.innerHTML = /* html */`
 
   <div class='sweet-card'>

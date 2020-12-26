@@ -8,7 +8,7 @@ import processPlaceholder from './placeholder/processPlaceholder.js'
 // input: 'name is [name.first]'
 // output: [ { string : 'name is' }, { path: ['name', 'first'], value: 'Manan' }]
 
-function split (text) {
+function split (comp, text) {
   const parts = []
   let cursorInBracket = false
   let str = ''
@@ -37,7 +37,7 @@ function split (text) {
     else if (cursorInBracket && text[i] === ']') {
       // remove [ then split to get the placeholder content
       // then split to get the path array
-      parts.push(processPlaceholder.call(this, str, true))
+      parts.push(processPlaceholder(comp, str, true))
 
       // check for function call
       cursorInBracket = false

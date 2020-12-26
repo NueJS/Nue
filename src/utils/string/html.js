@@ -4,6 +4,7 @@
 
 import { bracketify } from './bracket.js'
 
+// uses this
 function html (strings, ...exprs) {
   let str = ''
   for (let i = 0; i < strings.length; i++) {

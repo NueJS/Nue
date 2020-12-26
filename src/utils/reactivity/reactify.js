@@ -7,18 +7,16 @@ import deepEqual from '../deepEqual.js'
 const isObject = x => typeof x === 'object' && x !== null
 
 // create a reactive object which when mutated calls the on_change function
-function reactify (obj, path = []) {
-  const closure$ = this.sweet && this.sweet.closure.$
+function reactify (comp, obj, path = []) {
+  const closure$ = comp.sweet && comp.sweet.closure.$
   if (!isObject(obj)) return [obj]
 
   const target = Array.isArray(obj) ? [] : {}
 
   // debugger
   Object.keys(obj).forEach(key => {
-    [target[key]] = reactify.call(this, obj[key], [...path, key])
+    [target[key]] = reactify(comp, obj[key], [...path, key])
   })
-
-  const _this = this
 
   const reactive = new Proxy(target, {
 
@@ -30,7 +28,7 @@ function reactify (obj, path = []) {
       if (modes.noOverride) {
         // ignore set
         if (propInTarget) return true
-        if (typeof value === 'function') value = computedState.call(_this, value, prop)
+        if (typeof value === 'function') value = computedState(comp, value, prop)
       }
 
       else {
@@ -40,13 +38,13 @@ function reactify (obj, path = []) {
         }
       }
 
-      if (isObject(value)) [value] = reactify.call(_this, value, [...path, prop])
+      if (isObject(value)) [value] = reactify(comp, value, [...path, prop])
 
       if (modes.reactive) {
         if (!(prop === 'length' && Array.isArray(target))) {
           if (!deepEqual(target[prop], value)) {
             success = Reflect.set(target, prop, value)
-            onMutate.call(_this, [...path, prop])
+            onMutate(comp, [...path, prop])
           }
         }
       }
@@ -55,7 +53,7 @@ function reactify (obj, path = []) {
     },
 
     deleteProperty (target, prop) {
-      if (modes.reactive) onMutate.call(_this, [...path, prop])
+      if (modes.reactive) onMutate(comp, [...path, prop])
       return Reflect.deleteProperty(target, prop)
     },
 

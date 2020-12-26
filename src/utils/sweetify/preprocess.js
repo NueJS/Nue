@@ -4,21 +4,21 @@ import html from '../string/html.js'
 import populateSlots from './populateSlots.js'
 import sweetifyTemplate from './sweetifyTemplate.js'
 
-function preprocess (component) {
-  [this.$, this.$Target] = reactify.call(this, this.stateProps || {})
+function preprocess (comp, component) {
+  [comp.$, comp.$Target] = reactify(comp, comp.stateProps || {})
 
   const invokeComp = (processed) => {
     modes.reactive = false
     modes.noOverride = true
 
     component({
-      $: this.$,
-      on: this.on,
-      refs: this.refs,
-      html: processed ? () => {} : html.bind(this),
-      fn: this.fn,
-      component: this,
-      props: { ...this.stateProps, ...this.fnProps }
+      $: comp.$,
+      on: comp.on,
+      refs: comp.refs,
+      html: processed ? () => {} : html.bind(comp),
+      fn: comp.fn,
+      component: comp,
+      props: { ...comp.stateProps, ...comp.fnProps }
     })
 
     modes.reactive = true
@@ -26,15 +26,15 @@ function preprocess (component) {
   }
 
   // if template is processed already
-  if (this.memo.template) {
+  if (comp.memo.template) {
     invokeComp(true)
   }
 
   else {
-    this.memo.template = document.createElement('template')
+    comp.memo.template = document.createElement('template')
     invokeComp(false)
-    populateSlots.call(this)
-    sweetifyTemplate.call(this)
+    populateSlots(comp)
+    sweetifyTemplate(comp)
   }
 }
 

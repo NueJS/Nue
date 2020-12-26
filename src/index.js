@@ -11,7 +11,7 @@ export const defineActions = (obj) => {
   supersweet.actions = obj
 }
 
-export const defineComponents = (obj) => {
+export const define = (obj) => {
   supersweet.components = obj
 }
 

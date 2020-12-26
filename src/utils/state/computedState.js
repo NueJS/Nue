@@ -6,13 +6,13 @@ import detectStateUsage from './detectStateUsage.js'
 // call that function, detect the state keys it depends on, get the initial value
 // update its value whenever its deps changes
 
-function computedState (fn, k) {
+function computedState (comp, fn, k) {
   const [initValue, paths] = detectStateUsage(fn)
 
-  const compute = () => mutate(this.$, [k], fn(), 'set')
+  const compute = () => mutate(comp.$, [k], fn(), 'set')
 
   // when root of path changes value, recompute
-  paths.forEach(path => addDep.call(this, [path[0]], compute, 'computed'))
+  paths.forEach(path => addDep(comp, [path[0]], compute, 'computed'))
 
   return initValue
 }

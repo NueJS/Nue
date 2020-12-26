@@ -4,7 +4,7 @@ import processPlaceholder from '../string/placeholder/processPlaceholder.js'
 import { STATE, EVENT, BIND, NORMAL, FN_PROP, CONDITIONAL } from '../constants.js'
 // import { components } from '../../index.js'
 
-function sweetifyAttributes (element) {
+function sweetifyAttributes (comp, element) {
   const attributes = []
 
   // loop over each attribute
@@ -51,7 +51,7 @@ function sweetifyAttributes (element) {
     }
 
     if (isPlaceholder) {
-      placeholder = processPlaceholder.call(this, placeholderText)
+      placeholder = processPlaceholder(comp, placeholderText)
       element.removeAttribute(attributeName)
     }
     if (name) {

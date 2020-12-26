@@ -1,6 +1,6 @@
 import { reverseForEach } from '../../others.js'
-import { connect, connectNode, disconnect } from '../../node/connections.js'
-import traverse from '../../node/traverse.js'
+import { connect, disconnect } from '../../node/connections.js'
+// import traverse from '../../node/traverse.js'
 import processNode from '../processNode.js'
 
 const updateAnchor = (anchorNode, c) => {
@@ -19,7 +19,7 @@ export function addGroup (group) {
   group.isRendered = true
 
   // update anchor node
-  DEV && updateAnchor(anchorNode, ' ✅ ')
+  process.env.NODE_ENV !== 'production' && updateAnchor(anchorNode, ' ✅ ')
 }
 
 export function removeGroup (group) {
@@ -32,13 +32,13 @@ export function removeGroup (group) {
   })
 
   group.isRendered = false
-  DEV && updateAnchor(anchorNode, ' ❌ ')
+  process.env.NODE_ENV !== 'production' && updateAnchor(anchorNode, ' ❌ ')
 }
 
-export function processGroup (group) {
+export function processGroup (comp, group) {
   group.nodes.forEach(node => {
     if (node.sweet) node.sweet.isProcessed = false
-    processNode.call(this, node)
+    processNode(comp, node)
   })
   group.isProcessed = true
 }

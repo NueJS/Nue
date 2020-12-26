@@ -2,13 +2,8 @@ import { addGroup, processGroup } from './group.js'
 import createGroups from './createGroups.js'
 import { addDeps } from '../../state/addDep.js'
 
-function processIf (ifNode) {
-  // binding
-  const _createGroups = createGroups.bind(this)
-  const _processGroup = processGroup.bind(this)
-  const _addDeps = addDeps.bind(this)
-
-  const { groups, groupDeps } = _createGroups(ifNode)
+function processIf (comp, ifNode) {
+  const { groups, groupDeps } = createGroups(comp, ifNode)
 
   // group that is currently rendered
   let prevRenderedGroup
@@ -23,7 +18,7 @@ function processIf (ifNode) {
         foundSatisfied = true
 
         // if this group is never processed before, process it first
-        if (!group.isProcessed) _processGroup(group)
+        if (!group.isProcessed) processGroup(comp, group)
 
         // if this group is not already rendered
         if (!group.isRendered) {
@@ -46,9 +41,9 @@ function processIf (ifNode) {
     })
   }
 
-  _addDeps(groupDeps, groupDepChanged, 'stateReady')
+  addDeps(comp, groupDeps, groupDepChanged, 'stateReady')
 
-  this.delayedProcesses.push(() => {
+  comp.delayedProcesses.push(() => {
     ifNode.after(document.createComment(' / IF '))
     ifNode.remove()
     groupDepChanged()

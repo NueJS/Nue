@@ -2,14 +2,14 @@ import { CONDITIONAL } from '../../constants.js'
 import { wire } from '../../node/connections.js'
 
 // example: data-count=[XXX]
-function addAttribute (node, attribute) {
+function addAttribute (comp, node, attribute) {
   const { placeholder, name, type } = attribute
   const { deps, getValue } = placeholder
 
   let update
   if (type === CONDITIONAL) {
     update = () => {
-      const value = getValue.call(this)
+      const value = getValue(comp)
       if (value) node.setAttribute(name, value)
       else node.removeAttribute(name)
     }
@@ -18,11 +18,11 @@ function addAttribute (node, attribute) {
   // update attribute value when called with latest from state
   else {
     update = () => {
-      node.setAttribute(name, getValue.call(this))
+      node.setAttribute(name, getValue(comp))
     }
   }
 
-  wire.call(this, node, deps, update)
+  wire(comp, node, deps, update)
 }
 
 export default addAttribute

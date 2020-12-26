@@ -4,16 +4,16 @@ import traverse from '../node/traverse.js'
 import { supersweet } from '../../index.js'
 import processPlaceholder from '../string/placeholder/processPlaceholder.js'
 
-function sweetifyTemplate () {
+function sweetifyTemplate (comp) {
   const uselessNodes = []
-  this.delayedPreprocesses = []
+  comp.delayedPreprocesses = []
 
   // visit each node in template and memoize information
   const onVisit = node => {
     // memoize text content
     if (node.nodeType === Node.TEXT_NODE) {
       if (!node.textContent.trim()) uselessNodes.push(node)
-      else sweetifyTextNode.call(this, node)
+      else sweetifyTextNode(comp, node)
       return
     }
 
@@ -37,7 +37,7 @@ function sweetifyTemplate () {
       const hasAnimate = node.hasAttribute('animate')
       node.sweet = {
         type: node.nodeName,
-        condition: processPlaceholder.call(this, condition)
+        condition: processPlaceholder(comp, condition)
       }
       if (hasAnimate) node.sweet.animate = node.getAttribute('animate')
       return
@@ -45,14 +45,14 @@ function sweetifyTemplate () {
 
     // memoize attributes
     if (node.hasAttributes && node.hasAttributes()) {
-      sweetifyAttributes.call(this, node)
+      sweetifyAttributes(comp, node)
     }
   }
 
-  traverse(this.memo.template.content, onVisit, true)
+  traverse(comp.memo.template.content, onVisit, true)
 
   // remove redundant nodes
-  this.delayedPreprocesses.forEach(m => m())
+  comp.delayedPreprocesses.forEach(m => m())
   uselessNodes.forEach(n => n.remove())
 }
 

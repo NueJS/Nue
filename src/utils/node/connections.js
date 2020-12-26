@@ -2,9 +2,9 @@ import addDep from '../state/addDep.js'
 import traverse from './traverse.js'
 
 // lay wiring for node updates
-export function wire (node, deps, update) {
+export function wire (comp, node, deps, update) {
   update.node = node
-  const connectNode = () => deps.map(path => addDep.call(this, path, update, 'dom'))
+  const connectNode = () => deps.map(path => addDep(comp, path, update, 'dom'))
   addConnects(node, connectNode)
   if (!node.sweet.updates) node.sweet.updates = []
   node.sweet.updates.push(update)

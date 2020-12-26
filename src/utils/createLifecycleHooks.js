@@ -1,15 +1,27 @@
 import { addDeps } from './state/addDep.js'
+import err from './dev/error.js'
+import DEV from './dev/DEV.js'
 
-function createLifecycleHooks () {
-  this.on = {
-    mount: (cb) => this.mountCbs.push(cb),
-    destroy: (cb) => this.destroyCbs.push(cb),
-    beforeUpdate: (cb) => this.beforeUpdateCbs.push(cb),
-    afterUpdate: (cb) => this.afterUpdateCbs.push(cb),
+function createLifecycleHooks (comp) {
+  comp.on = {
+    mount: (cb) => comp.mountCbs.push(cb),
+    destroy: (cb) => comp.destroyCbs.push(cb),
+    beforeUpdate: (cb) => comp.beforeUpdateCbs.push(cb),
+    afterUpdate: (cb) => comp.afterUpdateCbs.push(cb),
     mutate: (cb, ...slices) => {
-      if (!slices.length) throw new Error('on.mutate expects one or more dependencies')
+      if (DEV) {
+        if (!slices.length) {
+          throw err({
+            message: 'on.mutate expects one or more dependencies',
+            link: '',
+            code: 2,
+            comp
+          })
+        }
+      }
+
       const deps = slices.map(slice => slice.split('.'))
-      addDeps.call(this, deps, cb, 'computed')
+      addDeps(comp, deps, cb, 'computed')
     }
   }
 }

@@ -7,25 +7,25 @@ export function triggerMapCbs (map) {
 }
 
 // only trigger cbs in $ Map
-export function trigger$Cbs (target, info) {
+export function trigger$Cbs (comp, target, info) {
   for (const [cb] of target.$) {
-    cb.call(this, info)
+    cb(comp, info)
   }
 }
 
 // trigger all the cbs in the object
-export function triggerAllCbs (target, info) {
+export function triggerAllCbs (comp, target, info) {
   for (const k in target) {
-    if (k === '$') trigger$Cbs.call(this, target, info)
-    else triggerAllCbs.call(this, target[k], info)
+    if (k === '$') trigger$Cbs(comp, target, info)
+    else triggerAllCbs(comp, target[k], info)
   }
 }
 
 // convert consecutive calls to single call
 // instead of using a flag, function is saved in queue
 // because it should be called once batching is completed
-export function cbQueuer (cb, type) {
-  const lifecycle = this.queue[type]
+export function cbQueuer (comp, cb, type) {
+  const lifecycle = comp.queue[type]
   const qcb = (...args) => {
     if (!lifecycle.has(cb)) lifecycle.set(cb, ...args)
   }
@@ -35,14 +35,14 @@ export function cbQueuer (cb, type) {
 }
 
 // find deps that needs to be called for given path update and trigger them
-export function triggerDeps (path, info) {
-  let target = this.deps
+export function triggerDeps (comp, path, info) {
+  let target = comp.deps
   path.forEach((c, i) => {
     if (typeof target !== 'object') return
     target = target[c]
     if (target) {
-      if (i !== path.length - 1) trigger$Cbs.call(this, target, info)
-      triggerAllCbs.call(this, target, info)
+      if (i !== path.length - 1) trigger$Cbs(comp, target, info)
+      triggerAllCbs(comp, target, info)
     }
   })
 }

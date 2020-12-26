@@ -1,4 +1,6 @@
 import { cbQueuer } from '../callbacks.js'
+import DEV from '../dev/DEV.js'
+import err from '../dev/error.js'
 import { hasSlice } from './slice.js'
 
 // get the origin component where the value of the path is coming from
@@ -12,10 +14,21 @@ function origin (comp, path) {
 }
 
 // add Dep for given path on its origin
-function addDep (path, cb, type) {
-  const comp = origin(this, path)
-  if (!comp) throw new Error(`invalid state used: $.${path.join('.')} in <${this.memo.compName}> on ${cb.node.nodeName}`)
-  const qcb = cbQueuer.call(comp, cb, type)
+function addDep (baseComp, path, cb, type) {
+  const comp = origin(baseComp, path)
+
+  if (DEV) {
+    if (!comp) {
+      throw err({
+        message: `invalid state used: $.${path.join('.')} in <${baseComp.memo.compName}> on ${cb.node.nodeName}`,
+        link: '',
+        code: -1,
+        comp: baseComp
+      })
+    }
+  }
+
+  const qcb = cbQueuer(comp, cb, type)
   let target = comp.deps
   const lastIndex = path.length - 1
 
@@ -29,8 +42,8 @@ function addDep (path, cb, type) {
   if (type === 'dom') return () => target.$.delete(qcb)
 }
 
-export function addDeps (deps, cb, type) {
-  deps.forEach(dep => addDep.call(this, dep, cb, type))
+export function addDeps (comp, deps, cb, type) {
+  deps.forEach(dep => addDep(comp, dep, cb, type))
 }
 
 export default addDep
