@@ -2,6 +2,7 @@ import { reverseForEach } from '../../others.js'
 import { connect, disconnect } from '../../node/connections.js'
 // import traverse from '../../node/traverse.js'
 import processNode from '../processNode.js'
+import settings from '../../../settings.js'
 
 const updateAnchor = (anchorNode, c) => {
   const len = anchorNode.textContent.length - c.length
@@ -12,6 +13,9 @@ export function addGroup (group) {
   const { anchorNode } = group
   reverseForEach(group.nodes, node => {
     anchorNode.after(node)
+    if (settings.showUpdates) {
+      settings.onNodeUpdate(node)
+    }
     if (group.animate) node.setAttribute('enter', '')
     connect(node)
   })
