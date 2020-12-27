@@ -43,7 +43,7 @@ function processIf (comp, ifNode) {
 
   addDeps(comp, groupDeps, groupDepChanged, 'stateReady')
 
-  comp.delayedProcesses.push(() => {
+  comp.deferred.push(() => {
     ifNode.after(document.createComment(' / IF '))
     ifNode.remove()
     groupDepChanged()
