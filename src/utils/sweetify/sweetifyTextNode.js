@@ -6,12 +6,8 @@ function sweetifyTextNode (comp, node) {
   const textNodes = []
 
   placeholders.forEach(placeholder => {
-    let textNode
-
-    if (placeholder.type === TEXT) {
-      textNode = document.createTextNode(placeholder.text)
-    } else {
-      textNode = document.createTextNode('')
+    const textNode = document.createTextNode(placeholder.text)
+    if (placeholder.type !== TEXT) {
       textNode.sweet = { placeholder }
     }
 
@@ -19,7 +15,7 @@ function sweetifyTextNode (comp, node) {
   })
 
   // after all memoization is done, replace the node with textNodes
-  comp.delayedPreprocesses.push(() => {
+  comp.deferred.push(() => {
     textNodes.forEach(t => node.before(t))
     node.remove()
   })
