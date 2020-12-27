@@ -17,11 +17,10 @@ const processFnPlaceholder = (comp, content, str) => {
     // memoize targets and props from deps
     // @TODO - this won't work when there are multiple instances of comp
     // use tpMemo
-    let tps
 
     const getValue = (comp) => {
-      if (!tps) tps = deps.map(path => targetProp(comp.$, path))
-      const values = tps.map(([t, p]) => t[p])
+      if (!comp.tpMemo[content]) comp.tpMemo[content] = deps.map(path => targetProp(comp.$, path))
+      const values = comp.tpMemo[content].map(([t, p]) => t[p])
       return fn(...values)
     }
 
