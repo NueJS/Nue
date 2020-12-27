@@ -30,7 +30,7 @@ function processAttributes (comp, node) {
     if (type === EVENT) addEvent(comp, node, attribute)
     // bind value on input nodes or bind a prop to custom component
     else if (type === BIND) {
-      if (sweet.isSweet) addState(comp, node, attribute)
+      if (sweet.isComp) addState(comp, node, attribute)
       else bindInput(comp, node, attribute)
     }
 

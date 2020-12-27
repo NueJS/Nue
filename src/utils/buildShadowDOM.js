@@ -1,4 +1,4 @@
-import sweetify from './node/sweetify.js'
+import copySweet from './node/copySweet.js'
 import processNode from './process/processNode.js'
 
 function buildShadowDOM (comp, template) {
@@ -6,13 +6,12 @@ function buildShadowDOM (comp, template) {
   const fragment = template.content.cloneNode(true)
 
   // add sweet property on nodes
-  sweetify(template.content, fragment)
+  copySweet(template.content, fragment)
 
   // process nodes using sweet property
+  comp.deferred = []
   processNode(comp, fragment)
-
-  // perform fragment modification which is part of processing
-  comp.delayedProcesses.forEach(p => p())
+  comp.deferred.forEach(p => p())
 
   // add fragment to shadow DOM
   comp.attachShadow({ mode: comp.memo.mode });

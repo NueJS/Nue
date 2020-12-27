@@ -1,5 +1,6 @@
 import addDep from '../../state/addDep.js'
-import { render, supersweet } from '../../../index.js'
+import { render } from '../../../index.js'
+import globalInfo from '../../../globalInfo.js'
 import err from '../../dev/error.js'
 import DEV from '../../dev/DEV.js'
 
@@ -15,7 +16,7 @@ function processFor (comp, forNode) {
 
   const { each, of, at } = loopInfo
 
-  let forName = forNode.getAttribute('name')
+  const forName = each.content + '-'
 
   if (DEV) {
     if (!forName) {
@@ -43,31 +44,31 @@ function processFor (comp, forNode) {
     }
   }
 
-  forName += '-'
-
-  function loopComp ({ html }) {
+  function loopCompFn ({ html }) {
     html(forNode.innerHTML)
   }
 
-  supersweet.components[forName] = loopComp
+  globalInfo.components[forName] = loopCompFn
 
   const init = () => {
     const array = of.getValue(comp)
 
     array.forEach((value, i) => {
-      const loopCompInstance = document.createElement(forName)
-      loopComps.push(loopComp)
+      const loopComp = document.createElement(forName)
+      loopComps.push(loopCompFn)
 
-      loopCompInstance.stateProps = {
+      loopComp.stateProps = {
         [each.content]: value
       }
 
+      // console.log({ [each.content]: value })
+
       if (at) {
-        loopCompInstance.stateProps[at.content] = i
+        loopComp.stateProps[at.content] = i
       }
 
-      comp.delayedProcesses.push(() => {
-        forNode.before(loopCompInstance)
+      comp.deferred.push(() => {
+        forNode.before(loopComp)
       })
     })
   }
@@ -81,7 +82,7 @@ function processFor (comp, forNode) {
 
   addDep(comp, loopInfo.of.deps[0], onArrayChange, 'dom')
 
-  comp.delayedProcesses.push(() => {
+  comp.deferred.push(() => {
     forNode.remove()
   })
 }

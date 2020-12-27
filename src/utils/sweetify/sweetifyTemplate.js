@@ -1,58 +1,61 @@
 import sweetifyAttributes from './sweetifyAttributes.js'
 import sweetifyTextNode from './sweetifyTextNode.js'
-import traverse from '../node/traverse.js'
-import { supersweet } from '../../index.js'
+// import traverse from '../node/traverse.js'
+import globalInfo from '../../globalInfo.js'
 import processPlaceholder from '../string/placeholder/processPlaceholder.js'
+import { isConditionNode } from '../node/dom.js'
 
 function sweetifyTemplate (comp) {
   const uselessNodes = []
-  comp.delayedPreprocesses = []
+  comp.deferred = []
 
   // visit each node in template and memoize information
-  const onVisit = node => {
+  const sweetify = node => {
+    const compName = node.nodeName.toLowerCase()
+    const isComp = globalInfo.components[compName]
+
     // memoize text content
     if (node.nodeType === Node.TEXT_NODE) {
       if (!node.textContent.trim()) uselessNodes.push(node)
       else sweetifyTextNode(comp, node)
-      return
+      return // must use return here
     }
 
-    const compName = node.nodeName.toLowerCase()
-    const isSweet = supersweet.components[compName]
-
-    if (isSweet) {
+    else if (isComp) {
       node.sweet = {
-        isSweet: true,
+        isComp: true,
         compName: compName
       }
 
       node.sweet.childNodes = [...node.childNodes]
       node.innerHTML = '' // do not sweetify slot in parent component
-      return
     }
 
     // if condition node
-    if (node.nodeName === 'IF' || node.nodeName === 'ELSE' || node.nodeName === 'ELSE-IF') {
+    else if (isConditionNode(node)) {
       const condition = node.getAttribute(':')
-      const hasAnimate = node.hasAttribute('animate')
       node.sweet = {
         type: node.nodeName,
-        condition: processPlaceholder(comp, condition)
+        condition: processPlaceholder(comp, condition),
+        animate: node.getAttribute('animate')
       }
-      if (hasAnimate) node.sweet.animate = node.getAttribute('animate')
-      return
     }
 
-    // memoize attributes
-    if (node.hasAttributes && node.hasAttributes()) {
+    else if (node.hasAttributes()) {
       sweetifyAttributes(comp, node)
+    }
+
+    if (node.nodeName === 'FOR') return
+
+    if (node.hasChildNodes()) {
+      node.childNodes.forEach(n => sweetify(n))
     }
   }
 
-  traverse(comp.memo.template.content, onVisit, true)
+  comp.memo.template.content.childNodes.forEach(n => sweetify(n))
 
   // remove redundant nodes
-  comp.delayedPreprocesses.forEach(m => m())
+  comp.deferred.forEach(m => m())
   uselessNodes.forEach(n => n.remove())
 }
 

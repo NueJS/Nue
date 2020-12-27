@@ -9,7 +9,6 @@ const processReactivePlaceholder = (content, str, noBrackets = true) => {
   // let target, prop
   function getValue (comp) {
     if (!comp.tpMemo[content]) {
-      console.log('save')
       comp.tpMemo[content] = targetProp(comp.$, path)
     }
     const [target, prop] = comp.tpMemo[content]

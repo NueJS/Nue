@@ -52,7 +52,7 @@ function createGroups (comp, ifNode, conditionNode = ifNode, groupDeps = [], gro
   // after processed
   // remove conditionNode, and all the nodes
   // add comment anchorNode
-  comp.delayedProcesses.push(() => {
+  comp.deferred.push(() => {
     ifNode.before(group.anchorNode)
     group.nodes.forEach(n => n.remove())
   })

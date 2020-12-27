@@ -26,14 +26,14 @@ function sweetifyAttributes (comp, element) {
       name = unBracket(attributeName)
       placeholderText = attributeName
       isPlaceholder = true
-      type = element.sweet && element.sweet.isSweet ? STATE : NORMAL
+      type = element.sweet && element.sweet.isComp ? STATE : NORMAL
     }
 
     else if (isPlaceholder) {
       // EVENT @event-name=[handler]
       if (attributeName[0] === '@') {
         // console.log({ sweet: element.sweet })
-        type = element.sweet && element.sweet.isSweet ? FN_PROP : EVENT
+        type = element.sweet && element.sweet.isComp ? FN_PROP : EVENT
         name = attributeName.substr(1)
       }
 
@@ -46,7 +46,7 @@ function sweetifyAttributes (comp, element) {
       // NORMAL name=[path]
       else {
         name = attributeName
-        type = element.sweet && element.sweet.isSweet ? STATE : NORMAL
+        type = element.sweet && element.sweet.isComp ? STATE : NORMAL
       }
     }
 

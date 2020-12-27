@@ -1,30 +1,34 @@
-import processTextNode from './textNode.js'
+import processTextNode from './processTextNode.js'
 import processAttributes from './attributes/processAttributes.js'
 import processIf from './if/if.js'
-import { render, supersweet } from '../../index.js'
+import { render } from '../../index.js'
+import globalInfo from '../../globalInfo.js'
 import processFor from './for/processFor.js'
 
 function processNode (comp, node) {
-  if (node.nodeType !== Node.DOCUMENT_FRAGMENT_NODE && node.sweet) {
-    if (node.sweet.isProcessed) return
-    node.sweet.isProcessed = true
+  const { sweet } = node
+  if (sweet) {
+    if (sweet.isProcessed) return
+    sweet.isProcessed = true
 
-    if (node.sweet.isSweet) {
-      node.sweet.closure = {
+    if (sweet.isComp) {
+      sweet.closure = {
         $: comp.$,
         fn: comp.fn,
         component: comp
       }
-      if (!supersweet.processedComponents[node.sweet.compName]) render(node.sweet.compName)
+      if (!globalInfo.renderedComps[sweet.compName]) render(sweet.compName)
     }
 
-    if (node.sweet.placeholder && node.nodeType === Node.TEXT_NODE) processTextNode(comp, node)
+    if (sweet.placeholder && node.nodeType === Node.TEXT_NODE) processTextNode(comp, node)
     else if (node.nodeName === 'IF') processIf(comp, node)
     else if (node.nodeName === 'FOR') processFor(comp, node)
-    else if (node.hasAttribute) processAttributes(comp, node)
+    else if (node.hasAttributes()) processAttributes(comp, node)
   }
 
-  if (node.hasChildNodes() && node.nodeName !== 'FOR') {
+  if (node.nodeName === 'FOR') return
+
+  if (node.hasChildNodes()) {
     node.childNodes.forEach(n => processNode(comp, n))
   }
 }

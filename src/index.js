@@ -1,24 +1,19 @@
 import defineComponent from './defineComponent.js'
+import globalInfo from './globalInfo.js'
 import DEV from './utils/dev/DEV.js'
 import err from './utils/dev/error.js'
 export { default as settings } from './settings.js'
 
-export const supersweet = {
-  components: {},
-  actions: {},
-  processedComponents: {}
-}
-
 export const defineActions = (obj) => {
-  supersweet.actions = obj
+  globalInfo.actions = obj
 }
 
 export const define = (obj) => {
-  supersweet.components = obj
+  globalInfo.components = obj
 }
 
 export const render = (name) => {
-  const comp = supersweet.components[name]
+  const comp = globalInfo.components[name]
 
   if (DEV) {
     if (!comp) {
@@ -28,6 +23,6 @@ export const render = (name) => {
     }
   }
 
-  supersweet.processedComponents[name] = true
+  globalInfo.renderedComps[name] = true
   defineComponent(name, comp)
 }

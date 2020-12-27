@@ -51,7 +51,7 @@ function defineComponent (compName, component) {
       comp.memo = memo
 
       // array of processing functions that should be run after all the nodes have been processed
-      comp.delayedProcesses = []
+      comp.deferred = []
 
       // once all the callbacks are called, clear the queue for the next interaction
       comp.clear_queue = () => {
