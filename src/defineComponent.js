@@ -3,6 +3,7 @@ import buildShadowDOM from './utils/buildShadowDOM.js'
 import createLifecycleHooks from './utils/createLifecycleHooks.js'
 import preprocess from './utils/sweetify/preprocess.js'
 import { connect, disconnect } from './utils/node/connections.js'
+import globalInfo from './globalInfo.js'
 
 // define a component using compName and a component function
 function defineComponent (compName, component) {
@@ -13,6 +14,9 @@ function defineComponent (compName, component) {
     constructor () {
       super()
       const comp = this
+
+      comp.hash = globalInfo.hash()
+
       comp.component = component
 
       // key is path joined by dot
