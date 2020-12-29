@@ -1,7 +1,8 @@
 import copySweet from './node/copySweet.js'
 import processNode from './process/processNode.js'
 
-function buildShadowDOM (comp, template) {
+function buildShadowDOM (comp) {
+  const template = comp.memo.template
   // create clone of template
   const fragment = template.content.cloneNode(true)
 
