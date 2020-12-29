@@ -8,13 +8,14 @@ import globalInfo from './globalInfo.js'
 // define a component using compName and a component function
 function defineComponent (compName, component) {
   // information about component which are same among all the instances of the components
-  // to improve performance these info will be calculated once and will be shared by all the instances
+  // to improve performance these info will be moved once and will be shared by all the instances
   const memo = { mode: component.mode || 'open', compName, template: undefined }
   class SuperSweet extends HTMLElement {
     constructor () {
       super()
       const comp = this
 
+      // @TODO - use the hash to persist state across page refreshes
       comp.hash = globalInfo.hash()
 
       comp.component = component
@@ -53,6 +54,7 @@ function defineComponent (compName, component) {
       // array of processing functions that should be run after all the nodes have been processed
       comp.deferred = []
 
+      // @TODO - remove this function out of class
       // once all the callbacks are called, clear the queue for the next interaction
       comp.clear_queue = () => {
         for (const key in comp.queue) {
@@ -61,18 +63,27 @@ function defineComponent (compName, component) {
       }
 
       createLifecycleHooks(comp)
-      preprocess(comp, component)
-      buildShadowDOM(comp, comp.memo.template)
     }
 
     // when component is added in dom
     connectedCallback () {
+      // console.log('should connect')
+      if (this.ignoreConnectionChange) return
+
+      // @TODO - do not call this functions once preprocess and building is done
+      if (!this.x) {
+        preprocess(this, component)
+        buildShadowDOM(this)
+        this.x = true
+      }
+
       connect(this.shadowRoot, true)
       this.mountCbs.forEach(cb => cb())
     }
 
     // when the component is removed from dom
     disconnectedCallback () {
+      if (this.ignoreConnectionChange) return
       disconnect(this.shadowRoot, true)
       this.destroyCbs.forEach(cb => cb())
     }
