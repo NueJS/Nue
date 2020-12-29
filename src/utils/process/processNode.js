@@ -23,7 +23,7 @@ function processNode (comp, node) {
     if (sweet.placeholder && node.nodeType === Node.TEXT_NODE) processTextNode(comp, node)
     else if (node.nodeName === 'IF') processIf(comp, node)
     else if (node.nodeName === 'FOR') processFor(comp, node)
-    else if (node.hasAttributes()) processAttributes(comp, node)
+    else if (node.hasAttribute) processAttributes(comp, node)
   }
 
   if (node.nodeName === 'FOR') return
