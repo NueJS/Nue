@@ -8,43 +8,47 @@ const insert = (arr, i, value) => {
   arr.splice(i, 0, value)
 }
 
-function reconcile (oldArr, newArr) {
+function reconcile (oldState, newState) {
+  // debugger
   const steps = []
-  const arr = [...oldArr]
 
   // order must be : 1. remove  2. add  3. swap
 
-  // remove, removed values in newArr from arr
-  for (let i = 0; i < arr.length; i++) {
-    const j = newArr.indexOf(arr[i])
+  // remove, removed values
+  for (let i = 0; i < oldState.hash.length; i++) {
+    const j = newState.hash.indexOf(oldState.hash[i])
     if (j === -1) {
       steps.push({ type: 'remove', index: i })
-      arr.splice(i, 1)
+      // arr.splice(i, 1)
+      oldState.hash.splice(i, 1)
+      oldState.value.splice(i, 1)
       i--
     }
   }
 
-  // insert, new values in newArr to arr at its position
-  for (let i = 0; i < newArr.length; i++) {
-    const value = newArr[i]
-    const j = arr.indexOf(value)
+  // insert, new values in newState.hash to arr at its position
+  for (let i = 0; i < newState.hash.length; i++) {
+    const hash = newState.hash[i]
+    const j = oldState.hash.indexOf(hash)
     if (j === -1) {
-      steps.push({ type: 'create', index: i, value })
-      insert(arr, i, value)
+      steps.push({ type: 'create', index: i, value: newState.value[i] })
+      insert(oldState.hash, i, hash)
+      insert(oldState.value, i, newState.value[i])
     }
   }
 
-  // swap, swapped values in newArr in arr
-  for (let i = 0; i < arr.length; i++) {
-    if (arr[i] !== newArr[i]) {
-      // find where its position in new array
-      const iShouldBe = newArr.indexOf(arr[i])
+  // swap, swapped values in newState.hash in arr
+  for (let i = 0; i < oldState.hash.length; i++) {
+    if (oldState.hash[i] !== newState.hash[i]) {
+      // find where its position in new oldState.hashay
+      const iShouldBe = newState.hash.indexOf(oldState.hash[i])
       steps.push({ type: 'swap', indexes: [i, iShouldBe] })
-      swap(arr, i, iShouldBe)
+      swap(oldState.hash, i, iShouldBe)
+      swap(oldState.value, i, iShouldBe)
     }
   }
 
-  return [steps, arr]
+  return steps
 }
 
 export default reconcile
