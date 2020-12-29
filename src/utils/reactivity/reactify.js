@@ -58,6 +58,7 @@ function reactify (comp, obj, path = []) {
     },
 
     get (target, prop) {
+      if (prop === '__target__') return target
       if (modes.detective) {
         if (path.length !== 0) accessed.paths[accessed.paths.length - 1] = [...path, prop]
         else accessed.paths.push([...path, prop])
