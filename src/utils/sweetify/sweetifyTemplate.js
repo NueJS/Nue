@@ -41,7 +41,7 @@ function sweetifyTemplate (comp) {
       }
     }
 
-    else if (node.hasAttributes()) {
+    else if (node.hasAttribute) {
       sweetifyAttributes(comp, node)
     }
 
