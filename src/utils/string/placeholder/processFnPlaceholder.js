@@ -15,12 +15,9 @@ const processFnPlaceholder = (comp, content, str) => {
     const deps = slices.map(a => a.split('.'))
 
     // memoize targets and props from deps
-    // @TODO - this won't work when there are multiple instances of comp
-    // use tpMemo
-
     const getValue = (comp) => {
-      if (!comp.tpMemo[content]) comp.tpMemo[content] = deps.map(path => targetProp(comp.$, path))
-      const values = comp.tpMemo[content].map(([t, p]) => t[p])
+      const tps = deps.map(path => targetProp(comp.$, path))
+      const values = tps.map(([t, p]) => t[p])
       return fn(...values)
     }
 

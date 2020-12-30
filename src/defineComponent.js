@@ -21,7 +21,6 @@ function defineComponent (compName, component) {
       comp.component = component
 
       // key is path joined by dot
-      comp.tpMemo = {}
       comp.refs = {}
 
       // functions added in component or given by parent component

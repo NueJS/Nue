@@ -8,10 +8,7 @@ const processReactivePlaceholder = (content, str, noBrackets = true) => {
   // memoize target and prop after getting it for the first time
   // let target, prop
   function getValue (comp) {
-    if (!comp.tpMemo[content]) {
-      comp.tpMemo[content] = targetProp(comp.$, path)
-    }
-    const [target, prop] = comp.tpMemo[content]
+    const [target, prop] = targetProp(comp.$, path)
     return target[prop]
   }
 
