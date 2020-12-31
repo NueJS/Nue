@@ -1,15 +1,6 @@
-const swap = (arr, i, j) => {
-  const temp = arr[i]
-  arr[i] = arr[j]
-  arr[j] = temp
-}
-
-const insert = (arr, i, value) => {
-  arr.splice(i, 0, value)
-}
+import { swap, insert } from './others.js'
 
 function reconcile (oldState, newState) {
-  // debugger
   const steps = []
 
   // order must be : 1. remove  2. add  3. swap
@@ -19,7 +10,6 @@ function reconcile (oldState, newState) {
     const j = newState.hash.indexOf(oldState.hash[i])
     if (j === -1) {
       steps.push({ type: 'remove', index: i })
-      // arr.splice(i, 1)
       oldState.hash.splice(i, 1)
       oldState.value.splice(i, 1)
       i--
@@ -39,12 +29,14 @@ function reconcile (oldState, newState) {
 
   // swap, swapped values in newState.hash in arr
   for (let i = 0; i < oldState.hash.length; i++) {
+    // console.log(JSON.stringify(oldState.value))
     if (oldState.hash[i] !== newState.hash[i]) {
-      // find where its position in new oldState.hashay
+      // find where its position in new oldState.hash
       const iShouldBe = newState.hash.indexOf(oldState.hash[i])
       steps.push({ type: 'swap', indexes: [i, iShouldBe] })
       swap(oldState.hash, i, iShouldBe)
       swap(oldState.value, i, iShouldBe)
+      i-- // keep checking the index i until we find the value which belongs to this index
     }
   }
 
