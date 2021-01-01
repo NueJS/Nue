@@ -1,11 +1,14 @@
 import settings from '../settings.js'
+import DEV from './dev/DEV.js'
 
 export function triggerMapCbs (map) {
   for (const [cb, args] of map) {
     if ((cb.node && cb.node.sweet.isConnected) || !cb.node) {
       cb(args)
-      if (settings.showUpdates && cb.node) {
-        settings.onNodeUpdate(cb.node)
+      if (DEV) {
+        if (settings.showUpdates && cb.node) {
+          settings.onNodeUpdate(cb.node)
+        }
       }
     }
   }

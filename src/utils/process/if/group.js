@@ -1,8 +1,8 @@
 import { reverseForEach } from '../../others.js'
 import { connect, disconnect } from '../../node/connections.js'
-// import traverse from '../../node/traverse.js'
 import processNode from '../processNode.js'
 import settings from '../../../settings.js'
+import DEV from '../../dev/DEV.js'
 
 const updateAnchor = (anchorNode, c) => {
   const len = anchorNode.textContent.length - c.length
@@ -13,17 +13,22 @@ export function addGroup (group) {
   const { anchorNode } = group
   reverseForEach(group.nodes, node => {
     anchorNode.after(node)
-    if (settings.showUpdates) {
-      settings.onNodeUpdate(node)
+
+    if (DEV) {
+      if (settings.showUpdates) {
+        settings.onNodeUpdate(node)
+      }
     }
+
     if (group.animate) node.setAttribute('enter', '')
     connect(node)
   })
 
   group.isRendered = true
 
-  // update anchor node
-  process.env.NODE_ENV !== 'production' && updateAnchor(anchorNode, ' ✅ ')
+  if (DEV) {
+    updateAnchor(anchorNode, ' ✅ ')
+  }
 }
 
 export function removeGroup (group) {
@@ -36,7 +41,9 @@ export function removeGroup (group) {
   })
 
   group.isRendered = false
-  process.env.NODE_ENV !== 'production' && updateAnchor(anchorNode, ' ❌ ')
+  if (DEV) {
+    updateAnchor(anchorNode, ' ❌ ')
+  }
 }
 
 export function processGroup (comp, group) {

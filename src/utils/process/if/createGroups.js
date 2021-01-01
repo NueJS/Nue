@@ -1,5 +1,7 @@
 import err from '../../dev/error.js'
+import errors from '../../dev/errors.js'
 import { disconnect } from '../../node/connections.js'
+import { isConditionNode } from '../../node/dom.js'
 import { removeGroup } from './group.js'
 
 const DEV = process.env.NODE_ENV !== 'production'
@@ -21,19 +23,21 @@ function createGroups (comp, ifNode, conditionNode = ifNode, groupDeps = [], gro
   }
 
   groups.push(group)
-  let commentText = ''
+  group.anchorNode = document.createComment('')
 
   if (sweet.type !== 'ELSE') {
     const { getValue, deps, text } = sweet.condition
     deps.forEach(d => groupDeps.push(d))
-    if (DEV) commentText = ` ${type} := ${text} ❌ `
-    group.anchorNode = document.createComment(commentText)
+    if (DEV) {
+      group.anchorNode.textContent = ` ${type} := ${text} ❌ `
+    }
     group.isSatisfied = () => getValue(comp)
   }
 
   else {
-    if (DEV) commentText = ` ${type} ❌ `
-    group.anchorNode = document.createComment(commentText)
+    if (DEV) {
+      group.anchorNode.textContent = ` ${type} ❌ `
+    }
     group.isSatisfied = () => true
   }
 
@@ -58,18 +62,14 @@ function createGroups (comp, ifNode, conditionNode = ifNode, groupDeps = [], gro
   })
 
   for (const node of conditionNode.childNodes) {
-    // if comp node is text node
-    if (DEV && node.nodeType === Node.TEXT_NODE) {
-      err({
-        comp: comp,
-        code: -1,
-        link: '',
-        message: 'text node is not direct child of <if> when animate attribute is added. wrap the textNode in span'
-      })
+    if (DEV) {
+      if (node.nodeType === Node.TEXT_NODE) {
+        errors.TEXTNODE_DIRECT_CHILD_OF_IF(comp)
+      }
     }
 
     // if is is condition node
-    else if (node.nodeName === 'ELSIF' || node.nodeName === 'ELSE' || node.nodeName === 'IF') {
+    if (isConditionNode(node)) {
       createGroups(comp, ifNode, node, groupDeps, groups)
     }
 
