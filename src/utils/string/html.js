@@ -6,14 +6,13 @@ function html (strings, ...exprs) {
   let str = ''
   for (let i = 0; i < strings.length; i++) {
     const value = exprs[i]
+    str += strings[i]
     if (value) {
-      if (typeof value === 'function') {
-        const name = 'sweet' + i
-        this.$[name] = value
-        str += strings[i] + bracketify(name)
-      } else str += strings[i] + value
+      if (typeof value === 'object') {
+        for (const k in value) str += `${k}='${value[k]}' `
+      } else str += value
     }
-    else str += strings[i]
+    // else str += strings[i]
   }
 
   this.memo.template.innerHTML += str
