@@ -1,9 +1,7 @@
-import { swap, insert } from './others.js'
+import { insert, swap } from '../../../others'
 
 function reconcile (oldState, newState) {
   const steps = []
-
-  // order must be : 1. remove  2. add  3. swap
 
   // remove, removed values
   for (let i = 0; i < oldState.hash.length; i++) {
