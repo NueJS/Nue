@@ -1,9 +1,9 @@
-// import { supersweet } from './index.js'
+import { connect, disconnect } from './utils/connection/recursive.js'
+
 import buildShadowDOM from './utils/buildShadowDOM.js'
 import createLifecycleHooks from './utils/createLifecycleHooks.js'
-import preprocess from './utils/sweetify/preprocess.js'
-import { connect, disconnect } from './utils/node/connections.js'
 import globalInfo from './globalInfo.js'
+import preprocess from './utils/sweetify/preprocess.js'
 
 // define a component using compName and a component function
 function defineComponent (compName, component) {
