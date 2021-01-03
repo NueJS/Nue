@@ -1,16 +1,13 @@
-import err from '../../dev/error.js'
+import { disconnect } from '../../connection/recursive.js'
+import DEV from '../../dev/DEV.js'
 import errors from '../../dev/errors.js'
-import { disconnect } from '../../node/connections.js'
 import { isConditionNode } from '../../node/dom.js'
 import { removeGroup } from './group.js'
-
-const DEV = process.env.NODE_ENV !== 'production'
 
 function createGroups (comp, ifNode, conditionNode = ifNode, groupDeps = [], groups = []) {
   const { sweet } = conditionNode
   const { type } = sweet
 
-  // group creation ---------------------------
   const group = {
     conditionNode,
     nodes: [],
