@@ -1,8 +1,8 @@
-import { reverseForEach } from '../../others.js'
-import { connect, disconnect } from '../../node/connections.js'
-import processNode from '../processNode.js'
 import settings from '../../../settings.js'
+import { connect, disconnect } from '../../connection/recursive.js'
 import DEV from '../../dev/DEV.js'
+import { reverseForEach } from '../../others.js'
+import processNode from '../processNode.js'
 
 const updateAnchor = (anchorNode, c) => {
   const len = anchorNode.textContent.length - c.length
