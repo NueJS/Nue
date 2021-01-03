@@ -1,5 +1,5 @@
 import { mutate } from '../../reactivity/mutate.js'
-import { wire } from '../../node/connections.js'
+import wire from '../../connection/wire.js'
 
 // ex: :value=[count]
 function bindInput (comp, node, attribute) {

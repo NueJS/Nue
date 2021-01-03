@@ -1,4 +1,4 @@
-import { wire } from '../node/connections.js'
+import wire from '../connection/wire.js'
 import isInvalidPlaceholder from '../string/placeholder/isInvalidPlaceholder.js'
 
 function processTextNode (comp, node) {

@@ -1,5 +1,5 @@
 import { CONDITIONAL } from '../../constants.js'
-import { wire } from '../../node/connections.js'
+import wire from '../../connection/wire'
 
 // example: data-count=[XXX]
 function addAttribute (comp, node, attribute) {
