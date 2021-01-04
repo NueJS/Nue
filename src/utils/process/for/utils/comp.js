@@ -4,7 +4,8 @@ import { getStateProps } from './get'
 
 const createComp = (compName, forInfo, value, i) => {
   const newComp = document.createElement(compName)
-  if (forInfo.class) newComp.className = forInfo.class
+  // // apply class
+  // if (forInfo.class) newComp.className = forInfo.class
   newComp.stateProps = getStateProps(forInfo, value, i)
   // record the initial offset
   if (forInfo.reorder) {
