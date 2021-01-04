@@ -23,7 +23,7 @@ export const getHash = (forInfo, stateProps) => {
 
 export const getForInfo = (forNode) => {
   const forInfo = {}
-  for (const at of ['reorder', 'enter', 'exit', 'class', 'key']) {
+  for (const at of ['reorder', 'enter', 'exit', 'key']) {
     forInfo[at] = attr(forNode, at)
   }
 
