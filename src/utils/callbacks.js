@@ -1,4 +1,4 @@
-import settings from '../settings.js'
+import devtools from '../devtools.js'
 import DEV from './dev/DEV.js'
 
 export function triggerMapCbs (map) {
@@ -6,8 +6,8 @@ export function triggerMapCbs (map) {
     if ((cb.node && cb.node.sweet.isConnected) || !cb.node) {
       cb(args)
       if (DEV) {
-        if (settings.showUpdates && cb.node) {
-          settings.onNodeUpdate(cb.node)
+        if (devtools.showUpdates && cb.node) {
+          devtools.onNodeUpdate(cb.node)
         }
       }
     }
