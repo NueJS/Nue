@@ -9,14 +9,14 @@ export const getNewState = (forInfo, comp) => {
   }
 }
 
-export const updateCompState = (newState, { comps, forInfo, oldState, $index }) => {
+export const updateCompState = (newState, { comps, forInfo, oldState, $index, $each }) => {
   if (forInfo.at) {
     // const movedComps = comps.map(c => c.isMoved)
     for (let i = 0; i < comps.length; i++) {
       const target = comps[i]
       // update index
-      if (target.$[$index] !== i) {
-        console.log('update index state', i)
+      if (target.$.__target__[$index] !== i) {
+        // console.log('update index state', i)
         target.$[$index] = i
       }
     }
@@ -26,6 +26,6 @@ export const updateCompState = (newState, { comps, forInfo, oldState, $index }) 
   console.log('find diff indexes', diffIndexes)
 
   diffIndexes.forEach(i => {
-    comps[i].$[forInfo.each.content] = newState.value[i]
+    comps[i].$[$each] = newState.value[i]
   })
 }
