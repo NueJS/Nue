@@ -1,67 +1,70 @@
 import { connect, disconnect } from './utils/connection/recursive.js'
-
-import buildShadowDOM from './utils/buildShadowDOM.js'
-import createLifecycleHooks from './utils/createLifecycleHooks.js'
-import globalInfo from './globalInfo.js'
 import preprocess from './utils/sweetify/preprocess.js'
+import createLifecycleHooks from './utils/createLifecycleHooks.js'
+import buildShadowDOM from './utils/buildShadowDOM.js'
+import globalInfo from './globalInfo.js'
 
 // define a component using compName and a component function
 function defineComponent (compName, component) {
-  // information about component which are same among all the instances of the components
-  // to improve performance these info will be moved once and will be shared by all the instances
-  const memo = { mode: component.mode || 'open', compName, template: undefined }
+  // memo is object containing information that will be same for all the instance of component
+  // it is basically a class static property
+  const memo = { mode: 'open', compName, template: null }
+
   class SuperSweet extends HTMLElement {
     constructor () {
       super()
-      const comp = this
+
+      // for better minification, refer to this using other variable name
+      const self = this
 
       // @TODO - use the hash to persist state across page refreshes
-      comp.hash = globalInfo.hash()
+      // self.hash = globalInfo.hash()
 
-      comp.component = component
+      // component is the component definition
+      self.component = component
 
       // key is path joined by dot
-      comp.refs = {}
+      self.refs = {}
 
       // functions added in component or given by parent component
-      comp.fn = comp.fnProps || {}
+      self.fn = self.fnProps || {}
 
       // function that call the cb when a certain action is performed in application
       // similar to svelte actions API
-      comp.actions = {}
+      self.actions = {}
 
       // callbacks which are to be called when state changes
-      comp.deps = { $: new Map() }
+      self.deps = { $: new Map() }
 
       // queue holds all the callbacks that should be called
       // queue is useful to avoid calling the callback more than once and in correct order
-      comp.queue = {
+      self.queue = {
         stateReady: new Map(),
         computed: new Map(),
         dom: new Map()
       }
 
       // callbacks that are to be called when the components is connected / disconnected to DOM
-      comp.mountCbs = []
-      comp.destroyCbs = []
-      comp.beforeUpdateCbs = []
-      comp.afterUpdateCbs = []
+      self.mountCbs = []
+      self.destroyCbs = []
+      self.beforeUpdateCbs = []
+      self.afterUpdateCbs = []
 
       // memo of the component which are same for all instances
-      comp.memo = memo
+      self.memo = memo
 
       // array of processing functions that should be run after all the nodes have been processed
-      comp.deferred = []
+      self.deferred = []
 
       // @TODO - remove this function out of class
       // once all the callbacks are called, clear the queue for the next interaction
-      comp.clear_queue = () => {
-        for (const key in comp.queue) {
-          comp.queue[key].clear()
+      self.clear_queue = () => {
+        for (const key in self.queue) {
+          self.queue[key].clear()
         }
       }
 
-      createLifecycleHooks(comp)
+      createLifecycleHooks(self)
     }
 
     // when component is added in dom
