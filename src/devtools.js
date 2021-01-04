@@ -1,6 +1,6 @@
-const settings = {
+const devtools = {
   showUpdates: false,
   onNodeUpdate: null
 }
 
-export default settings
+export default devtools

@@ -1,4 +1,4 @@
-import settings from '../../settings'
+import devtools from '../../devtools'
 import DEV from '../dev/DEV.js'
 import addDep from '../state/addDep'
 import { addConnects } from './addConnects'
@@ -8,8 +8,8 @@ function wire (comp, node, deps, update) {
   update.node = node
   const connectNode = () => {
     if (DEV) {
-      if (settings.showUpdates) {
-        settings.onNodeUpdate(node)
+      if (devtools.showUpdates) {
+        devtools.onNodeUpdate(node)
       }
     }
 
