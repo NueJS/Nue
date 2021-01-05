@@ -1,4 +1,4 @@
-import globalInfo from '../../../../globalInfo'
+import globalInfo from '../../../globalInfo'
 import { getOffset } from '../../../node/dom'
 import { getStateProps } from './get'
 

@@ -1,5 +1,5 @@
 import { addDeps } from './state/addDep.js'
-import err from './dev/error.js'
+import errors from './dev/errors.js'
 import DEV from './dev/DEV.js'
 
 function createLifecycleHooks (comp) {
@@ -11,12 +11,7 @@ function createLifecycleHooks (comp) {
     mutate: (cb, ...slices) => {
       if (DEV) {
         if (!slices.length) {
-          err({
-            message: 'on.mutate expects one or more dependencies',
-            link: '',
-            code: 2,
-            comp
-          })
+          errors.MISSING_DEPENDENCIES_IN_ON_MUTATE(comp)
         }
       }
 

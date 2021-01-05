@@ -1,8 +1,8 @@
-import { connect, disconnect } from './utils/connection/recursive.js'
-import preprocess from './utils/sweetify/preprocess.js'
-import createLifecycleHooks from './utils/createLifecycleHooks.js'
-import buildShadowDOM from './utils/buildShadowDOM.js'
-import globalInfo from './globalInfo.js'
+import { connect, disconnect } from './connection/recursive.js'
+import preprocess from './sweetify/preprocess.js'
+import createLifecycleHooks from './createLifecycleHooks.js'
+import buildShadowDOM from './buildShadowDOM.js'
+// import globalInfo from './globalInfo.js'
 
 // define a component using compName and a component function
 function defineComponent (compName, component) {

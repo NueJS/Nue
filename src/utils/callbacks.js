@@ -1,4 +1,4 @@
-import devtools from '../devtools.js'
+import devtools from '../apis/devtools.js'
 import DEV from './dev/DEV.js'
 
 export function triggerMapCbs (map) {

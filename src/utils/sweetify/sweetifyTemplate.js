@@ -1,7 +1,7 @@
 import sweetifyAttributes from './sweetifyAttributes.js'
 import sweetifyTextNode from './sweetifyTextNode.js'
 // import traverse from '../node/traverse.js'
-import globalInfo from '../../globalInfo.js'
+import globalInfo from '../globalInfo.js'
 import processPlaceholder from '../string/placeholder/processPlaceholder.js'
 import { isConditionNode } from '../node/dom.js'
 

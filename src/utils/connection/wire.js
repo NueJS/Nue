@@ -1,4 +1,4 @@
-import devtools from '../../devtools'
+import devtools from '../../apis/devtools'
 import DEV from '../dev/DEV.js'
 import addDep from '../state/addDep'
 import { addConnects } from './addConnects'

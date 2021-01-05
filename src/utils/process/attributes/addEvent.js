@@ -1,4 +1,4 @@
-import globalInfo from '../../../globalInfo.js'
+import globalInfo from '../../globalInfo.js'
 import getFn from '../../closure.js'
 import { addConnects } from '../../connection/addConnects.js'
 import DEV from '../../dev/DEV.js'

@@ -1,4 +1,4 @@
-import devtools from '../../../devtools.js'
+import devtools from '../../../apis/devtools.js'
 import { connect, disconnect } from '../../connection/recursive.js'
 import DEV from '../../dev/DEV.js'
 import { reverseForEach } from '../../others.js'

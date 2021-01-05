@@ -2,7 +2,7 @@ import processTextNode from './processTextNode.js'
 import processAttributes from './attributes/processAttributes.js'
 import processIf from './if/if.js'
 import { render } from '../../index.js'
-import globalInfo from '../../globalInfo.js'
+import globalInfo from '../globalInfo.js'
 import processFor from './for/processFor.js'
 
 function processNode (comp, node) {
