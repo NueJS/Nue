@@ -1,9 +1,7 @@
-// import DEV from './DEV.js'
-import handleErrors from './handleErrors.js'
+import showError from './error-overlay/showError.js'
 
 function err (obj) {
-  handleErrors(obj)
-  throw new Error(obj.message)
+  showError(obj)
 }
 
 export default err
