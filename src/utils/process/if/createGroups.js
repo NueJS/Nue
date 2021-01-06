@@ -1,12 +1,14 @@
 import { disconnect } from '../../connection/recursive.js'
 import DEV from '../../dev/DEV.js'
 import errors from '../../dev/errors.js'
-import { isConditionNode } from '../../node/dom.js'
+import { animate, isConditionNode, onAnimationEnd } from '../../node/dom.js'
 import { removeGroup } from './group.js'
 
 function createGroups (comp, ifNode, conditionNode = ifNode, groupDeps = [], groups = []) {
   const { sweet } = conditionNode
   const { type } = sweet
+
+  // console.log('group)
 
   const group = {
     conditionNode,
@@ -14,9 +16,11 @@ function createGroups (comp, ifNode, conditionNode = ifNode, groupDeps = [], gro
     isRendered: false,
     isProcessed: false,
     disconnect: () => group.nodes.forEach(disconnect),
-    onRemove: (cb) => {
-      lastNode.addEventListener('animationend', cb, { once: true })
-    }
+    enter: sweet.enter,
+    exit: sweet.exit,
+
+    // run callback after the group is removed from DOM
+    onRemove: (cb) => onAnimationEnd(lastNode, cb)
   }
 
   groups.push(group)
@@ -38,16 +42,22 @@ function createGroups (comp, ifNode, conditionNode = ifNode, groupDeps = [], gro
     group.isSatisfied = () => true
   }
 
+  const removeSelf = () => removeGroup(group)
+  // define group.remove
   // if group has animate, add animate attribute on all the nodes in the group
-  if (sweet.animate) {
+  if (sweet.exit) {
     group.remove = () => {
-      group.nodes.forEach(node => node.setAttribute('exit', ''))
-      lastNode.addEventListener('animationend', () => removeGroup(group), { once: true })
+      group.nodes.forEach(node => {
+        animate(node, sweet.exit)
+        onAnimationEnd(node, () => animate(node, null))
+      })
+
+      onAnimationEnd(lastNode, removeSelf)
     }
   }
 
   else {
-    group.remove = () => removeGroup(group)
+    group.remove = removeSelf
   }
 
   // after processed
@@ -61,7 +71,7 @@ function createGroups (comp, ifNode, conditionNode = ifNode, groupDeps = [], gro
   for (const node of conditionNode.childNodes) {
     if (DEV) {
       if (node.nodeType === Node.TEXT_NODE) {
-        errors.TEXTNODE_DIRECT_CHILD_OF_IF(comp)
+        errors.TEXTNODE_DIRECT_CHILD_OF_IF(comp, node)
       }
     }
 

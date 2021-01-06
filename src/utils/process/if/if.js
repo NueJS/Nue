@@ -23,9 +23,13 @@ function processIf (comp, ifNode) {
         // if this group is not already rendered
         if (!group.isRendered) {
           // if group should wait for other group's animation end
-          if (prevRenderedGroup && prevRenderedGroup.animate && group !== prevRenderedGroup) {
+          if (
+            prevRenderedGroup &&
+            prevRenderedGroup.exit &&
+            group !== prevRenderedGroup) {
             prevRenderedGroup.onRemove(() => addGroup(group))
           } else {
+            // console.log('add group: ')
             addGroup(group, groups.anchorNode)
           }
 

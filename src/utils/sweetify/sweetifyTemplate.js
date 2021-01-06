@@ -33,11 +33,15 @@ function sweetifyTemplate (comp) {
 
     // if condition node
     else if (isConditionNode(node)) {
-      const condition = node.getAttribute(':')
       node.sweet = {
         type: node.nodeName,
-        condition: processPlaceholder(comp, condition),
-        animate: node.getAttribute('animate')
+        enter: node.getAttribute('enter'),
+        exit: node.getAttribute('exit')
+      }
+
+      if (node.nodeName !== 'ELSE') {
+        const condition = node.getAttribute('?')
+        node.sweet.condition = processPlaceholder(comp, condition)
       }
     }
 
