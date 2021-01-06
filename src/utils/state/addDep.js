@@ -39,11 +39,15 @@ function addDep (baseComp, path, cb, type) {
   })
 
   // return cleanup to stop DOM updates when node is removed
-  if (type === 'dom') return () => target.$.delete(qcb)
+  if (type === 'dom') {
+    const removeDep = () => target.$.delete(qcb)
+    return removeDep
+  }
 }
 
 export function addDeps (comp, deps, cb, type) {
-  deps.forEach(dep => addDep(comp, dep, cb, type))
+  const removeDeps = deps.map(dep => addDep(comp, dep, cb, type))
+  return removeDeps
 }
 
 export default addDep
