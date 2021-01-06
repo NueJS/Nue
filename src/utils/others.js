@@ -16,10 +16,3 @@ export const uid = () => '' + i++
 export const insert = (arr, i, value) => {
   arr.splice(i, 0, value)
 }
-
-// export const promisifyWorker = worker => (...args) => new Promise(resolve => {
-//   worker.postMessage(args)
-//   worker.onmessage = (e) => {
-//     resolve(e.data)
-//   }
-// })
