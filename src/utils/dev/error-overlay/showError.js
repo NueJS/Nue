@@ -34,8 +34,9 @@ function handleErrors (error) {
   const $message = $sweetErrorOverlay.shadowRoot.querySelector('.message')
   $message.textContent = `❌ ${error.message}\n✨ ${error.fix}`
   // error in console
-  if (error.node) console.log('node:', error.node)
-  if (error.component) console.log(error.component)
+  console.log('Origin of Error: ')
+  if (error.node) console.log('Node:', error.node)
+  if (error.comp) console.log('Component: ', error.comp)
   throw new Error(errorMessage)
 }
 
