@@ -1,5 +1,5 @@
 import { mutate } from '../reactivity/mutate.js'
-import addDep from './addDep.js'
+import addDep, { addDeps } from './addDep.js'
 import detectStateUsage from './detectStateUsage.js'
 
 // when initializing the state, if a function is given
@@ -9,10 +9,15 @@ import detectStateUsage from './detectStateUsage.js'
 function computedState (comp, fn, k) {
   const [initValue, paths] = detectStateUsage(fn)
 
-  const compute = () => mutate(comp.$, [k], fn(), 'set')
+  const compute = () => {
+    const value = fn()
+    mutate(comp.$, [k], value)
+  }
 
   // when root of path changes value, recompute
-  paths.forEach(path => addDep(comp, [path[0]], compute, 'computed'))
+  const deps = paths.map(path => [path[0]])
+  addDeps(comp, deps, compute, 'computed')
+  // paths.forEach(path => addDep(comp, [path[0]], compute, 'computed'))
 
   return initValue
 }
