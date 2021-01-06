@@ -24,3 +24,7 @@ export const saveOffsets = (comps) => {
     c.prev = getOffset(c)
   }
 }
+
+export const onAnimationEnd = (node, cb) => {
+  node.addEventListener('animationend', cb, { once: true })
+}
