@@ -1,26 +1,29 @@
 import devtools from '../../../apis/devtools.js'
 import { connect, disconnect } from '../../connection/recursive.js'
 import DEV from '../../dev/DEV.js'
+import { animate } from '../../node/dom.js'
 import { reverseForEach } from '../../others.js'
 import processNode from '../processNode.js'
 
+// DEV Only
 const updateAnchor = (anchorNode, c) => {
   const len = anchorNode.textContent.length - c.length
   anchorNode.textContent = anchorNode.textContent.substr(0, len) + c
 }
 
+// add the group nodes to DOM
 export function addGroup (group) {
   const { anchorNode } = group
   reverseForEach(group.nodes, node => {
     anchorNode.after(node)
 
-    if (DEV) {
-      if (devtools.showUpdates) {
-        devtools.onNodeUpdate(node)
-      }
+    if (DEV && devtools.showUpdates) {
+      devtools.onNodeUpdate(node)
     }
 
-    if (group.animate) node.setAttribute('enter', '')
+    if (group.enter) {
+      animate(node, group.enter)
+    }
     connect(node)
   })
 
