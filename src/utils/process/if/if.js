@@ -1,9 +1,17 @@
-import { addGroup, processGroup } from './group.js'
-import createGroups from './createGroups.js'
+import createGroups from './group/createGroups.js'
 import { addDeps } from '../../state/addDep.js'
+import processGroup from './group/processGroup.js'
+import addGroup from './group/addGroup.js'
+import removeGroup from './group/removeGroup.js'
 
 function processIf (comp, ifNode) {
-  const { groups, groupDeps } = createGroups(comp, ifNode)
+  const groups = createGroups(comp, ifNode)
+
+  // get deps from groups
+  const groupDeps = []
+  groups.forEach(group => {
+    if (group.deps) groupDeps.push(group.deps)
+  })
 
   // group that is currently rendered
   let prevRenderedGroup
@@ -13,23 +21,23 @@ function processIf (comp, ifNode) {
     let foundSatisfied = false
 
     groups.forEach((group) => {
+      const { isSatisfied, isProcessed, isRendered } = group
       // if this group should be rendered
-      if (!foundSatisfied && group.isSatisfied()) {
+      if (!foundSatisfied && isSatisfied()) {
         foundSatisfied = true
 
-        // if this group is never processed before, process it first
-        if (!group.isProcessed) processGroup(comp, group)
+        // if this group is not currently rendered on DOM
+        if (!isRendered) {
+          // if this group is never processed before
+          if (!isProcessed) processGroup(comp, group)
 
-        // if this group is not already rendered
-        if (!group.isRendered) {
-          // if group should wait for other group's animation end
+          // if this group should wait for other group's animation to end
           if (
             prevRenderedGroup &&
             prevRenderedGroup.exit &&
             group !== prevRenderedGroup) {
             prevRenderedGroup.onRemove(() => addGroup(group))
           } else {
-            // console.log('add group: ')
             addGroup(group, groups.anchorNode)
           }
 
@@ -39,8 +47,7 @@ function processIf (comp, ifNode) {
 
       // if the group should be removed
       else if (group.isRendered) {
-        group.disconnect()
-        group.remove()
+        removeGroup(group)
       }
     })
   }

@@ -83,6 +83,7 @@ function processFor (comp, forNode) {
     oldState.hash = newState.hash
   }
 
+  // @TODO use addDeps here instead ?
   addDep(comp, forInfo.of.deps[0], handleArrayChange, 'dom')
 }
 
