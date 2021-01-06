@@ -10,7 +10,7 @@ function bindInput (comp, node, attribute) {
   const handler = () => {
     let value = node[name]
     value = isNumber ? Number(value) : value
-    mutate(comp.$, deps[0], value, 'set')
+    mutate(comp.$, deps[0], value)
   }
 
   node.addEventListener('input', handler)
