@@ -3,7 +3,7 @@ import err from './error'
 export default {
   TEXTNODE_DIRECT_CHILD_OF_IF (comp, node) {
     err({
-      message: "TEXT_NODE can't be direct child of <if>",
+      message: "TEXT_NODE can't be direct child in <if>",
       fix: 'Wrap the TEXT_NODE inside <span>',
       comp,
       node
