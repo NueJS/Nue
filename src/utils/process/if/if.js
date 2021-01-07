@@ -9,8 +9,16 @@ function processIf (comp, ifNode) {
 
   // get deps from groups
   const groupDeps = []
+
   groups.forEach(group => {
     if (group.deps) groupDeps.push(group.deps)
+
+    comp.deferred.push(() => {
+      // add comment anchorNode
+      ifNode.before(group.anchorNode)
+      // remove all the nodes of group
+      group.nodes.forEach(n => n.remove())
+    })
   })
 
   // group that is currently rendered
@@ -38,7 +46,7 @@ function processIf (comp, ifNode) {
             group !== prevRenderedGroup) {
             prevRenderedGroup.onRemove(() => addGroup(group))
           } else {
-            addGroup(group, groups.anchorNode)
+            addGroup(group)
           }
 
           prevRenderedGroup = group

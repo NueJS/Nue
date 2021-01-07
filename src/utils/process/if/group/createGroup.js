@@ -1,13 +1,11 @@
-import { disconnect } from '../../../connection/recursive'
 import DEV from '../../../dev/DEV'
 import errors from '../../../dev/errors'
 import { isConditionNode, onAnimationEnd } from '../../../node/dom'
-// import removeGroup from './removeGroup'
 
 const createGroup = (comp, conditionNode) => {
   const { type, enter, exit, condition } = conditionNode.sweet
 
-  const anchorNode = document.createComment('')
+  const anchorNode = document.createComment(type)
   const onRemove = (cb) => onAnimationEnd(lastNode, cb)
   const nodes = []
   let isSatisfied
@@ -51,18 +49,18 @@ const createGroup = (comp, conditionNode) => {
   const lastNode = nodes[nodes.length - 1]
 
   const group = {
-    conditionNode,
+    // conditionNode,
     nodes,
     isRendered: false,
     isProcessed: false,
-    disconnect: () => nodes.forEach(disconnect),
     enter,
     exit,
     anchorNode,
     onRemove,
     deps: condition && condition.deps,
     isSatisfied,
-    lastNode: nodes[nodes.length - 1]
+    lastNode: nodes[nodes.length - 1],
+    comp
   }
 
   return group

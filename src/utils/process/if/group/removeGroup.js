@@ -1,18 +1,15 @@
+import { disconnect } from '../../../connection/recursive'
 import DEV from '../../../dev/DEV'
 import { animate, onAnimationEnd } from '../../../node/dom'
 import updateAnchor from './updateAnchor'
 
 export function removeGroup (group) {
-  const { anchorNode, exit, lastNode, nodes, disconnect } = group
+  const { anchorNode, exit, lastNode, nodes } = group
 
-  disconnect()
+  nodes.forEach(disconnect)
 
   const remove = () => {
-    group.nodes.forEach(node => {
-      disconnect(node)
-      node.remove()
-    })
-
+    group.nodes.forEach(node => node.remove())
     group.isRendered = false
 
     if (DEV) {
@@ -21,15 +18,11 @@ export function removeGroup (group) {
   }
 
   if (exit) {
-    nodes.forEach(node => {
-      animate(node, exit)
-      onAnimationEnd(node, () => animate(node, null))
-    })
-
+    nodes.forEach(node => animate(node, exit))
     onAnimationEnd(lastNode, remove)
+  } else {
+    remove()
   }
-
-  else remove()
 }
 
 export default removeGroup

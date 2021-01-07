@@ -12,8 +12,8 @@ const addGroup = (group) => {
   // add nodes of group in DOM
   reverseForEach(nodes, node => {
     anchorNode.after(node)
-    if (enter) animate(node, enter)
     connect(node)
+    if (enter) animate(node, enter)
 
     // show updates
     if (DEV && devtools.showUpdates) devtools.onNodeUpdate(node)
