@@ -3,7 +3,8 @@ const globalInfo = {
   hash: () => globalInfo._hash++,
   components: {},
   actions: {},
-  renderedComps: {}
+  renderedComps: {},
+  defaultStyle: ':host{display: block;}'
 }
 
 export default globalInfo
