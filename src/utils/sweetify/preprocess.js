@@ -1,3 +1,4 @@
+import globalInfo from '../globalInfo.js'
 import modes from '../reactivity/modes.js'
 import reactify from '../reactivity/reactify.js'
 import html from '../string/html.js'
@@ -33,7 +34,17 @@ function preprocess (comp, component) {
 
   else {
     comp.memo.template = document.createElement('template')
+
     invokeComp(false)
+    const style = comp.memo.template.content.querySelector('style')
+    const defaultStyle = document.createElement('style')
+    defaultStyle.setAttribute('sweet-default', '')
+    defaultStyle.textContent = globalInfo.defaultStyle
+    if (style) {
+      style.before(defaultStyle)
+    } else {
+      comp.memo.template.content.lastChild.after(defaultStyle)
+    }
     populateSlots(comp)
     sweetifyTemplate(comp)
   }
