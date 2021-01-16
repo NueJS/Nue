@@ -3,7 +3,7 @@ import DEV from '../../../dev/DEV'
 import { animate, onAnimationEnd } from '../../../node/dom'
 import updateAnchor from './updateAnchor'
 
-export function removeGroup (group) {
+export function unmountGroup (group) {
   const { anchorNode, exit, lastNode, nodes } = group
 
   nodes.forEach(disconnect)
@@ -25,4 +25,4 @@ export function removeGroup (group) {
   }
 }
 
-export default removeGroup
+export default unmountGroup

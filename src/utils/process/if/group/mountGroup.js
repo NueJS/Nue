@@ -6,7 +6,7 @@ import { animate } from '../../../node/dom'
 import { connect } from '../../../connection/recursive'
 
 // add the group nodes to DOM
-const addGroup = (group) => {
+const mountGroup = (group) => {
   const { anchorNode, enter, nodes } = group
 
   // add nodes of group in DOM
@@ -23,4 +23,4 @@ const addGroup = (group) => {
   if (DEV) updateAnchor(anchorNode, ' ✅ ')
 }
 
-export default addGroup
+export default mountGroup

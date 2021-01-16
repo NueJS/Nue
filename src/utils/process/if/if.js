@@ -1,8 +1,8 @@
 import createGroups from './group/createGroups.js'
 import { addDeps } from '../../state/addDep.js'
 import processGroup from './group/processGroup.js'
-import addGroup from './group/addGroup.js'
-import removeGroup from './group/removeGroup.js'
+import mountGroup from './group/mountGroup.js'
+import unmountGroup from './group/unmountGroup.js'
 
 function processIf (comp, ifNode) {
   const groups = createGroups(comp, ifNode)
@@ -44,9 +44,9 @@ function processIf (comp, ifNode) {
             prevRenderedGroup &&
             prevRenderedGroup.exit &&
             group !== prevRenderedGroup) {
-            prevRenderedGroup.onRemove(() => addGroup(group))
+            prevRenderedGroup.onRemove(() => mountGroup(group))
           } else {
-            addGroup(group)
+            mountGroup(group)
           }
 
           prevRenderedGroup = group
@@ -55,7 +55,7 @@ function processIf (comp, ifNode) {
 
       // if the group should be removed
       else if (group.isRendered) {
-        removeGroup(group)
+        unmountGroup(group)
       }
     })
   }
