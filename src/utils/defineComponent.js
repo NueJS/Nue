@@ -8,63 +8,64 @@ import buildShadowDOM from './buildShadowDOM.js'
 function defineComponent (compName, component) {
   // memo is object containing information that will be same for all the instance of component
   // it is basically a class static property
-  const memo = { mode: 'open', compName, template: null }
+  // @TODO move it to globalInfo
+  const memo = { compName, template: null }
 
   class SuperSweet extends HTMLElement {
     constructor () {
       super()
 
       // for better minification, refer to this using other variable name
-      const self = this
+      const comp = this
 
       // @TODO - use the hash to persist state across page refreshes
-      // self.hash = globalInfo.hash()
+      // comp.hash = globalInfo.hash()
 
       // component is the component definition
-      self.component = component
+      comp.component = component
 
       // key is path joined by dot
-      self.refs = {}
+      comp.refs = {}
 
       // functions added in component or given by parent component
-      self.fn = self.fnProps || {}
+      comp.fn = comp.fnProps || {}
 
       // function that call the cb when a certain action is performed in application
       // similar to svelte actions API
-      self.actions = {}
+      comp.actions = {}
 
       // callbacks which are to be called when state changes
-      self.deps = { $: new Map() }
+      comp.deps = { $: new Map() }
 
       // queue holds all the callbacks that should be called
       // queue is useful to avoid calling the callback more than once and in correct order
-      self.queue = {
+      comp.queue = {
         stateReady: new Map(),
         computed: new Map(),
         dom: new Map()
       }
 
       // callbacks that are to be called when the components is connected / disconnected to DOM
-      self.mountCbs = []
-      self.destroyCbs = []
-      self.beforeUpdateCbs = []
-      self.afterUpdateCbs = []
+      comp.mountCbs = []
+      comp.destroyCbs = []
+      comp.beforeUpdateCbs = []
+      comp.afterUpdateCbs = []
 
       // memo of the component which are same for all instances
-      self.memo = memo
+      comp.memo = memo
 
       // array of processing functions that should be run after all the nodes have been processed
-      self.deferred = []
+      comp.deferred = []
 
       // @TODO - remove this function out of class
       // once all the callbacks are called, clear the queue for the next interaction
-      self.clear_queue = () => {
-        for (const key in self.queue) {
-          self.queue[key].clear()
+      comp.clear_queue = () => {
+        for (const key in comp.queue) {
+          comp.queue[key].clear()
         }
       }
 
-      createLifecycleHooks(self)
+      createLifecycleHooks(comp)
     }
 
     // when component is added in dom
