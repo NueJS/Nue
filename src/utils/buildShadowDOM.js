@@ -15,7 +15,7 @@ function buildShadowDOM (comp) {
   comp.deferred.forEach(p => p())
 
   // add fragment to shadow DOM
-  comp.attachShadow({ mode: comp.memo.mode });
+  comp.attachShadow({ mode: 'open' });
   // must use spread here even though childNodes is an array
   // because, appending node to shadowRoot, removes it from childNodes array
   [...fragment.childNodes].forEach(node => comp.shadowRoot.append(node))
