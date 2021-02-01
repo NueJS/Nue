@@ -11,85 +11,66 @@ function defineComponent (compName, component) {
   // @TODO move it to globalInfo
   const memo = { compName, template: null }
 
+  // @TODO - use the hash to persist state across page refreshes
+  // comp.hash = globalInfo.hash()
+
   class SuperSweet extends HTMLElement {
     constructor () {
       super()
+      this.supersweet = {
+        self: this,
+        component,
+        refs: {},
+        actions: {},
+        deps: { $: new Map() },
+        fn: this.fnProps || {},
 
-      // for better minification, refer to this using other variable name
-      const comp = this
+        // callbacks that are to be called in various phases
+        queue: {
+          stateReady: new Map(),
+          computed: new Map(),
+          dom: new Map()
+        },
 
-      // @TODO - use the hash to persist state across page refreshes
-      // comp.hash = globalInfo.hash()
+        // lifecycle callbacks
+        mountCbs: [],
+        destroyCbs: [],
+        beforeUpdateCbs: [],
+        afterUpdateCbs: [],
 
-      // component is the component definition
-      comp.component = component
+        // common data between all instances of component
+        memo,
 
-      // key is path joined by dot
-      comp.refs = {}
-
-      // functions added in component or given by parent component
-      comp.fn = comp.fnProps || {}
-
-      // function that call the cb when a certain action is performed in application
-      // similar to svelte actions API
-      comp.actions = {}
-
-      // callbacks which are to be called when state changes
-      comp.deps = { $: new Map() }
-
-      // queue holds all the callbacks that should be called
-      // queue is useful to avoid calling the callback more than once and in correct order
-      comp.queue = {
-        stateReady: new Map(),
-        computed: new Map(),
-        dom: new Map()
+        // methods to be invoked after certain phase is completed
+        deferred: []
       }
 
-      // callbacks that are to be called when the components is connected / disconnected to DOM
-      comp.mountCbs = []
-      comp.destroyCbs = []
-      comp.beforeUpdateCbs = []
-      comp.afterUpdateCbs = []
-
-      // memo of the component which are same for all instances
-      comp.memo = memo
-
-      // array of processing functions that should be run after all the nodes have been processed
-      comp.deferred = []
-
-      // @TODO - remove this function out of class
-      // once all the callbacks are called, clear the queue for the next interaction
-      comp.clear_queue = () => {
-        for (const key in comp.queue) {
-          comp.queue[key].clear()
-        }
-      }
-
+      const comp = this.supersweet
       createLifecycleHooks(comp)
     }
 
     // when component is added in dom
     connectedCallback () {
-      const comp = this
+      const comp = this.supersweet
       // console.log('should connect')
       if (comp.ignoreConnectionChange) return
 
       // @TODO - do not call comp functions once preprocess and building is done
-      if (!comp.x) {
+      if (!this.shadowRoot) {
         preprocess(comp, component)
         buildShadowDOM(comp)
-        comp.x = true
+        // comp.x = true
       }
 
-      connect(comp.shadowRoot, true)
+      connect(this.shadowRoot, true)
       comp.mountCbs.forEach(cb => cb())
     }
 
     // when the component is removed from dom
     disconnectedCallback () {
-      const comp = this
+      const comp = this.supersweet
       if (comp.ignoreConnectionChange) return
-      disconnect(comp.shadowRoot, true)
+      disconnect(this.shadowRoot, true)
       comp.destroyCbs.forEach(cb => cb())
     }
   }

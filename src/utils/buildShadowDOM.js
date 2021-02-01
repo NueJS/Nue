@@ -2,23 +2,24 @@ import copySweet from './node/copySweet.js'
 import processNode from './process/processNode.js'
 
 function buildShadowDOM (comp) {
-  const template = comp.memo.template
+  const { template } = comp.memo
+
   // create clone of template
   const fragment = template.content.cloneNode(true)
 
-  // add sweet property on nodes
+  // add sweet property on fragment
   copySweet(template.content, fragment)
 
   // process nodes using sweet property
-  comp.deferred = []
   processNode(comp, fragment)
   comp.deferred.forEach(p => p())
 
   // add fragment to shadow DOM
-  comp.attachShadow({ mode: 'open' });
+  comp.self.attachShadow({ mode: 'open' });
+
   // must use spread here even though childNodes is an array
   // because, appending node to shadowRoot, removes it from childNodes array
-  [...fragment.childNodes].forEach(node => comp.shadowRoot.append(node))
+  [...fragment.childNodes].forEach(node => comp.self.shadowRoot.append(node))
 }
 
 export default buildShadowDOM
