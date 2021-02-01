@@ -1,6 +1,6 @@
+let hash = 0
 const globalInfo = {
-  _hash: 0,
-  hash: () => globalInfo._hash++,
+  hash: () => hash++,
   components: {},
   actions: {},
   renderedComps: {},
