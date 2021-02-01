@@ -70,25 +70,27 @@ function defineComponent (compName, component) {
 
     // when component is added in dom
     connectedCallback () {
+      const comp = this
       // console.log('should connect')
-      if (this.ignoreConnectionChange) return
+      if (comp.ignoreConnectionChange) return
 
-      // @TODO - do not call this functions once preprocess and building is done
-      if (!this.x) {
-        preprocess(this, component)
-        buildShadowDOM(this)
-        this.x = true
+      // @TODO - do not call comp functions once preprocess and building is done
+      if (!comp.x) {
+        preprocess(comp, component)
+        buildShadowDOM(comp)
+        comp.x = true
       }
 
-      connect(this.shadowRoot, true)
-      this.mountCbs.forEach(cb => cb())
+      connect(comp.shadowRoot, true)
+      comp.mountCbs.forEach(cb => cb())
     }
 
     // when the component is removed from dom
     disconnectedCallback () {
-      if (this.ignoreConnectionChange) return
-      disconnect(this.shadowRoot, true)
-      this.destroyCbs.forEach(cb => cb())
+      const comp = this
+      if (comp.ignoreConnectionChange) return
+      disconnect(comp.shadowRoot, true)
+      comp.destroyCbs.forEach(cb => cb())
     }
   }
 
