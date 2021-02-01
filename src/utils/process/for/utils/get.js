@@ -1,5 +1,6 @@
 import { attr } from '../../../node/dom'
 import { targetProp } from '../../../state/slice'
+import { TARGET } from '../../../symbols'
 
 export const getStateProps = (forInfo, value, i) => {
   const stateProps = {
@@ -10,7 +11,7 @@ export const getStateProps = (forInfo, value, i) => {
   return stateProps
 }
 
-export const getArray = (forInfo, comp) => forInfo.of.getValue(comp).__target__
+export const getArray = (forInfo, comp) => forInfo.of.getValue(comp)[TARGET]
 
 export const getHashArray = (forInfo, arr) =>
   arr.map((value, i) => getHash(forInfo, getStateProps(forInfo, value, i)))

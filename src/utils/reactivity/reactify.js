@@ -3,6 +3,7 @@ import modes from './modes.js'
 import computedState from '../state/computedState.js'
 import { accessed } from '../state/detectStateUsage.js'
 import deepEqual from '../deepEqual.js'
+import { TARGET } from '../symbols.js'
 
 const isObject = x => typeof x === 'object' && x !== null
 
@@ -58,7 +59,7 @@ function reactify (comp, obj, path = []) {
     },
 
     get (target, prop) {
-      if (prop === '__target__') return target
+      if (prop === TARGET) return target
       if (modes.detective) {
         if (path.length !== 0) accessed.paths[accessed.paths.length - 1] = [...path, prop]
         else accessed.paths.push([...path, prop])
