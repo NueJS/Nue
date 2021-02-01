@@ -1,5 +1,11 @@
 import { triggerMapCbs } from '../callbacks.js'
 
+const clearQueue = (comp) => {
+  for (const key in comp.queue) {
+    comp.queue[key].clear()
+  }
+}
+
 // wait for all the callbacks to be registered and then call all of them in proper order
 function invokeQueue (comp) {
   // don't trigger setTimeout again once the collecting is started
@@ -17,7 +23,7 @@ function invokeQueue (comp) {
     comp.afterUpdateCbs.forEach(cb => cb())
 
     // once all cbs are invoked, clear the queue
-    comp.clear_queue()
+    clearQueue(comp)
 
     // allow the queue to being built for next state mutation
     comp.batching = false
