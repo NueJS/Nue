@@ -6,9 +6,9 @@ export default /* html */`
 <div class='sweet-error__panel'>
   <div class='sweet-error__card'>
     <button class='sweet-error__close-icon'> ${closeIcon} </button>
-    <!-- <pre class='error-message'>  </pre> -->
     <div class='title'> ERROR </div>
     <pre class='message'>  </pre>
+    <div class='component-name'>  </div>
     <div class='subtitle'> open console for more information </div>
   </div>
 </div>

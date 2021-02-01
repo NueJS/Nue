@@ -33,6 +33,10 @@ function handleErrors (error) {
 
   const $message = $sweetErrorOverlay.shadowRoot.querySelector('.message')
   $message.textContent = `❌ ${error.message}\n✨ ${error.fix}`
+
+  const $componentName = $sweetErrorOverlay.shadowRoot.querySelector('.component-name')
+  $componentName.textContent = error.comp.nodeName
+
   // error in console
   console.log('Origin of Error: ')
   if (error.node) console.log('Node:', error.node)
