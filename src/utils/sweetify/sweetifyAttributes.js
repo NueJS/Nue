@@ -1,64 +1,60 @@
-// import { uid } from '../others.js'
-import { isBracketed, unBracket } from '../string/bracket.js'
+import { isBracketed } from '../string/bracket.js'
 import processPlaceholder from '../string/placeholder/processPlaceholder.js'
 import { STATE, EVENT, BIND, NORMAL, FN_PROP, CONDITIONAL } from '../constants.js'
 // import { components } from '../../index.js'
 
+const isComp = element => element.sweet && element.sweet.isComp
+
 function sweetifyAttributes (comp, element) {
   const attributes = []
+  const isSweetComp = isComp(element)
 
-  // loop over each attribute
   for (const attributeName of element.getAttributeNames()) {
-    //
+    // get the attribute string value
     const attributeValue = element.getAttribute(attributeName)
-    let isPlaceholder = isBracketed(attributeValue)
+    // check if the value is variable or not
+    const variableValue = isBracketed(attributeValue)
+
     let name, type, placeholder
 
-    let placeholderText = attributeValue
+    // EVENT: @click='increment'
+    if (attributeName[0] === '@') {
+      type = isSweetComp ? FN_PROP : EVENT
+      name = attributeName.slice(1)
+      placeholder = {
+        fnName: attributeValue
+      }
+    }
 
+    // CONDITIONAL: disabled:if='{{ disabled }}'
     if (attributeName.endsWith(':if')) {
-      name = attributeName.substr(0, attributeName.length - 1 - 2)
+      name = attributeName.slice(0, -3)
       type = CONDITIONAL
     }
 
-    // handle Shorthand
-    else if (attributeValue === '' && isBracketed(attributeName)) {
-      name = unBracket(attributeName)
-      placeholderText = attributeName
-      isPlaceholder = true
-      type = element.sweet && element.sweet.isComp ? STATE : NORMAL
-    }
-
-    else if (isPlaceholder) {
-      // EVENT @event-name=[handler]
-      if (attributeName[0] === '@') {
-        // console.log({ sweet: element.sweet })
-        type = element.sweet && element.sweet.isComp ? FN_PROP : EVENT
-        name = attributeName.substr(1)
-      }
-
-      // BIND :prop=[path]
-      else if (attributeName[0] === ':') {
+    if (variableValue) {
+      // BIND: :value='{{ count }}'
+      if (attributeName[0] === ':') {
         type = BIND
-        name = attributeName.substr(1)
+        name = attributeName.slice(1)
       }
 
-      // NORMAL name=[path]
+      // NORMAL: data-count='{{ count }}'
       else {
         name = attributeName
-        type = element.sweet && element.sweet.isComp ? STATE : NORMAL
+        type = isSweetComp ? STATE : NORMAL
       }
+
+      placeholder = processPlaceholder(attributeValue)
     }
 
-    if (isPlaceholder) {
-      placeholder = processPlaceholder(comp, placeholderText)
-      element.removeAttribute(attributeName)
-    }
-    if (name) {
+    if (placeholder) {
       attributes.push({ name, type, placeholder })
+      element.removeAttribute(attributeName)
     }
   }
 
+  // if placeholder attributes found
   if (attributes.length) {
     if (!element.sweet) element.sweet = {}
     element.sweet.attributes = attributes
