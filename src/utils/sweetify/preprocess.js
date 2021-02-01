@@ -15,12 +15,12 @@ function preprocess (comp, component) {
 
     component({
       $: comp.$,
-      on: comp.on,
       refs: comp.refs,
       template: processed ? () => {} : template.bind(comp),
       fn: comp.fn,
       component: comp,
-      props: { ...comp.stateProps, ...comp.fnProps }
+      props: { ...comp.stateProps, ...comp.fnProps },
+      ...comp.lifecycles
     })
 
     modes.reactive = true
