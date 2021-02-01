@@ -1,8 +1,8 @@
 
-import { bracketify } from './bracket.js'
+// import { bracketify } from './bracket.js'
 
 // uses this
-function html (strings, ...exprs) {
+function template (strings, ...exprs) {
   let str = ''
   for (let i = 0; i < strings.length; i++) {
     const value = exprs[i]
@@ -15,7 +15,7 @@ function html (strings, ...exprs) {
     // else str += strings[i]
   }
 
-  this.memo.template.innerHTML += str
+  this.memo.template.innerHTML = str
 }
 
-export default html
+export default template

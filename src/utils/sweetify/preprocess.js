@@ -1,7 +1,7 @@
 import globalInfo from '../globalInfo.js'
 import modes from '../reactivity/modes.js'
 import reactify from '../reactivity/reactify.js'
-import html from '../string/html.js'
+import template from '../string/template.js'
 import populateSlots from './populateSlots.js'
 import sweetifyTemplate from './sweetifyTemplate.js'
 
@@ -17,7 +17,7 @@ function preprocess (comp, component) {
       $: comp.$,
       on: comp.on,
       refs: comp.refs,
-      html: processed ? () => {} : html.bind(comp),
+      template: processed ? () => {} : template.bind(comp),
       fn: comp.fn,
       component: comp,
       props: { ...comp.stateProps, ...comp.fnProps }

@@ -16,8 +16,8 @@ const createComp = (compName, forInfo, value, i) => {
   return newComp
 }
 
-export const registerComp = (name, html) => {
-  globalInfo.components[name] = o => o.html(html)
+export const registerComp = (name, tempString) => {
+  globalInfo.components[name] = o => o.template(tempString)
 }
 
 export default createComp
