@@ -1,13 +1,13 @@
 import { REACTIVE } from '../../constants.js'
+// import DEV from '../../dev/DEV.js'
+// import err from '../../dev/error.js'
 import { targetProp } from '../../state/slice.js'
-import { bracketify } from '../bracket.js'
 
-const processReactivePlaceholder = (content, str, noBrackets = true) => {
+const processReactivePlaceholder = (content) => {
   const path = content.split('.')
 
-  // memoize target and prop after getting it for the first time
-  // let target, prop
-  function getValue (comp) {
+  // return the value of placeholder in given component
+  const getValue = (comp) => {
     const [target, prop] = targetProp(comp.$, path)
     return target[prop]
   }
@@ -15,9 +15,7 @@ const processReactivePlaceholder = (content, str, noBrackets = true) => {
   return {
     type: REACTIVE,
     getValue,
-    deps: [path],
-    text: noBrackets ? bracketify(str) : str,
-    content
+    deps: [path]
   }
 }
 

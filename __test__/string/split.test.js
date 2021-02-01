@@ -1,89 +1,41 @@
 const { default: split } = require('../../src/utils/string/split')
+const { TEXT, REACTIVE, FN } = require('../../src/utils/constants.js')
 
-test('all text, no placeholders', () => {
-  const parts = split('this is just plain text')
-  expect(parts).toEqual([
-    {
-      string: 'this is just plain text'
-    }
-  ])
+test('text', () => {
+  const parts = split({}, 'this is just plain text')
+  expect(parts[0].text).toEqual('this is just plain text')
+  expect(parts[0].type).toBe(TEXT)
 })
 
-test('only placeholder', () => {
-  const parts = split('[text inside placeholder]')
-  expect(parts).toEqual([
-    {
-      string: 'text inside placeholder',
-      value: ['textinsideplaceholder'] // spaces are removed
-    }
-  ])
+test('reactive variable', () => {
+  const parts = split({}, '{{ foo }}')
+  expect(parts[0].deps).toEqual([['foo']])
+  expect(parts[0].type).toBe(REACTIVE)
 })
 
-test('text then reactive placeholder', () => {
-  const parts = split('count is [a.b.c]')
-  expect(parts).toEqual([
-    {
-      string: 'count is '
-    },
-    {
-      string: 'a.b.c',
-      value: ['a', 'b', 'c']
-    }
-  ])
+test('function call variable', () => {
+  const parts = split({}, '{{ foo(a, b.c) }}')
+  expect(parts[0].type).toBe(FN)
+  expect(parts[0].deps).toEqual([['a'], ['b', 'c']])
 })
 
-test('reactive placeholder then text', () => {
-  const parts = split('[a.b.c] is the count')
-  expect(parts).toEqual([
-    {
-      string: 'a.b.c',
-      value: ['a', 'b', 'c']
-    },
-    {
-      string: ' is the count'
-    }
-  ])
-})
+test('text and variable', () => {
+  const parts = split({}, 'count is {{ a.b.c }} and name is {{ foo(a, b.c) }}')
+  // text
+  expect(parts[0].type).toBe(TEXT)
+  expect(parts[0].text).toBe('count is ')
 
-test('multiple reactive placeholders and text', () => {
-  const parts = split('[a.b.c] and [d.e.f] is same as [e.f.g.h]')
-  expect(parts).toEqual([
-    {
-      string: 'a.b.c',
-      value: ['a', 'b', 'c']
-    },
-    {
-      string: ' and '
-    },
-    {
-      string: 'd.e.f',
-      value: ['d', 'e', 'f']
-    },
-    {
-      string: ' is same as '
-    },
-    {
-      string: 'e.f.g.h',
-      value: ['e', 'f', 'g', 'h']
-    }
+  // variable
+  expect(parts[1].type).toBe(REACTIVE)
+  expect(parts[1].deps).toEqual([
+    ['a', 'b', 'c']
   ])
-})
 
-test('text and functional placeholder', () => {
-  const parts = split('count is [ foo(bar, bazz.fuzz) ]')
-  expect(parts).toEqual([
-    {
-      string: 'count is '
-    },
-    {
-      string: ' foo(bar, bazz.fuzz) ',
-      value: {
-        fn_name: 'foo',
-        args: [
-          ['bar'],
-          ['bazz', 'fuzz']
-        ]
-      }
-    }
-  ])
+  // text
+  expect(parts[2].type).toBe(TEXT)
+  expect(parts[2].text).toBe(' and name is ')
+
+  // variable
+  expect(parts[3].type).toBe(FN)
+  expect(parts[3].deps).toEqual([['a'], ['b', 'c']])
 })

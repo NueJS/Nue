@@ -1,57 +1,62 @@
 
 import { TEXT } from '../constants.js'
 import processPlaceholder from './placeholder/processPlaceholder.js'
+import DEV from '../dev/DEV.js'
+import err from '../dev/error.js'
 
-// split the text into placeholders and strings
-// if the text inside the placeholder is not a valid path of slice of state, treat it as string
-// returns parts array of object
-// input: 'name is [name.first]'
-// output: [ { string : 'name is' }, { path: ['name', 'first'], value: 'Manan' }]
+const varEnds = (text, i) => text[i] === '}' && text[i + 1] === '}'
+const varStarts = (text, i) => text[i] === '{' && text[i + 1] === '{'
 
+// take the string text and split it into placeholders and strings
+// returns array of parts
+// [ part, part, part ... ]
 function split (comp, text) {
   const parts = []
-  let cursorInBracket = false
-  let str = ''
+  let collectingVar = false
+  let collectedString = ''
+  let i = 0
 
-  for (let i = 0; i < text.length; i++) {
-    // if not the end of placeholder
-    if (cursorInBracket && text[i] !== ']') str += text[i]
+  // reset string and set the collectingVar value and jump over the next character
+  const reset = (cv) => {
+    collectedString = ''
+    collectingVar = cv
+    // jump over the next '}' or '{' character
+    i += 2
+  }
 
-    // if found the start of new placeholder
-    else if (text[i] === '[') {
-      // mark the bracket content as string
-      if (text[i - 1] === '!') {
-        str = str.substr(0, str.length - 1) + '['
-        continue
+  while (i < text.length) {
+    if (varStarts(text, i)) {
+      // save previously collected string, if not null
+      if (collectedString) {
+        parts.push({ text: collectedString, type: TEXT })
       }
 
-      cursorInBracket = true
-      // if str is not empty, add string
-      if (str) {
-        parts.push({ text: str, type: TEXT })
-        str = ''
+      reset(true)
+    }
+
+    else if (varEnds(text, i)) {
+      if (DEV && !collectingVar) {
+        err({
+          message: 'invalid use of }}',
+          comp
+        })
       }
+
+      // process variable and save it in parts
+      const part = processPlaceholder(collectedString, true)
+      parts.push(part)
+      reset(false)
     }
 
-    // if end of placeholder, check for path validity
-    else if (cursorInBracket && text[i] === ']') {
-      // remove [ then split to get the placeholder content
-      // then split to get the path array
-      parts.push(processPlaceholder(comp, str, true))
-
-      // check for function call
-      cursorInBracket = false
-      str = '' // reset
-    }
-
-    // collect str if not edge cases
+    // keep collecting
     else {
-      str += text[i]
+      collectedString += text[i]
+      i++
     }
   }
 
-  // remaining text is text
-  if (str) parts.push({ text: str, type: TEXT })
+  // add the remaining text
+  if (collectedString) parts.push({ text: collectedString, type: TEXT })
   return parts
 }
 
