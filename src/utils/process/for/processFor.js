@@ -33,8 +33,12 @@ function processFor (comp, forNode) {
     removedComps: [],
     animating: false,
     movedIndexes: [],
-    $index: forInfo.at.content,
+    // $index: forInfo.at.content,
     $each: forInfo.each.content
+  }
+
+  if (forInfo.at) {
+    blob.$index = forInfo.at.content
   }
 
   if (DEV) checkForInfo(blob)
