@@ -20,7 +20,6 @@ function handleErrors (error) {
     connectedCallback () {
       const closeButton = this.shadowRoot.querySelector('.sweet-error__close-icon')
       closeButton.addEventListener('click', e => {
-        console.log('clicked on button')
         this.remove()
       })
     }

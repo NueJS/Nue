@@ -55,7 +55,6 @@ function processFor (comp, forNode) {
   })
 
   const handleArrayChange = () => {
-    // console.log('array is changed')
     const { comps, forInfo, oldState } = blob
 
     // get the new state - using the forInfo and comp
@@ -68,8 +67,6 @@ function processFor (comp, forNode) {
 
     // reconcile using the oldState and newState
     const steps = reconcile(oldState, newState)
-
-    // console.log('steps', steps)
 
     if (forInfo.reorder) saveOffsets(comps)
 

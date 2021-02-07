@@ -27,7 +27,6 @@ function reconcile (oldState, newState) {
 
   // swap, swapped values in newState.hash in arr
   for (let i = 0; i < oldState.hash.length; i++) {
-    // console.log(JSON.stringify(oldState.value))
     if (oldState.hash[i] !== newState.hash[i]) {
       // find where its position in new oldState.hash
       const iShouldBe = newState.hash.indexOf(oldState.hash[i])

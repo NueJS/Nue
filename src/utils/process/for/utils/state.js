@@ -17,15 +17,12 @@ export const updateCompState = (newState, { comps, forInfo, oldState, $index, $e
       const target = comps[i]
       // update index
       if (target.$[TARGET][$index] !== i) {
-        // console.log('update index state', i)
         target.$[$index] = i
       }
     }
   }
 
   const diffIndexes = arrayDiff(newState.value, oldState.value)
-  // console.log('find diff indexes', diffIndexes)
-
   diffIndexes.forEach(i => {
     comps[i].$[$each] = newState.value[i]
   })

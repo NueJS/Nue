@@ -19,7 +19,6 @@ function addDep (baseComp, path, cb, type) {
 
   if (DEV) {
     if (!comp) {
-      console.log('base was : ', baseComp)
       err({
         message: `Invalid state placeholder used in template : {{ ${path.join('.')} }}`,
         fix: `make sure that "${path.join('.')}" exists in state of <${baseComp.name}/> component or it's closure`,

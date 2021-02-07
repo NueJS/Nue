@@ -1,5 +1,4 @@
 // function swapNodes (node1, node2) {
-//   // console.log('swapping : ', node1, node2)
 //   let type = 'before'
 //   let anchor = node2.nextSibling
 //   if (!anchor) {
@@ -12,7 +11,6 @@
 
 function swapDom (a, b)
 {
-  // console.log('should turn off connection')
   a.ignoreConnectionChange = true
   b.ignoreConnectionChange = true
 
@@ -27,8 +25,6 @@ function swapDom (a, b)
 
   aParent.replaceChild(b, aHolder)
   bParent.replaceChild(a, bHolder)
-
-  // console.log('should turn on connection')
 
   a.ignoreConnectionChange = false
   b.ignoreConnectionChange = false

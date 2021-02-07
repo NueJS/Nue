@@ -19,7 +19,6 @@ const addDefaultStyles = (template) => {
 }
 
 function preprocess (comp, component) {
-  // console.log('initial props: ', comp.stateProps);
   [comp.$, comp.$Target] = reactify(comp, comp.stateProps || {})
 
   const invokeComp = (processed) => {
