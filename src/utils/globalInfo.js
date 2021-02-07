@@ -3,7 +3,7 @@ const globalInfo = {
   hash: () => hash++,
   components: {},
   actions: {},
-  renderedComps: {},
+  components: {},
   defaultStyle: ':host{display: block;}'
 }
 
