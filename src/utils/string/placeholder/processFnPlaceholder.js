@@ -25,7 +25,8 @@ const processFnPlaceholder = (content) => {
     if (DEV && !fn) {
       err({
         comp,
-        message: `can't find the function : ${fnName}`
+        message: `invalid method "${fnName}" used in [${content}] placeholder in template`,
+        fix: `make sure "${fnName}" method exists in the 'fn' object of <${comp.name}/> or its closure`
       })
     }
     const tps = deps.map(path => targetProp(comp.$, path))
