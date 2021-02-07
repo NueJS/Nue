@@ -11,14 +11,12 @@ function processNode (comp, node) {
     if (sweet.isProcessed) return
     sweet.isProcessed = true
 
-    // if component, record the closure
+    // console.log('supersweet : ', supersweet)
+    // if node is supersweet component
     if (sweet.isComp) {
-      sweet.closure = {
-        $: comp.$,
-        fn: comp.fn,
-        component: comp
-      }
-      if (!globalInfo.renderedComps[sweet.compName]) render(sweet.compName)
+      node.sweet.closure = comp
+      const { name } = node.sweet
+      if (!globalInfo.renderedComps[name]) render(name)
     }
 
     if (nodeType === Node.TEXT_NODE) processTextNode(comp, node)

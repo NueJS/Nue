@@ -9,12 +9,11 @@ const isObject = x => typeof x === 'object' && x !== null
 
 // create a reactive object which when mutated calls the on_change function
 function reactify (comp, obj, path = []) {
-  const closure$ = comp.sweet && comp.sweet.closure.$
+  const closure$ = comp.closure && comp.closure.$
   if (!isObject(obj)) return [obj]
 
+  // make the slice of state reactive
   const target = Array.isArray(obj) ? [] : {}
-
-  // debugger
   Object.keys(obj).forEach(key => {
     [target[key]] = reactify(comp, obj[key], [...path, key])
   })

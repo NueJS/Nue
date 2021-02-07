@@ -4,12 +4,12 @@ import createLifecycleHooks from './createLifecycleHooks.js'
 import buildShadowDOM from './buildShadowDOM.js'
 // import globalInfo from './globalInfo.js'
 
-// define a component using compName and a component function
-function defineComponent (compName, component) {
+// define a component using name and a component function
+function defineComponent (name, component) {
   // memo is object containing information that will be same for all the instance of component
   // it is basically a class static property
   // @TODO move it to globalInfo
-  const memo = { compName, template: null }
+  const memo = { name, template: null }
 
   // @TODO - use the hash to persist state across page refreshes
   // comp.hash = globalInfo.hash()
@@ -43,7 +43,8 @@ function defineComponent (compName, component) {
 
         // methods to be invoked after certain phase is completed
         deferred: [],
-        name: compName
+        name,
+        closure: this.sweet && this.sweet.closure
       }
 
       const comp = this.supersweet
@@ -62,10 +63,10 @@ function defineComponent (compName, component) {
       }
 
       // before connecting component to state, run onMount callbacks
-      comp.mountCbs.forEach(cb => cb())
-
       // connect component to state and make it reactive
       connect(this.shadowRoot, true)
+
+      comp.mountCbs.forEach(cb => cb())
     }
 
     // when the component is removed from dom
@@ -77,7 +78,7 @@ function defineComponent (compName, component) {
     }
   }
 
-  customElements.define(compName, SuperSweet)
+  customElements.define(name, SuperSweet)
 }
 
 export default defineComponent

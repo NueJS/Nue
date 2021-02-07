@@ -7,8 +7,8 @@ import { hasSlice } from './slice.js'
 function origin (comp, path) {
   let target = comp
   while (!hasSlice(target.$Target, path)) {
-    if (!target.sweet) return undefined
-    target = target.sweet.closure.component
+    if (!target.closure) return undefined
+    target = target.closure
   }
   return target
 }
@@ -19,6 +19,7 @@ function addDep (baseComp, path, cb, type) {
 
   if (DEV) {
     if (!comp) {
+      console.log('base was : ', baseComp)
       err({
         message: `Invalid state placeholder used in template : {{ ${path.join('.')} }}`,
         fix: `make sure that "${path.join('.')}" exists in state of <${baseComp.name}/> component or it's closure`,
