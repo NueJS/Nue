@@ -17,7 +17,7 @@ import deepClone from '../../deepClone.js'
 import checkUniquenessOfKeys from './dev/checkUniquenessOfKeys.js'
 
 function processFor (comp, forNode) {
-  const compName = 'swt-' + uid()
+  const name = 'swt-' + uid()
   const forInfo = getForInfo(forNode)
 
   const blob = {
@@ -25,7 +25,7 @@ function processFor (comp, forNode) {
     oldState: {},
     anchorNode: null,
     forInfo,
-    compName,
+    name,
     forNode,
     comp: comp,
     deferred: [],
@@ -43,12 +43,12 @@ function processFor (comp, forNode) {
 
   if (DEV) checkForInfo(blob)
 
-  registerComp(compName, forNode.innerHTML)
+  registerComp(name, forNode.innerHTML)
 
   comp.deferred.push(() => {
     blob.anchorNode = document.createComment('for')
     forNode.before(blob.anchorNode)
-    render(compName)
+    render(name)
     init(blob)
     forNode.before(document.createComment('/for'))
     forNode.remove()

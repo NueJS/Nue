@@ -2,8 +2,8 @@ import globalInfo from '../../../globalInfo'
 import { getOffset } from '../../../node/dom'
 import { getStateProps } from './get'
 
-const createComp = (compName, forInfo, value, i) => {
-  const newComp = document.createElement(compName)
+const createComp = (name, forInfo, value, i) => {
+  const newComp = document.createElement(name)
   // // apply class
   // if (forInfo.class) newComp.className = forInfo.class
   newComp.stateProps = getStateProps(forInfo, value, i)

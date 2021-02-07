@@ -4,7 +4,7 @@ import deepClone from '../../../deepClone'
 import checkUniquenessOfKeys from '../dev/checkUniquenessOfKeys'
 import DEV from '../../../dev/DEV'
 
-const init = ({ forInfo, comp, comps, forNode, compName, oldState }) => {
+const init = ({ forInfo, comp, comps, forNode, name, oldState }) => {
   const state = getNewState(forInfo, comp)
 
   if (DEV) {
@@ -14,7 +14,7 @@ const init = ({ forInfo, comp, comps, forNode, compName, oldState }) => {
   // create and add component to DOM by going over array
   state.value.forEach((value, index) => {
     // debugger
-    const newComp = createComp(compName, forInfo, value, index)
+    const newComp = createComp(name, forInfo, value, index)
     comps.push(newComp)
     forNode.before(newComp)
   })

@@ -11,8 +11,8 @@ function sweetifyTemplate (comp) {
 
   // visit each node in template and memoize information
   const sweetify = node => {
-    const compName = node.nodeName.toLowerCase()
-    const isComp = globalInfo.components[compName]
+    const name = node.nodeName.toLowerCase()
+    const isComp = globalInfo.components[name]
 
     // memoize text content
     if (node.nodeType === Node.TEXT_NODE) {
@@ -24,7 +24,7 @@ function sweetifyTemplate (comp) {
     else if (isComp) {
       node.sweet = {
         isComp: true,
-        compName: compName
+        name: name
       }
 
       node.sweet.childNodes = [...node.childNodes]
