@@ -20,7 +20,8 @@ function addDep (baseComp, path, cb, type) {
   if (DEV) {
     if (!comp) {
       err({
-        message: `invalid state used: $.${path.join('.')} in <${baseComp.memo.compName}> on ${cb.node.nodeName}`,
+        message: `Invalid state placeholder used in template : {{ ${path.join('.')} }}`,
+        fix: `make sure that "${path.join('.')}" exists in state of <${baseComp.name}/> component or it's closure`,
         link: '',
         code: -1,
         comp: baseComp
