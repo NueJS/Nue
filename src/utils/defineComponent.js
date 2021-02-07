@@ -42,7 +42,8 @@ function defineComponent (compName, component) {
         memo,
 
         // methods to be invoked after certain phase is completed
-        deferred: []
+        deferred: [],
+        name: compName
       }
 
       const comp = this.supersweet
