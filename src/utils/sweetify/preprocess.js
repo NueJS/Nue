@@ -5,6 +5,19 @@ import template from '../string/template.js'
 import populateSlots from './populateSlots.js'
 import sweetifyTemplate from './sweetifyTemplate.js'
 
+const addDefaultStyles = (template) => {
+  const { content } = template
+  const style = content.querySelector('style')
+  const defaultStyle = document.createElement('style')
+  defaultStyle.setAttribute('default-styles', '')
+  defaultStyle.textContent = globalInfo.defaultStyle
+  if (style) {
+    style.before(defaultStyle)
+  } else {
+    content.lastChild.after(defaultStyle)
+  }
+}
+
 function preprocess (comp, component) {
   // console.log('initial props: ', comp.stateProps);
   [comp.$, comp.$Target] = reactify(comp, comp.stateProps || {})
@@ -34,19 +47,12 @@ function preprocess (comp, component) {
 
   else {
     comp.memo.template = document.createElement('template')
-
     invokeComp(false)
-    const style = comp.memo.template.content.querySelector('style')
-    const defaultStyle = document.createElement('style')
-    defaultStyle.setAttribute('sweet-default', '')
-    defaultStyle.textContent = globalInfo.defaultStyle
-    if (style) {
-      style.before(defaultStyle)
-    } else {
-      comp.memo.template.content.lastChild.after(defaultStyle)
-    }
     populateSlots(comp)
     sweetifyTemplate(comp)
+
+    // add default styles in component
+    addDefaultStyles(comp.memo.template)
   }
 }
 
