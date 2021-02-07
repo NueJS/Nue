@@ -12,23 +12,23 @@ function sweetifyTemplate (comp) {
   // visit each node in template and memoize information
   const sweetify = node => {
     const name = node.nodeName.toLowerCase()
-    const isComp = globalInfo.components[name]
+    const isComp = comp.childCompNames && comp.childCompNames.has(name)
+
+    if (isComp) {
+      node.sweet = {
+        isComp: true,
+        name
+      }
+      // child nodes (slot) of child component should not be sweetified and saved in array instead
+      node.innerHTML = ''
+      node.sweet.childNodes = [...node.childNodes]
+    }
 
     // memoize text content
-    if (node.nodeType === Node.TEXT_NODE) {
+    else if (node.nodeType === Node.TEXT_NODE) {
       if (!node.textContent.trim()) uselessNodes.push(node)
       else sweetifyTextNode(comp, node)
       return // must use return here
-    }
-
-    else if (isComp) {
-      node.sweet = {
-        isComp: true,
-        name: name
-      }
-
-      node.sweet.childNodes = [...node.childNodes]
-      node.innerHTML = '' // do not sweetify slot in parent component
     }
 
     // if condition node

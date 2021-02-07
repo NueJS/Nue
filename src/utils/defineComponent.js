@@ -2,22 +2,24 @@ import { connect, disconnect } from './connection/recursive.js'
 import preprocess from './sweetify/preprocess.js'
 import createLifecycleHooks from './createLifecycleHooks.js'
 import buildShadowDOM from './buildShadowDOM.js'
+import globalInfo from './globalInfo.js'
 // import globalInfo from './globalInfo.js'
 
 // define a component using name and a component function
-function defineComponent (name, component) {
+function defineComponent (component) {
   // memo is object containing information that will be same for all the instance of component
   // it is basically a class static property
   // @TODO move it to globalInfo
+  const name = component.name
   const memo = { name, template: null }
 
-  // @TODO - use the hash to persist state across page refreshes
-  // comp.hash = globalInfo.hash()
+  globalInfo.components[name] = component
 
   class SuperSweet extends HTMLElement {
     constructor () {
       super()
       this.supersweet = {
+        childCompNames: component.uses && new Set(component.uses.map(c => c.name + '-')),
         self: this,
         component,
         refs: {},
@@ -49,24 +51,17 @@ function defineComponent (name, component) {
 
       const comp = this.supersweet
       createLifecycleHooks(comp)
+      preprocess(comp, component)
+      buildShadowDOM(comp)
     }
 
     // when component is added in dom
     connectedCallback () {
       const comp = this.supersweet
       if (comp.ignoreConnectionChange) return
-
-      // do not build shadow DOM it it's done already
-      if (!this.shadowRoot) {
-        preprocess(comp, component)
-        buildShadowDOM(comp)
-      }
-
-      // before connecting component to state, run onMount callbacks
-      // connect component to state and make it reactive
-      connect(this.shadowRoot, true)
-
+      // run mount callbacks first and then connect the DOM to state
       comp.mountCbs.forEach(cb => cb())
+      connect(this.shadowRoot, true)
     }
 
     // when the component is removed from dom
@@ -78,7 +73,13 @@ function defineComponent (name, component) {
     }
   }
 
-  customElements.define(name, SuperSweet)
+  customElements.define(name + '-', SuperSweet)
+
+  if (component.uses) {
+    component.uses.forEach(child => {
+      defineComponent(child)
+    })
+  }
 }
 
 export default defineComponent

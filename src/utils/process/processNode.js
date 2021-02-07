@@ -1,8 +1,6 @@
 import processTextNode from './processTextNode.js'
 import processAttributes from './attributes/processAttributes.js'
 import processIf from './if/if.js'
-import { render } from '../../index.js'
-import globalInfo from '../globalInfo.js'
 import processFor from './for/processFor.js'
 
 function processNode (comp, node) {
@@ -11,18 +9,11 @@ function processNode (comp, node) {
     if (sweet.isProcessed) return
     sweet.isProcessed = true
 
-    // console.log('supersweet : ', supersweet)
-    // if node is supersweet component
-    if (sweet.isComp) {
-      node.sweet.closure = comp
-      const { name } = node.sweet
-      if (!globalInfo.renderedComps[name]) render(name)
-    }
-
-    if (nodeType === Node.TEXT_NODE) processTextNode(comp, node)
+    // save the comp as closure of component
+    if (sweet.isComp) node.sweet.closure = comp
+    else if (nodeType === Node.TEXT_NODE) processTextNode(comp, node)
     else if (nodeName === 'IF') processIf(comp, node)
     else if (nodeName === 'FOR') processFor(comp, node)
-
     else if (node.hasAttribute) processAttributes(comp, node)
   }
 

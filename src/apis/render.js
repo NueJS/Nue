@@ -2,26 +2,24 @@ import globalInfo from '../utils/globalInfo'
 import DEV from '../utils/dev/DEV'
 import errors from '../utils/dev/errors'
 import defineComponent from '../utils/defineComponent'
+import dashify from '../utils/string/dashify'
 
 // define the custom element of given name
-const render = (name) => {
-  // get the component fn from components object
-  const comp = globalInfo.components[name]
+const render = (component) => {
+  const name = component.name
+
+  // find the <Component> in html and replace it with <Component->
+  const el = document.querySelector(name)
+  const root = document.createElement(dashify(name))
+  el.replaceWith(root)
 
   if (DEV) {
-    if (!comp) errors.RENDER_CALLED_BEFORE_DEFINE(name, __filename)
-
-    // if the component is already rendered
-    // @QUESTION should this error be ignored ?
-    if (globalInfo.renderedComps[name]) {
+    if (globalInfo.components[name]) {
       errors.COMPONENT_ALREADY_RENDERED(name)
     }
   }
 
-  // mark this component as rendered - to ensure that this is not rendered again
-  globalInfo.renderedComps[name] = true
-
-  defineComponent(name, comp)
+  defineComponent(component)
 }
 
 export default render

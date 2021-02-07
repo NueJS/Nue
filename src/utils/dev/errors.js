@@ -10,12 +10,12 @@ export default {
     })
   },
 
-  RENDER_CALLED_BEFORE_DEFINE (name) {
-    err({
-      message: `Tried to render <${name}> before it is defined`,
-      fix: `define the component first using defineComponents({ ... }) and then call render("${name}")`
-    })
-  },
+  // RENDER_CALLED_BEFORE_DEFINE (name) {
+  //   err({
+  //     message: `Tried to render <${name}> before it is defined`,
+  //     fix: `define the component first using defineComponents({ ... }) and then call render("${name}")`
+  //   })
+  // },
 
   COMPONENT_ALREADY_RENDERED (name) {
     err({
