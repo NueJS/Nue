@@ -4,9 +4,6 @@ import processPlaceholder from './placeholder/processPlaceholder.js'
 import DEV from '../dev/DEV.js'
 import err from '../dev/error.js'
 
-const varEnds = (text, i) => text[i] === '}' && text[i + 1] === '}'
-const varStarts = (text, i) => text[i] === '{' && text[i + 1] === '{'
-
 // take the string text and split it into placeholders and strings
 // returns array of parts
 // [ part, part, part ... ]
@@ -14,17 +11,18 @@ function split (comp, text) {
   const parts = []
   let collectingVar = false
   let collectedString = ''
-  let i = 0
+  let i = -1
 
   // reset string and set the collectingVar value and jump over the next character
   const reset = (cv) => {
     collectedString = ''
     collectingVar = cv
-    // jump over the next '}' or '{' character
-    i += 2
   }
 
-  while (i < text.length) {
+  const varEnds = (text, i) => text[i] === ']'
+  const varStarts = (text, i) => text[i] === '[' && text[i + 1] !== "'"
+
+  while (i++ < text.length - 1) {
     if (varStarts(text, i)) {
       // save previously collected string, if not null
       if (collectedString) {
@@ -37,7 +35,7 @@ function split (comp, text) {
     else if (varEnds(text, i)) {
       if (DEV && !collectingVar) {
         err({
-          message: 'invalid use of }}',
+          message: 'invalid use of ]',
           comp
         })
       }
@@ -51,7 +49,6 @@ function split (comp, text) {
     // keep collecting
     else {
       collectedString += text[i]
-      i++
     }
   }
 
