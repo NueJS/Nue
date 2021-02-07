@@ -12,9 +12,11 @@ function createLifecycleHooks (comp) {
       if (DEV && !slices.length) {
         errors.MISSING_DEPENDENCIES_IN_ON_MUTATE(comp)
       }
-
-      const deps = slices.map(slice => slice.split('.'))
-      addDeps(comp, deps, cb, 'computed')
+      // add the state dependency after the component is mounted
+      comp.mountCbs.push(() => {
+        const deps = slices.map(slice => slice.split('.'))
+        addDeps(comp, deps, cb, 'computed')
+      })
     }
   }
 }
