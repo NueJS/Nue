@@ -53,18 +53,19 @@ function defineComponent (compName, component) {
     // when component is added in dom
     connectedCallback () {
       const comp = this.supersweet
-      // console.log('should connect')
       if (comp.ignoreConnectionChange) return
 
-      // @TODO - do not call comp functions once preprocess and building is done
+      // do not build shadow DOM it it's done already
       if (!this.shadowRoot) {
         preprocess(comp, component)
         buildShadowDOM(comp)
-        // comp.x = true
       }
 
-      connect(this.shadowRoot, true)
+      // before connecting component to state, run onMount callbacks
       comp.mountCbs.forEach(cb => cb())
+
+      // connect component to state and make it reactive
+      connect(this.shadowRoot, true)
     }
 
     // when the component is removed from dom
