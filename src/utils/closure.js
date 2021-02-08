@@ -1,9 +1,7 @@
 function getFn (comp, fnName) {
   let target = comp
   while (!target.fn[fnName]) {
-    if (comp.sweet) {
-      target = comp.sweet.closure
-    }
+    if (target.closure) target = target.closure
     else return undefined
   }
 
