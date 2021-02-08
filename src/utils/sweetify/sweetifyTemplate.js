@@ -51,8 +51,8 @@ function sweetifyTemplate (comp) {
       }
 
       if (node.nodeName !== 'ELSE') {
-        const condition = node.getAttribute('?')
-        node.sweet.condition = processPlaceholder(comp, condition)
+        const condition = node.getAttribute(':')
+        node.sweet.condition = processPlaceholder(condition)
       }
     }
 
