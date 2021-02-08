@@ -8,7 +8,7 @@ import dashify from '../utils/string/dashify'
 const render = (component) => {
   const name = component.name
 
-  // find the <Component> in html and replace it with <Component->
+  // find the <CompName> in html and replace it with <compname-->
   const el = document.querySelector(name)
   const root = document.createElement(dashify(name))
   el.replaceWith(root)
