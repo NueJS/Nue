@@ -1,2 +1,2 @@
-const dashify = (name) => name + '-'
+const dashify = (name) => name.toLowerCase() + '-'
 export default dashify

@@ -3,12 +3,8 @@ import preprocess from './sweetify/preprocess.js'
 import createLifecycleHooks from './createLifecycleHooks.js'
 import buildShadowDOM from './buildShadowDOM.js'
 import globalInfo from './globalInfo.js'
+import dashify from './string/dashify.js'
 // import globalInfo from './globalInfo.js'
-
-const namify = (name) => {
-  return name.toLowerCase() + '-'
-}
-
 // define a component using name and a component function
 function defineComponent (component) {
   // memo is object containing information that will be same for all the instance of component
@@ -77,7 +73,7 @@ function defineComponent (component) {
     }
   }
 
-  customElements.define(namify(name), SuperSweet)
+  customElements.define(dashify(name), SuperSweet)
 
   if (component.uses) {
     component.uses.forEach(child => {
