@@ -1,7 +1,7 @@
 import globalInfo from '../globalInfo.js'
 import modes from '../reactivity/modes.js'
 import reactify from '../reactivity/reactify.js'
-import template from '../string/template.js'
+import templateTag from '../string/templateTag.js'
 import populateSlots from './populateSlots.js'
 import sweetifyTemplate from './sweetifyTemplate.js'
 
@@ -25,10 +25,16 @@ function preprocess (comp, component) {
     modes.reactive = false
     modes.noOverride = true
 
+    const template = (...args) => {
+      if (!processed) {
+        comp.memo.template.innerHTML = templateTag(...args)
+      }
+    }
+
     component({
       $: comp.$,
       refs: comp.refs,
-      template: processed ? () => {} : template.bind(comp),
+      template,
       fn: comp.fn,
       component: comp,
       props: { ...comp.stateProps, ...comp.fnProps },
