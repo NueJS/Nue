@@ -14,12 +14,13 @@ function defineComponent (component) {
   const memo = { name, template: null }
 
   globalInfo.components[name] = component
+  const childCompNames = component.uses && new Set(component.uses.map(c => c.name.toLowerCase()))
 
-  class SuperSweet extends HTMLElement {
+  class Nue extends HTMLElement {
     constructor () {
       super()
-      this.supersweet = {
-        childCompNames: component.uses && new Set(component.uses.map(c => c.name.toLowerCase())),
+      this.nue = {
+        childCompNames,
         self: this,
         component,
         refs: {},
@@ -49,7 +50,7 @@ function defineComponent (component) {
         closure: this.sweet && this.sweet.closure
       }
 
-      const comp = this.supersweet
+      const comp = this.nue
       createLifecycleHooks(comp)
       preprocess(comp, component)
       buildShadowDOM(comp)
@@ -57,23 +58,24 @@ function defineComponent (component) {
 
     // when component is added in dom
     connectedCallback () {
-      const comp = this.supersweet
+      const comp = this.nue
       if (comp.ignoreConnectionChange) return
       // run mount callbacks first and then connect the DOM to state
+      // this allows state to set by onMount callbacks to be used directly by the DOM without having to initialize with null values
       comp.mountCbs.forEach(cb => cb())
       connect(this.shadowRoot, true)
     }
 
     // when the component is removed from dom
     disconnectedCallback () {
-      const comp = this.supersweet
+      const comp = this.nue
       if (comp.ignoreConnectionChange) return
       disconnect(this.shadowRoot, true)
       comp.destroyCbs.forEach(cb => cb())
     }
   }
 
-  customElements.define(dashify(name), SuperSweet)
+  customElements.define(dashify(name), Nue)
 
   if (component.uses) {
     component.uses.forEach(child => {
