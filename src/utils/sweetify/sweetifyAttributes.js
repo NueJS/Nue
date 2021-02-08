@@ -1,17 +1,15 @@
 import { isBracketed } from '../string/bracket.js'
 import processPlaceholder from '../string/placeholder/processPlaceholder.js'
 import { STATE, EVENT, BIND, NORMAL, FN_PROP, CONDITIONAL } from '../constants.js'
-// import { components } from '../../index.js'
+import isComp from '../node/isComp.js'
 
-const isComp = element => element.sweet && element.sweet.isComp
-
-function sweetifyAttributes (comp, element) {
+function sweetifyAttributes (comp, node) {
   const attributes = []
-  const isSweetComp = isComp(element)
+  const isSweetComp = isComp(node)
 
-  for (const attributeName of element.getAttributeNames()) {
+  for (const attributeName of node.getAttributeNames()) {
     // get the attribute string value
-    const attributeValue = element.getAttribute(attributeName)
+    const attributeValue = node.getAttribute(attributeName)
     // check if the value is variable or not
     const variableValue = isBracketed(attributeValue)
 
@@ -50,14 +48,14 @@ function sweetifyAttributes (comp, element) {
 
     if (placeholder) {
       attributes.push({ name, type, placeholder })
-      element.removeAttribute(attributeName)
+      node.removeAttribute(attributeName)
     }
   }
 
   // if placeholder attributes found
   if (attributes.length) {
-    if (!element.sweet) element.sweet = {}
-    element.sweet.attributes = attributes
+    if (!node.sweet) node.sweet = {}
+    node.sweet.attributes = attributes
   }
 }
 

@@ -5,6 +5,10 @@ import buildShadowDOM from './buildShadowDOM.js'
 import globalInfo from './globalInfo.js'
 // import globalInfo from './globalInfo.js'
 
+const namify = (name) => {
+  return name.toLowerCase() + '-'
+}
+
 // define a component using name and a component function
 function defineComponent (component) {
   // memo is object containing information that will be same for all the instance of component
@@ -19,7 +23,7 @@ function defineComponent (component) {
     constructor () {
       super()
       this.supersweet = {
-        childCompNames: component.uses && new Set(component.uses.map(c => c.name + '-')),
+        childCompNames: component.uses && new Set(component.uses.map(c => c.name.toLowerCase())),
         self: this,
         component,
         refs: {},
@@ -73,7 +77,7 @@ function defineComponent (component) {
     }
   }
 
-  customElements.define(name + '-', SuperSweet)
+  customElements.define(namify(name), SuperSweet)
 
   if (component.uses) {
     component.uses.forEach(child => {

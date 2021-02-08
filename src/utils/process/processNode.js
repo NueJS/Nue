@@ -14,7 +14,7 @@ function processNode (comp, node) {
     else if (nodeType === Node.TEXT_NODE) processTextNode(comp, node)
     else if (nodeName === 'IF') processIf(comp, node)
     else if (nodeName === 'FOR') processFor(comp, node)
-    else if (node.hasAttribute) processAttributes(comp, node)
+    if (node.hasAttribute) processAttributes(comp, node)
   }
 
   if (nodeName === 'FOR') return

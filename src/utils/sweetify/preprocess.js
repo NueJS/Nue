@@ -19,7 +19,7 @@ const addDefaultStyles = (template) => {
 }
 
 function preprocess (comp, component) {
-  [comp.$, comp.$Target] = reactify(comp, comp.stateProps || {})
+  [comp.$, comp.$Target] = reactify(comp, (comp.self.sweet && comp.self.sweet.stateProps) || {})
 
   const invokeComp = (processed) => {
     modes.reactive = false
@@ -49,8 +49,6 @@ function preprocess (comp, component) {
     invokeComp(false)
     populateSlots(comp)
     sweetifyTemplate(comp)
-
-    // add default styles in component
     addDefaultStyles(comp.memo.template)
   }
 }
