@@ -13,16 +13,10 @@ function sweetifyTemplate (comp) {
   const sweetify = _node => {
     let node = _node
     const name = node.nodeName.toLowerCase()
-    const isComp = comp.childCompNames && comp.childCompNames.has(name)
+    const { childComps } = comp.memo
+    const isComp = childComps && childComps.has(name)
 
-    // memoize text content
-    if (node.nodeType === Node.TEXT_NODE) {
-      if (!node.textContent.trim()) uselessNodes.push(node)
-      else sweetifyTextNode(comp, node)
-      return // must use return here
-    }
-
-    else if (isComp) {
+    if (isComp) {
       // child nodes (slot) of child component should not be sweetified and saved in array instead
       _node.innerHTML = ''
       const newNode = document.createElement(name + '-')
@@ -40,6 +34,13 @@ function sweetifyTemplate (comp) {
       }
 
       node = newNode
+    }
+
+    // memoize text content
+    else if (node.nodeType === Node.TEXT_NODE) {
+      if (!node.textContent.trim()) uselessNodes.push(node)
+      else sweetifyTextNode(comp, node)
+      return // must use return here
     }
 
     // if condition node

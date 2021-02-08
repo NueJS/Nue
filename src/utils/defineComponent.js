@@ -11,18 +11,16 @@ function defineComponent (component) {
   // it is basically a class static property
   // @TODO move it to globalInfo
   const name = component.name
-  const memo = { name, template: null }
 
   globalInfo.components[name] = component
-  const childCompNames = component.uses && new Set(component.uses.map(c => c.name.toLowerCase()))
+  const childComps = component.uses && new Set(component.uses.map(c => c.name.toLowerCase()))
+  const memo = { name, template: null, childComps, component }
 
   class Nue extends HTMLElement {
     constructor () {
       super()
       this.nue = {
-        childCompNames,
         self: this,
-        component,
         refs: {},
         actions: {},
         deps: { $: new Map() },
@@ -46,7 +44,6 @@ function defineComponent (component) {
 
         // methods to be invoked after certain phase is completed
         deferred: [],
-        name,
         closure: this.sweet && this.sweet.closure
       }
 

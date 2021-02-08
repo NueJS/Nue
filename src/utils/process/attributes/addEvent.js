@@ -6,7 +6,7 @@ import err from '../../dev/error.js'
 
 function addEvent (comp, node, info) {
   const { name, placeholder } = info
-  const { actions } = comp.component
+  const { actions } = comp.memo.component
 
   const action = actions && actions[name]
   const fnName = placeholder.fnName
