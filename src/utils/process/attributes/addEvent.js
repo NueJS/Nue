@@ -6,7 +6,9 @@ import err from '../../dev/error.js'
 
 function addEvent (comp, node, info) {
   const { name, placeholder } = info
-  const action = globalInfo.actions[name]
+  const { actions } = comp.component
+
+  const action = actions && actions[name]
   const fnName = placeholder.fnName
   const handler = getFn(comp, fnName)
 
