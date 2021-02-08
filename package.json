@@ -1,13 +1,15 @@
 {
-  "name": "supersweet",
+  "name": "@nuejs/nue",
   "version": "0.0.9",
-  "description": "Sweetest JS Framework To Create Reactive UIs Using Web Components",
+  "description": "Next Generation Reactive JavaScript Framework",
   "main": "src/index.js",
   "scripts": {
     "test": "jest"
   },
   "keywords": [
-    "ui-library",
+    "nuejs",
+    "nue",
+    "ui library",
     "framework",
     "reactive",
     "web components"
