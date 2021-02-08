@@ -25,12 +25,12 @@ function sweetifyAttributes (comp, node) {
     }
 
     // CONDITIONAL: disabled:if='{{ disabled }}'
-    if (attributeName.endsWith(':if')) {
+    else if (attributeName.endsWith(':if')) {
       name = attributeName.slice(0, -3)
       type = CONDITIONAL
     }
 
-    if (variableValue) {
+    else if (variableValue) {
       // BIND: :value='{{ count }}'
       if (attributeName[0] === ':') {
         type = BIND
