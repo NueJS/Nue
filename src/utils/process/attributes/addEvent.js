@@ -13,7 +13,7 @@ function addEvent (comp, node, info) {
   if (DEV) {
     if (!handler) {
       err({
-        message: `"ERROR in <${comp.nodeName}>'s <${node.nodeName}> : "${placeholder.content}" function is not defined`,
+        message: `invalid method "${placeholder.fnName}" used`,
         link: '',
         code: -1,
         comp
