@@ -3,7 +3,7 @@ import sweetifyTextNode from './sweetifyTextNode.js'
 // import traverse from '../node/traverse.js'
 import globalInfo from '../globalInfo.js'
 import processPlaceholder from '../string/placeholder/processPlaceholder.js'
-import { isConditionNode } from '../node/dom.js'
+import { attr, isConditionNode } from '../node/dom.js'
 
 function sweetifyTemplate (comp) {
   const uselessNodes = []
@@ -61,7 +61,23 @@ function sweetifyTemplate (comp) {
       sweetifyAttributes(comp, node)
     }
 
-    if (node.nodeName === 'FOR') return
+    if (node.nodeName === 'FOR') {
+      const loopInfo = attr(node, ':')
+      const [item, items] = loopInfo.split('in')
+      const key = attr(node, 'key')
+      node.sweet = {}
+
+      const names = ['each', 'of', 'key'];
+      [item, items, key].forEach((x, i) => {
+        node.sweet[names[i]] = processPlaceholder(x, true)
+      })
+
+      for (const x of ['reorder', 'enter', 'exit', 'at']) {
+        node.sweet[x] = attr(node, x)
+      }
+
+      return
+    }
 
     if (node.hasChildNodes()) {
       node.childNodes.forEach(n => sweetify(n))

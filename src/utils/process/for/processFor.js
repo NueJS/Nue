@@ -19,7 +19,7 @@ import defineComponent from '../../defineComponent.js'
 
 function processFor (comp, forNode) {
   const name = 'swt-' + uid()
-  const forInfo = getForInfo(forNode)
+  const forInfo = forNode.sweet
 
   const blob = {
     comps: [],
@@ -39,7 +39,7 @@ function processFor (comp, forNode) {
   }
 
   if (forInfo.at) {
-    blob.$index = forInfo.at.content
+    blob.$index = forInfo.at
   }
 
   if (DEV) checkForInfo(blob)

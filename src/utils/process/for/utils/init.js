@@ -14,7 +14,7 @@ const init = ({ forInfo, comp, comps, forNode, name, oldState }) => {
   // create and add component to DOM by going over array
   state.value.forEach((value, index) => {
     // debugger
-    const newComp = createComp(name, forInfo, value, index)
+    const newComp = createComp(comp, name, forInfo, value, index)
     comps.push(newComp)
     forNode.before(newComp)
   })

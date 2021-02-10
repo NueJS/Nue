@@ -2,12 +2,15 @@
 import { getOffset } from '../../../node/dom'
 import { getStateProps } from './get'
 
-const createComp = (name, forInfo, value, i) => {
+const createComp = (comp, name, forInfo, value, i) => {
   const newComp = document.createElement(name)
   // // apply class
   // if (forInfo.class) newComp.className = forInfo.class
-  newComp.sweet = {}
-  newComp.sweet.stateProps = getStateProps(forInfo, value, i)
+  newComp.sweet = {
+    isComp: true,
+    closure: comp,
+    stateProps: getStateProps(forInfo, value, i)
+  }
 
   // record the initial offset
   if (forInfo.reorder) {

@@ -16,7 +16,6 @@ export const updateCompState = (newState, { comps, forInfo, oldState, $index, $e
     for (let i = 0; i < comps.length; i++) {
       const state = comps[i].nue.$
       // update index
-      // console.log(target, target.$)
       if (state[TARGET][$index] !== i) {
         state[$index] = i
       }

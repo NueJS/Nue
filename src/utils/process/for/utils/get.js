@@ -4,10 +4,10 @@ import { TARGET } from '../../../symbols'
 
 export const getStateProps = (forInfo, value, i) => {
   const stateProps = {
-    [forInfo.each.content]: value
+    [forInfo.each.content]: value,
+    [forInfo.at]: i
   }
 
-  if (forInfo.at) stateProps[forInfo.at.content] = i
   return stateProps
 }
 
@@ -20,19 +20,4 @@ export const getHashArray = (forInfo, arr) =>
 export const getHash = (forInfo, stateProps) => {
   const [target, prop] = targetProp(stateProps, forInfo.key.deps[0])
   return target[prop]
-}
-
-export const getForInfo = (forNode) => {
-  const forInfo = {}
-  for (const at of ['reorder', 'enter', 'exit', 'key']) {
-    forInfo[at] = attr(forNode, at)
-  }
-
-  // build forInfo object
-  forNode.sweet.attributes.forEach(attribute => {
-    const { name, placeholder } = attribute
-    forInfo[name] = placeholder
-  })
-
-  return forInfo
 }
