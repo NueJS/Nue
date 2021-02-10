@@ -22,7 +22,7 @@ function defineComponent (name, component) {
         refs: {},
         actions: {},
         deps: { $: new Map() },
-        fn: this.fnProps || {},
+        fn: this.fnProps || {}, // move this to connectedCallback
 
         // callbacks that are to be called in various phases
         queue: {
@@ -41,8 +41,8 @@ function defineComponent (name, component) {
         memo,
 
         // methods to be invoked after certain phase is completed
-        deferred: [],
-        closure: this.sweet && this.sweet.closure
+        deferred: []
+
       }
 
       const comp = this.nue
@@ -54,6 +54,7 @@ function defineComponent (name, component) {
       const comp = this.nue
       // must run preprocess after the node is connected, to make sure that it gets stateProps from node.sweet
       if (!this.shadowRoot) {
+        comp.closure = this.sweet && this.sweet.closure
         preprocess(comp, component)
         buildShadowDOM(comp)
       }
