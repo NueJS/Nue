@@ -19,7 +19,9 @@ const addDefaultStyles = (template) => {
 }
 
 function preprocess (comp, component) {
-  [comp.$, comp.$Target] = reactify(comp, (comp.self.sweet && comp.self.sweet.stateProps) || {})
+  const init = (comp.self.sweet && comp.self.sweet.stateProps);
+
+  [comp.$, comp.$Target] = reactify(comp, init || {})
 
   const invokeComp = (processed) => {
     modes.reactive = false

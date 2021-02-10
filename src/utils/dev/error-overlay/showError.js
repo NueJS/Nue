@@ -34,7 +34,7 @@ function handleErrors (error) {
   $message.textContent = `❌ ${error.message}\n✨ ${error.fix}`
 
   const $componentName = $sweetErrorOverlay.shadowRoot.querySelector('.title')
-  $componentName.textContent = `error in <${error.comp.self.nue.name}/> `
+  $componentName.textContent = `error in <${error.comp.memo.name}/> `
 
   // error in console
   console.log('Origin of Error: ')

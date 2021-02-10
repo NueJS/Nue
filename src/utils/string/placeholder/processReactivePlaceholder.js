@@ -15,7 +15,8 @@ const processReactivePlaceholder = (content) => {
   return {
     type: REACTIVE,
     getValue,
-    deps: [path]
+    deps: [path],
+    content
   }
 }
 

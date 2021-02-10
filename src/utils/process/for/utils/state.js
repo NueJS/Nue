@@ -14,10 +14,11 @@ export const updateCompState = (newState, { comps, forInfo, oldState, $index, $e
   if (forInfo.at) {
     // const movedComps = comps.map(c => c.isMoved)
     for (let i = 0; i < comps.length; i++) {
-      const target = comps[i]
+      const state = comps[i].nue.$
       // update index
-      if (target.$[TARGET][$index] !== i) {
-        target.$[$index] = i
+      // console.log(target, target.$)
+      if (state[TARGET][$index] !== i) {
+        state[$index] = i
       }
     }
   }

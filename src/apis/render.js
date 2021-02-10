@@ -22,7 +22,7 @@ const render = (component, settings) => {
     }
   }
 
-  defineComponent(component)
+  defineComponent(component.name, component)
 }
 
 export default render

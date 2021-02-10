@@ -1,4 +1,4 @@
-import { render } from '../../../index.js'
+// import { render } from '../../../index.js'
 import { saveOffsets } from '../../node/dom.js'
 import DEV from '../../dev/DEV.js'
 import addDep from '../../state/addDep.js'
@@ -9,12 +9,13 @@ import animateMove from './animate/animateMove.js'
 import animateRemove from './animate/animateRemove.js'
 import checkForInfo from './utils/checkForInfo.js'
 import { getForInfo } from './utils/get.js'
-import { registerComp } from './utils/comp.js'
+// import { registerComp } from './utils/comp.js'
 import init from './utils/init.js'
 import executeSteps from './executeSteps/executeSteps.js'
 import reconcile from './diff/reconcile.js'
 import deepClone from '../../deepClone.js'
 import checkUniquenessOfKeys from './dev/checkUniquenessOfKeys.js'
+import defineComponent from '../../defineComponent.js'
 
 function processFor (comp, forNode) {
   const name = 'swt-' + uid()
@@ -43,12 +44,12 @@ function processFor (comp, forNode) {
 
   if (DEV) checkForInfo(blob)
 
-  registerComp(name, forNode.innerHTML)
+  const loopComp = o => o.template(forNode.innerHTML)
+  defineComponent(name, loopComp)
 
   comp.deferred.push(() => {
     blob.anchorNode = document.createComment('for')
     forNode.before(blob.anchorNode)
-    render(name)
     init(blob)
     forNode.before(document.createComment('/for'))
     forNode.remove()

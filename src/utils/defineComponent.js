@@ -6,12 +6,10 @@ import globalInfo from './globalInfo.js'
 import dashify from './string/dashify.js'
 // import globalInfo from './globalInfo.js'
 // define a component using name and a component function
-function defineComponent (component) {
+function defineComponent (name, component) {
   // memo is object containing information that will be same for all the instance of component
   // it is basically a class static property
   // @TODO move it to globalInfo
-  const name = component.name
-
   globalInfo.components[name] = component
   const childComps = component.uses && new Set(component.uses.map(c => c.name.toLowerCase()))
   const memo = { name, template: null, childComps, component }
@@ -49,14 +47,18 @@ function defineComponent (component) {
 
       const comp = this.nue
       createLifecycleHooks(comp)
-      preprocess(comp, component)
-      buildShadowDOM(comp)
     }
 
     // when component is added in dom
     connectedCallback () {
       const comp = this.nue
+      // must run preprocess after the node is connected, to make sure that it gets stateProps from node.sweet
+      if (!this.shadowRoot) {
+        preprocess(comp, component)
+        buildShadowDOM(comp)
+      }
       if (comp.ignoreConnectionChange) return
+
       // run mount callbacks first and then connect the DOM to state
       // this allows state to set by onMount callbacks to be used directly by the DOM without having to initialize with null values
       comp.mountCbs.forEach(cb => cb())

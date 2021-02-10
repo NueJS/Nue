@@ -36,15 +36,16 @@ export default {
       return keys.indexOf(key, i) !== keys.lastIndexOf(key)
     })
 
+    const message = 'non-unique keys used in <for>' +
+    '\n' +
+    `keys used: ${keys} ` +
+    '\n' +
+    `non-unique keys: ${nonUniqueKeys}`
+
     err({
-      message:
-      `non-unique keys used in <${component.localName}>` +
-      '\n\n' +
-      `keys used: ${JSON.stringify(keys, null, 2)} ` +
-      '\n\n' +
-      `non-unique keys: ${JSON.stringify(nonUniqueKeys, null, 2)}`,
+      message,
       component,
-      fix: 'All keys must be unique, change the key attribute on <for> '
+      fix: 'make sure that key used in <for> is unique for all items'
     })
   },
 
