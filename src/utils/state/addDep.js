@@ -17,16 +17,14 @@ function origin (comp, path) {
 function addDep (baseComp, path, cb, type) {
   const comp = origin(baseComp, path)
 
-  if (DEV) {
-    if (!comp) {
-      err({
-        message: `Invalid state placeholder used in template : {{ ${path.join('.')} }}`,
-        fix: `make sure that "${path.join('.')}" exists in state of <${baseComp.name}/> component or it's closure`,
-        link: '',
-        code: -1,
-        comp: baseComp
-      })
-    }
+  if (DEV && !comp) {
+    err({
+      message: `Invalid state placeholder used in template : [${path.join('.')}]`,
+      fix: `make sure that "${path.join('.')}" exists in state of <${baseComp.memo.name}/> component or it's closure`,
+      link: '',
+      code: -1,
+      comp: baseComp
+    })
   }
 
   const qcb = cbQueuer(comp, cb, type)
