@@ -12,11 +12,11 @@ const createGroup = (comp, conditionNode) => {
 
   // set isSatisfied method and anchorNode textContent
   if (type !== 'ELSE') {
-    const { getValue, text } = condition
+    const { getValue, content } = condition
     isSatisfied = () => getValue(comp)
 
     if (DEV) {
-      anchorNode.textContent = ` ${type} := ${text} ❌ `
+      anchorNode.textContent = ` ${type} := [${content}] ❌ `
     }
   }
 
