@@ -7,9 +7,6 @@ import { getNewState, updateCompState } from './utils/state.js'
 import animateEnter from './animate/animateEnter.js'
 import animateMove from './animate/animateMove.js'
 import animateRemove from './animate/animateRemove.js'
-import checkForInfo from './utils/checkForInfo.js'
-// import { getForInfo } from './utils/get.js'
-// import { registerComp } from './utils/comp.js'
 import init from './utils/init.js'
 import executeSteps from './executeSteps/executeSteps.js'
 import reconcile from './diff/reconcile.js'
@@ -35,8 +32,6 @@ function processFor (comp, forNode) {
     animating: false,
     movedIndexes: []
   }
-
-  if (DEV) checkForInfo(blob)
 
   const loopComp = o => o.template(forNode.innerHTML)
   defineComponent(name, loopComp)
