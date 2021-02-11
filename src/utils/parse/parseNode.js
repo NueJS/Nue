@@ -15,11 +15,10 @@ const parseNode = (comp, _node, uselessNodes) => {
     node = parseComp(name, node, _node)
   }
 
-  // memoize text content
   else if (node.nodeType === Node.TEXT_NODE) {
     if (!node.textContent.trim()) uselessNodes.push(node)
     else parseTextNode(comp, node)
-    return // must use return here
+    return
   }
 
   else if (isConditionNode(node)) {
