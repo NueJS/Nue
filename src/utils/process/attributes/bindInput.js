@@ -7,19 +7,38 @@ function bindInput (comp, node, attribute) {
   const { getValue, deps } = attribute.placeholder
   const { name } = attribute
 
-  const handler = () => {
-    let value = node[name]
-    value = isNumber ? Number(value) : value
-    mutate(comp.$, deps[0], value)
-  }
-
-  node.addEventListener('input', handler)
-
-  const cb = () => {
+  const setProp = () => {
     node[name] = getValue(comp, node)
   }
 
-  wire(comp, node, deps, cb)
+  const setText = () => {
+    node.textContent = getValue(comp, node)
+  }
+
+  const addHandler = (handler) => {
+    const { onMount, onDestroy } = comp.events
+    onMount(() => node.addEventListener('input', handler))
+    onDestroy(() => node.removeEventListener('input', handler))
+  }
+
+  if (node.matches('[contenteditable]')) {
+    const handler = () => mutate(comp.$, deps[0], node.textContent)
+    addHandler(handler)
+    wire(comp, node, deps, setText)
+    return // must return
+  }
+
+  if (node.matches('input, textarea')) {
+    const handler = () => {
+      let value = node[name]
+      value = isNumber ? Number(value) : value
+      mutate(comp.$, deps[0], value)
+    }
+
+    addHandler(handler)
+  }
+
+  wire(comp, node, deps, setProp)
 }
 
 export default bindInput
