@@ -1,17 +1,7 @@
 import { cbQueuer } from '../callbacks.js'
+import { origin } from '../closure.js'
 import DEV from '../dev/DEV.js'
 import err from '../dev/error.js'
-import { hasSlice } from './slice.js'
-
-// get the origin component where the value of the path is coming from
-const origin = (comp, path) => {
-  let target = comp
-  while (!hasSlice(target.$Target, path)) {
-    if (!target.closure) return undefined
-    target = target.closure
-  }
-  return target
-}
 
 // add Dep for given path on its origin
 const addDep = (baseComp, path, cb, type) => {
@@ -44,7 +34,7 @@ const addDep = (baseComp, path, cb, type) => {
   }
 }
 
-export function addDeps (comp, deps, cb, type) {
+export const addDeps = (comp, deps, cb, type) => {
   const removeDeps = deps.map(dep => addDep(comp, dep, cb, type))
   return removeDeps
 }
