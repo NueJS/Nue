@@ -24,20 +24,20 @@ function parseAttributes (comp, node) {
       }
     }
 
-    // CONDITIONAL: disabled:if='{{ disabled }}'
-    else if (attributeName.endsWith(':if')) {
-      name = attributeName.slice(0, -3)
-      type = CONDITIONAL
-    }
-
     else if (variableValue) {
-      // BIND: :value='{{ count }}'
-      if (attributeName[0] === ':') {
+      // CONDITIONAL: disabled:if=[disabled]
+      if (attributeName.endsWith(':if')) {
+        type = CONDITIONAL
+        name = attributeName.slice(0, -3)
+      }
+
+      // BIND: :value=[count],  :index=[i]
+      else if (attributeName[0] === ':') {
         type = BIND
         name = attributeName.slice(1)
       }
 
-      // NORMAL: data-count='{{ count }}'
+      // NORMAL: class=[foo]
       else {
         name = attributeName
         type = isSweetComp ? STATE : NORMAL

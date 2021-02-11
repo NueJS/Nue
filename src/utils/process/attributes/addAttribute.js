@@ -9,9 +9,7 @@ function addAttribute (comp, node, attribute) {
   let update
   if (type === CONDITIONAL) {
     update = () => {
-      const value = getValue(comp)
-      if (value) node.setAttribute(name, value)
-      else node.removeAttribute(name)
+      getValue(comp) ? node.setAttribute(name, '') : node.removeAttribute(name)
     }
   }
 
