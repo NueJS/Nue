@@ -1,3 +1,4 @@
+import DEV from '../dev/DEV'
 import err from '../dev/error'
 import { attr } from '../node/dom'
 import processPlaceholder from '../string/placeholder/processPlaceholder'
@@ -18,7 +19,7 @@ const parseFor = (node) => {
     node.parsed[x] = attr(node, x)
   }
 
-  checkForNode(node.parsed)
+  if (DEV) checkForNode(node.parsed)
 }
 
 const checkForNode = (parsed) => {
