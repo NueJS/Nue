@@ -18,16 +18,16 @@ function handleErrors (error) {
     }
 
     connectedCallback () {
-      const closeButton = this.shadowRoot.querySelector('.sweet-error__close-icon')
+      const closeButton = this.shadowRoot.querySelector('.parsed-error__close-icon')
       closeButton.addEventListener('click', e => {
         this.remove()
       })
     }
   }
 
-  window.customElements.define('sweet-error-overlay', sweetErrorOverlay)
+  window.customElements.define('parsed-error-overlay', sweetErrorOverlay)
 
-  const $sweetErrorOverlay = document.createElement('sweet-error-overlay')
+  const $sweetErrorOverlay = document.createElement('parsed-error-overlay')
   document.body.append($sweetErrorOverlay)
 
   const $message = $sweetErrorOverlay.shadowRoot.querySelector('.message')

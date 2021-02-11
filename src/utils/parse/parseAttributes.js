@@ -54,8 +54,8 @@ function parseAttributes (comp, node) {
 
   // if placeholder attributes found
   if (attributes.length) {
-    if (!node.sweet) node.sweet = {}
-    node.sweet.attributes = attributes
+    if (!node.parsed) node.parsed = {}
+    node.parsed.attributes = attributes
   }
 }
 

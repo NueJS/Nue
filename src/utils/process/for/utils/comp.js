@@ -6,7 +6,7 @@ const createComp = (comp, name, forInfo, value, i) => {
   const newComp = document.createElement(name)
   // // apply class
   // if (forInfo.class) newComp.className = forInfo.class
-  newComp.sweet = {
+  newComp.parsed = {
     isComp: true,
     closure: comp,
     stateProps: getStateProps(forInfo, value, i)

@@ -4,13 +4,13 @@ import processIf from './if/if.js'
 import processFor from './for/processFor.js'
 
 function processNode (comp, node) {
-  const { sweet, nodeType, nodeName } = node
-  if (sweet) {
-    if (sweet.isProcessed) return
-    sweet.isProcessed = true
+  const { parsed, nodeType, nodeName } = node
+  if (parsed) {
+    if (parsed.isProcessed) return
+    parsed.isProcessed = true
 
     // save the comp as closure of component
-    if (sweet.isComp) node.sweet.closure = comp
+    if (parsed.isComp) node.parsed.closure = comp
     else if (nodeType === Node.TEXT_NODE) processTextNode(comp, node)
     else if (nodeName === 'IF') processIf(comp, node)
     else if (nodeName === 'FOR') processFor(comp, node)

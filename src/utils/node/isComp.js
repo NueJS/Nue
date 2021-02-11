@@ -1,3 +1,3 @@
-const isComp = node => node.sweet && node.sweet.isComp
+const isComp = node => node.parsed && node.parsed.isComp
 
 export default isComp

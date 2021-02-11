@@ -7,10 +7,10 @@ const buildShadowDOM = (comp) => {
   // create clone of template
   const fragment = template.content.cloneNode(true)
 
-  // add sweet property on fragment
+  // add parsed property on fragment
   copySweet(template.content, fragment)
 
-  // process nodes using sweet property
+  // process nodes using parsed property
   processNode(comp, fragment)
   comp.deferred.forEach(p => p())
 

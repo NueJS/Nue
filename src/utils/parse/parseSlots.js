@@ -1,7 +1,7 @@
 function parseSlots (comp) {
   // if we need nodes in slot
-  if (comp.sweet && comp.sweet.childNodes) {
-    comp.sweet.childNodes.forEach(node => {
+  if (comp.parsed && comp.parsed.childNodes) {
+    comp.parsed.childNodes.forEach(node => {
       let slotSelector = 'slot:not([name])'
       if (node.nodeType !== Node.TEXT_NODE) {
         // slotSelector = 'slot'

@@ -4,7 +4,7 @@ import DEV from './dev/DEV.js'
 export const runQueue = (comp, name) => {
   const map = comp.queue[name]
   for (const [cb, args] of map) {
-    if ((cb.node && cb.node.sweet.isConnected) || !cb.node) {
+    if ((cb.node && cb.node.parsed.isConnected) || !cb.node) {
       cb(args)
       if (DEV) {
         if (devtools.showUpdates && cb.node) {

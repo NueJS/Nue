@@ -19,7 +19,7 @@ const addDefaultStyles = (template) => {
 }
 
 function runComponent (comp, component) {
-  const init = (comp.node.sweet && comp.node.sweet.stateProps);
+  const init = (comp.node.parsed && comp.node.parsed.stateProps);
   [comp.$, comp.$Target] = reactify(comp, init || {})
 
   const invokeComp = (processed) => {

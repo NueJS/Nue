@@ -19,7 +19,7 @@ function parseTemplate (comp) {
       _node.innerHTML = ''
       const newNode = document.createElement(name + '-')
       _node.replaceWith(newNode)
-      newNode.sweet = {
+      newNode.parsed = {
         isComp: true,
         name,
         childNodes: [...node.childNodes]
@@ -43,7 +43,7 @@ function parseTemplate (comp) {
 
     // if condition node
     else if (isConditionNode(node)) {
-      node.sweet = {
+      node.parsed = {
         type: node.nodeName,
         enter: node.getAttribute('enter'),
         exit: node.getAttribute('exit')
@@ -51,7 +51,7 @@ function parseTemplate (comp) {
 
       if (node.nodeName !== 'ELSE') {
         const condition = node.getAttribute(':')
-        node.sweet.condition = processPlaceholder(condition)
+        node.parsed.condition = processPlaceholder(condition)
       }
     }
 
@@ -63,15 +63,15 @@ function parseTemplate (comp) {
       const loopInfo = attr(node, ':')
       const [item, items] = loopInfo.split('in')
       const key = attr(node, 'key')
-      node.sweet = {}
+      node.parsed = {}
 
       const names = ['each', 'of', 'key'];
       [item, items, key].forEach((x, i) => {
-        node.sweet[names[i]] = processPlaceholder(x, true)
+        node.parsed[names[i]] = processPlaceholder(x, true)
       })
 
       for (const x of ['reorder', 'enter', 'exit', 'at']) {
-        node.sweet[x] = attr(node, x)
+        node.parsed[x] = attr(node, x)
       }
 
       return

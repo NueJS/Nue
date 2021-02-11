@@ -3,7 +3,7 @@ import errors from '../../../dev/errors'
 import { isConditionNode, onAnimationEnd } from '../../../node/dom'
 
 const createGroup = (comp, conditionNode) => {
-  const { type, enter, exit, condition } = conditionNode.sweet
+  const { type, enter, exit, condition } = conditionNode.parsed
 
   const anchorNode = document.createComment(type)
   const onRemove = (cb) => onAnimationEnd(lastNode, cb)
@@ -42,7 +42,7 @@ const createGroup = (comp, conditionNode) => {
       nodes.push(node)
 
       // mark it as processed
-      if (node.sweet) node.sweet.isProcessed = true
+      if (node.parsed) node.parsed.isProcessed = true
     }
   })
 

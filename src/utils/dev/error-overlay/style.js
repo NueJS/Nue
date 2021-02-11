@@ -12,7 +12,7 @@ export default /* html */`
     height: 100vh;
   }
 
-  .sweet-error__card {
+  .parsed-error__card {
     background: white;
     border-radius: 5px;
     padding: 30px 20px;
@@ -23,7 +23,7 @@ export default /* html */`
     box-shadow: 2px 2px 20px rgba(0,0,0,0.1);
   }
 
-  .sweet-error__close-icon {
+  .parsed-error__close-icon {
     background: red;
     border: none;
     border-radius: 50%;
@@ -57,7 +57,7 @@ export default /* html */`
     }
   }
 
-  .sweet-error__panel {
+  .parsed-error__panel {
     background: hsl(193, 20%, 62%, 0.5);
     padding: 50px 20px;
     min-height: 100vh;

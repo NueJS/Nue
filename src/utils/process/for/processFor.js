@@ -19,7 +19,7 @@ import defineComponent from '../../defineComponent.js'
 
 function processFor (comp, forNode) {
   const name = 'swt-' + uid()
-  const forInfo = forNode.sweet
+  const forInfo = forNode.parsed
 
   const blob = {
     comps: [],

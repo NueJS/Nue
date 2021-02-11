@@ -19,8 +19,8 @@ function wire (comp, node, deps, update) {
     // return deps.map(path => addDep(comp, path, update, 'dom'))
   }
   addConnects(node, connectNode)
-  if (!node.sweet.updates) node.sweet.updates = []
-  node.sweet.updates.push(update)
+  if (!node.parsed.updates) node.parsed.updates = []
+  node.parsed.updates.push(update)
 }
 
 export default wire

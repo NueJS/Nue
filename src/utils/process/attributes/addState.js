@@ -4,8 +4,8 @@ function addState (comp, node, attribute) {
   const { getValue } = placeholder
 
   // pass the stateProps to child component to initialize state
-  if (!node.sweet.stateProps) node.sweet.stateProps = {}
-  node.sweet.stateProps[name] = getValue(comp)
+  if (!node.parsed.stateProps) node.parsed.stateProps = {}
+  node.parsed.stateProps[name] = getValue(comp)
 }
 
 export default addState

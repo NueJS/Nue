@@ -45,9 +45,9 @@ function defineComponent (name, component) {
     // when component is added in dom
     connectedCallback () {
       const comp = this.nue
-      // must run runComponent after the node is connected, to make sure that it gets stateProps from node.sweet
+      // must run runComponent after the node is connected, to make sure that it gets stateProps from node.parsed
       if (!this.shadowRoot) {
-        comp.closure = this.sweet && this.sweet.closure
+        comp.closure = this.parsed && this.parsed.closure
         runComponent(comp, component)
         buildShadowDOM(comp)
       }
@@ -68,7 +68,7 @@ function defineComponent (name, component) {
     }
   }
 
-  // define the parent first and then child so that child components will have sweet on it
+  // define the parent first and then child so that child components will have parsed on it
   customElements.define(dashify(name), Nue)
 
   if (component.uses) {

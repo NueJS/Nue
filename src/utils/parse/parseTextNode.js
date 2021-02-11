@@ -8,7 +8,7 @@ function parseTextNode (comp, node) {
   placeholders.forEach(placeholder => {
     const textNode = document.createTextNode(placeholder.text)
     if (placeholder.type !== TEXT) {
-      textNode.sweet = { placeholder }
+      textNode.parsed = { placeholder }
     }
 
     textNodes.push(textNode)
