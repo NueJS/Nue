@@ -1,4 +1,5 @@
-import { triggerMapCbs } from '../callbacks.js'
+import { runQueue } from '../callbacks.js'
+import { runEvent } from '../lifecycle.js'
 
 const clearQueue = (comp) => {
   for (const key in comp.queue) {
@@ -6,25 +7,19 @@ const clearQueue = (comp) => {
   }
 }
 
+const queueOrder = ['computed', 'stateReady', 'dom']
+
 // wait for all the callbacks to be registered and then call all of them in proper order
-function invokeQueue (comp) {
+const invokeQueue = (comp) => {
   // don't trigger setTimeout again once the collecting is started
   comp.batching = true
 
   // after all the callbacks are triggered by state mutation, call callbacks in proper order
   setTimeout(() => {
-    comp.beforeUpdateCbs.forEach(cb => cb())
-
-    // all dom updates are batched here
-    triggerMapCbs(comp.queue.computed)
-    triggerMapCbs(comp.queue.stateReady)
-    triggerMapCbs(comp.queue.dom)
-
-    comp.afterUpdateCbs.forEach(cb => cb())
-
-    // once all cbs are invoked, clear the queue
+    runEvent(comp, 'beforeUpdate')
+    for (const queueName of queueOrder) runQueue(comp, queueName)
     clearQueue(comp)
-
+    runEvent(comp, 'afterUpdate')
     // allow the queue to being built for next state mutation
     comp.batching = false
   }, 0)

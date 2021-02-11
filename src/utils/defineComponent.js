@@ -1,6 +1,6 @@
 import { connect, disconnect } from './connection/recursive.js'
-import preprocess from './sweetify/preprocess.js'
-import createLifecycleHooks from './createLifecycleHooks.js'
+import runComponent from './runComponent.js'
+import addLifecycles, { runEvent } from './lifecycle.js'
 import buildShadowDOM from './buildShadowDOM.js'
 import globalInfo from './globalInfo.js'
 import dashify from './string/dashify.js'
@@ -17,8 +17,8 @@ function defineComponent (name, component) {
   class Nue extends HTMLElement {
     constructor () {
       super()
-      this.nue = {
-        self: this,
+      const comp = this.nue = {
+        node: this,
         refs: {},
         actions: {},
         deps: { $: new Map() },
@@ -31,12 +31,6 @@ function defineComponent (name, component) {
           dom: new Map()
         },
 
-        // lifecycle callbacks
-        mountCbs: [],
-        destroyCbs: [],
-        beforeUpdateCbs: [],
-        afterUpdateCbs: [],
-
         // common data between all instances of component
         memo,
 
@@ -45,24 +39,23 @@ function defineComponent (name, component) {
 
       }
 
-      const comp = this.nue
-      createLifecycleHooks(comp)
+      addLifecycles(comp)
     }
 
     // when component is added in dom
     connectedCallback () {
       const comp = this.nue
-      // must run preprocess after the node is connected, to make sure that it gets stateProps from node.sweet
+      // must run runComponent after the node is connected, to make sure that it gets stateProps from node.sweet
       if (!this.shadowRoot) {
         comp.closure = this.sweet && this.sweet.closure
-        preprocess(comp, component)
+        runComponent(comp, component)
         buildShadowDOM(comp)
       }
       if (comp.ignoreConnectionChange) return
 
       // run mount callbacks first and then connect the DOM to state
       // this allows state to set by onMount callbacks to be used directly by the DOM without having to initialize with null values
-      comp.mountCbs.forEach(cb => cb())
+      runEvent(comp, 'onMount')
       connect(this.shadowRoot, true)
     }
 
@@ -71,10 +64,11 @@ function defineComponent (name, component) {
       const comp = this.nue
       if (comp.ignoreConnectionChange) return
       disconnect(this.shadowRoot, true)
-      comp.destroyCbs.forEach(cb => cb())
+      runEvent(comp, 'onDestroy')
     }
   }
 
+  // define the parent first and then child so that child components will have sweet on it
   customElements.define(dashify(name), Nue)
 
   if (component.uses) {
