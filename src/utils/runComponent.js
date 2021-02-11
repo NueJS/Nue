@@ -38,7 +38,7 @@ function runComponent (comp, component) {
       template,
       fn: comp.fn,
       component: comp,
-      props: { ...comp.stateProps, ...comp.fnProps },
+      props: comp.stateProps,
       ...comp.events
     })
 

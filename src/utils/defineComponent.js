@@ -22,7 +22,7 @@ function defineComponent (name, component) {
         refs: {},
         actions: {},
         deps: { $: new Map() },
-        fn: this.fnProps || {}, // move this to connectedCallback
+        fn: {}, // move this to connectedCallback
 
         // callbacks that are to be called in various phases
         queue: {

@@ -6,12 +6,12 @@ import { EVENT, BIND, STATE, FN_PROP } from '../../constants.js'
 
 // ex: @click=[fn]
 // set fn.click in the comp
-function addFnProp (parentComp, comp, attribute) {
-  const { name, placeholder } = attribute
-  if (!comp.fnProps) comp.fnProps = {}
-  comp.fnProps[name] = parentComp.fn[placeholder.content]
-  comp.removeAttribute(name)
-}
+// function addFnProp (parentComp, comp, attribute) {
+//   const { name, placeholder } = attribute
+//   if (!comp.fnProps) comp.fnProps = {}
+//   comp.fnProps[name] = parentComp.fn[placeholder.content]
+//   comp.removeAttribute(name)
+// }
 
 function processAttributes (comp, node) {
   // refs API
@@ -36,7 +36,7 @@ function processAttributes (comp, node) {
 
     // prop=[value] on parsed component
     else if (type === STATE) addState(comp, node, attribute)
-    else if (type === FN_PROP) addFnProp(comp, node, attribute)
+    // else if (type === FN_PROP) addFnProp(comp, node, attribute)
     else addAttribute(comp, node, attribute)
   })
 }
