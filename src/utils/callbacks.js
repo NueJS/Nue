@@ -6,11 +6,8 @@ export const runQueue = (comp, name) => {
   for (const [cb, args] of map) {
     if ((cb.node && cb.node.parsed.isConnected) || !cb.node) {
       cb(args)
-      if (DEV) {
-        if (devtools.showUpdates && cb.node) {
-          devtools.onNodeUpdate(cb.node)
-        }
-      }
+      // show node updates
+      if (DEV && cb.node && devtools.showUpdates) devtools.onNodeUpdate(cb.node)
     }
   }
 }
