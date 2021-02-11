@@ -1,23 +1,22 @@
 import { isBracketed } from '../string/bracket.js'
 import processPlaceholder from '../string/placeholder/processPlaceholder.js'
-import { STATE, EVENT, BIND, NORMAL, FN_PROP, CONDITIONAL } from '../constants.js'
+import { STATE, EVENT, BIND, NORMAL, CONDITIONAL } from '../constants.js'
 import isComp from '../node/isComp.js'
 
 function parseAttributes (comp, node) {
   const attributes = []
-  const isSweetComp = isComp(node)
+  const nodeIsComp = isComp(node)
 
   for (const attributeName of node.getAttributeNames()) {
-    // get the attribute string value
     const attributeValue = node.getAttribute(attributeName)
-    // check if the value is variable or not
     const variableValue = isBracketed(attributeValue)
 
     let name, type, placeholder
+    const firstChar = attributeName[0]
 
     // EVENT: @click='increment'
-    if (attributeName[0] === '@') {
-      type = isSweetComp ? FN_PROP : EVENT
+    if (firstChar === '@') {
+      type = EVENT
       name = attributeName.slice(1)
       placeholder = {
         fnName: attributeValue
@@ -25,22 +24,22 @@ function parseAttributes (comp, node) {
     }
 
     else if (variableValue) {
-      // CONDITIONAL: disabled:if=[disabled]
+      // disabled:if=[disabled]
       if (attributeName.endsWith(':if')) {
         type = CONDITIONAL
         name = attributeName.slice(0, -3)
       }
 
-      // BIND: :value=[count],  :index=[i]
-      else if (attributeName[0] === ':') {
+      // :value=[count], :index=[i]
+      else if (firstChar === ':') {
         type = BIND
         name = attributeName.slice(1)
       }
 
-      // NORMAL: class=[foo]
+      // class=[foo]
       else {
         name = attributeName
-        type = isSweetComp ? STATE : NORMAL
+        type = nodeIsComp ? STATE : NORMAL
       }
 
       placeholder = processPlaceholder(attributeValue)

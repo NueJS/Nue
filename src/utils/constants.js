@@ -10,4 +10,4 @@ export const CONDITIONAL = 6
 export const REACTIVE = 7
 export const FN = 8
 export const TEXT = 9
-export const FN_PROP = 10
+// export const FN_PROP = 10
