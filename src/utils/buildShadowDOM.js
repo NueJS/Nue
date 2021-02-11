@@ -1,7 +1,7 @@
 import copySweet from './node/copySweet.js'
 import processNode from './process/processNode.js'
 
-function buildShadowDOM (comp) {
+const buildShadowDOM = (comp) => {
   const { template } = comp.memo
 
   // create clone of template
@@ -15,11 +15,11 @@ function buildShadowDOM (comp) {
   comp.deferred.forEach(p => p())
 
   // add fragment to shadow DOM
-  comp.self.attachShadow({ mode: 'open' });
+  comp.node.attachShadow({ mode: 'open' });
 
   // must use spread here even though childNodes is an array
   // because, appending node to shadowRoot, removes it from childNodes array
-  [...fragment.childNodes].forEach(node => comp.self.shadowRoot.append(node))
+  [...fragment.childNodes].forEach(node => comp.node.shadowRoot.append(node))
 }
 
 export default buildShadowDOM

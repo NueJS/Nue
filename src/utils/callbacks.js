@@ -1,7 +1,8 @@
 import devtools from '../apis/devtools.js'
 import DEV from './dev/DEV.js'
 
-export function triggerMapCbs (map) {
+export const runQueue = (comp, name) => {
+  const map = comp.queue[name]
   for (const [cb, args] of map) {
     if ((cb.node && cb.node.sweet.isConnected) || !cb.node) {
       cb(args)

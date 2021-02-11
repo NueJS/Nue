@@ -39,7 +39,7 @@ function handleErrors (error) {
   // error in console
   console.log('Origin of Error: ')
   if (error.node) console.log('Node:', error.node)
-  if (error.comp) console.log('Component: ', error.comp.self)
+  if (error.comp) console.log('Component: ', error.comp.node)
   throw new Error(errorMessage)
 }
 

@@ -6,7 +6,7 @@ import { addConnects } from './addConnects'
 // lay wiring for node updates
 function wire (comp, node, deps, update) {
   // attach which node the update method is for so that when the update is called in queue
-  // it can check whether to invoke it self based on whether the node is connected or not to the state
+  // it can check whether to invoke it node based on whether the node is connected or not to the state
   update.node = node
   const connectNode = () => {
     if (DEV) {
