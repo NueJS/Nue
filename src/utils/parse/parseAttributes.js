@@ -3,7 +3,7 @@ import processPlaceholder from '../string/placeholder/processPlaceholder.js'
 import { STATE, EVENT, BIND, NORMAL, FN_PROP, CONDITIONAL } from '../constants.js'
 import isComp from '../node/isComp.js'
 
-function sweetifyAttributes (comp, node) {
+function parseAttributes (comp, node) {
   const attributes = []
   const isSweetComp = isComp(node)
 
@@ -59,4 +59,4 @@ function sweetifyAttributes (comp, node) {
   }
 }
 
-export default sweetifyAttributes
+export default parseAttributes

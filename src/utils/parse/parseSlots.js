@@ -1,4 +1,4 @@
-function populateSlots (comp) {
+function parseSlots (comp) {
   // if we need nodes in slot
   if (comp.sweet && comp.sweet.childNodes) {
     comp.sweet.childNodes.forEach(node => {
@@ -22,4 +22,4 @@ function populateSlots (comp) {
   }
 }
 
-export default populateSlots
+export default parseSlots

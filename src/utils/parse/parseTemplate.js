@@ -1,11 +1,9 @@
-import sweetifyAttributes from './sweetifyAttributes.js'
-import sweetifyTextNode from './sweetifyTextNode.js'
-// import traverse from '../node/traverse.js'
-import globalInfo from '../globalInfo.js'
+import parseAttributes from './parseAttributes.js'
+import parseTextNode from './parseTextNode.js'
 import processPlaceholder from '../string/placeholder/processPlaceholder.js'
 import { attr, isConditionNode } from '../node/dom.js'
 
-function sweetifyTemplate (comp) {
+function parseTemplate (comp) {
   const uselessNodes = []
   comp.deferred = []
 
@@ -39,7 +37,7 @@ function sweetifyTemplate (comp) {
     // memoize text content
     else if (node.nodeType === Node.TEXT_NODE) {
       if (!node.textContent.trim()) uselessNodes.push(node)
-      else sweetifyTextNode(comp, node)
+      else parseTextNode(comp, node)
       return // must use return here
     }
 
@@ -58,7 +56,7 @@ function sweetifyTemplate (comp) {
     }
 
     if (node.hasAttribute) {
-      sweetifyAttributes(comp, node)
+      parseAttributes(comp, node)
     }
 
     if (node.nodeName === 'FOR') {
@@ -91,4 +89,4 @@ function sweetifyTemplate (comp) {
   uselessNodes.forEach(n => n.remove())
 }
 
-export default sweetifyTemplate
+export default parseTemplate

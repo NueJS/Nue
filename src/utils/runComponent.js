@@ -1,9 +1,9 @@
-import globalInfo from '../globalInfo.js'
-import modes from '../reactivity/modes.js'
-import reactify from '../reactivity/reactify.js'
-import templateTag from '../string/templateTag.js'
-import populateSlots from './populateSlots.js'
-import sweetifyTemplate from './sweetifyTemplate.js'
+import globalInfo from './globalInfo.js'
+import modes from './reactivity/modes.js'
+import reactify from './reactivity/reactify.js'
+import templateTag from './string/templateTag.js'
+import parseSlots from './parse/parseSlots.js'
+import parseTemplate from './parse/parseTemplate.js'
 
 const addDefaultStyles = (template) => {
   const { content } = template
@@ -18,9 +18,8 @@ const addDefaultStyles = (template) => {
   }
 }
 
-function preprocess (comp, component) {
-  const init = (comp.self.sweet && comp.self.sweet.stateProps);
-
+function runComponent (comp, component) {
+  const init = (comp.node.sweet && comp.node.sweet.stateProps);
   [comp.$, comp.$Target] = reactify(comp, init || {})
 
   const invokeComp = (processed) => {
@@ -40,7 +39,7 @@ function preprocess (comp, component) {
       fn: comp.fn,
       component: comp,
       props: { ...comp.stateProps, ...comp.fnProps },
-      ...comp.lifecycles
+      ...comp.events
     })
 
     modes.reactive = true
@@ -55,10 +54,10 @@ function preprocess (comp, component) {
   else {
     comp.memo.template = document.createElement('template')
     invokeComp(false)
-    populateSlots(comp)
-    sweetifyTemplate(comp)
+    parseSlots(comp)
+    parseTemplate(comp)
     addDefaultStyles(comp.memo.template)
   }
 }
 
-export default preprocess
+export default runComponent
