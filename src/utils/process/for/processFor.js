@@ -1,5 +1,5 @@
 // import { render } from '../../../index.js'
-import { saveOffsets } from '../../node/dom.js'
+import { attr, saveOffsets } from '../../node/dom.js'
 import DEV from '../../dev/DEV.js'
 import addDep from '../../state/addDep.js'
 import { uid } from '../../others.js'
@@ -14,8 +14,8 @@ import deepClone from '../../deepClone.js'
 import defineComponent from '../../defineComponent.js'
 
 function processFor (comp, forNode) {
-  const name = 'nue-' + uid()
   const forInfo = forNode.parsed
+  const name = forInfo.each.content + '-nue' + uid()
 
   const blob = {
     comps: [],
@@ -24,12 +24,11 @@ function processFor (comp, forNode) {
     forInfo,
     name,
     forNode,
-    comp: comp,
+    comp,
     deferred: [],
     // to keep track of what new components add or removed
     createdComps: [],
     removedComps: [],
-    animating: false,
     movedIndexes: []
   }
 
@@ -37,11 +36,11 @@ function processFor (comp, forNode) {
   defineComponent(name, loopComp)
 
   comp.deferred.push(() => {
-    blob.anchorNode = document.createComment('for')
+    blob.anchorNode = document.createComment(` FOR  := '${attr(forNode, ':')}' `)
     // add anchorNode before forNode
     forNode.before(blob.anchorNode)
     init(blob)
-    forNode.before(document.createComment('/for'))
+    forNode.before(document.createComment(' / FOR '))
     forNode.remove()
   })
 
