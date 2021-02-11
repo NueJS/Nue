@@ -24,6 +24,6 @@ export const updateCompState = (newState, { comps, forInfo, oldState, $index, $e
 
   const diffIndexes = arrayDiff(newState.value, oldState.value)
   diffIndexes.forEach(i => {
-    comps[i].$[$each] = newState.value[i]
+    comps[i].nue.$[$each] = newState.value[i]
   })
 }
