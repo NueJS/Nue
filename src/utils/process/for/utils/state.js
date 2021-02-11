@@ -1,29 +1,40 @@
+import DEV from '../../../dev/DEV'
 import { TARGET } from '../../../symbols'
+import checkUniquenessOfKeys from '../dev/checkUniquenessOfKeys'
 import arrayDiff from '../diff/arrayDiff'
-import { getArray, getHashArray } from './get'
+import { getHashArray } from './get'
 
 export const getNewState = (forInfo, comp) => {
-  const array = getArray(forInfo, comp)
+  const value = forInfo.of.getValue(comp)[TARGET]
+  const hash = getHashArray(forInfo, value)
+
+  if (DEV) {
+    checkUniquenessOfKeys(comp, hash)
+  }
+
   return {
-    hash: getHashArray(forInfo, array),
-    value: array
+    hash,
+    value
   }
 }
 
-export const updateCompState = (newState, { comps, forInfo, oldState, $index, $each }) => {
+export const updateCompState = (newState, { comps, forInfo, oldState }) => {
+  const each = forInfo.each.content
+  const at = forInfo.at
+
   if (forInfo.at) {
     // const movedComps = comps.map(c => c.isMoved)
     for (let i = 0; i < comps.length; i++) {
       const state = comps[i].nue.$
       // update index
-      if (state[TARGET][$index] !== i) {
-        state[$index] = i
+      if (state[TARGET][at] !== i) {
+        state[at] = i
       }
     }
   }
 
   const diffIndexes = arrayDiff(newState.value, oldState.value)
   diffIndexes.forEach(i => {
-    comps[i].nue.$[$each] = newState.value[i]
+    comps[i].nue.$[each] = newState.value[i]
   })
 }

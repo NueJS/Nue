@@ -8,17 +8,16 @@ import animateEnter from './animate/animateEnter.js'
 import animateMove from './animate/animateMove.js'
 import animateRemove from './animate/animateRemove.js'
 import checkForInfo from './utils/checkForInfo.js'
-import { getForInfo } from './utils/get.js'
+// import { getForInfo } from './utils/get.js'
 // import { registerComp } from './utils/comp.js'
 import init from './utils/init.js'
 import executeSteps from './executeSteps/executeSteps.js'
 import reconcile from './diff/reconcile.js'
 import deepClone from '../../deepClone.js'
-import checkUniquenessOfKeys from './dev/checkUniquenessOfKeys.js'
 import defineComponent from '../../defineComponent.js'
 
 function processFor (comp, forNode) {
-  const name = 'swt-' + uid()
+  const name = 'nue-' + uid()
   const forInfo = forNode.parsed
 
   const blob = {
@@ -30,16 +29,11 @@ function processFor (comp, forNode) {
     forNode,
     comp: comp,
     deferred: [],
+    // to keep track of what new components add or removed
     createdComps: [],
     removedComps: [],
     animating: false,
-    movedIndexes: [],
-    // $index: forInfo.at.content,
-    $each: forInfo.each.content
-  }
-
-  if (forInfo.at) {
-    blob.$index = forInfo.at
+    movedIndexes: []
   }
 
   if (DEV) checkForInfo(blob)
@@ -49,6 +43,7 @@ function processFor (comp, forNode) {
 
   comp.deferred.push(() => {
     blob.anchorNode = document.createComment('for')
+    // add anchorNode before forNode
     forNode.before(blob.anchorNode)
     init(blob)
     forNode.before(document.createComment('/for'))
@@ -57,16 +52,8 @@ function processFor (comp, forNode) {
 
   const handleArrayChange = () => {
     const { comps, forInfo, oldState } = blob
-
-    // get the new state - using the forInfo and comp
     const newState = getNewState(forInfo, comp)
 
-    // check that no two hash are same
-    if (DEV) {
-      checkUniquenessOfKeys(comp, newState.hash)
-    }
-
-    // reconcile using the oldState and newState
     const steps = reconcile(oldState, newState)
 
     if (forInfo.reorder) saveOffsets(comps)

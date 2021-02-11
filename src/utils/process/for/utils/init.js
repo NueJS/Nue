@@ -1,15 +1,10 @@
 import createComp from './comp'
 import { getNewState } from './state'
 import deepClone from '../../../deepClone'
-import checkUniquenessOfKeys from '../dev/checkUniquenessOfKeys'
-import DEV from '../../../dev/DEV'
 
+// initialize for loop
 const init = ({ forInfo, comp, comps, forNode, name, oldState }) => {
   const state = getNewState(forInfo, comp)
-
-  if (DEV) {
-    checkUniquenessOfKeys(comp, state.hash)
-  }
 
   // create and add component to DOM by going over array
   state.value.forEach((value, index) => {

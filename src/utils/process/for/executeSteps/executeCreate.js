@@ -6,7 +6,7 @@ const executeCreate = (index, value, blob) => {
   // create new comp
   const newComp = createComp(comp, name, forInfo, value, index)
 
-  // update DOM
+  // add to DOM
   if (index === 0) anchorNode.after(newComp)
   else comps[index - 1].after(newComp)
 

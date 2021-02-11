@@ -11,7 +11,7 @@ export const getStateProps = (forInfo, value, i) => {
   return stateProps
 }
 
-export const getArray = (forInfo, comp) => forInfo.of.getValue(comp)[TARGET]
+// export const getValue = (forInfo, comp) => forInfo.of.getValue(comp)[TARGET]
 
 export const getHashArray = (forInfo, arr) =>
   arr.map((value, i) => getHash(forInfo, getStateProps(forInfo, value, i)))
