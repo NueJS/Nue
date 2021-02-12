@@ -15,8 +15,8 @@ export const getNewState = (forInfo, comp) => {
   }
 }
 
-export const updateCompState = (newState, { comps, forInfo, oldState }) => {
-  if (!comps.length) return
+export const updateCompState = (newState, { comps, forInfo, oldState, initialized }) => {
+  if (!comps.length || !initialized) return
   const { as, at } = forInfo
 
   // if index is used, update index state of all components

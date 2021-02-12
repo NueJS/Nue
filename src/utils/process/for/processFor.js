@@ -1,17 +1,12 @@
-// import { render } from '../../../index.js'
-import { attr, saveOffsets } from '../../node/dom.js'
-// import DEV from '../../dev/DEV.js'
+import { saveOffsets } from '../../node/dom.js'
 import addDep from '../../state/addDep.js'
-import { uid } from '../../others.js'
 import { getNewState, updateCompState } from './utils/state.js'
 import animateEnter from './animate/animateEnter.js'
 import animateMove from './animate/animateMove.js'
 import animateRemove from './animate/animateRemove.js'
-import init from './utils/init.js'
 import executeSteps from './executeSteps/executeSteps.js'
 import reconcile from './diff/reconcile.js'
 import deepClone from '../../deepClone.js'
-import defineComponent from '../../defineComponent.js'
 import dashify from '../../string/dashify.js'
 
 function processFor (comp, forNode) {
@@ -21,7 +16,7 @@ function processFor (comp, forNode) {
 
   const blob = {
     comps: [],
-    oldState: {},
+    oldState: { value: [], hash: [] },
     anchorNode: null,
     forInfo,
     forNode,
@@ -38,17 +33,18 @@ function processFor (comp, forNode) {
     blob.anchorNode = document.createComment(' FOR ')
     // add anchorNode before forNode
     forNode.before(blob.anchorNode)
-    init(blob)
+
+    // init(blob)
     forNode.before(document.createComment(' / FOR '))
     forNode.remove()
+    handleArrayChange()
+    blob.initialized = true
   })
 
   const handleArrayChange = () => {
     const { comps, forInfo, oldState } = blob
     const newState = getNewState(forInfo, comp)
-
     const steps = reconcile(oldState, newState)
-
     if (forInfo.reorder) saveOffsets(comps)
 
     // add, remove and move the components
