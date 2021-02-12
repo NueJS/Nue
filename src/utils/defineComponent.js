@@ -73,7 +73,7 @@ function defineComponent (name, component) {
 
   if (component.uses) {
     component.uses.forEach(child => {
-      defineComponent(child)
+      defineComponent(child.name, child)
     })
   }
 }
