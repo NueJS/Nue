@@ -1,5 +1,3 @@
-import globalInfo from '../../globalInfo.js'
-import getFn from '../../closure.js'
 import { addConnects } from '../../connection/addConnects.js'
 import DEV from '../../dev/DEV.js'
 import err from '../../dev/error.js'
@@ -10,7 +8,7 @@ function addEvent (comp, node, info) {
 
   const action = actions && actions[name]
   const fnName = placeholder.fnName
-  const handler = getFn(comp, fnName)
+  const handler = comp.fn[fnName]
 
   if (DEV) {
     if (!handler) {

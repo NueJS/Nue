@@ -1,9 +1,7 @@
-import getFn from '../../closure.js'
 import { FN } from '../../constants.js'
 import { targetProp } from '../../state/slice.js'
 import DEV from '../../dev/DEV'
 import err from '../../dev/error.js'
-// import { bracketify } from '../bracket.js'
 
 // 'foo(bar.baz, fizz, buzz)'
 const processFnPlaceholder = (content) => {
@@ -21,7 +19,7 @@ const processFnPlaceholder = (content) => {
 
   // using the deps and comp - get the value of foo(bar.baz, fizz, buzz)
   const getValue = (comp) => {
-    const fn = getFn(comp, fnName)
+    const fn = comp.fn[fnName]
     if (DEV && !fn) {
       err({
         comp,
