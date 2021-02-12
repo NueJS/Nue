@@ -5,12 +5,9 @@ import arrayDiff from '../diff/arrayDiff'
 import { getHashArray } from './get'
 
 export const getNewState = (forInfo, comp) => {
-  const value = forInfo.of.getValue(comp)[TARGET]
+  const value = forInfo.map.getValue(comp)[TARGET]
   const hash = getHashArray(forInfo, value)
-
-  if (DEV) {
-    checkUniquenessOfKeys(comp, hash)
-  }
+  if (DEV) checkUniquenessOfKeys(comp, hash)
 
   return {
     hash,
@@ -20,8 +17,7 @@ export const getNewState = (forInfo, comp) => {
 
 export const updateCompState = (newState, { comps, forInfo, oldState }) => {
   if (!comps.length) return
-  const each = forInfo.each.content
-  const at = forInfo.at
+  const { as, at } = forInfo
 
   // if index is used, update index state of all components
   if (forInfo.at) {
@@ -39,6 +35,6 @@ export const updateCompState = (newState, { comps, forInfo, oldState }) => {
   // for those components, update the state
   const diffIndexes = arrayDiff(newState.value, oldState.value)
   diffIndexes.forEach(i => {
-    comps[i].nue.$[each] = newState.value[i]
+    comps[i].nue.$[as] = newState.value[i]
   })
 }

@@ -1,51 +1,24 @@
 import DEV from '../dev/DEV'
-import err from '../dev/error'
 import { attr } from '../node/dom'
 import processPlaceholder from '../string/placeholder/processPlaceholder'
+import { checkFor } from './checkParsed'
 
-const parseFor = (node) => {
-  const loopInfo = attr(node, ':')
-  const [item, items] = loopInfo.split('in')
-  const key = attr(node, 'key')
+const parseFor = (node, forAttribute) => {
+  // replace ' in ', '(' ')' ',' with space, split with space, and remove empty strings
+  const arr = forAttribute.replace(/\(|\)|,|(\sin\s)/g, ' ').split(/\s+/).filter(t => t)
+  const atUsed = arr.length === 3
 
-  node.parsed = {}
-
-  const names = ['each', 'of', 'key'];
-  [item, items, key].forEach((x, i) => {
-    node.parsed[names[i]] = x && processPlaceholder(x, true)
-  })
-
-  for (const x of ['reorder', 'enter', 'exit', 'at']) {
-    node.parsed[x] = attr(node, x)
+  node.parsed.for = {
+    map: processPlaceholder(atUsed ? arr[2] : arr[1], true),
+    as: arr[0],
+    at: atUsed && arr[1],
+    key: processPlaceholder(attr(node, 'key')),
+    enter: attr(node, 'enter'),
+    reorder: attr(node, 'reorder'),
+    exit: attr(node, 'exit')
   }
 
-  if (DEV) checkForNode(node.parsed)
-}
-
-const checkForNode = (parsed) => {
-  if (!parsed.each) {
-    err({
-      message: 'for loop is missing "each" attribute',
-      code: 1,
-      link: ''
-    })
-  }
-
-  if (!parsed.of) {
-    err({
-      message: 'for loop is missing "of" attribute',
-      code: 2,
-      link: ''
-    })
-  }
-
-  if (!parsed.key) {
-    err({
-      message: 'for loop is missing "key" attribute',
-      code: 2,
-      link: ''
-    })
-  }
+  if (DEV) checkFor(node, arr)
 }
 
 export default parseFor

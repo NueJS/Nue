@@ -1,4 +1,4 @@
-import { isConditionNode } from '../node/dom'
+import { attr, isConditionNode } from '../node/dom'
 import parseAttributes from './parseAttributes'
 import parseComp from './parseComp'
 import parseConditionNode from './parseConditionNode'
@@ -13,6 +13,11 @@ const parseNode = (comp, _node, uselessNodes) => {
 
   if (isComp) {
     node = parseComp(name, node, _node)
+
+    const forAttribute = attr(node, 'for')
+    if (forAttribute) {
+      parseFor(node, forAttribute)
+    }
   }
 
   else if (node.nodeType === Node.TEXT_NODE) {
@@ -25,11 +30,7 @@ const parseNode = (comp, _node, uselessNodes) => {
     parseConditionNode(node)
   }
 
-  else if (node.nodeName === 'FOR') {
-    return parseFor(node)
-  }
-
-  else if (node.hasAttribute) {
+  if (node.hasAttribute) {
     parseAttributes(comp, node)
   }
 

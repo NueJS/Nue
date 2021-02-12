@@ -1,3 +1,5 @@
+import { attr } from '../node/dom'
+
 const parseComp = (name, node, _node) => {
   // child nodes (slot) of child component should not be sweetified and saved in array instead
   _node.innerHTML = ''
@@ -10,9 +12,9 @@ const parseComp = (name, node, _node) => {
   }
 
   // copy attributes
-  for (const attributeName of node.getAttributeNames()) {
-    const attributeValue = node.getAttribute(attributeName)
-    newNode.setAttribute(attributeName, attributeValue)
+  for (const attrName of node.getAttributeNames()) {
+    const attributeValue = attr(node, attrName)
+    newNode.setAttribute(attrName, attributeValue)
   }
 
   return newNode

@@ -9,6 +9,7 @@ const createComp = (comp, name, forInfo, value, i) => {
   newComp.parsed = {
     isComp: true,
     closure: comp,
+    // @todo - add other attributes as well ??
     stateProps: getStateProps(forInfo, value, i)
   }
 

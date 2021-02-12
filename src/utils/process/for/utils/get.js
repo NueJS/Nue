@@ -3,12 +3,11 @@ import { targetProp } from '../../../state/slice'
 import { TARGET } from '../../../symbols'
 
 export const getStateProps = (forInfo, value, i) => {
-  const stateProps = {
-    [forInfo.each.content]: value,
-    [forInfo.at]: i
+  const { as, at } = forInfo
+  return {
+    [as]: value,
+    [at]: i
   }
-
-  return stateProps
 }
 
 // export const getValue = (forInfo, comp) => forInfo.of.getValue(comp)[TARGET]

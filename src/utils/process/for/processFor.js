@@ -12,19 +12,21 @@ import executeSteps from './executeSteps/executeSteps.js'
 import reconcile from './diff/reconcile.js'
 import deepClone from '../../deepClone.js'
 import defineComponent from '../../defineComponent.js'
+import dashify from '../../string/dashify.js'
 
 function processFor (comp, forNode) {
-  const forInfo = forNode.parsed
-  const name = forInfo.each.content + '-nue' + uid()
+  const forInfo = forNode.parsed.for
+  const name = dashify(forNode.parsed.name)
+  console.log(name, forNode.parsed)
 
   const blob = {
     comps: [],
     oldState: {},
     anchorNode: null,
     forInfo,
-    name,
     forNode,
     comp,
+    name,
     deferred: [],
     // to keep track of what new components add or removed
     createdComps: [],
@@ -32,11 +34,8 @@ function processFor (comp, forNode) {
     movedIndexes: []
   }
 
-  const loopComp = o => o.template(forNode.innerHTML)
-  defineComponent(name, loopComp)
-
   comp.deferred.push(() => {
-    blob.anchorNode = document.createComment(` FOR  := '${attr(forNode, ':')}' `)
+    blob.anchorNode = document.createComment(' FOR ')
     // add anchorNode before forNode
     forNode.before(blob.anchorNode)
     init(blob)
@@ -66,7 +65,7 @@ function processFor (comp, forNode) {
   }
 
   // @TODO use addDeps here instead ?
-  addDep(comp, forInfo.of.deps[0], handleArrayChange, 'dom')
+  addDep(comp, forInfo.map.deps[0], handleArrayChange, 'dom')
 }
 
 export default processFor
