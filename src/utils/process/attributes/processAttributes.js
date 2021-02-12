@@ -2,16 +2,7 @@ import bindInput from './bindInput.js'
 import addAttribute from './addAttribute.js'
 import addState from './addState.js'
 import addEvent from './addEvent.js'
-import { EVENT, BIND, STATE, FN_PROP } from '../../constants.js'
-
-// ex: @click=[fn]
-// set fn.click in the comp
-// function addFnProp (parentComp, comp, attribute) {
-//   const { name, placeholder } = attribute
-//   if (!comp.fnProps) comp.fnProps = {}
-//   comp.fnProps[name] = parentComp.fn[placeholder.content]
-//   comp.removeAttribute(name)
-// }
+import { EVENT, BIND, STATE } from '../../constants.js'
 
 function processAttributes (comp, node) {
   // refs API

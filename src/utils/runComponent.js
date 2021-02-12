@@ -37,6 +37,7 @@ function runComponent (comp, component) {
       refs: comp.refs,
       template,
       fn: comp.fn,
+      self: comp.node,
       // component: comp,
       // props: comp.stateProps,
       ...comp.events

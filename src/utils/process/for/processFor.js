@@ -12,7 +12,7 @@ import dashify from '../../string/dashify.js'
 function processFor (comp, forNode) {
   const forInfo = forNode.parsed.for
   const name = dashify(forNode.parsed.name)
-  console.log(name, forNode.parsed)
+  console.log(forNode.parsed)
 
   const blob = {
     comps: [],
@@ -34,7 +34,6 @@ function processFor (comp, forNode) {
     // add anchorNode before forNode
     forNode.before(blob.anchorNode)
 
-    // init(blob)
     forNode.before(document.createComment(' / FOR '))
     forNode.remove()
     handleArrayChange()
@@ -46,7 +45,6 @@ function processFor (comp, forNode) {
     const newState = getNewState(forInfo, comp)
     const steps = reconcile(oldState, newState)
     if (forInfo.reorder) saveOffsets(comps)
-
     // add, remove and move the components
     executeSteps(steps, blob)
     // update state of components if needed

@@ -32,6 +32,7 @@ function reactify (comp, obj, path = []) {
       }
 
       else {
+        // if prop being set is not in current state and we have closure state available
         if (closure$ && !propInTarget) {
           const success = Reflect.set(closure$, prop, newValue)
           if (success) return success

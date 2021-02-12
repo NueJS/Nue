@@ -1,10 +1,10 @@
-import createComp from '../utils/comp'
+import createComp from '../utils/createComp'
 
 const executeCreate = (index, value, blob) => {
-  const { name, forInfo, comps, anchorNode, comp } = blob
+  const { name, forInfo, comps, anchorNode, comp, forNode } = blob
 
   // create new comp
-  const newComp = createComp(comp, name, forInfo, value, index)
+  const newComp = createComp(comp, name, forNode, forInfo, value, index)
 
   // add to DOM
   if (index === 0) anchorNode.after(newComp)
