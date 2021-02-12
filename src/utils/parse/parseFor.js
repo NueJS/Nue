@@ -16,7 +16,11 @@ const parseFor = (node, forAttribute) => {
     enter: attr(node, 'enter'),
     reorder: attr(node, 'reorder'),
     exit: attr(node, 'exit')
-  }
+  };
+
+  ['exit', 'enter', 'reorder', 'for', 'key'].forEach(name => {
+    node.removeAttribute(name)
+  })
 
   if (DEV) checkFor(node, arr)
 }
