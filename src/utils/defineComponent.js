@@ -4,7 +4,7 @@ import addLifecycles, { runEvent } from './lifecycle.js'
 import buildShadowDOM from './buildShadowDOM.js'
 import globalInfo from './globalInfo.js'
 import dashify from './string/dashify.js'
-// import globalInfo from './globalInfo.js'
+
 // define a component using name and a component function
 function defineComponent (name, component) {
   // memo is object containing information that will be same for all the instance of component
@@ -22,7 +22,6 @@ function defineComponent (name, component) {
         refs: {},
         actions: {},
         deps: { $: new Map() },
-        fn: {}, // move this to connectedCallback
 
         // callbacks that are to be called in various phases
         queue: {
@@ -45,9 +44,13 @@ function defineComponent (name, component) {
     // when component is added in dom
     connectedCallback () {
       const comp = this.nue
+
       // must run runComponent after the node is connected, to make sure that it gets stateProps from node.parsed
       if (!this.shadowRoot) {
-        comp.closure = this.parsed && this.parsed.closure
+        const closure = this.parsed && this.parsed.closure
+        comp.closure = closure
+        comp.fn = closure ? closure.fn : {}
+
         runComponent(comp, component)
         buildShadowDOM(comp)
       }
