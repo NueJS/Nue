@@ -19,9 +19,11 @@ export const getNewState = (forInfo, comp) => {
 }
 
 export const updateCompState = (newState, { comps, forInfo, oldState }) => {
+  if (!comps.length) return
   const each = forInfo.each.content
   const at = forInfo.at
 
+  // if index is used, update index state of all components
   if (forInfo.at) {
     // const movedComps = comps.map(c => c.isMoved)
     for (let i = 0; i < comps.length; i++) {
@@ -33,6 +35,8 @@ export const updateCompState = (newState, { comps, forInfo, oldState }) => {
     }
   }
 
+  // get the indexes where the state is updated
+  // for those components, update the state
   const diffIndexes = arrayDiff(newState.value, oldState.value)
   diffIndexes.forEach(i => {
     comps[i].nue.$[each] = newState.value[i]

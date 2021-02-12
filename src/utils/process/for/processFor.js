@@ -1,6 +1,6 @@
 // import { render } from '../../../index.js'
 import { attr, saveOffsets } from '../../node/dom.js'
-import DEV from '../../dev/DEV.js'
+// import DEV from '../../dev/DEV.js'
 import addDep from '../../state/addDep.js'
 import { uid } from '../../others.js'
 import { getNewState, updateCompState } from './utils/state.js'
@@ -52,16 +52,15 @@ function processFor (comp, forNode) {
 
     if (forInfo.reorder) saveOffsets(comps)
 
-    // add, remove and move the comps
+    // add, remove and move the components
     executeSteps(steps, blob)
+    // update state of components if needed
+    updateCompState(newState, blob)
 
-    // update the state of comps
-    if (comps.length) {
-      updateCompState(newState, blob)
-    }
-
+    // if there are any kind of animations specified, run them in this order
     animateRemove(blob).then(animateMove).then(animateEnter)
 
+    // save newState as oldState
     oldState.value = deepClone(newState.value)
     oldState.hash = newState.hash
   }
