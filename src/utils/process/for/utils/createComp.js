@@ -1,27 +1,16 @@
-import { getOffset } from '../../../node/dom'
-import processAttributes from '../../attributes/processAttributes'
-import processNode from '../../processNode'
+import copyParsed from '../../../node/copyParsed'
 import { getStateProps } from './get'
 
+// create a clone of component with for attribute - forNode
+// add the given item and index as the stateProps
 const createComp = (comp, name, forNode, forInfo, value, i) => {
+  // clone forNode
   const newComp = forNode.cloneNode(true)
-  // console.log('cloned : ', newComp)
-  // const { as, at } = forInfo
-  newComp.parsed = {
-    isComp: true,
-    closure: comp,
-    stateProps: getStateProps(forInfo, value, i),
-    attributes: forNode.parsed.attributes
-  }
+  copyParsed(forNode, newComp)
 
-  // processAttributes(newComp)
+  // add the loop's value and index as stateProps
+  newComp.parsed.stateProps = getStateProps(forInfo, value, i)
 
-  // record the initial offset
-  if (forInfo.reorder) {
-    requestAnimationFrame(() => {
-      newComp.prev = getOffset(newComp)
-    })
-  }
   return newComp
 }
 

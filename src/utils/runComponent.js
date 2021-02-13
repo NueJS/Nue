@@ -2,7 +2,6 @@ import globalInfo from './globalInfo.js'
 import modes from './reactivity/modes.js'
 import reactify from './reactivity/reactify.js'
 import templateTag from './string/templateTag.js'
-import parseSlots from './parse/parseSlots.js'
 import parseTemplate from './parse/parseTemplate.js'
 
 const addDefaultStyles = (template) => {
@@ -55,7 +54,6 @@ function runComponent (comp, component) {
   else {
     comp.memo.template = document.createElement('template')
     invokeComp(false)
-    parseSlots(comp)
     parseTemplate(comp)
     addDefaultStyles(comp.memo.template)
   }

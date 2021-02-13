@@ -2,14 +2,19 @@ import { attr } from '../node/dom'
 
 const parseComp = (name, node, _node) => {
   // child nodes (slot) of child component should not be sweetified and saved in array instead
-  _node.innerHTML = ''
+
   const newNode = document.createElement(name + '-')
-  _node.replaceWith(newNode)
+
   newNode.parsed = {
     isComp: true,
     name,
-    childNodes: [...node.childNodes]
+    childNodes: [...node.childNodes],
+    children: node.innerHTML
   }
+
+  newNode.innerHTML = _node.innerHTML
+  _node.innerHTML = ''
+  _node.replaceWith(newNode)
 
   // copy attributes
   for (const attrName of node.getAttributeNames()) {
