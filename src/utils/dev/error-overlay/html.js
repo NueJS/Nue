@@ -8,7 +8,6 @@ export default /* html */`
     <button class='parsed-error__close-icon'> ${closeIcon} </button>
     <div class='title'> ERROR </div>
     <pre class='message'>  </pre>
-    <div class='component-name'>  </div>
     <div class='subtitle'> open console for more information </div>
   </div>
 </div>
