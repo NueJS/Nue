@@ -9,7 +9,7 @@ const isObject = x => typeof x === 'object' && x !== null
 
 // create a reactive object which when mutated calls the on_change function
 function reactify (comp, obj, path = []) {
-  const closure$ = comp.closure && comp.closure.$
+  const closure$ = path.length === 0 && comp.closure && comp.closure.$
   if (!isObject(obj)) return [obj]
 
   // make the slice of state reactive
@@ -22,9 +22,12 @@ function reactify (comp, obj, path = []) {
 
     set (target, prop, newValue) {
       let success
+      // if the mutated prop exists in the target already
       const propInTarget = prop in target
 
       let value = newValue
+
+      // do not override the state set by parent component by default value of the state added in component
       if (modes.noOverride) {
         // ignore set
         if (propInTarget) return true
