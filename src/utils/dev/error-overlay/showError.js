@@ -1,15 +1,6 @@
 import html from './html'
 
 function handleErrors (error) {
-  // -----------------------
-  const errorMessage = `
-
-  ❌ ${error.message}
-
-  ✨ ${error.fix}
-  `
-  // -----------------------
-
   class sweetErrorOverlay extends HTMLElement {
     constructor () {
       super()
@@ -31,16 +22,13 @@ function handleErrors (error) {
   document.body.append($sweetErrorOverlay)
 
   const $message = $sweetErrorOverlay.shadowRoot.querySelector('.message')
-  $message.textContent = `❌ ${error.message}\n✨ ${error.fix}`
+  const errorMessage = `${error.message}\n\n${error.fix || ''}`
+  $message.textContent = errorMessage
 
   const $componentName = $sweetErrorOverlay.shadowRoot.querySelector('.title')
-  $componentName.textContent = `error in <${error.comp.memo.name}/> `
+  $componentName.textContent = `error in <${error.comp.memo.name}>`
 
-  // error in console
-  console.log('Origin of Error: ')
-  if (error.node) console.log('Node:', error.node)
-  if (error.comp) console.log('Component: ', error.comp.node)
-  throw new Error(errorMessage)
+  // throw new Error(errorMessage)
 }
 
 export default handleErrors
