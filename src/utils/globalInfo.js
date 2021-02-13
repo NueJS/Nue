@@ -1,10 +1,10 @@
 let hash = 0
 const globalInfo = {
   hash: () => hash++,
-  components: {},
+  definedComponents: {},
   actions: {},
-  components: {},
   defaultStyle: ':host{display: block;}'
 }
 
+window.globalInfo = globalInfo
 export default globalInfo
