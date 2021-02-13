@@ -4,9 +4,9 @@
 export function connectNode (node) {
   if (!node.parsed) return
   const { parsed } = node
+
   // if node is connected, do nothing
   if (parsed.isConnected) return
-
   // if node can be connected
   if (parsed.connects) {
     // collect disconnects which is returned when calling connects
