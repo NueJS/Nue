@@ -1,4 +1,4 @@
-import copySweet from './node/copySweet.js'
+import copyParsed from './node/copyParsed.js'
 import processNode from './process/processNode.js'
 
 const buildShadowDOM = (comp) => {
@@ -8,11 +8,13 @@ const buildShadowDOM = (comp) => {
   const fragment = template.content.cloneNode(true)
 
   // add parsed property on fragment
-  copySweet(template.content, fragment)
+  copyParsed(template.content, fragment)
 
   // process nodes using parsed property
   processNode(comp, fragment)
+  // console.log('deferred is ', comp.deferred)
   comp.deferred.forEach(p => p())
+  comp.deferred = []
 
   // add fragment to shadow DOM
   comp.node.attachShadow({ mode: 'open' });
