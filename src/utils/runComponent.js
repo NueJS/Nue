@@ -39,7 +39,7 @@ function runComponent (comp, component) {
       fn: comp.fn,
       self: comp.node,
       // component: comp,
-      // props: comp.stateProps,
+      props: comp.node.parsed && comp.node.parsed.stateProps,
       ...comp.events
     })
 

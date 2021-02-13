@@ -6,7 +6,8 @@ const modes = {
   reactive: false,
 
   // when noOverride is true, setting a key in state which already exists does nothing
-  // this is used so that default value of state does not override the value in props
+  // this is used so that default value of state does not override the state set by the parent component
+  // via state attribute
   noOverride: false
 }
 

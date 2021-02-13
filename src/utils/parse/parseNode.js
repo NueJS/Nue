@@ -16,7 +16,7 @@ const parseNode = (comp, _node, uselessNodes) => {
 
     const forAttribute = attr(node, 'for')
     if (forAttribute) {
-      parseFor(node, forAttribute)
+      parseFor(comp, node, forAttribute)
     }
   }
 
