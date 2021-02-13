@@ -5,16 +5,19 @@ import err from '../dev/error.js'
 
 // add Dep for given path on its origin
 const addDep = (baseComp, path, cb, type) => {
+  // console.log('adding dep for :', path, baseComp)
+
   const comp = origin(baseComp, path)
+  // console.log('comp is', comp, baseComp.parsed)
 
   if (DEV && !comp) {
-    err({
+    throw {
       message: `Invalid state placeholder used in template : [${path.join('.')}]`,
       fix: `make sure that "${path.join('.')}" exists in state of <${baseComp.memo.name}/> component or it's closure`,
       link: '',
       code: -1,
       comp: baseComp
-    })
+    }
   }
 
   const qcb = cbQueuer(comp, cb, type)

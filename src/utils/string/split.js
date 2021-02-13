@@ -34,10 +34,10 @@ function split (comp, text) {
 
     else if (varEnds(text, i)) {
       if (DEV && !collectingVar) {
-        err({
+        throw {
           message: 'invalid use of ]',
           comp
-        })
+        }
       }
 
       // process variable and save it in parts

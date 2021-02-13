@@ -12,12 +12,12 @@ function addEvent (comp, node, info) {
 
   if (DEV) {
     if (!handler) {
-      err({
+      throw {
         message: `invalid method "${placeholder.fnName}" used`,
         link: '',
         code: -1,
         comp
-      })
+      }
     }
   }
 

@@ -21,11 +21,11 @@ const processFnPlaceholder = (content) => {
   const getValue = (comp) => {
     const fn = comp.fn[fnName]
     if (DEV && !fn) {
-      err({
+      throw {
         comp,
         message: `invalid method "${fnName}" used in [${content}] placeholder in template`,
         fix: `make sure "${fnName}" method exists in the 'fn' object of <${comp.name}/> or its closure`
-      })
+      }
     }
     const tps = deps.map(path => targetProp(comp.$, path))
     const values = tps.map(([t, p]) => t[p])

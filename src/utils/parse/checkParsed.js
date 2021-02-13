@@ -1,12 +1,10 @@
-import err from '../dev/error'
-
 export const checkFor = (comp, node, arr) => {
   if (arr.length < 2) {
-    err({
+    throw {
       message: `invalid for attribute value on ${node.nodeName}`,
       code: 1,
       link: ''
-    })
+    }
   }
 
   const { key, exit } = node.parsed.for
@@ -18,21 +16,21 @@ export const checkFor = (comp, node, arr) => {
       // style.textContent
       const styleUsesAnimation = style.textContent.includes(animationName)
       if (!styleUsesAnimation) {
-        err({
+        throw {
           message: `exit animation: "${animationName}" used on <${node.parsed.name}> but not defined in CSS. \nThis will result in component never being removed, as nue.js keeps waiting for the animation to end which does not exist`,
           fix: `To fix this: define animation "${animationName}" in CSS using @keyframes`,
           comp,
           code: 'MISSING_EXIT_ANIMATION_IN_CSS'
-        })
+        }
       }
     })
   }
 
   if (!key) {
-    err({
+    throw {
       message: `missing attribute "key" on ${node.nodeName}.`,
       code: 2,
       link: ''
-    })
+    }
   }
 }

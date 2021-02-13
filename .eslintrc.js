@@ -12,6 +12,7 @@ module.exports = {
     sourceType: 'module'
   },
   rules: {
-    'brace-style': 'off'
+    'brace-style': 'off',
+    'no-throw-literal': 'off'
   }
 }
