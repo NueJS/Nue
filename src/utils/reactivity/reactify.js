@@ -42,7 +42,7 @@ function reactify (comp, obj, path = []) {
         }
       }
 
-      if (isObject(value)) [value] = reactify(comp, value, [...path, prop])
+      if (isObject(value) && !value.__reactive__) [value] = reactify(comp, value, [...path, prop])
 
       if (modes.reactive) {
         if (!(prop === 'length' && Array.isArray(target))) {
@@ -62,6 +62,7 @@ function reactify (comp, obj, path = []) {
     },
 
     get (target, prop) {
+      if (prop === '__reactive__') return true
       if (prop === TARGET) return target
       if (modes.detective) {
         if (path.length !== 0) accessed.paths[accessed.paths.length - 1] = [...path, prop]
