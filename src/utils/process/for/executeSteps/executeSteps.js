@@ -25,8 +25,10 @@ const executeSteps = (steps, blob) => {
       const [i, j] = indexes
       swapNodes(comps[i], comps[j])
       swap(comps, i, j)
-      comps[i].isMoved = true
-      comps[j].isMoved = true
+      if (forInfo.reorder) {
+        comps[i].isMoved = true
+        comps[j].isMoved = true
+      }
     }
   })
 }
