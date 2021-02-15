@@ -8,7 +8,7 @@ const parseComp = (name, node, _node) => {
   newNode.parsed = {
     isComp: true,
     name,
-    childNodes: [...node.childNodes],
+    childNodes: [...node.childNodes].filter(n => n.textContent.trim() !== ''),
     children: node.innerHTML
   }
 
