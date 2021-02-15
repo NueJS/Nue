@@ -3,69 +3,79 @@ import { addDeps } from '../../state/addDep.js'
 import processGroup from './group/processGroup.js'
 import mountGroup from './group/mountGroup.js'
 import unmountGroup from './group/unmountGroup.js'
+import copyParsed from '../../node/copyParsed.js'
+import processNode from '../processNode.js'
 
 function processIf (comp, ifNode) {
-  const groups = createGroups(comp, ifNode)
+  const group = [ifNode]
 
-  // get deps from groups
-  const groupDeps = []
-
-  groups.forEach(group => {
-    if (group.deps) groupDeps.push(group.deps)
-
-    comp.deferred.push(() => {
-      // add comment anchorNode
-      ifNode.before(group.anchorNode)
-      // remove all the nodes of group
-      group.nodes.forEach(n => n.remove())
+  if (ifNode.parsed.group) {
+    ifNode.parsed.group.forEach(node => {
+      const clone = node.cloneNode(true)
+      copyParsed(node, clone)
+      group.push(clone)
     })
-  })
+  }
+
+  ifNode.parsed.isProcessed = true
+
+  const { groupDeps } = ifNode.parsed
+  const anchorNode = ifNode.previousSibling
 
   // group that is currently rendered
-  let prevRenderedGroup
+  let active
 
-  const groupDepChanged = () => {
+  const onGroupDepChange = () => {
     // if a group's condition is foundSatisfied, this becomes true
     let foundSatisfied = false
 
-    groups.forEach((group) => {
-      const { isSatisfied, isProcessed, isRendered } = group
+    group.forEach(conditionNode => {
+      const { condition, isProcessed, isRendered } = conditionNode.parsed
+      const satisfied = condition ? condition.getValue(comp) : true
+
       // if this group should be rendered
-      if (!foundSatisfied && isSatisfied()) {
+      if (!foundSatisfied && satisfied) {
         foundSatisfied = true
 
         // if this group is not currently rendered on DOM
         if (!isRendered) {
-          // if this group is never processed before
-          if (!isProcessed) processGroup(comp, group)
-
-          // if this group should wait for other group's animation to end
-          if (
-            prevRenderedGroup &&
-            prevRenderedGroup.exit &&
-            group !== prevRenderedGroup) {
-            prevRenderedGroup.onRemove(() => mountGroup(group))
-          } else {
-            mountGroup(group)
+          // if this comp is never processed before
+          if (!isProcessed) {
+            console.log('process : ', conditionNode)
+            processNode(comp, conditionNode)
+            conditionNode.parsed.isProcessed = true
           }
 
-          prevRenderedGroup = group
+          // if this group should wait for other group's animation to end
+          // if (
+          //   active &&
+          //   active.exit &&
+          //   group !== active) {
+          //   active.onRemove(() => mountGroup(group))
+          // } else {
+          //   mountGroup(group)
+          // }
+
+          if (!anchorNode) debugger
+          anchorNode.after(conditionNode)
+          conditionNode.parsed.isRendered = true
+          active = conditionNode
         }
       }
 
       // if the group should be removed
-      else if (group.isRendered) {
-        unmountGroup(group)
+      else if (isRendered) {
+        conditionNode.remove()
+        conditionNode.parsed.isRendered = false
       }
     })
   }
 
-  addDeps(comp, groupDeps, groupDepChanged, 'stateReady')
+  addDeps(comp, groupDeps, onGroupDepChange, 'stateReady')
 
   comp.deferred.push(() => {
-    ifNode.after(document.createComment(' / IF '))
     ifNode.remove()
-    groupDepChanged()
+    onGroupDepChange()
   })
 }
 

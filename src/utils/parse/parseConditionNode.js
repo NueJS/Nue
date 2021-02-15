@@ -1,16 +1,17 @@
+import { attr } from '../node/dom'
 import processPlaceholder from '../string/placeholder/processPlaceholder'
 
-const parseConditionNode = (node) => {
-  node.parsed = {
-    type: node.nodeName,
-    enter: node.getAttribute('enter'),
-    exit: node.getAttribute('exit')
-  }
+const parseConditionNode = (node, type) => {
+  const condition = type !== 'else' && processPlaceholder(attr(node, type))
 
-  if (node.nodeName !== 'ELSE') {
-    const condition = node.getAttribute(':')
-    node.parsed.condition = processPlaceholder(condition)
+  node.parsed = {
+    ...node.parsed,
+    conditionType: type,
+    enter: attr(node, 'enter'),
+    exit: attr(node, 'exit'),
+    condition
   }
+  node.removeAttribute(type)
 }
 
 export default parseConditionNode

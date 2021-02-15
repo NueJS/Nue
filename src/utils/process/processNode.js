@@ -4,24 +4,16 @@ import processIf from './if/if.js'
 import processFor from './for/processFor.js'
 
 function processNode (comp, node) {
-  const { parsed, nodeType, nodeName } = node
+  const { parsed, nodeType } = node
   if (parsed) {
-    // when would we be trying to process the already processed node ?
-    // is this even necessary ?
-    if (parsed.isProcessed) {
-      console.log('already processed : ', node)
-      return
-    }
-    parsed.isProcessed = true
-
     // save the comp as closure of component
     if (parsed.isComp) {
       node.parsed.closure = comp
       // if the component is being used in for loop
       if (parsed.for) processFor(comp, node)
+      if (parsed.conditionType === 'if') processIf(comp, node)
     }
     else if (nodeType === Node.TEXT_NODE) processTextNode(comp, node)
-    else if (nodeName === 'IF') processIf(comp, node)
     if (node.hasAttribute) processAttributes(comp, node)
   }
 
