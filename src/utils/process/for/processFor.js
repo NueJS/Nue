@@ -12,7 +12,6 @@ import dashify from '../../string/dashify.js'
 function processFor (comp, forNode) {
   const forInfo = forNode.parsed.for
   const name = dashify(forNode.parsed.name)
-  console.log(forNode.parsed)
 
   const blob = {
     comps: [],

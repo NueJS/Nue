@@ -5,10 +5,7 @@ import err from '../dev/error.js'
 
 // add Dep for given path on its origin
 const addDep = (baseComp, path, cb, type) => {
-  // console.log('adding dep for :', path, baseComp)
-
   const comp = origin(baseComp, path)
-  // console.log('comp is', comp, baseComp.parsed)
 
   if (DEV && !comp) {
     throw {

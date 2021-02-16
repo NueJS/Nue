@@ -12,7 +12,6 @@ const buildShadowDOM = (comp) => {
 
   // process nodes using parsed property
   processNode(comp, fragment)
-  // console.log('deferred is ', comp.deferred)
   comp.deferred.forEach(p => p())
   comp.deferred = []
 
