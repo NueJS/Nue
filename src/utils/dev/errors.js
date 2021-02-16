@@ -1,12 +1,12 @@
 export default {
-  TEXTNODE_DIRECT_CHILD_OF_IF (comp, node) {
-    throw {
-      message: "TEXT_NODE can't be direct child in <if>",
-      fix: 'Wrap the TEXT_NODE inside <span>',
-      comp,
-      node
-    }
-  },
+  // TEXTNODE_DIRECT_CHILD_OF_IF (comp, node) {
+  //   throw {
+  //     message: "TEXT_NODE can't be direct child in <if>",
+  //     fix: 'Wrap the TEXT_NODE inside <span>',
+  //     comp,
+  //     node
+  //   }
+  // },
 
   KEYS_ARE_NOT_UNIQUE (keys, component) {
     const nonUniqueKeys = keys.filter((key, i) => {

@@ -1,6 +1,6 @@
 import processTextNode from './processTextNode.js'
 import processAttributes from './attributes/processAttributes.js'
-import processIf from './if/if.js'
+import processIf from './processIf.js'
 import processFor from './for/processFor.js'
 
 function processNode (comp, node) {
