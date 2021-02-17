@@ -3,6 +3,7 @@ import modes from './reactivity/modes.js'
 import reactify from './reactivity/reactify.js'
 import templateTag from './string/templateTag.js'
 import parseTemplate from './parse/parseTemplate.js'
+import { TARGET } from './symbols.js'
 
 const addDefaultStyles = (template) => {
   const { content } = template
@@ -18,8 +19,10 @@ const addDefaultStyles = (template) => {
 }
 
 function runComponent (comp, component) {
-  const init = (comp.node.parsed && comp.node.parsed.stateProps);
-  [comp.$, comp.$Target] = reactify(comp, init || {})
+  const init = (comp.node.parsed && comp.node.parsed.stateProps) || {}
+  const closure$ = comp.closure && comp.closure.$
+  comp.$ = reactify(comp, init, [], closure$)
+  comp.$Target = comp.$[TARGET]
 
   const invokeComp = (processed) => {
     modes.reactive = false
