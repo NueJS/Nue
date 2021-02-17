@@ -58,7 +58,7 @@ function defineComponent (name, component) {
         comp.closure = closure
 
         // add fn using closure
-        comp.fn = closure ? closure.fn : {}
+        comp.fn = Object.create(closure ? closure.fn : {})
 
         // now that comp is ready, run the component
         runComponent(comp, component)
