@@ -1,6 +1,6 @@
 {
   "name": "@nuejs/nue",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "Next Generation Reactive JavaScript Framework",
   "main": "src/index.js",
   "scripts": {
