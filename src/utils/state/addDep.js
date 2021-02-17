@@ -1,7 +1,6 @@
 import { cbQueuer } from '../callbacks.js'
 import { origin } from '../closure.js'
 import DEV from '../dev/DEV.js'
-import err from '../dev/error.js'
 
 // add Dep for given path on its origin
 const addDep = (baseComp, path, cb, type) => {

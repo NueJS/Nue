@@ -8,10 +8,10 @@ export const swap = (arr, i, j) => {
   [arr[i], arr[j]] = [arr[j], arr[i]]
 }
 
-// export const uid = () => Math.random().toString(36).replace(/[^a-z]+/g, '')
-
-let i = 0
-export const uid = () => '' + i++
+export const uid = /*#__PURE__ */ (() => {
+  let i = 0
+  return () => i++
+})()
 
 export const insert = (arr, i, value) => {
   arr.splice(i, 0, value)
