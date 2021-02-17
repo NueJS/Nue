@@ -19,15 +19,14 @@ function processAttributes (comp, node) {
   parsed.attributes.forEach(attribute => {
     const { type } = attribute
     if (type === EVENT) addEvent(comp, node, attribute)
-    // bind value on input nodes or bind a prop to custom component
-    else if (type === BIND) {
-      if (parsed.isComp) addState(comp, node, attribute)
-      else bindInput(comp, node, attribute)
-    }
 
-    // prop=[value] on parsed component
+    // bind placeholder
+    else if (type === BIND) bindInput(comp, node, attribute)
+
+    // placeholder attribute on component
     else if (type === STATE) addState(comp, node, attribute)
-    // else if (type === FN_PROP) addFnProp(comp, node, attribute)
+
+    // placeholder attribute on non-component
     else addAttribute(comp, node, attribute)
   })
 }
