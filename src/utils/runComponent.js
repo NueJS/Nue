@@ -19,9 +19,12 @@ const addDefaultStyles = (template) => {
 }
 
 function runComponent (comp, component) {
-  const init = (comp.node.parsed && comp.node.parsed.stateProps) || {}
+  const { parsed } = comp.node
+  const stateProps = (parsed && parsed.stateProps) || {}
   const closure$ = comp.closure && comp.closure.$
-  comp.$ = reactify(comp, init, [], closure$)
+
+  // set the state and target
+  comp.$ = reactify(comp, stateProps, [], closure$)
   comp.$Target = comp.$[TARGET]
 
   const invokeComp = (processed) => {
@@ -41,7 +44,7 @@ function runComponent (comp, component) {
       fn: comp.fn,
       self: comp.node,
       // component: comp,
-      props: comp.node.parsed && comp.node.parsed.stateProps,
+      stateProps,
       ...comp.events
     })
 
