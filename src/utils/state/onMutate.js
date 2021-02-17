@@ -6,11 +6,6 @@ import { triggerDeps } from '../callbacks.js'
 // which would trigger some more callbacks, to avoid calling the same cb more than once, build a queue
 // once a cb is added in queue it is not added again
 function onMutate (comp, path, old) {
-  // to avoid infinite loop
-  // if comp component triggered state change in parent and as a result component's own state is again mutated
-  // this would create infinite loop, to prevent that, do not process such state mutation
-  if (comp.ignoredRoot === path[0]) return true
-
   // if queue is being built, don't invoke, invoke once the building is stopped
   if (!comp.batching) invokeQueue(comp)
 
