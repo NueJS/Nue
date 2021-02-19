@@ -1,6 +1,6 @@
 import bindInput from './bindInput.js'
 import addAttribute from './addAttribute.js'
-import addState from './addState.js'
+// import addState from './addState.js'
 import addEvent from './addEvent.js'
 import { EVENT, BIND, STATE } from '../../constants.js'
 
@@ -24,7 +24,9 @@ function processAttributes (comp, node) {
     else if (type === BIND) bindInput(comp, node, attribute)
 
     // placeholder attribute on component
-    else if (type === STATE) addState(comp, node, attribute)
+    // else if (type === STATE) {
+    //   // addState(comp, node, attribute)
+    // }
 
     // placeholder attribute on non-component
     else addAttribute(comp, node, attribute)

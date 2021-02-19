@@ -9,14 +9,14 @@ function addAttribute (comp, node, attribute) {
   let update
   if (type === CONDITIONAL) {
     update = () => {
-      getValue(comp) ? node.setAttribute(name, '') : node.removeAttribute(name)
+      getValue(comp.$) ? node.setAttribute(name, '') : node.removeAttribute(name)
     }
   }
 
   // update attribute value when called with latest from state
   else {
     update = () => {
-      node.setAttribute(name, getValue(comp))
+      node.setAttribute(name, getValue(comp.$))
     }
   }
 

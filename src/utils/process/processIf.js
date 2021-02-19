@@ -28,7 +28,7 @@ function processIf (comp, ifNode) {
 
     group.forEach(conditionNode => {
       const { condition, isProcessed, isRendered, enter } = conditionNode.parsed
-      const satisfied = condition ? condition.getValue(comp) : true
+      const satisfied = condition ? condition.getValue(comp.$) : true
 
       // if this group should be rendered
       if (!foundSatisfied && satisfied) {

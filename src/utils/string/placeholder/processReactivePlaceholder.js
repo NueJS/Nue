@@ -7,9 +7,21 @@ const processReactivePlaceholder = (content) => {
   const path = content.split('.')
 
   // return the value of placeholder in given component
-  const getValue = (comp) => {
-    const [target, prop] = targetProp(comp.$, path)
-    return target[prop]
+  // @TODO clean this up
+  const getValue = (state, closure) => {
+    if (!closure) {
+      // console.log('get value from state : ', path)
+      const [target, prop] = targetProp(state, path)
+      return target[prop]
+    } else {
+      const [target, prop] = targetProp(closure, path)
+      if (target) return target[prop]
+      else {
+        // console.log('get value from closure : ', path)
+        const [target, prop] = targetProp(state, path)
+        return target[prop]
+      }
+    }
   }
 
   return {
