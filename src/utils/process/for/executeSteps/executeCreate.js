@@ -1,14 +1,11 @@
-import { connect } from '../../../connection/recursive'
-import copyParsed from '../../../node/copyParsed'
 import { getOffset } from '../../../node/dom'
-import processNode from '../../processNode'
 import createComp from '../utils/createComp'
 
 const executeCreate = (index, value, blob) => {
-  const { name, forInfo, comps, anchorNode, comp, forNode } = blob
+  const { forInfo, comps, anchorNode } = blob
 
   // create new comp
-  const newComp = createComp(comp, name, forNode, forInfo, value, index)
+  const newComp = createComp(blob, value, index)
 
   // if reorder animation is set, record the initial offset
   if (forInfo.reorder) {

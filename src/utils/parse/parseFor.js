@@ -12,7 +12,7 @@ const parseFor = (comp, node, forAttribute) => {
     map: processPlaceholder(atUsed ? arr[2] : arr[1], true),
     as: arr[0],
     at: atUsed && arr[1],
-    key: processPlaceholder(attr(node, 'key'), true),
+    key: processPlaceholder(attr(node, 'key')),
     enter: attr(node, 'enter'),
     reorder: attr(node, 'reorder'),
     exit: attr(node, 'exit')

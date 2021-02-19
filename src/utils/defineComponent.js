@@ -5,6 +5,7 @@ import buildShadowDOM from './buildShadowDOM.js'
 import dashify from './string/dashify.js'
 import processNode from './process/processNode.js'
 import globalInfo from './globalInfo.js'
+import addStateFromAttribute from './addStateFromAttribute.js'
 
 function defineComponent (name, component) {
   // if the component is already defined, do nothing
@@ -40,7 +41,8 @@ function defineComponent (name, component) {
         memo,
 
         // methods to be invoked after certain phase is completed
-        deferred: []
+        deferred: [],
+        initState: {}
 
       }
 
@@ -56,9 +58,18 @@ function defineComponent (name, component) {
         // add closure using parsed
         const closure = this.parsed && this.parsed.closure
         comp.closure = closure
+        comp.loopClosure = this.parsed && this.parsed.loopClosure
 
         // add fn using closure
         comp.fn = closure ? Object.create(closure.fn) : {}
+
+        if (closure) {
+          if (this.parsed.attributes) {
+            this.parsed.attributes.forEach(at => {
+              addStateFromAttribute(closure, comp, at)
+            })
+          }
+        }
 
         // now that comp is ready, run the component
         runComponent(comp, component)

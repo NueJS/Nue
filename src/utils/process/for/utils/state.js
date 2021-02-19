@@ -2,19 +2,22 @@ import DEV from '../../../dev/DEV'
 import { TARGET } from '../../../symbols'
 import checkUniquenessOfKeys from '../dev/checkUniquenessOfKeys'
 import arrayDiff from '../diff/arrayDiff'
-import { getHashArray } from './get'
+import { getKeys } from './get'
 
-export const getNewState = (forInfo, comp) => {
-  const value = forInfo.map.getValue(comp)[TARGET]
-  const hash = getHashArray(forInfo, value)
+export const getNewState = (blob) => {
+  const { forInfo, comp } = blob
+  // get new array from state
+  const value = forInfo.map.getValue(comp.$)
+  // using the new array, re-compute the keys for each item
+  const hash = getKeys(blob, value)
   if (DEV) checkUniquenessOfKeys(comp, hash)
-
   return {
     hash,
     value
   }
 }
 
+// @todo - do not update index - we need to update props now
 export const updateCompState = (newState, { comps, forInfo, oldState, initialized }) => {
   if (!comps.length || !initialized) return
   const { as, at } = forInfo

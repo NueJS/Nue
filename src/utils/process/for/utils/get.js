@@ -1,18 +1,13 @@
-import { targetProp } from '../../../state/slice'
-
-export const getStateProps = (forInfo, value, i) => {
-  const { as, at } = forInfo
-  return {
-    [as]: value,
-    [at]: i
-  }
+export const getKeys = (blob, values) => {
+  const { forInfo, comp } = blob
+  const { getValue } = forInfo.key
+  return values.map((value, index) => getValue(comp.$, getClosure(blob, value, index)))
 }
 
-export const getHashArray = (forInfo, arr) =>
-  arr.map((value, i) => getHash(forInfo, getStateProps(forInfo, value, i)))
-
-// @TODO - do not use deps[0] - it won't work with function
-export const getHash = (forInfo, stateProps) => {
-  const [target, prop] = targetProp(stateProps, forInfo.key.deps[0])
-  return target[prop]
+export const getClosure = (blob, value, index) => {
+  const { at, as } = blob.forInfo
+  return {
+    [at]: index,
+    [as]: value
+  }
 }
