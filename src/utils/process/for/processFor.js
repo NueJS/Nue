@@ -9,16 +9,16 @@ import reconcile from './diff/reconcile.js'
 import deepClone from '../../deepClone.js'
 import dashify from '../../string/dashify.js'
 
-function processFor (comp, forNode) {
-  const forInfo = forNode.parsed.for
-  const name = dashify(forNode.parsed.name)
+function processFor (comp, loopedComp) {
+  const forInfo = loopedComp.parsed.for
+  const name = dashify(loopedComp.parsed.name)
 
   const blob = {
     comps: [],
     oldState: { value: [], hash: [] },
     anchorNode: null,
     forInfo,
-    forNode,
+    loopedComp,
     comp,
     name,
     deferred: [],
@@ -30,18 +30,18 @@ function processFor (comp, forNode) {
 
   comp.deferred.push(() => {
     blob.anchorNode = document.createComment(' FOR ')
-    // add anchorNode before forNode
-    forNode.before(blob.anchorNode)
+    // add anchorNode before loopedComp
+    loopedComp.before(blob.anchorNode)
 
-    forNode.before(document.createComment(' / FOR '))
-    forNode.remove()
+    loopedComp.before(document.createComment(' / FOR '))
+    loopedComp.remove()
     handleArrayChange()
     blob.initialized = true
   })
 
   const handleArrayChange = () => {
     const { comps, forInfo, oldState } = blob
-    const newState = getNewState(forInfo, comp)
+    const newState = getNewState(blob)
     const steps = reconcile(oldState, newState)
     if (forInfo.reorder) saveOffsets(comps)
     // add, remove and move the components
