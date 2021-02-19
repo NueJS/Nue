@@ -9,7 +9,7 @@ const isObject = x => typeof x === 'object' && x !== null
 
 // create a reactive object which when mutated calls the on_change function
 function reactify (comp, obj, path = [], closure$) {
-  if (!isObject(obj)) return [obj]
+  if (!isObject(obj)) return obj
 
   // make the slice of state reactive
   const target = Array.isArray(obj) ? [] : {}
