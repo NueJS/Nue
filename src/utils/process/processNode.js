@@ -10,7 +10,10 @@ function processNode (comp, node) {
     if (parsed.isComp) {
       node.parsed.closure = comp
       // if the component is being used in for loop
-      if (parsed.for) processFor(comp, node)
+      if (parsed.for) {
+        processFor(comp, node)
+        return
+      }
       if (parsed.conditionType === 'if') processIf(comp, node)
     }
     else if (nodeType === Node.TEXT_NODE) processTextNode(comp, node)
