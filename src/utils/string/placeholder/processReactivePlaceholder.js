@@ -1,6 +1,4 @@
 import { REACTIVE } from '../../constants.js'
-// import DEV from '../../dev/DEV.js'
-// import err from '../../dev/error.js'
 import { targetProp } from '../../state/slice.js'
 
 const processReactivePlaceholder = (content) => {

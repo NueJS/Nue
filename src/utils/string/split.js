@@ -2,7 +2,6 @@
 import { TEXT } from '../constants.js'
 import processPlaceholder from './placeholder/processPlaceholder.js'
 import DEV from '../dev/DEV.js'
-import err from '../dev/error.js'
 
 // take the string text and split it into placeholders and strings
 // returns array of parts
