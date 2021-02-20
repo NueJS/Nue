@@ -1,17 +1,18 @@
 import DEV from '../../../dev/DEV'
+import { arrayToHash } from '../../../others'
 import checkUniquenessOfKeys from '../dev/checkUniquenessOfKeys'
 import arrayDiff from '../diff/arrayDiff'
 
 export const getNewState = (blob) => {
   const { comp, getArray, getKeys } = blob
-  // get new array from state
   const values = getArray()
-  // using the new array, re-compute the keys for each item
   const keys = getKeys()
+  const keyHash = arrayToHash(keys)
   if (DEV) checkUniquenessOfKeys(comp, keys)
   return {
     keys,
-    values
+    values,
+    keyHash
   }
 }
 

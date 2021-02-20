@@ -1,25 +1,11 @@
 import { insert, swap } from '../../../others'
 
-const getHashTable = (hashArray) => {
-  const hash = {}
-  hashArray.forEach((h, i) => {
-    hash[h] = i
-  })
-  return hash
-}
-
 function reconcile (oldState, newState) {
   const steps = []
 
-  const newHash = getHashTable(newState.keys)
-  const oldHash = getHashTable(oldState.keys)
-
-  console.log(newHash, oldHash)
-
   // remove, removed values
-  // if the hash is not present in newHash
   for (let i = 0; i < oldState.keys.length; i++) {
-    if (newHash[oldState.keys[i]] === undefined) {
+    if (newState.keyHash[oldState.keys[i]] === undefined) {
       steps.push({ type: 'remove', index: i })
       oldState.keys.splice(i, 1)
       oldState.values.splice(i, 1)
@@ -30,7 +16,7 @@ function reconcile (oldState, newState) {
   // insert, new values in newState.keys to arr at its position
   for (let i = 0; i < newState.keys.length; i++) {
     const hash = newState.keys[i]
-    if (oldHash[hash] === undefined) {
+    if (oldState.keyHash[hash] === undefined) {
       steps.push({ type: 'create', index: i, value: newState.values[i] })
       insert(oldState.keys, i, hash)
       insert(oldState.values, i, newState.values[i])
@@ -41,7 +27,7 @@ function reconcile (oldState, newState) {
   for (let i = 0; i < oldState.keys.length; i++) {
     if (oldState.keys[i] !== newState.keys[i]) {
       // find where its position in new oldState.keys
-      const iShouldBe = newHash[oldState.keys[i]]
+      const iShouldBe = newState.keyHash[oldState.keys[i]]
       steps.push({ type: 'swap', indexes: [i, iShouldBe] })
       swap(oldState.keys, i, iShouldBe)
       swap(oldState.values, i, iShouldBe)

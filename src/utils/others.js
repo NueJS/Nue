@@ -16,3 +16,9 @@ export const uid = /*#__PURE__ */ (() => {
 export const insert = (arr, i, value) => {
   arr.splice(i, 0, value)
 }
+
+export const arrayToHash = (arr) =>
+  arr.reduce((hash, value, i) => {
+    hash[value] = i
+    return hash
+  }, {})
