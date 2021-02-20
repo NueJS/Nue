@@ -7,20 +7,21 @@ import animateRemove from './animate/animateRemove.js'
 import executeSteps from './executeSteps/executeSteps.js'
 import reconcile from './diff/reconcile.js'
 import deepClone from '../../deepClone.js'
-import dashify from '../../string/dashify.js'
 
 function processFor (comp, loopedComp) {
   const forInfo = loopedComp.parsed.for
-  const name = dashify(loopedComp.parsed.name)
+  const { map, reorder } = forInfo
 
   const blob = {
     comps: [],
     oldState: { value: [], hash: [] },
     anchorNode: null,
+    attributes: loopedComp.parsed.attributes,
     forInfo,
     loopedComp,
+    getArray: () => map.getValue(comp.$),
     comp,
-    name,
+    name: loopedComp.parsed.dashName,
     deferred: [],
     // to keep track of what new components add or removed
     createdComps: [],
@@ -40,10 +41,11 @@ function processFor (comp, loopedComp) {
   })
 
   const handleArrayChange = () => {
-    const { comps, forInfo, oldState } = blob
+    const { comps, oldState } = blob
     const newState = getNewState(blob)
     const steps = reconcile(oldState, newState)
-    if (forInfo.reorder) saveOffsets(comps)
+
+    if (reorder) saveOffsets(comps)
     // add, remove and move the components
     executeSteps(steps, blob)
     // update state of components if needed
