@@ -1,10 +1,12 @@
+import { createComment } from '../node/dom'
+
 const parseIf = (comp) => {
   comp.ifNodes.forEach(ifNode => {
     const group = []
     let node = ifNode.nextElementSibling
 
     // create a starting marker which will be used to add conditional nodes to DOM
-    const anchorNode = document.createComment('if')
+    const anchorNode = createComment('if')
     ifNode.before(anchorNode)
 
     // keep checking the next node
@@ -19,7 +21,7 @@ const parseIf = (comp) => {
 
     // add a end if marker after the last node in group
     // if ifNode is alone, add after it
-    (group[group.length - 1] || ifNode).after(document.createComment('/if'))
+    (group[group.length - 1] || ifNode).after(createComment('/if'))
 
     // remove other nodes from template
     group.forEach(n => n.remove())

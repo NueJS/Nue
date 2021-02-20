@@ -7,6 +7,7 @@ import executeSteps from './executeSteps/executeSteps.js'
 import reconcile from './diff/reconcile.js'
 import deepClone from '../../deepClone.js'
 import { saveOffsets } from './animate/offset.js'
+import { createComment } from '../../node/dom.js'
 
 function processLoop (comp, loopedComp) {
   const forInfo = loopedComp.parsed.for
@@ -35,9 +36,9 @@ function processLoop (comp, loopedComp) {
   }
 
   comp.deferred.push(() => {
-    blob.anchorNode = document.createComment('loop')
+    blob.anchorNode = createComment('loop')
     loopedComp.before(blob.anchorNode)
-    loopedComp.before(document.createComment('/loop'))
+    loopedComp.before(createComment('/loop'))
     loopedComp.remove()
     handleArrayChange()
     blob.initialized = true
@@ -67,7 +68,9 @@ function processLoop (comp, loopedComp) {
     oldState.keyHash = newState.keyHash
   }
 
-  // @TODO use addDeps here instead ?
+  // @TODO optimize this
+  // handleArrayChange should be called only the entire array is mutated
+  // else only update the state of exact item in array
   addDep(comp, map.deps[0], handleArrayChange, 'dom')
 }
 
