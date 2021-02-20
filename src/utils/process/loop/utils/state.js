@@ -7,10 +7,10 @@ export const getNewState = (blob) => {
   // get new array from state
   const value = getArray()
   // using the new array, re-compute the keys for each item
-  const hash = getKeys()
-  if (DEV) checkUniquenessOfKeys(comp, hash)
+  const keys = getKeys()
+  if (DEV) checkUniquenessOfKeys(comp, keys)
   return {
-    hash,
+    keys,
     value
   }
 }

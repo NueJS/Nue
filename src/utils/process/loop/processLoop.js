@@ -19,7 +19,7 @@ function processLoop (comp, loopedComp) {
 
   const blob = {
     comps: [],
-    oldState: { value: [], hash: [] },
+    oldState: { value: [], keys: [] },
     anchorNode: null,
     attributes: loopedComp.parsed.attributes,
     ...forInfo,
@@ -62,7 +62,7 @@ function processLoop (comp, loopedComp) {
 
     // save newState as oldState
     oldState.value = deepClone(newState.value)
-    oldState.hash = newState.hash
+    oldState.keys = newState.keys
   }
 
   // @TODO use addDeps here instead ?
