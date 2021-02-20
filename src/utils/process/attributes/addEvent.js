@@ -22,20 +22,19 @@ function addEvent (comp, node, info) {
   }
 
   // ex: @swipe-left=[moveLeft]
+  let connect
   if (action) {
-    const connect = () => action(node, handler)
-    addConnects(node, connect)
+    connect = () => action(node, handler)
   }
 
   // ex: @click=[increment]
   else {
-    const connect = () => {
+    connect = () => {
       node.addEventListener(name, handler)
       return () => node.removeEventListener(name, handler)
     }
-
-    addConnects(node, connect)
   }
+  addConnects(node, connect)
 }
 
 export default addEvent
