@@ -12,21 +12,17 @@ function processLoop (comp, loopedComp) {
   const forInfo = loopedComp.parsed.for
   const { map, reorder, at, as, key } = forInfo
 
-  const getClosure = (value, index) => ({
-    [at]: index,
-    [as]: value
-  })
-
+  const getClosure = (value, index) => ({ [at]: index, [as]: value })
   const getArray = () => map.getValue(comp.$)
-
-  const getKeys = () => getArray().map((value, index) => key.getValue(comp.$, getClosure(value, index)))
+  const getKey = (value, index) => key.getValue(comp.$, getClosure(value, index))
+  const getKeys = () => getArray().map(getKey)
 
   const blob = {
     comps: [],
     oldState: { value: [], hash: [] },
     anchorNode: null,
     attributes: loopedComp.parsed.attributes,
-    forInfo,
+    ...forInfo,
     loopedComp,
     getArray,
     getClosure,
@@ -34,7 +30,6 @@ function processLoop (comp, loopedComp) {
     comp,
     name: loopedComp.parsed.dashName,
     deferred: [],
-    // to keep track of what new components add or removed
     createdComps: [],
     removedComps: [],
     movedIndexes: []
@@ -42,9 +37,7 @@ function processLoop (comp, loopedComp) {
 
   comp.deferred.push(() => {
     blob.anchorNode = document.createComment(' FOR ')
-    // add anchorNode before loopedComp
     loopedComp.before(blob.anchorNode)
-
     loopedComp.before(document.createComment(' / FOR '))
     loopedComp.remove()
     handleArrayChange()
@@ -71,7 +64,7 @@ function processLoop (comp, loopedComp) {
   }
 
   // @TODO use addDeps here instead ?
-  addDep(comp, forInfo.map.deps[0], handleArrayChange, 'dom')
+  addDep(comp, map.deps[0], handleArrayChange, 'dom')
 }
 
 export default processLoop

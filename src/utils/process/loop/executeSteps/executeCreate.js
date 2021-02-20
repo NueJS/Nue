@@ -2,13 +2,13 @@ import { getOffset } from '../../../node/dom'
 import createComp from '../utils/createComp'
 
 const executeCreate = (index, value, blob) => {
-  const { forInfo, comps, anchorNode } = blob
+  const { reorder, comps, anchorNode, enter } = blob
 
   // create new comp
   const newComp = createComp(blob, value, index)
 
   // if reorder animation is set, record the initial offset
-  if (forInfo.reorder) {
+  if (reorder) {
     requestAnimationFrame(() => {
       newComp.prev = getOffset(newComp)
     })
@@ -26,7 +26,7 @@ const executeCreate = (index, value, blob) => {
 
   // if it should be animated
   // hide it
-  if (forInfo.enter) {
+  if (enter) {
     newComp.style.visibility = 'hidden'
   }
 }

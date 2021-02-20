@@ -1,7 +1,6 @@
 
 const animateRemove = (blob) => {
-  const { forInfo, removedComps } = blob
-  const { exit } = forInfo
+  const { exit, removedComps } = blob
 
   return new Promise(resolve => {
     const next = () => resolve(blob)

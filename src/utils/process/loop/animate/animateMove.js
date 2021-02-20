@@ -25,8 +25,7 @@ const animateCompMove = (node, oldBox, newBox, reorder, transitionEnded) => {
 }
 
 export const animateMove = (blob) => {
-  const { forInfo, comps } = blob
-  const { reorder } = forInfo
+  const { reorder, comps } = blob
 
   const movedComps = comps.filter(c => c.isMoved)
 

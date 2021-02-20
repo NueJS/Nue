@@ -6,8 +6,7 @@ import executeRemove from './executeRemove.js'
 
 // get the steps from reconcile and perform them in DOM
 const executeSteps = (steps, blob) => {
-  const { comps, forInfo } = blob
-  const { reorder } = forInfo
+  const { reorder, comps } = blob
 
   steps.forEach(step => {
     const { type, index, value, indexes } = step

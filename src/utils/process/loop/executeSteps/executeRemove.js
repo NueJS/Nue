@@ -1,5 +1,5 @@
 const executeRemove = async (index, blob) => {
-  const { comps, forInfo, removedComps } = blob
+  const { comps, exit, removedComps } = blob
 
   // get the comp that is to be removed
   const removedComp = comps[index]
@@ -8,7 +8,7 @@ const executeRemove = async (index, blob) => {
   comps.splice(index, 1)
 
   // if it should have animated exit, record it in removedComps
-  if (forInfo.exit) removedComps.push(removedComp)
+  if (exit) removedComps.push(removedComp)
   // else remove it immediately
   else removedComp.remove()
 }
