@@ -1,4 +1,4 @@
-import { getOffset } from '../../../node/dom'
+import { saveOffset } from '../animate/offset'
 import createComp from '../utils/createComp'
 
 const executeCreate = (index, value, blob) => {
@@ -9,9 +9,7 @@ const executeCreate = (index, value, blob) => {
 
   // if reorder animation is set, record the initial offset
   if (reorder) {
-    requestAnimationFrame(() => {
-      newComp.prev = getOffset(newComp)
-    })
+    requestAnimationFrame(() => saveOffset(newComp))
   }
 
   // add to DOM

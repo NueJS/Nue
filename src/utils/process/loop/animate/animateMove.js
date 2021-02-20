@@ -1,4 +1,4 @@
-import { getOffset } from '../../../node/dom'
+import { getOffset } from './offset'
 
 const animateCompMove = (node, oldBox, newBox, reorder, transitionEnded) => {
   // @TODO throw here instead
@@ -26,7 +26,6 @@ const animateCompMove = (node, oldBox, newBox, reorder, transitionEnded) => {
 
 export const animateMove = (blob) => {
   const { reorder, comps } = blob
-
   const movedComps = comps.filter(c => c.isMoved)
 
   return new Promise(resolve => {

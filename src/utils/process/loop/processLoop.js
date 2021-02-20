@@ -1,4 +1,3 @@
-import { saveOffsets } from '../../node/dom.js'
 import addDep from '../../state/addDep.js'
 import { getNewState, updateCompState } from './utils/state.js'
 import animateEnter from './animate/animateEnter.js'
@@ -7,6 +6,7 @@ import animateRemove from './animate/animateRemove.js'
 import executeSteps from './executeSteps/executeSteps.js'
 import reconcile from './diff/reconcile.js'
 import deepClone from '../../deepClone.js'
+import { saveOffsets } from './animate/offset.js'
 
 function processLoop (comp, loopedComp) {
   const forInfo = loopedComp.parsed.for
@@ -28,7 +28,6 @@ function processLoop (comp, loopedComp) {
     getClosure,
     getKeys,
     comp,
-    name: loopedComp.parsed.dashName,
     deferred: [],
     createdComps: [],
     removedComps: [],
@@ -36,9 +35,9 @@ function processLoop (comp, loopedComp) {
   }
 
   comp.deferred.push(() => {
-    blob.anchorNode = document.createComment(' FOR ')
+    blob.anchorNode = document.createComment('loop')
     loopedComp.before(blob.anchorNode)
-    loopedComp.before(document.createComment(' / FOR '))
+    loopedComp.before(document.createComment('/loop'))
     loopedComp.remove()
     handleArrayChange()
     blob.initialized = true
@@ -49,9 +48,12 @@ function processLoop (comp, loopedComp) {
     const newState = getNewState(blob)
     const steps = reconcile(oldState, newState)
 
+    // to show reorder animation - we have to save offsets before updating nodes
     if (reorder) saveOffsets(comps)
+
     // add, remove and move the components
     executeSteps(steps, blob)
+
     // update state of components if needed
     updateCompState(newState, blob)
 
