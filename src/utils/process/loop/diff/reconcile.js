@@ -22,7 +22,7 @@ function reconcile (oldState, newState) {
     if (newHash[oldState.keys[i]] === undefined) {
       steps.push({ type: 'remove', index: i })
       oldState.keys.splice(i, 1)
-      oldState.value.splice(i, 1)
+      oldState.values.splice(i, 1)
       i--
     }
   }
@@ -31,9 +31,9 @@ function reconcile (oldState, newState) {
   for (let i = 0; i < newState.keys.length; i++) {
     const hash = newState.keys[i]
     if (oldHash[hash] === undefined) {
-      steps.push({ type: 'create', index: i, value: newState.value[i] })
+      steps.push({ type: 'create', index: i, value: newState.values[i] })
       insert(oldState.keys, i, hash)
-      insert(oldState.value, i, newState.value[i])
+      insert(oldState.values, i, newState.values[i])
     }
   }
 
@@ -44,7 +44,7 @@ function reconcile (oldState, newState) {
       const iShouldBe = newHash[oldState.keys[i]]
       steps.push({ type: 'swap', indexes: [i, iShouldBe] })
       swap(oldState.keys, i, iShouldBe)
-      swap(oldState.value, i, iShouldBe)
+      swap(oldState.values, i, iShouldBe)
       i-- // keep checking the index i until we find the value which belongs to this index
     }
   }

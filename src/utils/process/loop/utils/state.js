@@ -5,13 +5,13 @@ import arrayDiff from '../diff/arrayDiff'
 export const getNewState = (blob) => {
   const { comp, getArray, getKeys } = blob
   // get new array from state
-  const value = getArray()
+  const values = getArray()
   // using the new array, re-compute the keys for each item
   const keys = getKeys()
   if (DEV) checkUniquenessOfKeys(comp, keys)
   return {
     keys,
-    value
+    values
   }
 }
 
@@ -20,7 +20,7 @@ export const updateCompState = (newState, blob) => {
   const { comps, attributes, oldState, initialized, comp, getArray, getClosure } = blob
   if (!comps.length || !initialized) return
 
-  const diffIndexes = arrayDiff(newState.value, oldState.value)
+  const diffIndexes = arrayDiff(newState.values, oldState.values)
   diffIndexes.forEach(i => {
     attributes.forEach(attribute => {
       const arr = getArray()
