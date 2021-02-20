@@ -9,6 +9,8 @@
 //   anchor[type](node1)
 // }
 
+import { createElement } from './dom'
+
 function swapDom (a, b)
 {
   a.ignoreConnectionChange = true
@@ -17,8 +19,8 @@ function swapDom (a, b)
   const aParent = a.parentNode
   const bParent = b.parentNode
 
-  const aHolder = document.createElement('div')
-  const bHolder = document.createElement('div')
+  const aHolder = createElement('div')
+  const bHolder = createElement('div')
 
   aParent.replaceChild(aHolder, a)
   bParent.replaceChild(bHolder, b)

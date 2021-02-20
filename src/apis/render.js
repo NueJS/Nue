@@ -3,6 +3,7 @@ import defineComponent from '../utils/defineComponent'
 import dashify from '../utils/string/dashify'
 import showError from '../utils/dev/error-overlay/showError.js'
 import DEV from '../utils/dev/DEV'
+import { createElement } from '../utils/node/dom'
 
 // define the custom element of given name
 const render = (component, settings) => {
@@ -20,7 +21,7 @@ const render = (component, settings) => {
 
   // find the <CompName> in html and replace it with <compname->
   const el = document.querySelector(name)
-  const root = document.createElement(dashify(name))
+  const root = createElement(dashify(name))
   el.replaceWith(root)
 
   defineComponent(component.name, component)

@@ -12,3 +12,5 @@ export const waitForEvent = async (node, eventName) =>
 export const onAnimationEnd = (node, cb) => {
   node.addEventListener('animationend', cb, { once: true })
 }
+
+export const createElement = (name) => document.createElement(name)

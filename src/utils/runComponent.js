@@ -4,11 +4,12 @@ import reactify from './reactivity/reactify.js'
 import templateTag from './string/templateTag.js'
 import parseTemplate from './parse/parseTemplate.js'
 import { TARGET } from './symbols.js'
+import { createElement } from './node/dom.js'
 
 const addDefaultStyles = (template) => {
   const { content } = template
   const style = content.querySelector('style')
-  const defaultStyle = document.createElement('style')
+  const defaultStyle = createElement('style')
   defaultStyle.setAttribute('default-styles', '')
   defaultStyle.textContent = globalInfo.defaultStyle
   if (style) {
@@ -57,7 +58,7 @@ function runComponent (comp, component) {
   }
 
   else {
-    comp.memo.template = document.createElement('template')
+    comp.memo.template = createElement('template')
     invokeComp(false)
     parseTemplate(comp)
     addDefaultStyles(comp.memo.template)

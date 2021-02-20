@@ -1,3 +1,4 @@
+import { createElement } from '../../node/dom'
 import html from './html'
 
 function handleErrors (error) {
@@ -18,7 +19,7 @@ function handleErrors (error) {
 
   window.customElements.define('parsed-error-overlay', sweetErrorOverlay)
 
-  const $sweetErrorOverlay = document.createElement('parsed-error-overlay')
+  const $sweetErrorOverlay = createElement('parsed-error-overlay')
   document.body.append($sweetErrorOverlay)
 
   const $message = $sweetErrorOverlay.shadowRoot.querySelector('.message')

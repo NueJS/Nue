@@ -1,10 +1,10 @@
-import { attr } from '../node/dom'
+import { attr, createElement } from '../node/dom'
 import dashify from '../string/dashify'
 
 const parseComp = (name, node, _node) => {
   // child nodes (slot) of child component should not be sweetified and saved in array instead
 
-  const newNode = document.createElement(name + '-')
+  const newNode = createElement(name + '-')
 
   newNode.parsed = {
     isComp: true,
