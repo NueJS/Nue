@@ -8,9 +8,18 @@ import executeSteps from './executeSteps/executeSteps.js'
 import reconcile from './diff/reconcile.js'
 import deepClone from '../../deepClone.js'
 
-function processFor (comp, loopedComp) {
+function processLoop (comp, loopedComp) {
   const forInfo = loopedComp.parsed.for
-  const { map, reorder } = forInfo
+  const { map, reorder, at, as, key } = forInfo
+
+  const getClosure = (value, index) => ({
+    [at]: index,
+    [as]: value
+  })
+
+  const getArray = () => map.getValue(comp.$)
+
+  const getKeys = () => getArray().map((value, index) => key.getValue(comp.$, getClosure(value, index)))
 
   const blob = {
     comps: [],
@@ -19,7 +28,9 @@ function processFor (comp, loopedComp) {
     attributes: loopedComp.parsed.attributes,
     forInfo,
     loopedComp,
-    getArray: () => map.getValue(comp.$),
+    getArray,
+    getClosure,
+    getKeys,
     comp,
     name: loopedComp.parsed.dashName,
     deferred: [],
@@ -63,4 +74,4 @@ function processFor (comp, loopedComp) {
   addDep(comp, forInfo.map.deps[0], handleArrayChange, 'dom')
 }
 
-export default processFor
+export default processLoop

@@ -1,7 +1,7 @@
 import processTextNode from './processTextNode.js'
 import processAttributes from './attributes/processAttributes.js'
 import processIf from './processIf.js'
-import processFor from './for/processFor.js'
+import processLoop from './loop/processLoop.js'
 
 function processNode (comp, node) {
   const { parsed, nodeType } = node
@@ -11,7 +11,7 @@ function processNode (comp, node) {
       node.parsed.closure = comp
       // if the component is being used in for loop
       if (parsed.for) {
-        processFor(comp, node)
+        processLoop(comp, node)
         return
       }
       if (parsed.conditionType === 'if') processIf(comp, node)
