@@ -1,27 +1,14 @@
-import globalInfo from './globalInfo.js'
 import modes from './reactivity/modes.js'
 import reactify from './reactivity/reactify.js'
 import templateTag from './string/templateTag.js'
 import parseTemplate from './parse/parseTemplate.js'
 import { TARGET } from './symbols.js'
 import { createElement } from './node/dom.js'
-
-const addDefaultStyles = (template) => {
-  const { content } = template
-  const style = content.querySelector('style')
-  const defaultStyle = createElement('style')
-  defaultStyle.setAttribute('default-styles', '')
-  defaultStyle.textContent = globalInfo.defaultStyle
-  if (style) {
-    style.before(defaultStyle)
-  } else {
-    content.lastChild.after(defaultStyle)
-  }
-}
+import addDefaultStyles from './addDefaultStyle.js'
 
 function runComponent (comp, component) {
-  const { parsed } = comp.node
-  const closure$ = comp.closure && comp.closure.$
+  const { closure } = comp
+  const closure$ = closure && closure.$
 
   // set the state and target
   comp.$ = reactify(comp, comp.initState, [], closure$)
@@ -43,8 +30,6 @@ function runComponent (comp, component) {
       template,
       fn: comp.fn,
       self: comp.node,
-      // component: comp,
-      // stateProps,
       ...comp.events
     })
 
