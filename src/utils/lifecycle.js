@@ -19,7 +19,7 @@ function addLifecycles (comp) {
     afterUpdate: (cb) => afterUpdate.push(cb),
     onMutate: (cb, ...slices) => {
       if (DEV && !slices.length) {
-        errors.MISSING_DEPENDENCIES_IN_ON_MUTATE(comp)
+        throw errors.MISSING_DEPENDENCIES_IN_ON_MUTATE(comp)
       }
       // add the state dependency after the component is mounted
       onMount.push(() => {
