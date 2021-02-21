@@ -8,12 +8,11 @@ const processReactivePlaceholder = (content) => {
   // @TODO clean this up
   const getValue = (state, closure) => {
     if (!closure) {
-      // console.log('get value from state : ', path)
       const [target, prop] = targetProp(state, path)
       return target[prop]
     } else {
       const [target, prop] = targetProp(closure, path)
-      if (target) return target[prop]
+      if (target && prop in target) return target[prop]
       else {
         // console.log('get value from closure : ', path)
         const [target, prop] = targetProp(state, path)
