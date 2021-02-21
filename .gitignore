@@ -1,7 +1,4 @@
 node_modules/
 .vscode
-test/
-out/
 .cache/
-dist/
-play.js
+coverage/
