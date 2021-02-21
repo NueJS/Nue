@@ -1,433 +1,242 @@
-import reconcile from '../src/utils/reconcile'
+import { arrayToHash, swap } from '../src/utils/others'
+import reconcile, { created, removed, swapped } from '../src/utils/process/loop/diff/reconcile'
 
+const getState = values => {
+  const keys = values.map(value => value * 2)
+  return {
+    values,
+    keys,
+    keyHash: arrayToHash(keys)
+  }
+}
+
+const matches = (fn, expectedSteps) => {
+  const values = [10, 20, 30, 40]
+  fn(values)
+
+  const newState = getState(values)
+  const steps = reconcile(oldState, newState)
+
+  expect(steps).toEqual(expectedSteps)
+  expect(oldState).toEqual(newState)
+}
+
+let oldState
+beforeEach(() => {
+  oldState = getState([10, 20, 30, 40])
+})
+
+// --------------------------------------------
 test('no change', () => {
-  const oldArr = [1, 2, 3, 4]
-  const newArr = [1, 2, 3, 4]
-
-  const [steps, syncArr] = reconcile(oldArr, newArr)
-
-  expect(steps).toEqual([])
-  expect(syncArr).toEqual(newArr)
+  matches(() => {}, [])
 })
 
 test('PUSH: single', () => {
-  const oldArr = [10, 20, 30, 40]
-  const newArr = [10, 20, 30, 40, 50]
-
-  const [steps, syncArr] = reconcile(oldArr, newArr)
-
-  expect(steps).toEqual([{
-    type: 'create',
-    index: 4,
-    value: 50
-  }])
-
-  expect(syncArr).toEqual(newArr)
+  const action = values => {
+    values.push(50)
+  }
+  const steps = [created(4, 50)]
+  matches(action, steps)
 })
 
 test('PUSH: multiple', () => {
-  const oldArr = [10, 20, 30, 40]
-  const newArr = [10, 20, 30, 40, 50, 60, 70]
+  const action = values => {
+    values.push(50)
+    values.push(60)
+    values.push(70)
+  }
 
-  const [steps, syncArr] = reconcile(oldArr, newArr)
-
-  expect(steps).toEqual([
-    {
-      type: 'create',
-      index: 4,
-      value: 50
-    },
-    {
-      type: 'create',
-      index: 5,
-      value: 60
-    },
-    {
-      type: 'create',
-      index: 6,
-      value: 70
-    }
-  ])
-
-  expect(syncArr).toEqual(newArr)
+  const steps = [created(4, 50), created(5, 60), created(6, 70)]
+  matches(action, steps)
 })
 
 test('SHIFT: single', () => {
-  const oldArr = [10, 20, 30, 40]
-  const newArr = [20, 30, 40]
+  const action = values => {
+    values.shift()
+  }
 
-  const [steps, syncArr] = reconcile(oldArr, newArr)
-
-  expect(steps).toEqual([
-    {
-      type: 'remove',
-      index: 0
-    }
-  ])
-
-  expect(syncArr).toEqual(newArr)
+  const steps = [removed(0)]
+  matches(action, steps)
 })
 
 test('SHIFT: multiple', () => {
-  const oldArr = [10, 20, 30, 40]
-  const newArr = [30, 40]
+  const action = values => {
+    values.shift()
+    values.shift()
+  }
 
-  const [steps, syncArr] = reconcile(oldArr, newArr)
-
-  expect(steps).toEqual([
-    {
-      type: 'remove',
-      index: 0
-    },
-    {
-      type: 'remove',
-      index: 0
-    }
-  ])
-
-  expect(syncArr).toEqual(newArr)
+  const steps = [removed(0), removed(0)]
+  matches(action, steps)
 })
 
+// add new item at the start of the array
 test('UNSHIFT: single', () => {
-  const oldArr = [10, 20, 30, 40]
-  const newArr = [50, 10, 20, 30, 40]
+  const action = values => {
+    values.unshift(50)
+  }
 
-  const [steps, syncArr] = reconcile(oldArr, newArr)
+  const steps = [created(0, 50)]
 
-  expect(steps).toEqual([
-    {
-      type: 'create',
-      index: 0,
-      value: 50
-    }
-  ])
-
-  expect(syncArr).toEqual(newArr)
+  matches(action, steps)
 })
 
 test('UNSHIFT: multiple', () => {
-  const oldArr = [10, 20, 30, 40]
-  const newArr = [50, 60, 70, 10, 20, 30, 40]
+  const action = values => {
+    values.unshift(50)
+    values.unshift(60)
+  }
 
-  const [steps, syncArr] = reconcile(oldArr, newArr)
+  const steps = [created(0, 60), created(1, 50)]
 
-  expect(steps).toEqual([
-    {
-      type: 'create',
-      index: 0,
-      value: 50
-    },
-    {
-      type: 'create',
-      index: 1,
-      value: 60
-    },
-    {
-      type: 'create',
-      index: 2,
-      value: 70
-    }
-  ])
-
-  expect(syncArr).toEqual(newArr)
+  matches(action, steps)
 })
 
 test('SWAP: single', () => {
-  const oldArr = [10, 20, 30, 40]
-  const newArr = [40, 20, 30, 10]
+  const action = values => {
+    swap(values, 0, 3)
+  }
 
-  const [steps, syncArr] = reconcile(oldArr, newArr)
+  const steps = [swapped(0, 3)]
 
-  expect(steps).toEqual([
-    {
-      type: 'swap',
-      indexes: [0, 3]
-    }
-  ])
-
-  expect(syncArr).toEqual(newArr)
+  matches(action, steps)
 })
 
 test('SWAP: multiple', () => {
-  const oldArr = [10, 20, 30, 40]
-  const newArr = [30, 10, 40, 20]
+  // 10, 20, 30, 40
+  const action = values => {
+    swap(values, 0, 1) // 20, 10, 30, 40
+    swap(values, 0, 3) // 40, 10, 30, 20
+    swap(values, 0, 2) // 30, 10, 40, 20
+  }
 
-  const [steps, syncArr] = reconcile(oldArr, newArr)
+  const steps = [swapped(0, 1), swapped(0, 3), swapped(0, 2)]
 
-  expect(steps).toEqual([
-    {
-      type: 'swap',
-      indexes: [0, 1]
-    },
-    {
-      type: 'swap',
-      indexes: [2, 0]
-    },
-    {
-      type: 'swap',
-      indexes: [3, 2]
-    }
-  ])
-
-  expect(syncArr).toEqual(newArr)
+  matches(action, steps)
 })
 
 test('PUSH + SWAP', () => {
-  const oldArr = [10, 20, 30, 40]
-  const newArr = [30, 20, 10, 40, 50]
+  const action = values => {
+    values.push(50)
+    swap(values, 0, 2)
+  }
 
-  const [steps, syncArr] = reconcile(oldArr, newArr)
+  const steps = [created(4, 50), swapped(0, 2)]
 
-  expect(steps).toEqual([
-    {
-      type: 'create',
-      index: 4,
-      value: 50
-    },
-    {
-      type: 'swap',
-      indexes: [0, 2]
-    }
-  ])
-
-  expect(syncArr).toEqual(newArr)
-})
-
-test('PUSH + SHIFT', () => {
-  const oldArr = [10, 20, 30, 40]
-  const newArr = [50, 10, 20, 30, 40, 60]
-
-  const [steps, syncArr] = reconcile(oldArr, newArr)
-
-  expect(steps).toEqual([
-    {
-      type: 'create',
-      index: 0,
-      value: 50
-    },
-    {
-      type: 'create',
-      index: 5,
-      value: 60
-    }
-  ])
-
-  expect(syncArr).toEqual(newArr)
+  matches(action, steps)
 })
 
 test('PUSH + UNSHIFT', () => {
-  const oldArr = [10, 20, 30, 40]
-  const newArr = [20, 30, 40, 50]
+  const action = values => {
+    values.unshift(50)
+    values.push(60)
+  }
 
-  const [steps, syncArr] = reconcile(oldArr, newArr)
+  const steps = [created(0, 50), created(5, 60)]
 
-  expect(steps).toEqual([
-    {
-      type: 'remove',
-      index: 0
-    },
-    {
-      type: 'create',
-      index: 3,
-      value: 50
-    }
-  ])
+  matches(action, steps)
+})
 
-  expect(syncArr).toEqual(newArr)
+test('PUSH + SHIFT', () => {
+  const action = values => {
+    values.shift()
+    values.push(50)
+  }
+
+  const steps = [removed(0), created(3, 50)]
+
+  matches(action, steps)
 })
 
 test('PUSH + SWAP', () => {
-  const oldArr = [10, 20, 30, 40]
-  const newArr = [40, 30, 20, 10, 50]
+  const action = values => {
+    values.push(50)
+    swap(values, 0, 3)
+    swap(values, 1, 2)
+  }
 
-  const [steps, syncArr] = reconcile(oldArr, newArr)
+  const steps = [created(4, 50), swapped(0, 3), swapped(1, 2)]
 
-  expect(steps).toEqual([
-    {
-      type: 'create',
-      index: 4,
-      value: 50
-    },
-    {
-      type: 'swap',
-      indexes: [0, 3]
-    },
-    {
-      type: 'swap',
-      indexes: [1, 2]
-    }
-  ])
-
-  expect(syncArr).toEqual(newArr)
+  matches(action, steps)
 })
 
 test('SHIFT + SWAP', () => {
-  const oldArr = [10, 20, 30, 40, 50, 60]
-  const newArr = [60, 50, 40]
+  const action = values => {
+    values.shift()
+    values.shift()
+    values.shift()
+    values.unshift(50)
+    values.unshift(60)
+  }
 
-  const [steps, syncArr] = reconcile(oldArr, newArr)
-
-  expect(steps).toEqual([
-    {
-      type: 'remove',
-      index: 0
-    },
-    {
-      type: 'remove',
-      index: 0
-    },
-    {
-      type: 'remove',
-      index: 0
-    },
-    {
-      type: 'swap',
-      indexes: [0, 2]
-    }
-  ])
-
-  expect(syncArr).toEqual(newArr)
+  const steps = [removed(0), removed(0), removed(0), created(0, 60), created(1, 50)]
+  matches(action, steps)
 })
 
 test('SHIFT + UNSHIFT', () => {
-  const oldArr = [10, 20, 30, 40]
-  const newArr = [50, 20, 30, 40]
+  // [50, 20, 30, 40]
+  const action = values => {
+    values.shift()
+    values.unshift(50)
+  }
 
-  const [steps, syncArr] = reconcile(oldArr, newArr)
-
-  expect(steps).toEqual([
-    {
-      type: 'remove',
-      index: 0
-    },
-    {
-      type: 'create',
-      index: 0,
-      value: 50
-    }
-  ])
-
-  expect(syncArr).toEqual(newArr)
+  const steps = [removed(0), created(0, 50)]
+  matches(action, steps)
 })
 
 test('UNSHIFT + SWAP', () => {
-  const oldArr = [10, 20, 30, 40]
-  const newArr = [50, 20, 10, 40, 30]
-
-  const [steps, syncArr] = reconcile(oldArr, newArr)
-
-  expect(steps).toEqual([
-    {
-      type: 'create',
-      index: 0,
-      value: 50
-    },
-    {
-      type: 'swap',
-      indexes: [1, 2]
-    },
-    {
-      type: 'swap',
-      indexes: [3, 4]
-    }
-  ])
-
-  expect(syncArr).toEqual(newArr)
+  // [50, 20, 10, 40, 30]
+  const action = values => {
+    values.unshift(50)
+    swap(values, 1, 2)
+    swap(values, 3, 4)
+  }
+  const steps = [created(0, 50), swapped(1, 2), swapped(3, 4)]
+  matches(action, steps)
 })
 
 test('SPLICE ADD', () => {
-  const oldArr = [10, 20, 30, 40]
-  const newArr = [10, 50, 20, 60, 30, 40]
+  // [10, 50, 20, 60, 30, 40]
+  const action = values => {
+    values.splice(1, 0, 50)
+    values.splice(3, 0, 60)
+  }
 
-  const [steps, syncArr] = reconcile(oldArr, newArr)
-
-  expect(steps).toEqual([
-    {
-      type: 'create',
-      index: 1,
-      value: 50
-    },
-    {
-      type: 'create',
-      index: 3,
-      value: 60
-    }
-  ])
-
-  expect(syncArr).toEqual(newArr)
+  const steps = [created(1, 50), created(3, 60)]
+  matches(action, steps)
 })
 
 test('SPLICE REMOVE', () => {
-  const oldArr = [10, 20, 30, 40]
-  const newArr = [10, 40]
-
-  const [steps, syncArr] = reconcile(oldArr, newArr)
-
-  expect(steps).toEqual([
-    {
-      type: 'remove',
-      index: 1
-    },
-    {
-      type: 'remove',
-      index: 1
-    }
-  ])
-
-  expect(syncArr).toEqual(newArr)
+  // [10, 40]
+  const action = values => {
+    values.splice(1, 1)
+    values.splice(1, 1)
+  }
+  const steps = [removed(1), removed(1)]
+  matches(action, steps)
 })
 
 test('SPLICE ADD + SPLICE REMOVE', () => {
-  const oldArr = [10, 20, 30, 40, 50]
-  const newArr = [10, 30, 60, 50, 70]
-
-  const [steps, syncArr] = reconcile(oldArr, newArr)
-
-  expect(steps).toEqual([
-    {
-      type: 'remove',
-      index: 1
-    },
-    {
-      type: 'remove',
-      index: 2
-    },
-    {
-      type: 'create',
-      index: 2,
-      value: 60
-    },
-    {
-      type: 'create',
-      index: 4,
-      value: 70
-    }
-  ])
-
-  expect(syncArr).toEqual(newArr)
+  // [10, 30, 60, 50, 70]
+  const action = values => {
+    values.splice(1, 1)
+    values.splice(2, 0, 60)
+    values.splice(3, 0, 50)
+    values.splice(4, 0, 70)
+  }
+  const steps = [removed(1), created(2, 60), created(3, 50), created(4, 70)]
+  matches(action, steps)
 })
 
 test('SPLICE ADD + SPLICE REMOVE + SWAP', () => {
-  const oldArr = [10, 20, 30, 40, 50]
-  const newArr = [40, 30, 10, 60, 50]
+  // [40, 30, 10, 60, 50]
+  const action = values => {
+    values.splice(1, 1)
+    values.splice(3, 0, 60)
+    values.splice(4, 0, 50)
+    swap(values, 0, 2)
+  }
 
-  const [steps, syncArr] = reconcile(oldArr, newArr)
+  const steps = [removed(1), created(3, 60), created(4, 50), swapped(0, 2)]
 
-  expect(steps).toEqual([
-    {
-      type: 'remove',
-      index: 1
-    },
-    {
-      type: 'create',
-      index: 3,
-      value: 60
-    },
-    {
-      type: 'swap',
-      indexes: [0, 2]
-    }
-  ])
-
-  expect(syncArr).toEqual(newArr)
+  matches(action, steps)
 })
