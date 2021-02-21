@@ -1,5 +1,6 @@
 import { addConnects } from '../../connection/addConnects.js'
 import DEV from '../../dev/DEV.js'
+import errors from '../../dev/errors.js'
 
 function addEvent (comp, node, info) {
   const { name, placeholder } = info
@@ -9,16 +10,7 @@ function addEvent (comp, node, info) {
   const fnName = placeholder.fnName
   const handler = comp.fn[fnName]
 
-  if (DEV) {
-    if (!handler) {
-      throw {
-        message: `invalid method "${placeholder.fnName}" used`,
-        link: '',
-        code: -1,
-        comp
-      }
-    }
-  }
+  if (DEV && !handler) throw errors.METHOD_NOT_FOUND(comp, fnName)
 
   // ex: @swipe-left=[moveLeft]
   let connect

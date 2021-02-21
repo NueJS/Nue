@@ -1,20 +1,13 @@
 import { cbQueuer } from '../callbacks.js'
 import { origin } from '../closure.js'
 import DEV from '../dev/DEV.js'
+import errors from '../dev/errors.js'
 
 // add Dep for given path on its origin
 const addDep = (baseComp, path, cb, type) => {
   const comp = origin(baseComp, path)
 
-  if (DEV && !comp) {
-    throw {
-      message: `Invalid state placeholder used in template : [${path.join('.')}]`,
-      fix: `make sure that "${path.join('.')}" exists in state of <${baseComp.memo.name}/> component or it's closure`,
-      link: '',
-      code: -1,
-      comp: baseComp
-    }
-  }
+  if (DEV && !comp) throw errors.STATE_NOT_FOUND(comp, path.join('.'))
 
   const qcb = cbQueuer(comp, cb, type)
   let target = comp.deps
