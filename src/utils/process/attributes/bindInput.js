@@ -8,11 +8,11 @@ function bindInput (comp, node, attribute) {
   const { name } = attribute
 
   const setProp = () => {
-    node[name] = getValue(comp.$, node)
+    node[name] = getValue(comp, node)
   }
 
   const setText = () => {
-    node.textContent = getValue(comp.$, node)
+    node.textContent = getValue(comp, node)
   }
 
   const addHandler = (handler) => {

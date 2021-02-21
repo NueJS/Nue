@@ -1,5 +1,13 @@
 export default {
 
+  STATE_NOT_FOUND (comp, content) {
+    return {
+      message: `Could not find value of [${content}]`,
+      fix: `Make sure [${content}] is available in state or it's closure`,
+      comp
+    }
+  },
+
   KEYS_ARE_NOT_UNIQUE (keys, comp) {
     const nonUniqueKeys = keys.filter((key, i) => {
       return keys.indexOf(key, i) !== keys.lastIndexOf(key)

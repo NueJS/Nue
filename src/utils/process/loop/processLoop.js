@@ -14,8 +14,8 @@ function processLoop (comp, loopedComp) {
   const { map, reorder, at, as, key } = forInfo
 
   const getClosure = (value, index) => ({ [at]: index, [as]: value })
-  const getArray = () => map.getValue(comp.$)
-  const getKey = (value, index) => key.getValue(comp.$, getClosure(value, index))
+  const getArray = () => map.getValue(comp)
+  const getKey = (value, index) => key.getValue(comp, getClosure(value, index))
   const getKeys = () => getArray().map(getKey)
   const attributes = loopedComp.parsed.attributes
 

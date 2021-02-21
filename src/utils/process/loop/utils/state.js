@@ -37,7 +37,7 @@ export const updateCompState = (newState, blob) => {
     attributes.forEach(attribute => {
       const arr = getArray()
       const closure = getClosure(arr[i], i)
-      comps[i].nue.$[attribute.name] = attribute.placeholder.getValue(comp.$, closure)
+      comps[i].nue.$[attribute.name] = attribute.placeholder.getValue(comp, closure)
     })
   })
 }

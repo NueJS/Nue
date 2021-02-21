@@ -6,10 +6,10 @@ function addStateFromAttribute (parentComp, comp, attribute) {
   const { getValue, deps } = placeholder
 
   const cb = () => {
-    comp.$[name] = getValue(parentComp.$, comp.loopClosure)
+    comp.$[name] = getValue(parentComp, comp.loopClosure)
   }
 
-  comp.initState[name] = getValue(parentComp.$, comp.loopClosure)
+  comp.initState[name] = getValue(parentComp, comp.loopClosure)
 
   // if the attribute value depends on some part of state
   // when that part of state is changed update the attribute value

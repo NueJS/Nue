@@ -1,4 +1,6 @@
 import { REACTIVE } from '../../constants.js'
+import DEV from '../../dev/DEV.js'
+import errors from '../../dev/errors.js'
 import { targetProp } from '../../state/slice.js'
 
 const processReactivePlaceholder = (content) => {
@@ -6,17 +8,20 @@ const processReactivePlaceholder = (content) => {
 
   // return the value of placeholder in given component
   // @TODO clean this up
-  const getValue = (state, closure) => {
+  const getValue = (comp, closure) => {
+    const state = comp.$
     if (!closure) {
       const [target, prop] = targetProp(state, path)
       return target[prop]
     } else {
       const [target, prop] = targetProp(closure, path)
-      if (target && prop in target) return target[prop]
+      const value = target[prop]
+      if (target && value) return value
       else {
-        // console.log('get value from closure : ', path)
         const [target, prop] = targetProp(state, path)
-        return target[prop]
+        const value = target[prop]
+        if (target && value) return value
+        else if (DEV) throw errors.STATE_NOT_FOUND(comp, content)
       }
     }
   }

@@ -9,11 +9,11 @@ function addAttribute (comp, node, attribute) {
   let update
 
   if (type === CONDITIONAL) {
-    update = () => getValue(comp.$) ? node.setAttribute(name, '') : node.removeAttribute(name)
+    update = () => getValue(comp) ? node.setAttribute(name, '') : node.removeAttribute(name)
   }
 
   else {
-    update = () => node.setAttribute(name, getValue(comp.$))
+    update = () => node.setAttribute(name, getValue(comp))
   }
 
   wire(comp, node, deps, update)
