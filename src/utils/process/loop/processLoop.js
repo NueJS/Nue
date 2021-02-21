@@ -17,12 +17,22 @@ function processLoop (comp, loopedComp) {
   const getArray = () => map.getValue(comp.$)
   const getKey = (value, index) => key.getValue(comp.$, getClosure(value, index))
   const getKeys = () => getArray().map(getKey)
+  const attributes = loopedComp.parsed.attributes
+
+  const propsUsingIndex = []
+  // find props that are using indexes
+  attributes.forEach(attr => {
+    if (attr.placeholder.deps.some(dep => dep[0] === at)) {
+      propsUsingIndex.push(attr.name)
+    }
+  })
 
   const blob = {
+    propsUsingIndex,
     comps: [],
     oldState: { values: [], keys: [], keyHash: {} },
     anchorNode: null,
-    attributes: loopedComp.parsed.attributes,
+    attributes,
     ...forInfo,
     loopedComp,
     getArray,
