@@ -3,7 +3,7 @@ import DEV from '../../dev/DEV.js'
 
 function addEvent (comp, node, info) {
   const { name, placeholder } = info
-  const { actions } = comp.memo.component
+  const { actions } = comp.component
 
   const action = actions && actions[name]
   const fnName = placeholder.fnName

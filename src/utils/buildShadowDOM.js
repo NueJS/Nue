@@ -2,7 +2,7 @@ import copyParsed from './node/copyParsed.js'
 import processNode from './process/processNode.js'
 
 const buildShadowDOM = (comp) => {
-  const { template } = comp.memo
+  const { template } = comp
 
   // create clone of template
   const fragment = template.content.cloneNode(true)

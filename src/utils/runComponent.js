@@ -20,7 +20,7 @@ function runComponent (comp, component) {
 
     const template = (...args) => {
       if (!processed) {
-        comp.memo.template.innerHTML = templateTag(...args)
+        comp.template.innerHTML = templateTag(...args)
       }
     }
 
@@ -38,15 +38,15 @@ function runComponent (comp, component) {
   }
 
   // if template is processed already
-  if (comp.memo.template) {
+  if (comp.template) {
     invokeComp(true)
   }
 
   else {
-    comp.memo.template = createElement('template')
+    comp.template = createElement('template')
     invokeComp(false)
     parseTemplate(comp)
-    addDefaultStyles(comp.memo.template)
+    addDefaultStyles(comp.template)
   }
 }
 

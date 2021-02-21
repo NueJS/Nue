@@ -1,7 +1,7 @@
 export const checkFor = (comp, node, arr) => {
   if (arr.length < 2) {
     throw {
-      message: `invalid for attribute value on ${node.nodeName}`,
+      message: `Invalid for attribute value on ${node.nodeName}`,
       code: 1,
       link: ''
     }
@@ -12,9 +12,9 @@ export const checkFor = (comp, node, arr) => {
   if (exit) {
     comp.deferred.push(() => {
       const [animationName] = exit.split(' ')
-      const style = comp.memo.template.content.querySelector('style:not([default-styles])')
+      const style = comp.template.content.querySelector('style:not([default-styles])')
       // style.textContent
-      const styleUsesAnimation = style.textContent.includes(animationName)
+      const styleUsesAnimation = style && style.textContent.includes(animationName)
       if (!styleUsesAnimation) {
         throw {
           message: `exit animation: "${animationName}" used on <${node.parsed.name}> but not defined in CSS. \nThis will result in component never being removed, as nue.js keeps waiting for the animation to end which does not exist`,

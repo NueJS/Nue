@@ -5,7 +5,7 @@ export default {
       return keys.indexOf(key, i) !== keys.lastIndexOf(key)
     })
 
-    const compName = comp.memo.name
+    const compName = comp.name
     const message = `non-unique keys used in <${compName}>` +
     '\n' +
     `keys used: ${keys} ` +
@@ -21,7 +21,7 @@ export default {
 
   MISSING_DEPENDENCIES_IN_ON_MUTATE (comp) {
     return {
-      message: `invalid use of on.mutate() in ${comp.memo.name} on.mutate expects one or more dependencies`
+      message: `invalid use of on.mutate() in ${comp.name} on.mutate expects one or more dependencies`
     }
   }
 }

@@ -4,7 +4,7 @@ import parseNode from './parseNode'
 function parseTemplate (comp) {
   comp.uselessNodes = []
   comp.ifNodes = []
-  comp.memo.template.content.childNodes.forEach(n => parseNode(comp, n))
+  comp.template.content.childNodes.forEach(n => parseNode(comp, n))
   // run deferred methods
   comp.deferred.forEach(m => m())
   comp.deferred = []
