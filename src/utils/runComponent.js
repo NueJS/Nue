@@ -30,7 +30,8 @@ function runComponent (comp, component) {
       template,
       fn: comp.fn,
       self: comp.node,
-      ...comp.events
+      ...comp.events,
+      events: comp.events
     })
 
     modes.reactive = true
