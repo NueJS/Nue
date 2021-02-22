@@ -1,3 +1,5 @@
+import DEV from '../dev/DEV'
+import errors from '../dev/errors'
 import { attr } from '../node/dom'
 import parseAttributes from './parseAttributes'
 import parseComp from './parseComp'
@@ -35,6 +37,14 @@ const parseNode = (nue, _node) => {
     if (!node.textContent.trim()) nue.uselessNodes.push(node)
     else parseTextNode(nue, node)
     return
+  }
+
+  else if (DEV) {
+    ['for', 'key', 'if', 'else-if', 'else'].forEach(attrName => {
+      if (attr(node, attrName)) {
+        throw errors.RESERVED_ATTRIBUTE_USED_ON_NON_COMPONENT(nue.name, node, attrName)
+      }
+    })
   }
 
   if (node.hasAttribute) {

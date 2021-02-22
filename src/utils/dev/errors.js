@@ -1,3 +1,5 @@
+import dashify from '../string/dashify'
+
 export default {
 
   STATE_NOT_FOUND (compName, content) {
@@ -60,10 +62,20 @@ export default {
   },
 
   METHOD_NOT_FOUND (compName, fnName) {
-    throw {
+    return {
       message: `invalid method "${fnName}" used`,
       fix: `Make sure that "${fnName}" is defined in the fn or it's parent fn`,
       compName
     }
+  },
+
+  RESERVED_ATTRIBUTE_USED_ON_NON_COMPONENT (compName, node, attributeName) {
+    const nodeName = `<${dashify(node.nodeName)}>`
+    return {
+      message: `"${attributeName}" attribute can only be used on a nue component, but is used on a non-component node ${nodeName}`,
+      fix: `Remove this attribute if ${nodeName} is not a component. \nIf ${nodeName} is actually a nue component, make sure you have added it in ${compName}.uses array so that it can be parsed as a nue component`,
+      compName
+    }
   }
+
 }
