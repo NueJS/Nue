@@ -9,3 +9,4 @@ babel.config.js
 .eslintrc.js
 .eslintrc.js
 .eslintignore
+coverage/
