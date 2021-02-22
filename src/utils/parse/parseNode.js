@@ -4,7 +4,7 @@ import { attr } from '../node/dom'
 import parseAttributes from './parseAttributes'
 import parseComp from './parseComp'
 import parseConditionNode from './parseConditionNode'
-import parseFor from './parseFor'
+import parseLoop from './parseLoop'
 import parseTextNode from './parseTextNode'
 
 const parseNode = (nue, _node) => {
@@ -18,7 +18,7 @@ const parseNode = (nue, _node) => {
 
     const forAttribute = attr(node, 'for')
     if (forAttribute) {
-      parseFor(nue, node, forAttribute)
+      parseLoop(nue, node, forAttribute)
     }
 
     let type

@@ -2,7 +2,7 @@ import errors from '../dev/errors'
 import { attr } from '../node/dom'
 import { isBracketed } from '../string/bracket'
 
-export const checkFor = (nue, node, arr) => {
+export const checkParsedLoop = (nue, node, arr) => {
   if (arr.length < 2) {
     throw errors.INVALID_FOR_ATTRIBUTE(nue.name, node)
   }
