@@ -10,7 +10,7 @@ function addEvent (nue, node, info) {
   const fnName = placeholder.fnName
   const handler = nue.fn[fnName]
 
-  if (DEV && !handler) throw errors.METHOD_NOT_FOUND(nue, fnName)
+  if (DEV && !handler) throw errors.METHOD_NOT_FOUND(nue.name, fnName)
 
   // ex: @swipe-left=[moveLeft]
   let connect

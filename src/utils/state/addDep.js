@@ -7,7 +7,7 @@ import errors from '../dev/errors.js'
 const addDep = (baseComp, path, cb, type) => {
   const nue = origin(baseComp, path)
 
-  if (DEV && !nue) throw errors.STATE_NOT_FOUND(baseComp, path.join('.'))
+  if (DEV && !nue) throw errors.STATE_NOT_FOUND(baseComp.name, path.join('.'))
 
   const qcb = cbQueuer(nue, cb, type)
   let target = nue.deps

@@ -1,19 +1,18 @@
 export default {
 
-  STATE_NOT_FOUND (nue, content) {
+  STATE_NOT_FOUND (compName, content) {
     return {
       message: `Could not find value of [${content}]`,
       fix: `Make sure [${content}] is available in state or it's closure`,
-      nue
+      compName
     }
   },
 
-  KEYS_ARE_NOT_UNIQUE (keys, nue) {
+  KEYS_ARE_NOT_UNIQUE (compName, keys) {
     const nonUniqueKeys = keys.filter((key, i) => {
       return keys.indexOf(key, i) !== keys.lastIndexOf(key)
     })
 
-    const compName = nue.name
     const message = `non-unique keys used in <${compName}>` +
     '\n' +
     `keys used: ${keys} ` +
@@ -22,47 +21,49 @@ export default {
 
     return {
       message,
-      nue,
-      fix: 'make sure that key used in <for> is unique for all items'
+      compName,
+      fix: 'make sure that all keys are unique'
     }
   },
 
-  MISSING_DEPENDENCIES_IN_ON_MUTATE (nue) {
+  MISSING_DEPENDENCIES_IN_ON_MUTATE (compName) {
     return {
-      message: `invalid use of on.mutate() in ${nue.name} on.mutate expects one or more dependencies`
+      message: 'Missing dependencies in onMutate()',
+      fix: 'onMutate expects one or more dependencies.\nExample: onMutate(countChanged, \'count\')',
+      compName
     }
   },
 
-  INVALID_FOR_ATTRIBUTE (nue, node) {
+  INVALID_FOR_ATTRIBUTE (compName, node) {
     return {
       message: `Invalid for attribute value on ${node.nodeName}`,
       fix: 'make sure you are following the pattern:\nfor=\'(item, index) in items\'\nor\nfor=\'item in items\'',
-      nue
+      compName
     }
   },
 
-  EXIT_ANIMATION_NOT_FOUND (nue, animationName, node) {
+  EXIT_ANIMATION_NOT_FOUND (compName, animationName, node) {
     return {
       message: `exit animation: "${animationName}" used on <${node.parsed.name}> but not defined in CSS. \nThis will result in component never being removed, as nue.js keeps waiting for the animation to end which does not exist`,
       fix: `To fix this: define animation "${animationName}" in CSS using @keyframes`,
-      nue,
-      code: 'MISSING_EXIT_ANIMATION_IN_CSS'
+      compName
     }
   },
 
-  MISSING_KEY_ATTRIBUTE (nue, node) {
+  MISSING_KEY_ATTRIBUTE (compName, node) {
+    const loopCompName = node.nue.name
     return {
-      message: `missing attribute "key" on ${node.nodeName}.`,
-      nue
+      message: `Missing "key" attribute on <${loopCompName}>`,
+      fix: `<${loopCompName}> is looped and needs a key attribute for efficient reconciliation`,
+      compName
     }
   },
 
-  METHOD_NOT_FOUND (nue, fnName) {
+  METHOD_NOT_FOUND (compName, fnName) {
     throw {
       message: `invalid method "${fnName}" used`,
-      link: '',
-      code: -1,
-      nue
+      fix: `Make sure that "${fnName}" is defined in the fn or it's parent fn`,
+      compName
     }
   }
 }

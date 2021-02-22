@@ -7,7 +7,7 @@ const checkUniquenessOfKeys = (nue, keys) => {
   }
 
   if (!isUniqueArray(keys)) {
-    throw errors.KEYS_ARE_NOT_UNIQUE(keys, nue, 1)
+    throw errors.KEYS_ARE_NOT_UNIQUE(nue.name, keys)
   }
 }
 

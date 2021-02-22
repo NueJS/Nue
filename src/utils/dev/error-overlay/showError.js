@@ -27,7 +27,7 @@ function handleErrors (error) {
   $message.textContent = errorMessage
 
   const $componentName = $sweetErrorOverlay.shadowRoot.querySelector('.title')
-  $componentName.textContent = `error in <${error.nue.name}>`
+  $componentName.textContent = `error in <${error.compName}>`
 }
 
 export default handleErrors

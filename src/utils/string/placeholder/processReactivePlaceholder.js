@@ -22,7 +22,7 @@ const processReactivePlaceholder = (content) => {
         const [target, prop] = targetProp(state, path)
         const value = target[prop]
         if (target && isDefined(value)) return value
-        else if (DEV) throw errors.STATE_NOT_FOUND(nue, content)
+        else if (DEV) throw errors.STATE_NOT_FOUND(nue.name, content)
       }
     }
   }
