@@ -1,4 +1,4 @@
-import { arrayToHash, insert, swap } from '../../../others'
+import { arrayToHash, insert, isDefined, swap } from '../../../others'
 
 export const removed = (index) => ({ type: 'remove', index })
 export const created = (index, value) => ({ type: 'create', index, value })
@@ -9,7 +9,8 @@ function reconcile (oldState, newState) {
 
   // remove, removed items from oldState O(n)
   for (let i = 0; i < oldState.keys.length; i++) {
-    if (newState.keyHash[oldState.keys[i]] === undefined) {
+    const key = oldState.keys[i]
+    if (!(key in newState.keyHash)) {
       steps.push(removed(i))
       oldState.keys.splice(i, 1)
       oldState.values.splice(i, 1)
@@ -19,19 +20,20 @@ function reconcile (oldState, newState) {
 
   // insert, new items from oldState O(n)
   for (let i = 0; i < newState.keys.length; i++) {
-    const hash = newState.keys[i]
-    if (oldState.keyHash[hash] === undefined) {
+    const key = newState.keys[i]
+    if (!(key in oldState.keyHash)) {
       steps.push(created(i, newState.values[i]))
-      insert(oldState.keys, i, hash)
+      insert(oldState.keys, i, key)
       insert(oldState.values, i, newState.values[i])
     }
   }
 
   // swap, swapped values in newState.keys in arr
   for (let i = 0; i < oldState.keys.length; i++) {
-    if (oldState.keys[i] !== newState.keys[i]) {
+    const key = oldState.keys[i]
+    if (key !== newState.keys[i]) {
       // find where its position in new oldState.keys
-      const iShouldBe = newState.keyHash[oldState.keys[i]]
+      const iShouldBe = newState.keyHash[key]
       steps.push(swapped(i, iShouldBe))
       swap(oldState.keys, i, iShouldBe)
       swap(oldState.values, i, iShouldBe)

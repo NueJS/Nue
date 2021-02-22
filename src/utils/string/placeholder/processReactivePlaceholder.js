@@ -1,6 +1,7 @@
 import { REACTIVE } from '../../constants.js'
 import DEV from '../../dev/DEV.js'
 import errors from '../../dev/errors.js'
+import { isDefined } from '../../others.js'
 import { targetProp } from '../../state/slice.js'
 
 const processReactivePlaceholder = (content) => {
@@ -16,11 +17,11 @@ const processReactivePlaceholder = (content) => {
     } else {
       const [target, prop] = targetProp(closure, path)
       const value = target[prop]
-      if (target && value) return value
+      if (target && isDefined(value)) return value
       else {
         const [target, prop] = targetProp(state, path)
         const value = target[prop]
-        if (target && value) return value
+        if (target && isDefined(value)) return value
         else if (DEV) throw errors.STATE_NOT_FOUND(comp, content)
       }
     }

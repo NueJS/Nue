@@ -11,3 +11,5 @@ export const arrayToHash = (arr) =>
     hash[value] = i
     return hash
   }, {})
+
+export const isDefined = x => x !== undefined
