@@ -39,12 +39,10 @@ function defineComponent (name, component) {
 
         // common data between all instances of component
         memo,
-        template: memo.template,
-        name,
+        ...memo,
         // methods to be invoked after certain phase is completed
         deferred: [],
         initState: {}
-
       }
 
       addLifecycles(nue)
