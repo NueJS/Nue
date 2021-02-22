@@ -19,6 +19,11 @@ function reactify (comp, obj, path = [], closure$) {
 
   const reactive = new Proxy(target, {
 
+    has (target, property) {
+      // check if the property is in target or its closure
+      return property in target || (closure$ ? property in closure$ : false)
+    },
+
     set (target, prop, newValue) {
       let success
       // if the mutated prop exists in the target already
@@ -33,12 +38,10 @@ function reactify (comp, obj, path = [], closure$) {
         if (typeof value === 'function') value = computedState(comp, value, prop)
       }
 
-      else {
-        // if prop being set is not in current state and we have closure state available
-        if (closure$ && !propInTarget) {
-          const success = Reflect.set(closure$, prop, newValue)
-          if (success) return success
-        }
+      // if the prop is not in target but is in it's closure state
+      // then set the value in the closure state instead
+      else if (!propInTarget && closure$ && prop in closure$) {
+        return Reflect.set(closure$, prop, newValue)
       }
 
       if (isObject(value) && !value.__reactive__) {
