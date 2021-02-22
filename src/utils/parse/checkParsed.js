@@ -1,4 +1,6 @@
 import errors from '../dev/errors'
+import { attr } from '../node/dom'
+import { isBracketed } from '../string/bracket'
 
 export const checkFor = (nue, node, arr) => {
   if (arr.length < 2) {
@@ -21,5 +23,9 @@ export const checkFor = (nue, node, arr) => {
 
   if (!key) {
     throw errors.MISSING_KEY_ATTRIBUTE(nue.name, node)
+  }
+
+  else {
+    if (!isBracketed(attr(node, 'key'))) throw errors.KEY_NOT_BRACKETED(nue.name, node, key)
   }
 }

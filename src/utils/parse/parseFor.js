@@ -16,13 +16,13 @@ const parseFor = (nue, node, forAttribute) => {
     enter: attr(node, 'enter'),
     reorder: attr(node, 'reorder'),
     exit: attr(node, 'exit')
-  };
+  }
+
+  if (DEV) checkFor(nue, node, arr);
 
   ['exit', 'enter', 'reorder', 'for', 'key'].forEach(name => {
     node.removeAttribute(name)
   })
-
-  if (DEV) checkFor(nue, node, arr)
 }
 
 export default parseFor

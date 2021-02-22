@@ -1,5 +1,3 @@
-import dashify from '../string/dashify'
-
 export default {
 
   STATE_NOT_FOUND (compName, content) {
@@ -11,20 +9,34 @@ export default {
   },
 
   KEYS_ARE_NOT_UNIQUE (compName, keys) {
+    const toJSON = v => JSON.stringify(v)
     const nonUniqueKeys = keys.filter((key, i) => {
       return keys.indexOf(key, i) !== keys.lastIndexOf(key)
     })
 
-    const message = `non-unique keys used in <${compName}>` +
-    '\n' +
-    `keys used: ${keys} ` +
-    '\n' +
-    `non-unique keys: ${nonUniqueKeys}`
+    const _keys = keys.map(toJSON).join(', ')
+    const _nonUniqueKeys = nonUniqueKeys.map(toJSON).join(', ')
+    const _s = nonUniqueKeys.length > 1 ? 's' : ''
+
+    const message = `non-unique key${_s} used in <${compName}>` +
+    '\n\n' +
+    `keys used: \n${_keys} ` +
+    '\n\n' +
+    `non-unique key${_s}: ${_nonUniqueKeys}`
 
     return {
       message,
       compName,
       fix: 'make sure that all keys are unique'
+    }
+  },
+
+  KEY_NOT_BRACKETED (compName, node, key) {
+    const nodeName = `<${node.nodeName.toLowerCase()}>`
+    return {
+      message: `"Key" attribute on ${nodeName} is hard-coded`,
+      fix: 'make sure you are using a bracket [] on "key" attribute\'s value so that it is not hard-coded value but a placeholder',
+      compName
     }
   },
 
@@ -70,7 +82,7 @@ export default {
   },
 
   RESERVED_ATTRIBUTE_USED_ON_NON_COMPONENT (compName, node, attributeName) {
-    const nodeName = `<${dashify(node.nodeName)}>`
+    const nodeName = `<${node.nodeName.toLowerCase()}>`
     return {
       message: `"${attributeName}" attribute can only be used on a nue component, but is used on a non-component node ${nodeName}`,
       fix: `Remove this attribute if ${nodeName} is not a component. \nIf ${nodeName} is actually a nue component, make sure you have added it in ${compName}.uses array so that it can be parsed as a nue component`,
