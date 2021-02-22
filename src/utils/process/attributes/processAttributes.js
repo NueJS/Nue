@@ -1,13 +1,12 @@
 import bindInput from './bindInput.js'
 import addAttribute from './addAttribute.js'
-// import addState from './addState.js'
 import addEvent from './addEvent.js'
-import { EVENT, BIND, STATE } from '../../constants.js'
+import { EVENT, BIND } from '../../constants.js'
 
-function processAttributes (comp, node) {
+function processAttributes (nue, node) {
   // refs API
   if (node.hasAttribute('ref')) {
-    comp.refs[node.getAttribute('ref')] = node
+    nue.refs[node.getAttribute('ref')] = node
     node.removeAttribute('ref')
   }
 
@@ -18,18 +17,13 @@ function processAttributes (comp, node) {
 
   parsed.attributes.forEach(attribute => {
     const { type } = attribute
-    if (type === EVENT) addEvent(comp, node, attribute)
+    if (type === EVENT) addEvent(nue, node, attribute)
 
     // bind placeholder
-    else if (type === BIND) bindInput(comp, node, attribute)
-
-    // placeholder attribute on component
-    // else if (type === STATE) {
-    //   // addState(comp, node, attribute)
-    // }
+    else if (type === BIND) bindInput(nue, node, attribute)
 
     // placeholder attribute on non-component
-    else addAttribute(comp, node, attribute)
+    else addAttribute(nue, node, attribute)
   })
 }
 

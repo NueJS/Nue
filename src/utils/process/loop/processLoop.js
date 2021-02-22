@@ -9,13 +9,13 @@ import deepClone from '../../deepClone.js'
 import { saveOffsets } from './animate/offset.js'
 import { createComment } from '../../node/dom.js'
 
-function processLoop (comp, loopedComp) {
+function processLoop (nue, loopedComp) {
   const forInfo = loopedComp.parsed.for
   const { map, reorder, at, as, key } = forInfo
 
   const getClosure = (value, index) => ({ [at]: index, [as]: value })
-  const getArray = () => map.getValue(comp)
-  const getKey = (value, index) => key.getValue(comp, getClosure(value, index))
+  const getArray = () => map.getValue(nue)
+  const getKey = (value, index) => key.getValue(nue, getClosure(value, index))
   const getKeys = () => getArray().map(getKey)
   const attributes = loopedComp.parsed.attributes
 
@@ -38,14 +38,14 @@ function processLoop (comp, loopedComp) {
     getArray,
     getClosure,
     getKeys,
-    comp,
+    nue,
     deferred: [],
     createdComps: [],
     removedComps: [],
     movedIndexes: []
   }
 
-  comp.deferred.push(() => {
+  nue.deferred.push(() => {
     blob.anchorNode = createComment('loop')
     loopedComp.before(blob.anchorNode)
     loopedComp.before(createComment('/loop'))
@@ -81,7 +81,7 @@ function processLoop (comp, loopedComp) {
   // @TODO optimize this
   // handleArrayChange should be called only the entire array is mutated
   // else only update the state of exact item in array
-  addDep(comp, map.deps[0], handleArrayChange, 'dom')
+  addDep(nue, map.deps[0], handleArrayChange, 'dom')
 }
 
 export default processLoop

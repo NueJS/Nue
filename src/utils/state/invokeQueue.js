@@ -1,27 +1,27 @@
 import { runQueue } from '../callbacks.js'
 import { runEvent } from '../lifecycle.js'
 
-const clearQueue = (comp) => {
-  for (const key in comp.queue) {
-    comp.queue[key].clear()
+const clearQueue = (nue) => {
+  for (const key in nue.queue) {
+    nue.queue[key].clear()
   }
 }
 
 const queueOrder = ['computed', 'stateReady', 'dom']
 
 // wait for all the callbacks to be registered and then call all of them in proper order
-const invokeQueue = (comp) => {
+const invokeQueue = (nue) => {
   // don't trigger setTimeout again once the collecting is started
-  comp.batching = true
+  nue.batching = true
 
   // after all the callbacks are triggered by state mutation, call callbacks in proper order
   setTimeout(() => {
-    runEvent(comp, 'beforeUpdate')
-    for (const queueName of queueOrder) runQueue(comp, queueName)
-    clearQueue(comp)
-    runEvent(comp, 'afterUpdate')
+    runEvent(nue, 'beforeUpdate')
+    for (const queueName of queueOrder) runQueue(nue, queueName)
+    clearQueue(nue)
+    runEvent(nue, 'afterUpdate')
     // allow the queue to being built for next state mutation
-    comp.batching = false
+    nue.batching = false
   }, 0)
 }
 

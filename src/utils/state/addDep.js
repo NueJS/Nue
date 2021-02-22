@@ -5,12 +5,12 @@ import errors from '../dev/errors.js'
 
 // add Dep for given path on its origin
 const addDep = (baseComp, path, cb, type) => {
-  const comp = origin(baseComp, path)
+  const nue = origin(baseComp, path)
 
-  if (DEV && !comp) throw errors.STATE_NOT_FOUND(baseComp, path.join('.'))
+  if (DEV && !nue) throw errors.STATE_NOT_FOUND(baseComp, path.join('.'))
 
-  const qcb = cbQueuer(comp, cb, type)
-  let target = comp.deps
+  const qcb = cbQueuer(nue, cb, type)
+  let target = nue.deps
   const lastIndex = path.length - 1
 
   path.forEach((c, i) => {
@@ -26,8 +26,8 @@ const addDep = (baseComp, path, cb, type) => {
   }
 }
 
-export const addDeps = (comp, deps, cb, type) => {
-  const removeDeps = deps.map(dep => addDep(comp, dep, cb, type))
+export const addDeps = (nue, deps, cb, type) => {
+  const removeDeps = deps.map(dep => addDep(nue, dep, cb, type))
   return removeDeps
 }
 

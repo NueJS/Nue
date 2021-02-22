@@ -4,11 +4,11 @@ import checkUniquenessOfKeys from '../dev/checkUniquenessOfKeys'
 import arrayDiff from '../diff/arrayDiff'
 
 export const getNewState = (blob) => {
-  const { comp, getArray, getKeys } = blob
+  const { nue, getArray, getKeys } = blob
   const values = getArray()
   const keys = getKeys()
   const keyHash = arrayToHash(keys)
-  if (DEV) checkUniquenessOfKeys(comp, keys)
+  if (DEV) checkUniquenessOfKeys(nue, keys)
   return {
     keys,
     values,
@@ -18,7 +18,7 @@ export const getNewState = (blob) => {
 
 // @todo - do not update index - we need to update props now
 export const updateCompState = (newState, blob) => {
-  const { comps, attributes, oldState, initialized, comp, getArray, getClosure, at, propsUsingIndex } = blob
+  const { comps, attributes, oldState, initialized, nue, getArray, getClosure, at, propsUsingIndex } = blob
   if (!comps.length || !initialized) return
 
   // update props which are using index
@@ -37,7 +37,7 @@ export const updateCompState = (newState, blob) => {
     attributes.forEach(attribute => {
       const arr = getArray()
       const closure = getClosure(arr[i], i)
-      comps[i].nue.$[attribute.name] = attribute.placeholder.getValue(comp, closure)
+      comps[i].nue.$[attribute.name] = attribute.placeholder.getValue(nue, closure)
     })
   })
 }

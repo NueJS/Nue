@@ -3,7 +3,7 @@ import copyParsed from '../node/copyParsed.js'
 import processNode from './processNode.js'
 import { animate, onAnimationEnd } from '../node/dom.js'
 
-function processIf (comp, ifNode) {
+function processIf (nue, ifNode) {
   const group = [ifNode]
 
   if (ifNode.parsed.group) {
@@ -28,7 +28,7 @@ function processIf (comp, ifNode) {
 
     group.forEach(conditionNode => {
       const { condition, isProcessed, isRendered, enter } = conditionNode.parsed
-      const satisfied = condition ? condition.getValue(comp) : true
+      const satisfied = condition ? condition.getValue(nue) : true
 
       // if this group should be rendered
       if (!foundSatisfied && satisfied) {
@@ -36,9 +36,9 @@ function processIf (comp, ifNode) {
 
         // if this group is not currently rendered on DOM
         if (!isRendered) {
-          // if this comp is never processed before
+          // if this nue is never processed before
           if (!isProcessed) {
-            processNode(comp, conditionNode)
+            processNode(nue, conditionNode)
             conditionNode.parsed.isProcessed = true
           }
 
@@ -74,9 +74,9 @@ function processIf (comp, ifNode) {
     })
   }
 
-  addDeps(comp, groupDeps, onGroupDepChange, 'stateReady')
+  addDeps(nue, groupDeps, onGroupDepChange, 'stateReady')
 
-  comp.deferred.push(() => {
+  nue.deferred.push(() => {
     ifNode.remove()
     onGroupDepChange()
   })

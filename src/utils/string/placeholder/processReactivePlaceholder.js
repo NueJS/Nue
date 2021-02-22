@@ -9,8 +9,8 @@ const processReactivePlaceholder = (content) => {
 
   // return the value of placeholder in given component
   // @TODO clean this up
-  const getValue = (comp, closure) => {
-    const state = comp.$
+  const getValue = (nue, closure) => {
+    const state = nue.$
     if (!closure) {
       const [target, prop] = targetProp(state, path)
       return target[prop]
@@ -22,7 +22,7 @@ const processReactivePlaceholder = (content) => {
         const [target, prop] = targetProp(state, path)
         const value = target[prop]
         if (target && isDefined(value)) return value
-        else if (DEV) throw errors.STATE_NOT_FOUND(comp, content)
+        else if (DEV) throw errors.STATE_NOT_FOUND(nue, content)
       }
     }
   }

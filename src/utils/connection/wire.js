@@ -4,7 +4,7 @@ import { addDeps } from '../state/addDep'
 import { addConnects } from './addConnects'
 
 // lay wiring for node updates
-function wire (comp, node, deps, update) {
+function wire (nue, node, deps, update) {
   // attach which node the update method is for so that when the update is called in queue
   // it can check whether to invoke it node based on whether the node is connected or not to the state
   update.node = node
@@ -15,8 +15,8 @@ function wire (comp, node, deps, update) {
       }
     }
 
-    return addDeps(comp, deps, update, 'dom')
-    // return deps.map(path => addDep(comp, path, update, 'dom'))
+    return addDeps(nue, deps, update, 'dom')
+    // return deps.map(path => addDep(nue, path, update, 'dom'))
   }
   addConnects(node, connectNode)
   if (!node.parsed.updates) node.parsed.updates = []

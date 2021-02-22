@@ -1,11 +1,11 @@
 import wire from '../connection/wire.js'
 
-function processTextNode (comp, node) {
+function processTextNode (nue, node) {
   const { getValue, deps } = node.parsed.placeholder
   const update = () => {
-    node.textContent = getValue(comp)
+    node.textContent = getValue(nue)
   }
-  wire(comp, node, deps, update)
+  wire(nue, node, deps, update)
 }
 
 export default processTextNode

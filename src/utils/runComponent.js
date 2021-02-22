@@ -6,13 +6,13 @@ import { TARGET } from './symbols.js'
 import { createElement } from './node/dom.js'
 import addDefaultStyles from './addDefaultStyle.js'
 
-function runComponent (comp, component) {
-  const { closure } = comp
+function runComponent (nue, component) {
+  const { closure } = nue
   const closure$ = closure && closure.$
 
   // set the state and target
-  comp.$ = reactify(comp, comp.initState, [], closure$)
-  comp.$Target = comp.$[TARGET]
+  nue.$ = reactify(nue, nue.initState, [], closure$)
+  nue.$Target = nue.$[TARGET]
 
   const invokeComp = (processed) => {
     modes.reactive = false
@@ -20,18 +20,18 @@ function runComponent (comp, component) {
 
     const template = (...args) => {
       if (!processed) {
-        comp.template.innerHTML = templateTag(...args)
+        nue.template.innerHTML = templateTag(...args)
       }
     }
 
     component({
-      $: comp.$,
-      refs: comp.refs,
+      $: nue.$,
+      refs: nue.refs,
       template,
-      fn: comp.fn,
-      self: comp.node,
-      ...comp.events,
-      events: comp.events
+      fn: nue.fn,
+      self: nue.node,
+      ...nue.events,
+      events: nue.events
     })
 
     modes.reactive = true
@@ -39,15 +39,15 @@ function runComponent (comp, component) {
   }
 
   // if template is processed already
-  if (comp.template) {
+  if (nue.template) {
     invokeComp(true)
   }
 
   else {
-    comp.template = createElement('template')
+    nue.template = createElement('template')
     invokeComp(false)
-    parseTemplate(comp)
-    addDefaultStyles(comp.template)
+    parseTemplate(nue)
+    addDefaultStyles(nue.template)
   }
 }
 

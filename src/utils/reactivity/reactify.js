@@ -8,13 +8,13 @@ import { TARGET } from '../symbols.js'
 const isObject = x => typeof x === 'object' && x !== null
 
 // create a reactive object which when mutated calls the on_change function
-function reactify (comp, obj, path = [], closure$) {
+function reactify (nue, obj, path = [], closure$) {
   if (!isObject(obj)) return obj
 
   // make the slice of state reactive
   const target = Array.isArray(obj) ? [] : {}
   Object.keys(obj).forEach(key => {
-    target[key] = reactify(comp, obj[key], [...path, key])
+    target[key] = reactify(nue, obj[key], [...path, key])
   })
 
   const reactive = new Proxy(target, {
@@ -35,7 +35,7 @@ function reactify (comp, obj, path = [], closure$) {
       if (modes.noOverride) {
         // ignore set
         if (propInTarget) return true
-        if (typeof value === 'function') value = computedState(comp, value, prop)
+        if (typeof value === 'function') value = computedState(nue, value, prop)
       }
 
       // if the prop is not in target but is in it's closure state
@@ -45,14 +45,14 @@ function reactify (comp, obj, path = [], closure$) {
       }
 
       if (isObject(value) && !value.__reactive__) {
-        value = reactify(comp, value, [...path, prop])
+        value = reactify(nue, value, [...path, prop])
       }
 
       if (modes.reactive) {
         if (!(prop === 'length' && Array.isArray(target))) {
           if (!deepEqual(target[prop], value)) {
             success = Reflect.set(target, prop, value)
-            onMutate(comp, [...path, prop])
+            onMutate(nue, [...path, prop])
           }
         }
       }
@@ -61,7 +61,7 @@ function reactify (comp, obj, path = [], closure$) {
     },
 
     deleteProperty (target, prop) {
-      if (modes.reactive) onMutate(comp, [...path, prop])
+      if (modes.reactive) onMutate(nue, [...path, prop])
       return Reflect.deleteProperty(target, prop)
     },
 

@@ -24,7 +24,7 @@ function defineComponent (name, component) {
   class Nue extends HTMLElement {
     constructor () {
       super()
-      const comp = this.nue = {
+      const nue = this.nue = {
         node: this,
         refs: {},
         actions: {},
@@ -47,49 +47,49 @@ function defineComponent (name, component) {
 
       }
 
-      addLifecycles(comp)
+      addLifecycles(nue)
     }
 
     connectedCallback () {
-      const comp = this.nue
+      const nue = this.nue
 
       // this check is added to make sure, processing only happens once
       // and not again when component is disconnected and connected back
       if (!this.shadowRoot) {
         // add closure using parsed
         const closure = this.parsed && this.parsed.closure
-        comp.closure = closure
-        comp.loopClosure = this.parsed && this.parsed.loopClosure
+        nue.closure = closure
+        nue.loopClosure = this.parsed && this.parsed.loopClosure
 
         // add fn using closure
-        comp.fn = closure ? Object.create(closure.fn) : {}
+        nue.fn = closure ? Object.create(closure.fn) : {}
 
         if (closure) {
           if (this.parsed.attributes) {
             this.parsed.attributes.forEach(at => {
-              addStateFromAttribute(closure, comp, at)
+              addStateFromAttribute(closure, nue, at)
             })
           }
         }
 
-        // now that comp is ready, run the component
-        runComponent(comp, component)
+        // now that nue is ready, run the component
+        runComponent(nue, component)
 
         // now that $, lifecycles, fn, etc are filled with component definition,
 
         // process slots
-        if (this.childNodes) this.childNodes.forEach(n => processNode(comp, n))
+        if (this.childNodes) this.childNodes.forEach(n => processNode(nue, n))
 
         // process shadow dom
-        buildShadowDOM(comp)
+        buildShadowDOM(nue)
       }
 
       // if the connection change is due to reordering, no need to connect and disconnect
-      if (comp.ignoreConnectionChange) return
+      if (nue.ignoreConnectionChange) return
 
       // run mount callbacks first and then connect the DOM to state
       // this allows state to set by onMount callbacks to be used directly by the DOM without having to initialize with null values
-      runEvent(comp, 'onMount')
+      runEvent(nue, 'onMount')
 
       // connect shadow DOM and slots to the component state
       connect(this.shadowRoot, true)
@@ -97,16 +97,16 @@ function defineComponent (name, component) {
     }
 
     disconnectedCallback () {
-      const comp = this.nue
+      const nue = this.nue
       // if the connection change is due to reordering, no need to connect and disconnect
-      if (comp.ignoreConnectionChange) return
+      if (nue.ignoreConnectionChange) return
 
       // disconnect the shadow DOM and slots from component state
       disconnect(this.shadowRoot, true)
       disconnect(this, true)
 
       // run onDestroy callbacks
-      runEvent(comp, 'onDestroy')
+      runEvent(nue, 'onDestroy')
     }
   }
 

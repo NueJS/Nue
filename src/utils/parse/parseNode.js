@@ -5,10 +5,10 @@ import parseConditionNode from './parseConditionNode'
 import parseFor from './parseFor'
 import parseTextNode from './parseTextNode'
 
-const parseNode = (comp, _node) => {
+const parseNode = (nue, _node) => {
   let node = _node
   const name = node.nodeName.toLowerCase()
-  const { childComps } = comp.memo
+  const { childComps } = nue.memo
   const isComp = childComps && childComps.has(name)
 
   if (isComp) {
@@ -16,7 +16,7 @@ const parseNode = (comp, _node) => {
 
     const forAttribute = attr(node, 'for')
     if (forAttribute) {
-      parseFor(comp, node, forAttribute)
+      parseFor(nue, node, forAttribute)
     }
 
     let type
@@ -27,22 +27,22 @@ const parseNode = (comp, _node) => {
       parseConditionNode(node, type)
     }
     if (type === 'if') {
-      comp.ifNodes.push(node)
+      nue.ifNodes.push(node)
     }
   }
 
   else if (node.nodeType === Node.TEXT_NODE) {
-    if (!node.textContent.trim()) comp.uselessNodes.push(node)
-    else parseTextNode(comp, node)
+    if (!node.textContent.trim()) nue.uselessNodes.push(node)
+    else parseTextNode(nue, node)
     return
   }
 
   if (node.hasAttribute) {
-    parseAttributes(comp, node)
+    parseAttributes(nue, node)
   }
 
   if (node.hasChildNodes()) {
-    node.childNodes.forEach(n => parseNode(comp, n))
+    node.childNodes.forEach(n => parseNode(nue, n))
   }
 }
 

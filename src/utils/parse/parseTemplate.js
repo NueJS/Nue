@@ -1,16 +1,16 @@
 import parseIf from './parseIf'
 import parseNode from './parseNode'
 
-function parseTemplate (comp) {
-  comp.uselessNodes = []
-  comp.ifNodes = []
-  comp.template.content.childNodes.forEach(n => parseNode(comp, n))
+function parseTemplate (nue) {
+  nue.uselessNodes = []
+  nue.ifNodes = []
+  nue.template.content.childNodes.forEach(n => parseNode(nue, n))
   // run deferred methods
-  comp.deferred.forEach(m => m())
-  comp.deferred = []
+  nue.deferred.forEach(m => m())
+  nue.deferred = []
   // remove redundant nodes
-  comp.uselessNodes.forEach(n => n.remove())
-  parseIf(comp)
+  nue.uselessNodes.forEach(n => n.remove())
+  parseIf(nue)
 }
 
 export default parseTemplate

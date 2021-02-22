@@ -3,7 +3,7 @@ import { attr } from '../node/dom'
 import processPlaceholder from '../string/placeholder/processPlaceholder'
 import { checkFor } from './checkParsed'
 
-const parseFor = (comp, node, forAttribute) => {
+const parseFor = (nue, node, forAttribute) => {
   // replace ' in ', '(' ')' ',' with space, split with space, and remove empty strings
   const arr = forAttribute.replace(/\(|\)|,|(\sin\s)/g, ' ').split(/\s+/).filter(t => t)
   const atUsed = arr.length === 3
@@ -22,7 +22,7 @@ const parseFor = (comp, node, forAttribute) => {
     node.removeAttribute(name)
   })
 
-  if (DEV) checkFor(comp, node, arr)
+  if (DEV) checkFor(nue, node, arr)
 }
 
 export default parseFor

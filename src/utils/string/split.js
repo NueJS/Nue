@@ -6,7 +6,7 @@ import DEV from '../dev/DEV.js'
 // take the string text and split it into placeholders and strings
 // returns array of parts
 // [ part, part, part ... ]
-function split (comp, text) {
+function split (nue, text) {
   const parts = []
   let collectingVar = false
   let collectedString = ''
@@ -35,7 +35,7 @@ function split (comp, text) {
       if (DEV && !collectingVar) {
         throw {
           message: 'invalid use of ]',
-          comp
+          nue
         }
       }
 

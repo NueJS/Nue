@@ -1,7 +1,7 @@
 import { createComment } from '../node/dom'
 
-const parseIf = (comp) => {
-  comp.ifNodes.forEach(ifNode => {
+const parseIf = (nue) => {
+  nue.ifNodes.forEach(ifNode => {
     const group = []
     let node = ifNode.nextElementSibling
 
