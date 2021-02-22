@@ -13,3 +13,5 @@ export const arrayToHash = (arr) =>
   }, {})
 
 export const isDefined = x => x !== undefined
+
+export const addGetter = (obj, name, cb) => Object.defineProperty(obj, name, { get: cb })

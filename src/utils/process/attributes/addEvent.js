@@ -1,6 +1,7 @@
 import { addConnects } from '../../connection/addConnects.js'
 import DEV from '../../dev/DEV.js'
 import errors from '../../dev/errors.js'
+import { addGetter } from '../../others.js'
 
 function addEvent (nue, node, info) {
   const { name, placeholder } = info
@@ -9,6 +10,10 @@ function addEvent (nue, node, info) {
   const action = actions && actions[name]
   const fnName = placeholder.fnName
   const handler = nue.fn[fnName]
+
+  // add parentState property on node so that event.target can get the
+  // component's state
+  if (!node.parent$) addGetter(node, 'parent$', () => nue.$)
 
   if (DEV && !handler) throw errors.METHOD_NOT_FOUND(nue.name, fnName)
 
