@@ -1,5 +1,5 @@
-import addDep from './state/addDep'
-import { hasSlice } from './state/slice'
+import addDep from '../state/addDep'
+import { hasSlice } from '../state/slice'
 
 function addStateFromAttribute (parentComp, nue, attribute) {
   const { name, placeholder } = attribute

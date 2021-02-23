@@ -1,6 +1,6 @@
-import { addDeps } from './state/addDep.js'
-import errors from './dev/errors.js'
-import DEV from './dev/DEV.js'
+import { addDeps } from '../state/addDep.js'
+import errors from '../dev/errors.js'
+import DEV from '../dev/DEV.js'
 
 export const runEvent = (nue, name) => nue.cbs[name].forEach(cb => cb())
 

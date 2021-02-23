@@ -4,8 +4,7 @@ import errors from '../../dev/errors.js'
 
 function addEvent (nue, node, info) {
   const { name, placeholder } = info
-  const { actions } = nue.component
-
+  const { actions } = nue.common.component
   const action = actions && actions[name]
   const fnName = placeholder.fnName
   const handler = nue.fn[fnName]

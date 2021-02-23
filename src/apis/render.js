@@ -1,24 +1,18 @@
-import globalInfo from '../utils/globalInfo'
-import defineComponent from '../utils/defineComponent'
+import defineCustomElement from '../utils/component/defineCustomElement'
 import showError from '../utils/dev/error-overlay/showError.js'
 import DEV from '../utils/dev/DEV'
+import stats from '../utils/stats'
 
 // define the custom element of given name
-const render = (component, settings) => {
-  window.globalInfo = globalInfo
-
+const render = (component, config) => {
   if (DEV) {
     window.onerror = function (message, filename, lineno, colno, error) {
       showError(error)
     }
   }
-
-  if (settings) {
-    const { defaultStyle } = settings
-    if (defaultStyle) globalInfo.defaultStyle = defaultStyle
-  }
-
-  defineComponent(component)
+  // override config with default config
+  if (config) stats.config = { ...stats.config, ...config }
+  defineCustomElement(component)
 }
 
 export default render

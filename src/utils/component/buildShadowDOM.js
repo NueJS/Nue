@@ -1,6 +1,6 @@
-import getClone from './node/clone.js'
-import { executeAndClear } from './others.js'
-import processNode from './process/processNode.js'
+import getClone from '../node/clone.js'
+import { executeAndClear } from '../others.js'
+import processNode from '../process/processNode.js'
 
 const buildShadowDOM = (nue) => {
   const { deferred, node } = nue

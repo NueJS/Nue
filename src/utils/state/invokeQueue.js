@@ -1,5 +1,5 @@
 import { runQueue } from '../callbacks.js'
-import { runEvent } from '../lifecycle.js'
+import { runEvent } from '../component/lifecycle.js'
 
 const clearQueue = (nue) => {
   for (const key in nue.queue) {
