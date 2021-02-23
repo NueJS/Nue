@@ -7,6 +7,7 @@ import processNode from './process/processNode.js'
 import globalInfo from './globalInfo.js'
 import addStateFromAttribute from './addStateFromAttribute.js'
 import { upper } from './others.js'
+import { STATE, STATIC_STATE } from './constants.js'
 
 function defineComponent (name, component) {
   // if the component is already defined, do nothing
@@ -73,7 +74,8 @@ function defineComponent (name, component) {
         if (closure) {
           if (this.parsed.attributes) {
             this.parsed.attributes.forEach(at => {
-              addStateFromAttribute(closure, nue, at)
+              if (at.type === STATE) addStateFromAttribute(closure, nue, at)
+              else if (at.type === STATIC_STATE) nue.initState[at.name] = at.placeholder
             })
           }
         }

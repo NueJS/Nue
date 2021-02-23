@@ -1,6 +1,6 @@
 import { isBracketed } from '../string/bracket.js'
 import processPlaceholder from '../string/placeholder/processPlaceholder.js'
-import { STATE, EVENT, BIND, NORMAL, CONDITIONAL } from '../constants.js'
+import { STATE, EVENT, BIND, NORMAL, CONDITIONAL, STATIC_STATE } from '../constants.js'
 import isComp from '../node/isComp.js'
 
 function parseAttributes (nue, node) {
@@ -43,6 +43,13 @@ function parseAttributes (nue, node) {
       }
 
       placeholder = processPlaceholder(attributeValue)
+    }
+
+    // if it's a simple attribute on a component
+    else if (nodeIsComp) {
+      type = STATIC_STATE
+      name = attributeName
+      placeholder = attributeValue
     }
 
     if (placeholder) {

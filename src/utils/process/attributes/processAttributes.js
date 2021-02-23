@@ -23,7 +23,7 @@ function processAttributes (nue, node) {
     else if (type === BIND) bindInput(nue, node, attribute)
 
     // placeholder attribute on non-component
-    else addAttribute(nue, node, attribute)
+    else if (!parsed.isComp) addAttribute(nue, node, attribute)
   })
 }
 
