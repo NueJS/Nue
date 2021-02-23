@@ -3,14 +3,12 @@ import addAttribute from './addAttribute.js'
 import addEvent from './addEvent.js'
 import { EVENT, BIND } from '../../constants.js'
 
-function processAttributes (nue, node) {
+function processAttributes (nue, node, parsed) {
   // refs API
   if (node.hasAttribute('ref')) {
     nue.refs[node.getAttribute('ref')] = node
     node.removeAttribute('ref')
   }
-
-  const { parsed } = node
 
   // if no attributes memo available for node
   if (!parsed.attributes) return

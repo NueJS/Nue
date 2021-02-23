@@ -9,15 +9,14 @@ import deepClone from '../../deepClone.js'
 import { saveOffsets } from './animate/offset.js'
 import { createComment } from '../../node/dom.js'
 
-function processLoop (nue, loopedComp) {
-  const forInfo = loopedComp.parsed.for
+function processLoop (nue, loopedComp, parsed) {
+  const { for: forInfo, attributes } = parsed.for
   const { map, reorder, at, as, key } = forInfo
 
   const getClosure = (value, index) => ({ [at]: index, [as]: value })
   const getArray = () => map.getValue(nue)
   const getKey = (value, index) => key.getValue(nue, getClosure(value, index))
   const getKeys = () => getArray().map(getKey)
-  const attributes = loopedComp.parsed.attributes
 
   const propsUsingIndex = []
   // find props that are using indexes

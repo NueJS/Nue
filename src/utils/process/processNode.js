@@ -9,11 +9,11 @@ function processNode (nue, node) {
     // save the nue as closure of component
     if (parsed.isComp) {
       parsed.closure = nue
-      if (parsed.for) return processLoop(nue, node)
-      if (parsed.conditionType === 'if') processIf(nue, node)
+      if (parsed.for) return processLoop(nue, node, parsed)
+      if (parsed.conditionType === 'if') processIf(nue, node, parsed)
     }
-    else if (nodeType === Node.TEXT_NODE) processTextNode(nue, node)
-    if (node.hasAttribute) processAttributes(nue, node)
+    else if (nodeType === Node.TEXT_NODE) processTextNode(nue, node, parsed)
+    if (node.hasAttribute) processAttributes(nue, node, parsed)
   }
 
   // if it a component, do not process it's child nodes

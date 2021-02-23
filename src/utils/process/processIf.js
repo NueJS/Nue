@@ -3,20 +3,20 @@ import copyParsed from '../node/copyParsed.js'
 import processNode from './processNode.js'
 import { animate, onAnimationEnd } from '../node/dom.js'
 
-function processIf (nue, ifNode) {
+function processIf (nue, ifNode, parsed) {
   const group = [ifNode]
 
-  if (ifNode.parsed.group) {
-    ifNode.parsed.group.forEach(node => {
+  if (parsed.group) {
+    parsed.group.forEach(node => {
       const clone = node.cloneNode(true)
       copyParsed(node, clone)
       group.push(clone)
     })
   }
 
-  ifNode.parsed.isProcessed = true
+  parsed.isProcessed = true
 
-  const { groupDeps } = ifNode.parsed
+  const { groupDeps } = parsed
   const anchorNode = ifNode.previousSibling
 
   // group that is currently rendered

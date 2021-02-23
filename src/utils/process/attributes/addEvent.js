@@ -1,7 +1,6 @@
 import { addConnects } from '../../connection/addConnects.js'
 import DEV from '../../dev/DEV.js'
 import errors from '../../dev/errors.js'
-import { addGetter } from '../../others.js'
 
 function addEvent (nue, node, info) {
   const { name, placeholder } = info
