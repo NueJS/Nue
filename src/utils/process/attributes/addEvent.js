@@ -11,25 +11,25 @@ function addEvent (nue, node, info) {
   const fnName = placeholder.fnName
   const handler = nue.fn[fnName]
 
-  // add parentState property on node so that event.target can get the
-  // component's state
-  if (!node.parent$) addGetter(node, 'parent$', () => nue.$)
-
   if (DEV && !handler) throw errors.METHOD_NOT_FOUND(nue.name, fnName)
+
+  // handler gets called with event and the state of component event is originated from
+  const _handler = (e) => handler(e, nue.$)
 
   // ex: @swipe-left=[moveLeft]
   let connect
   if (action) {
-    connect = () => action(node, handler)
+    connect = () => action(node, _handler)
   }
 
   // ex: @click=[increment]
   else {
     connect = () => {
-      node.addEventListener(name, handler)
-      return () => node.removeEventListener(name, handler)
+      node.addEventListener(name, _handler)
+      return () => node.removeEventListener(name, _handler)
     }
   }
+
   addConnects(node, connect)
 }
 
