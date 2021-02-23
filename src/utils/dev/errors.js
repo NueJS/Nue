@@ -1,3 +1,6 @@
+import { lower } from '../others'
+
+const getNodeName = (node) => `<${lower(node.nodeName)}>`
 export default {
 
   STATE_NOT_FOUND (compName, content) {
@@ -32,7 +35,7 @@ export default {
   },
 
   KEY_NOT_BRACKETED (compName, node, key) {
-    const nodeName = `<${node.nodeName.toLowerCase()}>`
+    const nodeName = getNodeName(node)
     return {
       message: `"Key" attribute on ${nodeName} is hard-coded`,
       fix: 'make sure you are using a bracket [] on "key" attribute\'s value so that it is not hard-coded value but a placeholder',
@@ -49,8 +52,9 @@ export default {
   },
 
   INVALID_FOR_ATTRIBUTE (compName, node) {
+    const nodeName = getNodeName(node)
     return {
-      message: `Invalid for attribute value on ${node.nodeName}`,
+      message: `Invalid for attribute value on ${nodeName}`,
       fix: 'make sure you are following the pattern:\nfor=\'(item, index) in items\'\nor\nfor=\'item in items\'',
       compName
     }
@@ -82,7 +86,7 @@ export default {
   },
 
   RESERVED_ATTRIBUTE_USED_ON_NON_COMPONENT (compName, node, attributeName) {
-    const nodeName = `<${node.nodeName.toLowerCase()}>`
+    const nodeName = getNodeName(node)
     return {
       message: `"${attributeName}" attribute can only be used on a nue component, but is used on a non-component node ${nodeName}`,
       fix: `Remove this attribute if ${nodeName} is not a component. \nIf ${nodeName} is actually a nue component, make sure you have added it in ${compName}.uses array so that it can be parsed as a nue component`,
