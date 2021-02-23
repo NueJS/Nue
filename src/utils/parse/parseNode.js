@@ -1,20 +1,19 @@
 import DEV from '../dev/DEV'
 import errors from '../dev/errors'
 import { attr } from '../node/dom'
-import { lower } from '../others'
 import parseAttributes from './parseAttributes'
-import parseComp from './parseComp'
 import parseConditionNode from './parseConditionNode'
 import parseLoop from './parseLoop'
 import parseTextNode from './parseTextNode'
 
-const parseNode = (nue, _node) => {
-  let node = _node
+const parseNode = (nue, node) => {
   const { childComps } = nue.memo
-  const compName = childComps[node.nodeName]
+  const isComp = node.nodeName in childComps
 
-  if (compName) {
-    node = parseComp(compName, node, _node)
+  if (isComp) {
+    node.parsed = {
+      isComp: true
+    }
 
     const forAttribute = attr(node, 'for')
     if (forAttribute) {

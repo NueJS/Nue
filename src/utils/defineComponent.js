@@ -6,7 +6,6 @@ import dashify from './string/dashify.js'
 import processNode from './process/processNode.js'
 import globalInfo from './globalInfo.js'
 import addStateFromAttribute from './addStateFromAttribute.js'
-import { upper } from './others.js'
 import { FUNCTION_ATTRIBUTE, STATE, STATIC_STATE } from './constants.js'
 
 function defineComponent (component) {
@@ -19,17 +18,9 @@ function defineComponent (component) {
 
   // memo is object containing information that will be same for all the instance of component
   // it is basically a class static property
-  let childComps = {}
-  if (component.uses) {
-    childComps = component.uses.reduce((hash, comp) => {
-      const key = upper(comp.name)
-      hash[key] = dashify(comp.name)
-      return hash
-    }, {})
-  }
 
   // @TODO save the memo to globalInfo
-  const memo = { name, template: null, childComps, component }
+  const memo = { name, template: null, component, childComps: {} }
 
   // save the memo in globalInfo so we can check if this component is already defined or not and other uses
   globalInfo.definedComponents[name] = memo
@@ -91,7 +82,7 @@ function defineComponent (component) {
         // now that $, lifecycles, fn, etc are filled with component definition,
 
         // process slots
-        if (this.childNodes) this.childNodes.forEach(n => processNode(nue, n))
+        this.childNodes.forEach(n => processNode(nue, n))
 
         // process shadow dom
         buildShadowDOM(nue)

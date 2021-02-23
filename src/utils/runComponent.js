@@ -5,6 +5,7 @@ import parseTemplate from './parse/parseTemplate.js'
 import { TARGET } from './symbols.js'
 import { createElement } from './node/dom.js'
 import addDefaultStyles from './addDefaultStyle.js'
+import transformTemplate from './string/transformTemplate.js'
 
 function runComponent (nue, component) {
   const { closure } = nue
@@ -19,8 +20,9 @@ function runComponent (nue, component) {
     modes.noOverride = true
 
     const template = (...args) => {
+      // if the template is not processed, template function parses the string else it does nothing
       if (!processed) {
-        nue.template.innerHTML = templateTag(...args)
+        nue.templateHTML = templateTag(...args)
       }
     }
 
@@ -38,14 +40,17 @@ function runComponent (nue, component) {
     modes.noOverride = false
   }
 
-  // if template is processed already
+  // if template is parsed already
   if (nue.template) {
     invokeComp(true)
   }
 
+  // if the template is not parsed yet
   else {
-    nue.template = createElement('template')
     invokeComp(false)
+    transformTemplate(nue)
+    nue.template = createElement('template')
+    nue.template.innerHTML = nue.templateHTML
     parseTemplate(nue)
     addDefaultStyles(nue.template)
   }
