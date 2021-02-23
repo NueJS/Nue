@@ -1,17 +1,15 @@
 import { attr, createElement } from '../node/dom'
-import dashify from '../string/dashify'
 
 const parseComp = (name, node, _node) => {
   // child nodes (slot) of child component should not be sweetified and saved in array instead
 
-  const newNode = createElement(name + '-')
+  const newNode = createElement(name)
 
   newNode.parsed = {
     isComp: true,
     name,
     childNodes: [...node.childNodes].filter(n => n.textContent.trim() !== ''),
-    children: node.innerHTML,
-    dashName: dashify(name)
+    children: node.innerHTML
   }
 
   newNode.innerHTML = _node.innerHTML

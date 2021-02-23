@@ -1,6 +1,7 @@
 import DEV from '../dev/DEV'
 import errors from '../dev/errors'
 import { attr } from '../node/dom'
+import { lower } from '../others'
 import parseAttributes from './parseAttributes'
 import parseComp from './parseComp'
 import parseConditionNode from './parseConditionNode'
@@ -9,12 +10,11 @@ import parseTextNode from './parseTextNode'
 
 const parseNode = (nue, _node) => {
   let node = _node
-  const name = node.nodeName.toLowerCase()
   const { childComps } = nue.memo
-  const isComp = childComps && childComps.has(name)
+  const compName = childComps[node.nodeName]
 
-  if (isComp) {
-    node = parseComp(name, node, _node)
+  if (compName) {
+    node = parseComp(compName, node, _node)
 
     const forAttribute = attr(node, 'for')
     if (forAttribute) {

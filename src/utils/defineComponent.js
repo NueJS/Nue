@@ -6,6 +6,7 @@ import dashify from './string/dashify.js'
 import processNode from './process/processNode.js'
 import globalInfo from './globalInfo.js'
 import addStateFromAttribute from './addStateFromAttribute.js'
+import { upper } from './others.js'
 
 function defineComponent (name, component) {
   // if the component is already defined, do nothing
@@ -13,7 +14,14 @@ function defineComponent (name, component) {
 
   // memo is object containing information that will be same for all the instance of component
   // it is basically a class static property
-  const childComps = component.uses && new Set(component.uses.map(c => c.name.toLowerCase()))
+  let childComps = {}
+  if (component.uses) {
+    childComps = component.uses.reduce((hash, comp) => {
+      const key = upper(comp.name)
+      hash[key] = dashify(comp.name)
+      return hash
+    }, {})
+  }
 
   // @TODO save the memo to globalInfo
   const memo = { name, template: null, childComps, component }
