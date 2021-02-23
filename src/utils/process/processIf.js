@@ -2,15 +2,14 @@ import { addDeps } from '../state/addDep.js'
 import copyParsed from '../node/copyParsed.js'
 import processNode from './processNode.js'
 import { animate, onAnimationEnd } from '../node/dom.js'
+import getClone from '../node/clone.js'
 
 function processIf (nue, ifNode, parsed) {
   const group = [ifNode]
 
   if (parsed.group) {
     parsed.group.forEach(node => {
-      const clone = node.cloneNode(true)
-      copyParsed(node, clone)
-      group.push(clone)
+      group.push(getClone(node))
     })
   }
 

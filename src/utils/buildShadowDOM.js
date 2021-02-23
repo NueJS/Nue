@@ -1,17 +1,12 @@
-import copyParsed from './node/copyParsed.js'
+import getClone from './node/clone.js'
 import processNode from './process/processNode.js'
 
 const buildShadowDOM = (nue) => {
   const { deferred, node } = nue
   const { templateNode } = nue.common
 
-  // create clone of template
-  const fragment = templateNode.content.cloneNode(true)
+  const fragment = getClone(templateNode.content)
 
-  // add parsed property on fragment
-  copyParsed(templateNode.content, fragment)
-
-  // process nodes using parsed property
   processNode(nue, fragment)
   deferred.forEach(p => p())
   deferred.length = 0
