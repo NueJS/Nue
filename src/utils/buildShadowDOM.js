@@ -1,4 +1,5 @@
 import getClone from './node/clone.js'
+import { executeAndClear } from './others.js'
 import processNode from './process/processNode.js'
 
 const buildShadowDOM = (nue) => {
@@ -8,8 +9,7 @@ const buildShadowDOM = (nue) => {
   const fragment = getClone(templateNode.content)
 
   processNode(nue, fragment)
-  deferred.forEach(p => p())
-  deferred.length = 0
+  executeAndClear(deferred)
 
   // add fragment to shadow DOM
   node.attachShadow({ mode: 'open' });

@@ -1,3 +1,4 @@
+import { executeAndClear } from '../others'
 import parseIf from './parseIf'
 import parseNode from './parseNode'
 
@@ -12,8 +13,7 @@ function parseTemplate (templateNode, component) {
   templateNode.content.childNodes.forEach(node => parseNode(node, parsingInfo))
 
   const { deferred, uselessNodes, ifNodes } = parsingInfo
-  deferred.forEach(m => m())
-  deferred.length = 0
+  executeAndClear(deferred)
   uselessNodes.forEach(n => n.remove())
 
   parseIf(ifNodes)
