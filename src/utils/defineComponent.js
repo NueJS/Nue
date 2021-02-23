@@ -9,9 +9,13 @@ import addStateFromAttribute from './addStateFromAttribute.js'
 import { upper } from './others.js'
 import { FUNCTION_ATTRIBUTE, STATE, STATIC_STATE } from './constants.js'
 
-function defineComponent (name, component) {
+function defineComponent (component) {
+  const name = component.name
+
   // if the component is already defined, do nothing
   if (globalInfo.definedComponents[name]) return
+
+  const dashName = dashify(name)
 
   // memo is object containing information that will be same for all the instance of component
   // it is basically a class static property
@@ -120,14 +124,12 @@ function defineComponent (name, component) {
   }
 
   // define the parent first and then child so that child components will have parsed on it
-  customElements.define(dashify(name), Nue)
+  customElements.define(dashName, Nue)
 
   // if the component is using other components inside it
   if (component.uses) {
     // define all of them first
-    component.uses.forEach(child => {
-      defineComponent(child.name, child)
-    })
+    component.uses.forEach(defineComponent)
   }
 }
 

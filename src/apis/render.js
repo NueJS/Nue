@@ -24,7 +24,7 @@ const render = (component, settings) => {
   const root = createElement(dashify(name))
   el.replaceWith(root)
 
-  defineComponent(component.name, component)
+  defineComponent(component)
 }
 
 export default render
