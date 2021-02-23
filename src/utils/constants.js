@@ -6,8 +6,9 @@ export const STATE = 4
 export const BIND = 5
 export const CONDITIONAL = 6
 export const STATIC_STATE = 7
+export const FUNCTION_ATTRIBUTE = 8
 
 // placeholder or split type
-export const REACTIVE = 8
-export const FN = 9
-export const TEXT = 10
+export const REACTIVE = 9
+export const FN = 10
+export const TEXT = 11
