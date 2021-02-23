@@ -13,8 +13,8 @@ import { createElement } from './dom'
 
 function swapDom (a, b)
 {
-  a.ignoreConnectionChange = true
-  b.ignoreConnectionChange = true
+  a.reordering = true
+  b.reordering = true
 
   const aParent = a.parentNode
   const bParent = b.parentNode
@@ -28,8 +28,8 @@ function swapDom (a, b)
   aParent.replaceChild(b, aHolder)
   bParent.replaceChild(a, bHolder)
 
-  a.ignoreConnectionChange = false
-  b.ignoreConnectionChange = false
+  a.reordering = false
+  b.reordering = false
 }
 
 export default swapDom

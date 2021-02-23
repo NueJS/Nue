@@ -1,8 +1,8 @@
 import { TEXT } from '../constants.js'
 import split from '../string/split.js'
 
-function parseTextNode (nue, node) {
-  const placeholders = split(nue, node.textContent.trim())
+function parseTextNode (node, parsingInfo) {
+  const placeholders = split(node.textContent.trim(), parsingInfo)
   const textNodes = []
 
   placeholders.forEach(placeholder => {
@@ -15,7 +15,7 @@ function parseTextNode (nue, node) {
   })
 
   // after all memoization is done, replace the node with textNodes
-  nue.deferred.push(() => {
+  parsingInfo.deferred.push(() => {
     textNodes.forEach(t => node.before(t))
     node.remove()
   })

@@ -1,31 +1,48 @@
 import { connect, disconnect } from './connection/recursive.js'
-import runComponent from './runComponent.js'
+import runScript from './runScript.js'
 import addLifecycles, { runEvent } from './lifecycle.js'
 import buildShadowDOM from './buildShadowDOM.js'
-import dashify from './string/dashify.js'
 import processNode from './process/processNode.js'
 import globalInfo from './globalInfo.js'
 import addStateFromAttribute from './addStateFromAttribute.js'
 import { FUNCTION_ATTRIBUTE, STATE, STATIC_STATE } from './constants.js'
+import { upper } from './others.js'
+import reactify from './reactivity/reactify.js'
+import { TARGET } from './symbols.js'
+import { createElement } from './node/dom.js'
+import parseTemplate from './parse/parseTemplate'
 
 function defineComponent (component) {
-  const name = component.name
+  const { name, template = '', script, style = '', children } = component
 
   // if the component is already defined, do nothing
   if (globalInfo.definedComponents[name]) return
 
-  const dashName = dashify(name)
+  // create hash from component.children array for constant time checking to decide if the node is a component or not
+  const childrenHash = {}
+  if (children) {
+    children.forEach(childComp => {
+      childrenHash[upper(childrenHash.name)] = true
+    })
+  }
 
-  // memo is object containing information that will be same for all the instance of component
-  // it is basically a class static property
+  component.childrenHash = childrenHash
 
-  // @TODO save the memo to globalInfo
-  const memo = { name, template: null, component, childComps: {} }
+  // create templateNode using template, style, and defaultStyle
+  const templateNode = createElement('template')
+  const defaultStyle = globalInfo.defaultStyle && `<style default> ${globalInfo.defaultStyle} </style>`
+  templateNode.innerHTML = '<!-- template -->' + template + '<!-- style -->' + defaultStyle + '<style scoped >' + style + '</style>'
 
-  // save the memo in globalInfo so we can check if this component is already defined or not and other uses
-  globalInfo.definedComponents[name] = memo
+  // parse the template and create templateNode which has all the parsed info
+  parseTemplate(templateNode, component)
+
+  // node object contains the data that is common for all instances
+  const common = { templateNode, component }
+
+  globalInfo.definedComponents[name] = common
 
   class Nue extends HTMLElement {
+    // construct basic nue structure
     constructor () {
       super()
       const nue = this.nue = {
@@ -33,95 +50,96 @@ function defineComponent (component) {
         refs: {},
         actions: {},
         deps: { $: new Map() },
-
-        // callbacks that are to be called in various phases
+        fn: {},
         queue: {
+          // batched callbacks
           stateReady: new Map(),
           computed: new Map(),
           dom: new Map()
         },
-
-        // common data between all instances of component
-        memo,
-        ...memo,
-        // methods to be invoked after certain phase is completed
+        common,
         deferred: [],
-        initState: {}
+        initState: {},
+        reordering: false
       }
 
       addLifecycles(nue)
     }
 
     connectedCallback () {
-      const nue = this.nue
+      const node = this
+      const nue = node.nue
 
-      // this check is added to make sure, processing only happens once
+      // if the connection change is due to reordering, no need to connect and disconnect
+      if (nue.reordering) return
+
+      // node check is added to make sure, processing only happens once
       // and not again when component is disconnected and connected back
-      if (!this.shadowRoot) {
-        // add closure using parsed
-        const closure = this.parsed && this.parsed.closure
-        nue.closure = closure
-        nue.loopClosure = this.parsed && this.parsed.loopClosure
+      if (!node.shadowRoot) {
+        const { parsed } = node
+        if (parsed) {
+          const { closure, loopClosure, attributes } = parsed
 
-        // add fn using closure
-        nue.fn = closure ? Object.create(closure.fn) : {}
+          // if the closure is available, inherit fn
+          if (closure) {
+            nue.closure = closure // @todo move this to node maybe so we don't have to save it in parsed and nue ?
+            nue.fn = Object.create(closure.fn)
 
-        if (closure) {
-          if (this.parsed.attributes) {
-            this.parsed.attributes.forEach(at => {
-              if (at.type === STATE) addStateFromAttribute(closure, nue, at)
-              else if (at.type === STATIC_STATE) nue.initState[at.name] = at.placeholder
-              else if (at.type === FUNCTION_ATTRIBUTE) nue.fn[at.name] = nue.closure.fn[at.placeholder]
-            })
+            if (attributes) {
+              attributes.forEach(at => {
+                if (at.type === STATE) addStateFromAttribute(closure, nue, at)
+                else if (at.type === STATIC_STATE) nue.initState[at.name] = at.placeholder
+                else if (at.type === FUNCTION_ATTRIBUTE) nue.fn[at.name] = nue.closure.fn[at.placeholder]
+              })
+            }
+          }
+
+          // @todo save it in node maybe so don't have to save it in two places ?
+          if (loopClosure) {
+            nue.loopClosure = loopClosure
           }
         }
 
-        // now that nue is ready, run the component
-        runComponent(nue, component)
+        // create reactive state
+        const closure$ = nue.closure && nue.closure.$
+        nue.$ = reactify(nue, nue.initState, [], closure$)
+        nue.$Target = nue.$[TARGET]
 
-        // now that $, lifecycles, fn, etc are filled with component definition,
+        // run script method
+        if (script) runScript(nue, script)
 
-        // process slots
-        this.childNodes.forEach(n => processNode(nue, n))
-
-        // process shadow dom
+        // process childNodes (DOM) and shadow DOM
+        node.childNodes.forEach(n => processNode(nue, n))
         buildShadowDOM(nue)
       }
 
-      // if the connection change is due to reordering, no need to connect and disconnect
-      if (nue.ignoreConnectionChange) return
-
       // run mount callbacks first and then connect the DOM to state
-      // this allows state to set by onMount callbacks to be used directly by the DOM without having to initialize with null values
+      // node allows state to set by onMount callbacks to be used directly by the DOM without having to initialize with null values
       runEvent(nue, 'onMount')
 
       // connect shadow DOM and slots to the component state
-      connect(this.shadowRoot, true)
-      connect(this)
+      connect(node.shadowRoot, true)
+      connect(node)
     }
 
     disconnectedCallback () {
-      const nue = this.nue
-      // if the connection change is due to reordering, no need to connect and disconnect
-      if (nue.ignoreConnectionChange) return
-
-      // disconnect the shadow DOM and slots from component state
-      disconnect(this.shadowRoot, true)
-      disconnect(this, true)
+      const node = this
+      const nue = node.nue
+      // do nothing, if the connection change is due to reordering
+      if (nue.reordering) return
 
       // run onDestroy callbacks
       runEvent(nue, 'onDestroy')
+
+      // disconnect the shadow DOM and slots from component state
+      disconnect(node.shadowRoot, true)
+      disconnect(node, true)
     }
   }
 
-  // define the parent first and then child so that child components will have parsed on it
-  customElements.define(dashName, Nue)
-
-  // if the component is using other components inside it
-  if (component.uses) {
-    // define all of them first
-    component.uses.forEach(defineComponent)
-  }
+  // define current component and then it's children
+  customElements.define(name, Nue)
+  if (children) children.forEach(defineComponent)
 }
 
 export default defineComponent

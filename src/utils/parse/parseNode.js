@@ -6,9 +6,8 @@ import parseConditionNode from './parseConditionNode'
 import parseLoop from './parseLoop'
 import parseTextNode from './parseTextNode'
 
-const parseNode = (nue, node) => {
-  const { childComps } = nue.memo
-  const isComp = node.nodeName in childComps
+const parseNode = (node, parsingInfo) => {
+  const isComp = node.nodeName in parsingInfo.component.childrenHash
 
   if (isComp) {
     node.parsed = {
@@ -17,7 +16,7 @@ const parseNode = (nue, node) => {
 
     const forAttribute = attr(node, 'for')
     if (forAttribute) {
-      parseLoop(nue, node, forAttribute)
+      parseLoop(node, forAttribute, parsingInfo)
     }
 
     let type
@@ -28,30 +27,30 @@ const parseNode = (nue, node) => {
       parseConditionNode(node, type)
     }
     if (type === 'if') {
-      nue.ifNodes.push(node)
+      parsingInfo.ifNodes.push(node)
     }
   }
 
   else if (node.nodeType === Node.TEXT_NODE) {
-    if (!node.textContent.trim()) nue.uselessNodes.push(node)
-    else parseTextNode(nue, node)
+    if (!node.textContent.trim()) parsingInfo.uselessNodes.push(node)
+    else parseTextNode(node, parsingInfo)
     return
   }
 
-  else if (DEV) {
-    ['for', 'key', 'if', 'else-if', 'else'].forEach(attrName => {
-      if (attr(node, attrName)) {
-        throw errors.RESERVED_ATTRIBUTE_USED_ON_NON_COMPONENT(nue.name, node, attrName)
-      }
-    })
-  }
-
   if (node.hasAttribute) {
-    parseAttributes(nue, node)
+    parseAttributes(node)
+
+    if (DEV) {
+      ['for', 'key', 'if', 'else-if', 'else'].forEach(attrName => {
+        if (attr(node, attrName)) {
+          throw errors.RESERVED_ATTRIBUTE_USED_ON_NON_COMPONENT(parsingInfo.component.name, node, attrName)
+        }
+      })
+    }
   }
 
   if (node.hasChildNodes()) {
-    node.childNodes.forEach(n => parseNode(nue, n))
+    node.childNodes.forEach(childNode => parseNode(childNode, parsingInfo))
   }
 }
 

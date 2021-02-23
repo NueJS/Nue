@@ -3,7 +3,7 @@ import { attr } from '../node/dom'
 import processPlaceholder from '../string/placeholder/processPlaceholder'
 import { checkParsedLoop } from './checkParsed'
 
-const parseLoop = (nue, node, forAttribute) => {
+const parseLoop = (node, forAttribute, parsingInfo) => {
   // replace ' in ', '(' ')' ',' with space, split with space, and remove empty strings
   const arr = forAttribute.replace(/\(|\)|,|(\sin\s)/g, ' ').split(/\s+/).filter(t => t)
   const atUsed = arr.length === 3
@@ -18,7 +18,7 @@ const parseLoop = (nue, node, forAttribute) => {
     exit: attr(node, 'exit')
   }
 
-  if (DEV) checkParsedLoop(nue, node, arr);
+  if (DEV) checkParsedLoop(parsingInfo.component.name, node, arr);
 
   ['exit', 'enter', 'reorder', 'for', 'key'].forEach(name => {
     node.removeAttribute(name)

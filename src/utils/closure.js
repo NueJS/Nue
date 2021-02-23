@@ -1,6 +1,7 @@
 import { hasSlice } from './state/slice'
 
 // get the origin component where the value of the state is coming from
+// @todo replace with a custom mode in reactify?
 export const origin = (nue, path) => {
   let target = nue
   while (!hasSlice(target.$Target, path)) {

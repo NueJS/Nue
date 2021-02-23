@@ -1,16 +1,22 @@
 import parseIf from './parseIf'
 import parseNode from './parseNode'
 
-function parseTemplate (nue) {
-  nue.uselessNodes = []
-  nue.ifNodes = []
-  nue.template.content.childNodes.forEach(n => parseNode(nue, n))
-  // run deferred methods
-  nue.deferred.forEach(m => m())
-  nue.deferred = []
-  // remove redundant nodes
-  nue.uselessNodes.forEach(n => n.remove())
-  parseIf(nue)
+function parseTemplate (templateNode, component) {
+  const parsingInfo = {
+    uselessNodes: [],
+    ifNodes: [],
+    deferred: [],
+    component
+  }
+
+  templateNode.content.childNodes.forEach(node => parseNode(node, parsingInfo))
+
+  const { deferred, uselessNodes, ifNodes } = parsingInfo
+  deferred.forEach(m => m())
+  deferred.length = 0
+  uselessNodes.forEach(n => n.remove())
+
+  parseIf(ifNodes)
 }
 
 export default parseTemplate
