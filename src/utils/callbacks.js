@@ -15,9 +15,7 @@ export const runQueue = (nue, name) => {
 
 // only trigger cbs in $ Map
 export function trigger$Cbs (nue, target, info) {
-  for (const [cb] of target.$) {
-    cb(nue, info)
-  }
+  target.$.forEach(cb => cb(nue, info))
 }
 
 // trigger all the cbs in the object
@@ -45,10 +43,13 @@ export function cbQueuer (nue, cb, type) {
 export function triggerDeps (nue, path, info) {
   let target = nue.subscribers
   path.forEach((c, i) => {
+    // if primitive, return
     if (typeof target !== 'object') return
     target = target[c]
     if (target) {
+      // if last index, trigger cbs of target.$
       if (i !== path.length - 1) trigger$Cbs(nue, target, info)
+      // deeply trigger all inside target.*
       triggerAllCbs(nue, target, info)
     }
   })

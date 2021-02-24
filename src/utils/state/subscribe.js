@@ -22,9 +22,9 @@ const subscribe = (baseNue, path, cb, type) => {
   // add qcb in dep table at appropriate location
   // map is used to unsubscribe in constant time
   path.forEach((c, i) => {
-    if (!target[c]) target[c] = { $: new Map() }
+    if (!target[c]) target[c] = { $: new Set() }
     target = target[c]
-    if (i === lastIndex) target.$.set(qcb, true)
+    if (i === lastIndex) target.$.add(qcb)
   })
 
   // return unsubscribe to remove subscription
