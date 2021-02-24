@@ -1,7 +1,6 @@
 import { FUNCTION_ATTRIBUTE, STATE, STATIC_STATE } from '../constants.js'
 import addStateFromAttribute from './addStateFromAttribute.js'
 import reactify from '../reactivity/reactify.js'
-import { TARGET } from '../symbols.js'
 
 const setupNue = (node) => {
   const { nue } = node
@@ -32,7 +31,6 @@ const setupNue = (node) => {
   // create reactive state
   const closure$ = nue.closure && nue.closure.$
   nue.$ = reactify(nue, nue.initState, [], closure$)
-  nue.$Target = nue.$[TARGET]
 }
 
 export default setupNue
