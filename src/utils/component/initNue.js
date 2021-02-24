@@ -5,7 +5,6 @@ const initNue = (node, common) => ({
   fn: {},
   queue: {
     // batched callbacks
-    stateReady: new Map(),
     computed: new Map(),
     dom: new Map()
   },
