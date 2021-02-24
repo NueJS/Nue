@@ -14,8 +14,8 @@ const addDep = (baseNue, path, cb, type) => {
   // get the higher order cb that will only call the cb once every batch
   const qcb = cbQueuer(nue, cb, type)
 
-  // start from the root of deps object
-  let target = nue.deps
+  // start from the root of subscribers
+  let target = nue.subscribers
 
   const lastIndex = path.length - 1
 
@@ -26,7 +26,7 @@ const addDep = (baseNue, path, cb, type) => {
     if (i === lastIndex) target.$.set(qcb, true)
   })
 
-  // return removeDep function that can remove the qcb from the deps table
+  // return unsubscribe to remove subscription
   return () => target.$.delete(qcb)
 }
 

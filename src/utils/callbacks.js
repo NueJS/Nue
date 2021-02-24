@@ -41,9 +41,9 @@ export function cbQueuer (nue, cb, type) {
   return qcb
 }
 
-// find deps that needs to be called for given path update and trigger them
+// find callbacks that are subscribed to given path and trigger them
 export function triggerDeps (nue, path, info) {
-  let target = nue.deps
+  let target = nue.subscribers
   path.forEach((c, i) => {
     if (typeof target !== 'object') return
     target = target[c]

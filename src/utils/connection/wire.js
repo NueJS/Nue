@@ -16,7 +16,6 @@ function wire (nue, node, deps, update) {
     }
 
     return addDeps(nue, deps, update, 'dom')
-    // return deps.map(path => addDep(nue, path, update, 'dom'))
   }
   addConnects(node, connectNode)
   if (!node.parsed.updates) node.parsed.updates = []

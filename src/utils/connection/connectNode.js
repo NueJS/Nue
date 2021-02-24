@@ -1,6 +1,4 @@
 // connectNode the node to state
-// add the node's deps in this.deps
-// invoke update to update the node
 export function connectNode (node) {
   if (!node.parsed) return
   const { parsed } = node

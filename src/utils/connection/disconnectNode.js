@@ -1,6 +1,4 @@
 // disconnectNode the node from state
-// after disconnecting, no state mutation should affect the node
-// disconnecting involves removing its dep from this.deps map
 export function disconnectNode (node) {
   if (!node.parsed) return
   const { parsed } = node
