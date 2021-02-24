@@ -11,6 +11,7 @@
 
 import { createElement } from './dom'
 
+// @TODO update this with upper one
 function swapDom (a, b)
 {
   a.reordering = true

@@ -49,7 +49,7 @@ function defineCustomElement (component) {
       const node = this
       const nue = node.nue
       // if the connection change is due to reordering, ignore
-      if (nue.reordering) return
+      if (node.reordering) return
 
       // node check is added to make sure, processing only happens once
       // and not again when component is disconnected and connected back
@@ -73,7 +73,7 @@ function defineCustomElement (component) {
       const node = this
       const nue = node.nue
       // do nothing, if the connection change is due to reordering
-      if (nue.reordering) return
+      if (node.reordering) return
       // run onDestroy callbacks
       runEvent(nue, 'onDestroy')
       // disconnect the shadow DOM and slots from component state

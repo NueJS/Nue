@@ -11,8 +11,7 @@ const initNue = (node, common) => ({
   },
   common,
   deferred: [],
-  initState: {},
-  reordering: false
+  initState: {}
 })
 
 export default initNue
