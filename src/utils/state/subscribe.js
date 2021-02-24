@@ -4,7 +4,7 @@ import DEV from '../dev/DEV.js'
 import errors from '../dev/errors.js'
 
 // add Dep for given path on its origin
-const addDep = (baseNue, path, cb, type) => {
+const subscribe = (baseNue, path, cb, type) => {
   // get the nue where the state referred by path is coming from
   const nue = origin(baseNue, path)
 
@@ -20,6 +20,7 @@ const addDep = (baseNue, path, cb, type) => {
   const lastIndex = path.length - 1
 
   // add qcb in dep table at appropriate location
+  // map is used to unsubscribe in constant time
   path.forEach((c, i) => {
     if (!target[c]) target[c] = { $: new Map() }
     target = target[c]
@@ -31,6 +32,6 @@ const addDep = (baseNue, path, cb, type) => {
 }
 
 // returns an array of removeDep functions
-export const addDeps = (nue, deps, cb, type) => deps.map(dep => addDep(nue, dep, cb, type))
+export const addDeps = (nue, deps, cb, type) => deps.map(dep => subscribe(nue, dep, cb, type))
 
-export default addDep
+export default subscribe

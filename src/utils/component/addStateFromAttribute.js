@@ -1,4 +1,4 @@
-import addDep from '../state/addDep'
+import subscribe from '../state/subscribe'
 import { hasSlice } from '../state/slice'
 
 function addStateFromAttribute (parentComp, nue, attribute) {
@@ -15,7 +15,7 @@ function addStateFromAttribute (parentComp, nue, attribute) {
   // when that part of state is changed update the attribute value
   deps.forEach(dep => {
     if (hasSlice(parentComp.$, dep)) {
-      addDep(parentComp, dep, cb, 'computed')
+      subscribe(parentComp, dep, cb, 'computed')
     }
   })
   // return removeDeps

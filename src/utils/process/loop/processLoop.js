@@ -1,4 +1,4 @@
-import addDep from '../../state/addDep.js'
+import subscribe from '../../state/subscribe.js'
 import { getNewState, updateCompState } from './utils/state.js'
 import animateEnter from './animate/animateEnter.js'
 import animateMove from './animate/animateMove.js'
@@ -80,7 +80,7 @@ function processLoop (nue, loopedComp, parsed) {
   // @TODO optimize this
   // handleArrayChange should be called only the entire array is mutated
   // else only update the state of exact item in array
-  addDep(nue, map.deps[0], handleArrayChange, 'dom')
+  subscribe(nue, map.deps[0], handleArrayChange, 'dom')
 }
 
 export default processLoop

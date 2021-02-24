@@ -1,6 +1,6 @@
 import devtools from '../../apis/devtools'
 import DEV from '../dev/DEV.js'
-import { addDeps } from '../state/addDep'
+import { addDeps } from '../state/subscribe'
 import { addConnects } from './addConnects'
 
 // lay wiring for node updates

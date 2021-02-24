@@ -1,4 +1,4 @@
-import { addDeps } from '../state/addDep.js'
+import { addDeps } from '../state/subscribe.js'
 import copyParsed from '../node/copyParsed.js'
 import processNode from './processNode.js'
 import { animate, onAnimationEnd } from '../node/dom.js'

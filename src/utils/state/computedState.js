@@ -1,5 +1,5 @@
 import { mutate } from '../reactivity/mutate.js'
-import { addDeps } from './addDep.js'
+import { addDeps } from './subscribe.js'
 import detectStateUsage from './detectStateUsage.js'
 
 // when initializing the state, if a function is given

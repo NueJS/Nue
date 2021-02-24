@@ -1,4 +1,4 @@
-import { addDeps } from '../state/addDep.js'
+import { addDeps } from '../state/subscribe.js'
 import errors from '../dev/errors.js'
 import DEV from '../dev/DEV.js'
 
