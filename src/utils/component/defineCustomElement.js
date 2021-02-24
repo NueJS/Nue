@@ -21,7 +21,7 @@ function defineCustomElement (component) {
   const childrenHash = {}
   if (children) {
     children.forEach(childComp => {
-      childrenHash[upper(childrenHash.name)] = true
+      childrenHash[upper(childComp.name)] = true
     })
   }
 
