@@ -1,54 +1,44 @@
 
 import { TEXT } from '../constants.js'
 import processPlaceholder from './placeholder/processPlaceholder.js'
-import DEV from '../dev/DEV.js'
 
 // take the string text and split it into placeholders and strings
-// returns array of parts
-// [ part, part, part ... ]
-function split (text, parsingInfo) {
+// processes the placeholders and returns the array
+function split (text) {
   const parts = []
   let collectingVar = false
   let collectedString = ''
   let i = -1
 
-  // reset string and set the collectingVar value and jump over the next character
   const reset = (cv) => {
     collectedString = ''
     collectingVar = cv
   }
 
-  const varEnds = (text, i) => text[i] === ']'
-  const varStarts = (text, i) => text[i] === '[' && text[i + 1] !== "'"
+  while (++i < text.length) {
+    const char = text[i]
+    const nextChar = text[i + 1]
+    // if current char is ! and next [, ignore ! and don't make the
+    if (char === '!' && nextChar === '[') {
+      collectedString += '['
+      i += 1
+    }
 
-  while (i++ < text.length - 1) {
-    if (varStarts(text, i)) {
-      // save previously collected string, if not null
-      if (collectedString) {
-        parts.push({ text: collectedString, type: TEXT })
-      }
-
+    else if (char === '[') {
+      // save current collected string (if any)
+      if (collectedString) parts.push({ text: collectedString, type: TEXT })
       reset(true)
     }
 
-    else if (varEnds(text, i)) {
-      if (DEV && !collectingVar) {
-        throw {
-          message: 'invalid use of ]'
-          // nue
-        }
-      }
-
-      // process variable and save it in parts
+    else if (collectingVar && char === ']') {
+      // process collected variable and save it in parts
       const part = processPlaceholder(collectedString, true)
       parts.push(part)
       reset(false)
     }
 
     // keep collecting
-    else {
-      collectedString += text[i]
-    }
+    else collectedString += char
   }
 
   // add the remaining text
