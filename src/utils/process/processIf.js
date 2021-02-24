@@ -1,5 +1,4 @@
 import { addDeps } from '../state/subscribe.js'
-import copyParsed from '../node/copyParsed.js'
 import processNode from './processNode.js'
 import { animate, onAnimationEnd } from '../node/dom.js'
 import getClone from '../node/clone.js'
@@ -48,15 +47,14 @@ function processIf (nue, ifNode, parsed) {
             anchorNode.after(conditionNode)
             if (enter) animate(conditionNode, enter)
           }
+
           if (
             active &&
             active.parsed.exit &&
             conditionNode !== active) {
             onAnimationEnd(active, mount)
-            // active.onRemove(() => mountGroup(group))
           } else {
             mount()
-            // mountGroup(group)
           }
 
           anchorNode.after(conditionNode)
@@ -73,7 +71,8 @@ function processIf (nue, ifNode, parsed) {
     })
   }
 
-  addDeps(nue, groupDeps, onGroupDepChange, 'stateReady')
+  // since this modifies the DOM, it should be done in dom queue
+  addDeps(nue, groupDeps, onGroupDepChange, 'dom')
 
   nue.deferred.push(() => {
     ifNode.remove()
