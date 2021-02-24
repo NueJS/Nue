@@ -1,4 +1,4 @@
-import { addDeps } from '../state/subscribe.js'
+import { subscribeMultiple } from '../state/subscribe.js'
 import processNode from './processNode.js'
 import { animate, onAnimationEnd } from '../node/dom.js'
 import getClone from '../node/clone.js'
@@ -72,7 +72,7 @@ function processIf (nue, ifNode, parsed) {
   }
 
   // since this modifies the DOM, it should be done in dom queue
-  addDeps(nue, groupDeps, onGroupDepChange, 'dom')
+  subscribeMultiple(nue, groupDeps, onGroupDepChange, 'dom')
 
   nue.deferred.push(() => {
     ifNode.remove()

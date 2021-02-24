@@ -15,6 +15,7 @@ function addStateFromAttribute (parentComp, nue, attribute) {
   // when that part of state is changed update the attribute value
   deps.forEach(dep => {
     if (hasSlice(parentComp.$, dep)) {
+      // cb is creating state using the parentComp and closure, so it should be done in computed queue
       subscribe(parentComp, dep, cb, 'computed')
     }
   })

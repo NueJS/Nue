@@ -1,5 +1,5 @@
 import { mutate } from '../reactivity/mutate.js'
-import { addDeps } from './subscribe.js'
+import { subscribeMultiple } from './subscribe.js'
 import detectStateUsage from './detectStateUsage.js'
 
 // when initializing the state, if a function is given
@@ -16,7 +16,7 @@ const computedState = (nue, fn, prop) => {
 
   const deps = paths.map(path => path.length === 1 ? path : path.slice(0, -1))
 
-  addDeps(nue, deps, compute, 'computed')
+  subscribeMultiple(nue, deps, compute, 'computed')
   return initValue
 }
 

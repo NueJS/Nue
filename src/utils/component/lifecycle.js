@@ -1,4 +1,4 @@
-import { addDeps } from '../state/subscribe.js'
+import { subscribeMultiple } from '../state/subscribe.js'
 import errors from '../dev/errors.js'
 import DEV from '../dev/DEV.js'
 
@@ -20,7 +20,8 @@ function addLifecycles (nue) {
       // add the state dependency after the component is mounted
       onMount.push(() => {
         const deps = slices.map(slice => slice.split('.'))
-        addDeps(nue, deps, cb, 'computed')
+        // since the callback is not about DOM manipulation and only requires the state, do it in computed queue
+        subscribeMultiple(nue, deps, cb, 'computed')
       })
     }
   }

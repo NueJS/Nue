@@ -32,6 +32,6 @@ const subscribe = (baseNue, path, cb, type) => {
 }
 
 // returns an array of removeDep functions
-export const addDeps = (nue, deps, cb, type) => deps.map(dep => subscribe(nue, dep, cb, type))
+export const subscribeMultiple = (nue, deps, cb, type) => deps.map(dep => subscribe(nue, dep, cb, type))
 
 export default subscribe

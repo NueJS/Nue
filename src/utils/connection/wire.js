@@ -1,6 +1,6 @@
 import devtools from '../../apis/devtools'
 import DEV from '../dev/DEV.js'
-import { addDeps } from '../state/subscribe'
+import { subscribeMultiple } from '../state/subscribe'
 import { addConnects } from './addConnects'
 
 // lay wiring for node updates
@@ -15,7 +15,8 @@ function wire (nue, node, deps, update) {
       }
     }
 
-    return addDeps(nue, deps, update, 'dom')
+    // return removeDeps
+    return subscribeMultiple(nue, deps, update, 'dom')
   }
   addConnects(node, connectNode)
   if (!node.parsed.updates) node.parsed.updates = []
