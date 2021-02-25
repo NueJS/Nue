@@ -4,7 +4,7 @@ export function connectNode (node) {
   const { parsed } = node
 
   // if node is connected, do nothing
-  if (parsed.isConnected) return
+  if (node.isSubscribed) return
   // if node can be connected
   if (parsed.connects) {
     // collect disconnects which is returned when calling connects
@@ -20,9 +20,9 @@ export function connectNode (node) {
     // set the new disconnects
     parsed.disconnects = disconnects
 
-    // update() will/should not work unless isConnected is set to true
+    // update() will/should not work unless isSubscribed is set to true
     // so set it to true first and then update
-    parsed.isConnected = true
+    node.isSubscribed = true
     parsed.updates && parsed.updates.forEach(u => u())
   }
 }

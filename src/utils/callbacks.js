@@ -5,7 +5,7 @@ import DEV from './dev/DEV.js'
 export const runQueue = (nue, name) => {
   const map = nue.queue[name]
   for (const [cb, args] of map) {
-    if ((cb.node && cb.node.parsed.isConnected) || !cb.node) {
+    if ((cb.node && cb.node.isSubscribed) || !cb.node) {
       cb(args)
       // show node updates
       if (DEV && cb.node && devtools.showUpdates) devtools.onNodeUpdate(cb.node)
