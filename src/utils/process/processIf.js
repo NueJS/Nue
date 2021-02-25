@@ -64,7 +64,7 @@ const processIf = (nue, ifNode, parsed) => {
     })
   }
 
-  // since this modifies the DOM, it should be done in dom queue
+  // since this modifies the DOM, it should be done in dom batches
   subscribeMultiple(nue, groupDeps, onGroupDepChange, 'computed')
 
   nue.deferred.push(() => {

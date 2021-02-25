@@ -20,7 +20,7 @@ const addLifecycles = (nue) => {
       // add the state dependency after the component is mounted
       onMount.push(() => {
         const deps = slices.map(slice => slice.split('.'))
-        // since the callback is not about DOM manipulation and only requires the state, do it in computed queue
+        // since the callback is not about DOM manipulation and only requires the state, do it in computed batches
         subscribeMultiple(nue, deps, cb, 'computed')
       })
     }

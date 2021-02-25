@@ -3,10 +3,9 @@ const initNue = (node, common) => ({
   refs: {},
   subscriptions: { $: new Set() },
   fn: {},
-  queue: {
-    // batched callbacks
-    computed: new Map(),
-    dom: new Map()
+  batches: {
+    computed: new Set(),
+    dom: new Set()
   },
   common,
   deferred: [],
