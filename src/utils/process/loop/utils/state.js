@@ -18,14 +18,14 @@ export const getNewState = (blob) => {
 
 // @todo - do not update index - we need to update props now
 export const updateCompState = (newState, blob) => {
-  const { comps, attributes, oldState, initialized, nue, getArray, getClosure, at, propsUsingIndex } = blob
+  const { comps, attributes, oldState, initialized, nue, getArray, getClosure, propsUsingIndex } = blob
   if (!comps.length || !initialized) return
 
   // update props which are using index
-  comps.forEach((c, i) => {
+  comps.forEach((comp, i) => {
     propsUsingIndex.forEach(prop => {
-      if (comps[i].nue.$[prop] !== i) {
-        comps[i].nue.$[prop] = i
+      if (comp.nue.$[prop] !== i) {
+        comp.nue.$[prop] = i
       }
     })
   })
