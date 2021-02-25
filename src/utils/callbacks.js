@@ -38,7 +38,7 @@ export function cbQueuer (nue, cb, type) {
 
 // find callbacks that are subscribed to given path and trigger them
 export function triggerDeps (nue, path, info) {
-  let target = nue.subscribers
+  let target = nue.subscriptions
   path.forEach((c, i) => {
     // if primitive, return
     if (typeof target !== 'object') return
