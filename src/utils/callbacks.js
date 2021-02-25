@@ -30,12 +30,9 @@ export function triggerAllCbs (nue, target, info) {
 // instead of using a flag, function is saved in queue
 // because it should be called once batching is completed
 export function cbQueuer (nue, cb, type) {
-  const lifecycle = nue.queue[type]
-  const qcb = (...args) => {
-    if (!lifecycle.has(cb)) lifecycle.set(cb, ...args)
-  }
-
-  qcb.node = cb.node
+  const queue = nue.queue[type]
+  const qcb = (...args) => queue.set(cb, ...args)
+  qcb.node = cb.node // @todo remove this
   return qcb
 }
 
