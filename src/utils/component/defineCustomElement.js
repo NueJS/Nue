@@ -13,7 +13,7 @@ import setupNue from './setupNue.js'
 function defineCustomElement (component) {
   const { name, template = '', script, style = '', children } = component
   // return if already defined
-  const { components, defaultStyle = '' } = stats
+  const { components, config } = stats
   if (components[name]) return
   else components[name] = true
 
@@ -29,7 +29,7 @@ function defineCustomElement (component) {
 
   // create templateNode using template, style, and defaultStyle
   const templateNode = createElement('template')
-  templateNode.innerHTML = template + `<style default> ${defaultStyle} </style>` + '<style scoped >' + style + '</style>'
+  templateNode.innerHTML = template + `<style default> ${config.defaultStyle} </style>` + '<style scoped >' + style + '</style>'
 
   // parse the template and create templateNode which has all the parsed info
   parseTemplate(templateNode, component)
@@ -72,6 +72,8 @@ function defineCustomElement (component) {
     disconnectedCallback () {
       const node = this
       const nue = node.nue
+      // if disconnectedCallback was manually called earlier, no need to call it again when node is removed
+      if (!node.isConnected) return
       // do nothing, if the connection change is due to reordering
       if (node.reordering) return
       // run onDestroy callbacks
