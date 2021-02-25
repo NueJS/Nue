@@ -7,6 +7,4 @@ export const saveOffset = (node) => {
   node.prev = getOffset(node)
 }
 
-export const saveOffsets = (comps) => {
-  comps.forEach(saveOffset)
-}
+export const saveOffsets = (nodes) => nodes.forEach(saveOffset)
