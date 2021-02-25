@@ -11,12 +11,13 @@ function addStateFromAttribute (parentNue, nue, attribute) {
 
   nue.initState[name] = getValue(parentNue, nue.loopClosure)
 
-  // if the attribute value depends on some part of state
-  // when that part of state is changed update the attribute value
+  // if the attribute value depends on some part of state from parentNue
+  // when that part of state is changed update the state of nue
   deps.forEach(dep => {
     if (hasSlice(parentNue.$, dep)) {
-      // cb is creating state using the parentNue and closure, so it should be done in computed queue
-      subscribe(parentNue, dep, cb, 'computed')
+      const unsubscribe = subscribe(parentNue, dep, cb, 'computed')
+      // when the nue is destroyed, unsubscribe from parentNue
+      nue.events.onDestroy(unsubscribe)
     }
   })
   // return removeDeps
