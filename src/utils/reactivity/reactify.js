@@ -76,7 +76,6 @@ function reactify (nue, obj, path = [], closure$) {
       // closure state API
       if (prop in target) return Reflect.get(target, prop)
       if (closure$) return Reflect.get(closure$, prop)
-      return undefined
     }
 
   })
