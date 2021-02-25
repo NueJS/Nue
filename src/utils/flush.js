@@ -1,8 +1,9 @@
-import { runBatch } from '../batch'
-import { runEvent } from '../component/lifecycle.js'
+import { runBatch } from './batch'
+import { runEvent } from './component/lifecycle.js'
 
-// wait for all the callbacks to be registered and then call all of them in proper order
-const invokeQueue = (nue) => {
+// wait for all the callbacks to be batched,
+// then flush all events and batches in one go in proper order
+const flush = (nue) => {
   // don't trigger setTimeout again once the collecting is started
   nue.batching = true
 
@@ -20,4 +21,4 @@ const invokeQueue = (nue) => {
   }, 0)
 }
 
-export default invokeQueue
+export default flush

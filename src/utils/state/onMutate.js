@@ -1,4 +1,4 @@
-import invokeQueue from './invokeQueue.js'
+import flush from '../flush.js'
 import { triggerDeps } from '../callbacks.js'
 
 // when state is mutated, find cbs that should be triggered for given path
@@ -7,9 +7,9 @@ import { triggerDeps } from '../callbacks.js'
 // once a cb is added in batches it is not added again
 const onMutate = (nue, path, old) => {
   // if batches is being built, don't invoke, invoke once the building is stopped
-  if (!nue.batching) invokeQueue(nue)
+  if (!nue.batching) flush(nue)
 
-  // don't use if else - value of nue.batching will be changed by invokeQueue
+  // don't use if else - value of nue.batching will be changed by flush
   if (nue.batching) triggerDeps(nue, path, old)
 }
 
