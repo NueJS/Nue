@@ -63,17 +63,20 @@ function defineCustomElement (component) {
 
       // run mount callbacks first and then connect the DOM to state
       // node allows state to set by onMount callbacks to be used directly by the DOM without having to initialize with null values
+
       runEvent(nue, 'onMount')
       // connect shadow DOM and slots to the component state
       connect(node.shadowRoot, true)
       connect(node)
+
+      node.ignoreDisconnect = false
     }
 
     disconnectedCallback () {
       const node = this
       const nue = node.nue
       // if disconnectedCallback was manually called earlier, no need to call it again when node is removed
-      if (!node.isConnected) return
+      if (node.ignoreDisconnect) return
       // do nothing, if the connection change is due to reordering
       if (node.reordering) return
       // run onDestroy callbacks

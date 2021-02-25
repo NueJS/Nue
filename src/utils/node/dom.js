@@ -19,5 +19,6 @@ export const createComment = (text) => document.createComment(text)
 
 export const animatedRemove = (comp, animation) => {
   comp.disconnectedCallback()
+  comp.ignoreDisconnect = true
   animate(comp, animation, true, () => comp.remove())
 }
