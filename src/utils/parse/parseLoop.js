@@ -18,7 +18,7 @@ const parseLoop = (node, forAttribute, parsingInfo) => {
     exit: attr(node, 'exit')
   }
 
-  if (DEV) checkParsedLoop(parsingInfo.component.name, node, arr);
+  if (DEV) checkParsedLoop(parsingInfo.component, node, arr);
 
   ['exit', 'enter', 'reorder', 'for', 'key'].forEach(name => {
     node.removeAttribute(name)
