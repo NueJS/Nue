@@ -8,6 +8,11 @@ const setupNue = (node) => {
   if (parsed) {
     const { closure, loopClosure, attributes } = parsed
 
+    // @todo save it in node maybe so don't have to save it in two places ?
+    if (loopClosure) {
+      nue.loopClosure = loopClosure
+    }
+
     // if the closure is available, inherit fn
     if (closure) {
       nue.closure = closure // @todo move this to node maybe so we don't have to save it in parsed and nue ?
@@ -20,11 +25,6 @@ const setupNue = (node) => {
           else if (at.type === FUNCTION_ATTRIBUTE) nue.fn[at.name] = nue.closure.fn[at.placeholder]
         })
       }
-    }
-
-    // @todo save it in node maybe so don't have to save it in two places ?
-    if (loopClosure) {
-      nue.loopClosure = loopClosure
     }
   }
 
