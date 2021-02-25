@@ -3,7 +3,7 @@
 // sweetify is used to add those properties back in the cloneNode
 const copyParsed = (node, cloneNode) => {
   // @QUESTION ? is shallow clone enough ?
-  if (node.parsed) cloneNode.parsed = { ...node.parsed, isProcessed: false }
+  if (node.parsed) cloneNode.parsed = { ...node.parsed }
   if (node.hasChildNodes()) {
     node.childNodes.forEach((n, i) => {
       copyParsed(n, cloneNode.childNodes[i])

@@ -12,7 +12,7 @@ const processIf = (nue, ifNode, parsed) => {
     })
   }
 
-  parsed.isProcessed = true
+  ifNode.isProcessed = true
 
   const { groupDeps } = parsed
   const anchorNode = ifNode.previousSibling
@@ -25,19 +25,20 @@ const processIf = (nue, ifNode, parsed) => {
     let foundSatisfied = false
 
     group.forEach(conditionNode => {
-      const { condition, isProcessed, isRendered, enter, exit } = conditionNode.parsed
+      const { isProcessed, isConnected } = conditionNode
+      const { condition, enter, exit } = conditionNode.parsed
       const satisfied = condition ? condition.getValue(nue) : true
 
-      // if this group should be rendered
+      // if this component should be mounted
       if (!foundSatisfied && satisfied) {
         foundSatisfied = true
 
-        // if this group is not currently rendered on DOM
-        if (!isRendered) {
-          // if this nue is never processed before
+        // if this node is not mounted, already
+        if (!isConnected) {
+          // if this node is not processed
           if (!isProcessed) {
             processNode(nue, conditionNode)
-            conditionNode.parsed.isProcessed = true
+            conditionNode.isProcessed = true
           }
 
           const mount = () => {
@@ -51,16 +52,14 @@ const processIf = (nue, ifNode, parsed) => {
           // wait if needed, else mount it right now
           waitForAnimationEnd ? onAnimationEnd(active, mount) : mount()
 
-          conditionNode.parsed.isRendered = true
           active = conditionNode
         }
       }
 
       // if the group should be removed
-      else if (isRendered) {
+      else if (isConnected) {
         if (exit) animatedRemove(conditionNode, exit)
         else conditionNode.remove()
-        conditionNode.parsed.isRendered = false
       }
     })
   }
