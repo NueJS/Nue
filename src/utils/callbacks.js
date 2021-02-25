@@ -2,7 +2,7 @@ import devtools from '../apis/devtools.js'
 import DEV from './dev/DEV.js'
 
 // @todo reduce the amount of functions in this file - they all are very similar
-export const runQueue = (nue, name) => {
+export const runBatch = (nue, name) => {
   const map = nue.queue[name]
   for (const [cb, args] of map) {
     if ((cb.node && cb.node.isSubscribed) || !cb.node) {

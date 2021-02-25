@@ -1,4 +1,4 @@
-import { runQueue } from '../callbacks.js'
+import { runBatch } from '../callbacks.js'
 import { runEvent } from '../component/lifecycle.js'
 
 const clearQueue = (nue) => {
@@ -14,8 +14,8 @@ const invokeQueue = (nue) => {
   // after all the callbacks are triggered by state mutation, call callbacks in proper order
   setTimeout(() => {
     runEvent(nue, 'beforeUpdate')
-    runQueue(nue, 'computed')
-    runQueue(nue, 'dom')
+    runBatch(nue, 'computed')
+    runBatch(nue, 'dom')
     clearQueue(nue)
     runEvent(nue, 'afterUpdate')
     // allow the queue to being built for next state mutation
