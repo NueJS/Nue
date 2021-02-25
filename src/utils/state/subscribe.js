@@ -15,8 +15,8 @@ const subscribe = (baseNue, path, cb, queueName) => {
   // get the higher order cb that will only call the cb once every batch
   const qcb = cbQueuer(nue, cb, queueName)
 
-  // start from the root of subscribers
-  let target = nue.subscribers
+  // start from the root of subscriptions
+  let target = nue.subscriptions
 
   // add qcb in path table at appropriate location
   // map is used to unsubscribe in constant time
@@ -32,6 +32,10 @@ const subscribe = (baseNue, path, cb, queueName) => {
 }
 
 // returns an array of removeDep functions
-export const subscribeMultiple = (nue, paths, cb, queueName) => paths.map(path => subscribe(nue, path, cb, queueName))
+export const subscribeMultiple = (nue, paths, cb, queueName) => {
+  const unsubscribeFunctions = paths.map(path => subscribe(nue, path, cb, queueName))
+  // return unsubscribeMultiple
+  return () => unsubscribeFunctions.forEach(c => c())
+}
 
 export default subscribe

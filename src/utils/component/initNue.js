@@ -1,7 +1,7 @@
 const initNue = (node, common) => ({
   node,
   refs: {},
-  subscribers: { $: new Set() },
+  subscriptions: { $: new Set() },
   fn: {},
   queue: {
     // batched callbacks
