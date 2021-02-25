@@ -1,7 +1,12 @@
 export const attr = (node, name) => node.getAttribute(name)
 
-export const animate = (node, name) => {
+export const animate = (node, name, clearAnimation = false) => {
   node.style.animation = name
+  if (clearAnimation) {
+    onAnimationEnd(node, () => {
+      node.style.animation = null
+    })
+  }
 }
 
 export const onAnimationEnd = (node, cb) => {
@@ -10,3 +15,9 @@ export const onAnimationEnd = (node, cb) => {
 
 export const createElement = (name) => document.createElement(name)
 export const createComment = (text) => document.createComment(text)
+
+export const animatedRemove = (comp, animation) => {
+  comp.disconnectedCallback()
+  animate(comp, animation)
+  onAnimationEnd(comp, () => comp.remove())
+}
