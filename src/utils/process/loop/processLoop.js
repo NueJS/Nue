@@ -10,7 +10,8 @@ import { saveOffsets } from './animate/offset.js'
 import { createComment } from '../../node/dom.js'
 
 function processLoop (nue, loopedComp, parsed) {
-  const { for: forInfo, attributes } = parsed.for
+  const { attributes } = parsed
+  const forInfo = parsed.for
   const { map, reorder, at, as, key } = forInfo
 
   const getClosure = (value, index) => ({ [at]: index, [as]: value })
