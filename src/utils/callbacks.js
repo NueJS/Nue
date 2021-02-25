@@ -14,12 +14,12 @@ export const runQueue = (nue, name) => {
 }
 
 // only trigger cbs in $ Map
-export function trigger$Cbs (nue, target, info) {
+export const trigger$Cbs = (nue, target, info) => {
   target.$.forEach(cb => cb(nue, info))
 }
 
 // trigger all the cbs in the object
-export function triggerAllCbs (nue, target, info) {
+export const triggerAllCbs = (nue, target, info) => {
   for (const k in target) {
     if (k === '$') trigger$Cbs(nue, target, info)
     else triggerAllCbs(nue, target[k], info)
@@ -29,7 +29,7 @@ export function triggerAllCbs (nue, target, info) {
 // convert consecutive calls to single call
 // instead of using a flag, function is saved in queue
 // because it should be called once batching is completed
-export function cbQueuer (nue, cb, type) {
+export const cbQueuer = (nue, cb, type) => {
   const queue = nue.queue[type]
   const qcb = (...args) => queue.set(cb, ...args)
   qcb.node = cb.node // @todo remove this
@@ -37,7 +37,7 @@ export function cbQueuer (nue, cb, type) {
 }
 
 // find callbacks that are subscribed to given path and trigger them
-export function triggerDeps (nue, path, info) {
+export const triggerDeps = (nue, path, info) => {
   let target = nue.subscriptions
   path.forEach((c, i) => {
     // if primitive, return

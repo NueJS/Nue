@@ -9,7 +9,7 @@ import deepClone from '../../deepClone.js'
 import { saveOffsets } from './animate/offset.js'
 import { createComment } from '../../node/dom.js'
 
-function processLoop (nue, loopedComp, parsed) {
+const processLoop = (nue, loopedComp, parsed) => {
   const { attributes } = parsed
   const forInfo = parsed.for
   const { map, reorder, at, as, key } = forInfo

@@ -2,7 +2,7 @@ import { CONDITIONAL } from '../../constants.js'
 import wire from '../../connection/wire'
 
 // example: data-count=[XXX],  disabled:if=[XXx]
-function addAttribute (nue, node, attribute) {
+const addAttribute = (nue, node, attribute) => {
   const { placeholder, name, type } = attribute
   const { deps, getValue } = placeholder
 

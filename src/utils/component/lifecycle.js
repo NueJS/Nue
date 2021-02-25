@@ -4,7 +4,7 @@ import DEV from '../dev/DEV.js'
 
 export const runEvent = (nue, name) => nue.cbs[name].forEach(cb => cb())
 
-function addLifecycles (nue) {
+const addLifecycles = (nue) => {
   nue.cbs = { onMount: [], onDestroy: [], beforeUpdate: [], afterUpdate: [] }
   const { onMount, onDestroy, beforeUpdate, afterUpdate } = nue.cbs
 

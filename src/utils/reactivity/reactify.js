@@ -8,7 +8,7 @@ import { TARGET } from '../symbols.js'
 const isObject = x => typeof x === 'object' && x !== null
 
 // create a reactive object which when mutated calls the on_change function
-function reactify (nue, obj, path = [], closure$) {
+const reactify = (nue, obj, path = [], closure$) => {
   if (!isObject(obj)) return obj
 
   // make the slice of state reactive

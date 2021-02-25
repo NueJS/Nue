@@ -2,7 +2,7 @@ import { subscribeMultiple } from '../state/subscribe'
 import { addSubscriber } from './addSubscriber'
 
 // setup updates, subscribers and unsubscribers array
-function wire (nue, node, deps, update) {
+const wire = (nue, node, deps, update) => {
   // attach which node the update method is for so that when the update is called in queue
   // it can check whether to invoke it or not based on whether the node is subscribed or not
   update.node = node

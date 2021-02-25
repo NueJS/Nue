@@ -2,7 +2,7 @@ import { addSubscriber } from '../../connection/addSubscriber.js'
 import DEV from '../../dev/DEV.js'
 import errors from '../../dev/errors.js'
 
-function addEvent (nue, node, info) {
+const addEvent = (nue, node, info) => {
   const { name, placeholder } = info
   const { actions } = nue.common.component
   const action = actions && actions[name]

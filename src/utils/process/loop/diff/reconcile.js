@@ -1,10 +1,10 @@
-import { arrayToHash, insert, isDefined, swap } from '../../../others'
+import { arrayToHash, insert, swap } from '../../../others'
 
 export const removed = (index) => ({ type: 'remove', index })
 export const created = (index, value) => ({ type: 'create', index, value })
 export const swapped = (i, j) => ({ type: 'swap', indexes: [i, j] })
 
-function reconcile (oldState, newState) {
+const reconcile = (oldState, newState) => {
   const steps = []
 
   // remove, removed items from oldState O(n)

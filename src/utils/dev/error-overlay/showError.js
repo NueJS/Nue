@@ -1,7 +1,7 @@
 import { createElement } from '../../node/dom'
 import html from './html'
 
-function handleErrors (error) {
+const handleErrors = (error) => {
   class sweetErrorOverlay extends HTMLElement {
     constructor () {
       super()

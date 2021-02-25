@@ -1,4 +1,4 @@
-export function disconnectNode (node) {
+export const disconnectNode = (node) => {
   if (!node.unsubscribers) return
   node.unsubscribers.forEach(dc => dc())
   node.isSubscribed = false

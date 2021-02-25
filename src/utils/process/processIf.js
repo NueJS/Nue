@@ -3,7 +3,7 @@ import processNode from './processNode.js'
 import { animate, animatedRemove, onAnimationEnd } from '../node/dom.js'
 import getClone from '../node/clone.js'
 
-function processIf (nue, ifNode, parsed) {
+const processIf = (nue, ifNode, parsed) => {
   const group = [ifNode]
 
   if (parsed.group) {

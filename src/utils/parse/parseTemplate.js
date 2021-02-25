@@ -2,7 +2,7 @@ import { executeAndClear } from '../others'
 import parseIf from './parseIf'
 import parseNode from './parseNode'
 
-function parseTemplate (templateNode, component) {
+const parseTemplate = (templateNode, component) => {
   const parsingInfo = {
     uselessNodes: [],
     ifNodes: [],

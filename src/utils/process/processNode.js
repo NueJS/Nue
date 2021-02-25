@@ -3,7 +3,7 @@ import processAttributes from './attributes/processAttributes.js'
 import processIf from './processIf.js'
 import processLoop from './loop/processLoop.js'
 
-function processNode (nue, node) {
+const processNode = (nue, node) => {
   const { parsed, nodeType } = node
   if (parsed) {
     // save the nue as closure of component

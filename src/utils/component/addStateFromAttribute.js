@@ -1,7 +1,7 @@
 import subscribe from '../state/subscribe'
 import { hasSlice } from '../state/slice'
 
-function addStateFromAttribute (parentNue, nue, attribute) {
+const addStateFromAttribute = (parentNue, nue, attribute) => {
   const { name, placeholder } = attribute
   const { getValue, deps } = placeholder
 

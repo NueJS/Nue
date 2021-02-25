@@ -4,7 +4,7 @@ import processPlaceholder from './placeholder/processPlaceholder.js'
 
 // take the string text and split it into placeholders and strings
 // processes the placeholders and returns the array
-function split (text) {
+const split = (text) => {
   const parts = []
   let collectingVar = false
   let collectedString = ''

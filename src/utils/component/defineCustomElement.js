@@ -10,7 +10,7 @@ import parseTemplate from '../parse/parseTemplate'
 import initNue from './initNue.js'
 import setupNue from './setupNue.js'
 
-function defineCustomElement (component) {
+const defineCustomElement = (component) => {
   const { name, template = '', script, style = '', children } = component
   // return if already defined
   const { components, config } = stats

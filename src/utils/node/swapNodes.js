@@ -1,4 +1,4 @@
-// function swapNodes (node1, node2) {
+// const swapNodes = (node1, node2) => {
 //   let type = 'before'
 //   let anchor = node2.nextSibling
 //   if (!anchor) {
@@ -12,8 +12,7 @@
 import { createElement } from './dom'
 
 // @TODO update this with upper one
-function swapDom (a, b)
-{
+const swapDom = (a, b) => {
   a.reordering = true
   b.reordering = true
 

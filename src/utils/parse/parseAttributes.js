@@ -3,7 +3,7 @@ import processPlaceholder from '../string/placeholder/processPlaceholder.js'
 import { STATE, EVENT, BIND, NORMAL, CONDITIONAL, STATIC_STATE, FUNCTION_ATTRIBUTE } from '../constants.js'
 import isComp from '../node/isComp.js'
 
-function parseAttributes (node) {
+const parseAttributes = (node) => {
   const attributes = []
   const nodeIsComp = isComp(node)
 

@@ -6,7 +6,7 @@ import stats from '../utils/stats'
 // define the custom element of given name
 const render = (component, config) => {
   if (DEV) {
-    window.onerror = function (message, filename, lineno, colno, error) {
+    window.onerror = (message, filename, lineno, colno, error) => {
       showError(error)
     }
   }

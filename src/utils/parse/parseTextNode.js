@@ -1,7 +1,7 @@
 import { TEXT } from '../constants.js'
 import split from '../string/split.js'
 
-function parseTextNode (node, parsingInfo) {
+const parseTextNode = (node, parsingInfo) => {
   const placeholders = split(node.textContent.trim(), parsingInfo)
   const textNodes = []
 

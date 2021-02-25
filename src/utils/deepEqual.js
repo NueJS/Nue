@@ -1,4 +1,4 @@
-function deepEqual (x, y) {
+const deepEqual = (x, y) => {
   // type match
   if (typeof x !== typeof y) return false
 

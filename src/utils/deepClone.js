@@ -1,4 +1,4 @@
-function deepClone (x) {
+const deepClone = (x) => {
   // value
   if (typeof x !== 'object' || x === null) return x
 

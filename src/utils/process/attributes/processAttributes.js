@@ -3,7 +3,7 @@ import addAttribute from './addAttribute.js'
 import addEvent from './addEvent.js'
 import { EVENT, BIND } from '../../constants.js'
 
-function processAttributes (nue, node, parsed) {
+const processAttributes = (nue, node, parsed) => {
   // refs API
   if (node.hasAttribute('ref')) {
     nue.refs[node.getAttribute('ref')] = node
