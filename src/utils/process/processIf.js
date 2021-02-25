@@ -1,6 +1,6 @@
 import { subscribeMultiple } from '../state/subscribe.js'
 import processNode from './processNode.js'
-import { animate, onAnimationEnd } from '../node/dom.js'
+import { animate, animatedRemove, onAnimationEnd } from '../node/dom.js'
 import getClone from '../node/clone.js'
 
 function processIf (nue, ifNode, parsed) {
@@ -25,7 +25,7 @@ function processIf (nue, ifNode, parsed) {
     let foundSatisfied = false
 
     group.forEach(conditionNode => {
-      const { condition, isProcessed, isRendered, enter } = conditionNode.parsed
+      const { condition, isProcessed, isRendered, enter, exit } = conditionNode.parsed
       const satisfied = condition ? condition.getValue(nue) : true
 
       // if this group should be rendered
@@ -40,24 +40,17 @@ function processIf (nue, ifNode, parsed) {
             conditionNode.parsed.isProcessed = true
           }
 
-          // if another group is active and has exit animation, wait for that animation to end, and then add
-          // else directly add
-
           const mount = () => {
             anchorNode.after(conditionNode)
-            if (enter) animate(conditionNode, enter)
+            if (enter) animate(conditionNode, enter, true)
           }
 
-          if (
-            active &&
-            active.parsed.exit &&
-            conditionNode !== active) {
-            onAnimationEnd(active, mount)
-          } else {
-            mount()
-          }
+          // if it should wait for active component's animation to end
+          const waitForAnimationEnd = active && active.parsed.exit && conditionNode !== active
 
-          anchorNode.after(conditionNode)
+          // wait if needed, else mount it right now
+          waitForAnimationEnd ? onAnimationEnd(active, mount) : mount()
+
           conditionNode.parsed.isRendered = true
           active = conditionNode
         }
@@ -65,14 +58,15 @@ function processIf (nue, ifNode, parsed) {
 
       // if the group should be removed
       else if (isRendered) {
-        conditionNode.remove()
+        if (exit) animatedRemove(conditionNode, exit)
+        else conditionNode.remove()
         conditionNode.parsed.isRendered = false
       }
     })
   }
 
   // since this modifies the DOM, it should be done in dom queue
-  subscribeMultiple(nue, groupDeps, onGroupDepChange, 'dom')
+  subscribeMultiple(nue, groupDeps, onGroupDepChange, 'computed')
 
   nue.deferred.push(() => {
     ifNode.remove()
