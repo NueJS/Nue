@@ -1,4 +1,4 @@
-import { addConnects } from '../../connection/addConnects.js'
+import { addSubscriber } from '../../connection/addSubscriber.js'
 import DEV from '../../dev/DEV.js'
 import errors from '../../dev/errors.js'
 
@@ -15,20 +15,20 @@ function addEvent (nue, node, info) {
   const _handler = (e) => handler(e, nue.$)
 
   // ex: @swipe-left=[moveLeft]
-  let connect
+  let subscriber
   if (action) {
-    connect = () => action(node, _handler)
+    subscriber = () => action(node, _handler)
   }
 
   // ex: @click=[increment]
   else {
-    connect = () => {
+    subscriber = () => {
       node.addEventListener(name, _handler)
       return () => node.removeEventListener(name, _handler)
     }
   }
 
-  addConnects(node, connect)
+  addSubscriber(node, subscriber)
 }
 
 export default addEvent

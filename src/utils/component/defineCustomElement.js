@@ -1,4 +1,4 @@
-import { connect, disconnect } from '../connection/recursive.js'
+import { connectTree, disconnectTree } from '../connection/recursive.js'
 import runScript from './runScript.js'
 import addLifecycles, { runEvent } from './lifecycle.js'
 import buildShadowDOM from './buildShadowDOM.js'
@@ -61,13 +61,13 @@ function defineCustomElement (component) {
         buildShadowDOM(nue)
       }
 
-      // run mount callbacks first and then connect the DOM to state
+      // run mount callbacks first and then connectTree the DOM to state
       // node allows state to set by onMount callbacks to be used directly by the DOM without having to initialize with null values
 
       runEvent(nue, 'onMount')
-      // connect shadow DOM and slots to the component state
-      connect(node.shadowRoot, true)
-      connect(node)
+      // connectTree shadow DOM and slots to the component state
+      connectTree(node.shadowRoot, true)
+      connectTree(node)
 
       node.ignoreDisconnect = false
     }
@@ -81,9 +81,9 @@ function defineCustomElement (component) {
       if (node.reordering) return
       // run onDestroy callbacks
       runEvent(nue, 'onDestroy')
-      // disconnect the shadow DOM and slots from component state
-      disconnect(node.shadowRoot, true)
-      disconnect(node, true)
+      // disconnectTree the shadow DOM and slots from component state
+      disconnectTree(node.shadowRoot, true)
+      disconnectTree(node, true)
     }
   }
 

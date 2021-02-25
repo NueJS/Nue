@@ -1,26 +1,20 @@
-import devtools from '../../apis/devtools'
-import DEV from '../dev/DEV.js'
 import { subscribeMultiple } from '../state/subscribe'
-import { addConnects } from './addConnects'
+import { addSubscriber } from './addSubscriber'
 
-// lay wiring for node updates
+// setup updates, subscribers and unsubscribers array
 function wire (nue, node, deps, update) {
   // attach which node the update method is for so that when the update is called in queue
-  // it can check whether to invoke it node based on whether the node is connected or not to the state
+  // it can check whether to invoke it or not based on whether the node is subscribed or not
   update.node = node
-  const connectNode = () => {
-    if (DEV) {
-      if (devtools.showUpdates) {
-        devtools.onNodeUpdate(node)
-      }
-    }
 
-    // return removeDeps
+  // when node is subscribed, call update so that node is up-to-date with state
+  // and return unsubscriber function to removed the added subscription
+  const subscriber = () => {
+    update()
     return subscribeMultiple(nue, deps, update, 'dom')
   }
-  addConnects(node, connectNode)
-  if (!node.parsed.updates) node.parsed.updates = []
-  node.parsed.updates.push(update)
+
+  addSubscriber(node, subscriber)
 }
 
 export default wire

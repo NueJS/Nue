@@ -20,7 +20,6 @@ function addStateFromAttribute (parentNue, nue, attribute) {
       nue.events.onDestroy(unsubscribe)
     }
   })
-  // return removeDeps
 }
 
 export default addStateFromAttribute
