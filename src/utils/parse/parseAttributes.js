@@ -46,7 +46,7 @@ const parseAttributes = (node) => {
     }
 
     // if it's a simple attribute on a component
-    else if (nodeIsComp) {
+    else if (nodeIsComp && attributeName !== 'ref') {
       if (attributeName.startsWith('fn.')) {
         type = FUNCTION_ATTRIBUTE
         name = attributeName.slice(3)
