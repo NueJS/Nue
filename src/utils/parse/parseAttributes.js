@@ -14,49 +14,55 @@ const parseAttributes = (node) => {
     let name, type, placeholder
     const firstChar = attributeName[0]
 
-    // EVENT: @click='increment'
-    if (firstChar === '@') {
-      type = EVENT
-      name = attributeName.slice(1)
-      placeholder = {
-        fnName: attributeValue
+    // SETTING FN OF COMPONENT
+    if (attributeName.startsWith('fn.')) {
+      if (!nodeIsComp) continue
+      type = FUNCTION_ATTRIBUTE
+      name = attributeName.slice(3)
+      placeholder = attributeValue
+    }
+
+    // SETTING STATE OF COMPONENT
+    else if (attributeName.startsWith('$.')) {
+      if (!nodeIsComp) continue
+      name = attributeName.slice(2)
+      if (variableValue) {
+        type = STATE
+        placeholder = processPlaceholder(attributeValue)
+      } else {
+        type = STATIC_STATE
+        placeholder = attributeValue
       }
     }
 
+    // ATTACHING EVENT OR ACTION
+    else if (firstChar === '@') {
+      type = EVENT
+      name = attributeName.slice(1)
+      placeholder = attributeValue
+    }
+
+    // attributes that require variable value
     else if (variableValue) {
-      // disabled:if=[disabled]
+      // conditionally setting attribute
       if (attributeName.endsWith(':if')) {
         type = CONDITIONAL
         name = attributeName.slice(0, -3)
       }
 
-      // :value=[count], :index=[i]
+      // binding property
       else if (firstChar === ':') {
         type = BIND
         name = attributeName.slice(1)
       }
 
-      // class=[foo]
+      // normal attribute
       else {
         name = attributeName
-        type = nodeIsComp ? STATE : NORMAL
+        type = NORMAL
       }
 
       placeholder = processPlaceholder(attributeValue)
-    }
-
-    // if it's a simple attribute on a component
-    else if (nodeIsComp && attributeName !== 'ref') {
-      if (attributeName.startsWith('fn.')) {
-        type = FUNCTION_ATTRIBUTE
-        name = attributeName.slice(3)
-      }
-      else {
-        type = STATIC_STATE
-        name = attributeName
-      }
-
-      placeholder = attributeValue
     }
 
     if (placeholder) {

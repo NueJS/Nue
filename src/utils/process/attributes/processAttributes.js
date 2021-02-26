@@ -1,27 +1,24 @@
 import bindInput from './bindInput.js'
 import addAttribute from './addAttribute.js'
 import addEvent from './addEvent.js'
-import { EVENT, BIND } from '../../constants.js'
+import { EVENT, BIND, NORMAL, CONDITIONAL } from '../../constants.js'
+import { attr } from '../../node/dom.js'
+
+const typeToFn = {
+  [EVENT]: addEvent,
+  [BIND]: bindInput,
+  [NORMAL]: addAttribute,
+  [CONDITIONAL]: addAttribute
+}
 
 const processAttributes = (nue, node, parsed) => {
-  // refs API
-  if (node.hasAttribute('ref')) {
-    nue.refs[node.getAttribute('ref')] = node
-    node.removeAttribute('ref')
-  }
-
-  // if no attributes memo available for node
-  if (!parsed.attributes) return
+  const ref = attr(node, 'ref')
+  if (ref) nue.refs[ref] = node
 
   parsed.attributes.forEach(attribute => {
     const { type } = attribute
-    if (type === EVENT) addEvent(nue, node, attribute)
-
-    // bind placeholder
-    else if (type === BIND) bindInput(nue, node, attribute)
-
-    // placeholder attribute on non-component
-    else if (!parsed.isComp) addAttribute(nue, node, attribute)
+    const fn = typeToFn[type]
+    if (fn) fn(nue, node, attribute)
   })
 }
 

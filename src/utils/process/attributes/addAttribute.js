@@ -1,21 +1,11 @@
 import { CONDITIONAL } from '../../constants.js'
 import wire from '../../connection/wire'
 
-// example: data-count=[XXX],  disabled:if=[XXx]
 const addAttribute = (nue, node, attribute) => {
-  const { placeholder, name, type } = attribute
-  const { deps, getValue } = placeholder
-
+  const { placeholder: { deps, getValue }, name, type } = attribute
   let update
-
-  if (type === CONDITIONAL) {
-    update = () => getValue(nue) ? node.setAttribute(name, '') : node.removeAttribute(name)
-  }
-
-  else {
-    update = () => node.setAttribute(name, getValue(nue))
-  }
-
+  if (type === CONDITIONAL) update = () => getValue(nue) ? node.setAttribute(name, '') : node.removeAttribute(name)
+  else update = () => node.setAttribute(name, getValue(nue))
   wire(nue, node, deps, update)
 }
 

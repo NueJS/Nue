@@ -14,7 +14,7 @@ const processNode = (nue, node) => {
       if (parsed.conditionType === 'if') processIf(nue, node, parsed)
     }
     else if (nodeType === Node.TEXT_NODE) processTextNode(nue, node, parsed)
-    if (node.hasAttribute) processAttributes(nue, node, parsed)
+    if (parsed.attributes) processAttributes(nue, node, parsed)
   }
 
   // if it a component, do not process it's child nodes
