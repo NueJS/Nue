@@ -19,9 +19,9 @@ const setupNue = (node) => {
       nue.fn = Object.create(closure.fn)
 
       if (attributes) {
-        attributes.forEach(at => {
-          const { value, name, type } = at
-          if (type === STATE) addStateFromAttribute(closure, nue, at)
+        attributes.forEach(attribute => {
+          const [value, name, type] = attribute
+          if (type === STATE) addStateFromAttribute(closure, nue, attribute)
           else if (type === STATIC_STATE) nue.initState[name] = value
           else if (type === FUNCTION_ATTRIBUTE) nue.fn[name] = nue.closure.fn[value]
         })

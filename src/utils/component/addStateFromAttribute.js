@@ -2,13 +2,13 @@ import subscribe from '../state/subscribe'
 import { hasSlice } from '../state/slice'
 
 const addStateFromAttribute = (parentNue, nue, attribute) => {
-  const { name, value: { getValue, deps } } = attribute
+  const [{ getValue, deps }, stateName] = attribute
 
   const cb = () => {
-    nue.$[name] = getValue(parentNue, nue.loopClosure)
+    nue.$[stateName] = getValue(parentNue, nue.loopClosure)
   }
 
-  nue.initState[name] = getValue(parentNue, nue.loopClosure)
+  nue.initState[stateName] = getValue(parentNue, nue.loopClosure)
 
   // if the attribute value depends on some part of state from parentNue
   // when that part of state is changed update the state of nue

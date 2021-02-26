@@ -14,7 +14,7 @@ const typeToFn = {
 
 const processAttributes = (nue, node, attributes) => {
   attributes.forEach(attribute => {
-    const { type } = attribute
+    const type = attribute[2]
     const fn = typeToFn[type]
     if (fn) fn(nue, node, attribute)
   })

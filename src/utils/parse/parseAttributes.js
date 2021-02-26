@@ -72,7 +72,8 @@ const parseAttributes = (node) => {
     }
 
     if (value) {
-      attributes.push({ name, type, value })
+      // saving to array instead of object for better minification
+      attributes.push([value, name, type])
       node.removeAttribute(attributeName)
     }
   }
