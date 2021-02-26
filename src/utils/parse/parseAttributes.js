@@ -1,6 +1,6 @@
 import { isBracketed } from '../string/bracket.js'
 import processPlaceholder from '../string/placeholder/processPlaceholder.js'
-import { STATE, EVENT, BIND, NORMAL, CONDITIONAL, STATIC_STATE, FUNCTION_ATTRIBUTE } from '../constants.js'
+import { STATE, EVENT, BIND, NORMAL, CONDITIONAL, STATIC_STATE, FUNCTION_ATTRIBUTE, REF } from '../constants.js'
 import isComp from '../node/isComp.js'
 
 const parseAttributes = (node) => {
@@ -13,6 +13,13 @@ const parseAttributes = (node) => {
 
     let name, type, placeholder
     const firstChar = attributeName[0]
+
+    if (attributeName === 'ref') {
+      type = REF
+      name = attributeName
+      placeholder = attributeValue
+      node.removeAttribute(attributeName)
+    }
 
     // SETTING FN OF COMPONENT
     if (attributeName.startsWith('fn.')) {
