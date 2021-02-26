@@ -11,22 +11,21 @@ const parseAttributes = (node) => {
     const attributeValue = node.getAttribute(attributeName)
     const variableValue = isBracketed(attributeValue)
 
-    let name, type, placeholder
+    let name, type, value
     const firstChar = attributeName[0]
 
     if (attributeName === 'ref') {
       type = REF
       name = attributeName
-      placeholder = attributeValue
-      node.removeAttribute(attributeName)
+      value = attributeValue
     }
 
     // SETTING FN OF COMPONENT
-    if (attributeName.startsWith('fn.')) {
+    else if (attributeName.startsWith('fn.')) {
       if (!nodeIsComp) continue
       type = FUNCTION_ATTRIBUTE
       name = attributeName.slice(3)
-      placeholder = attributeValue
+      value = attributeValue
     }
 
     // SETTING STATE OF COMPONENT
@@ -35,10 +34,10 @@ const parseAttributes = (node) => {
       name = attributeName.slice(2)
       if (variableValue) {
         type = STATE
-        placeholder = processPlaceholder(attributeValue)
+        value = processPlaceholder(attributeValue)
       } else {
         type = STATIC_STATE
-        placeholder = attributeValue
+        value = attributeValue
       }
     }
 
@@ -46,7 +45,7 @@ const parseAttributes = (node) => {
     else if (firstChar === '@') {
       type = EVENT
       name = attributeName.slice(1)
-      placeholder = attributeValue
+      value = attributeValue
     }
 
     // attributes that require variable value
@@ -69,16 +68,16 @@ const parseAttributes = (node) => {
         type = NORMAL
       }
 
-      placeholder = processPlaceholder(attributeValue)
+      value = processPlaceholder(attributeValue)
     }
 
-    if (placeholder) {
-      attributes.push({ name, type, placeholder })
+    if (value) {
+      attributes.push({ name, type, value })
       node.removeAttribute(attributeName)
     }
   }
 
-  // if placeholder attributes found
+  // if value attributes found
   if (attributes.length) {
     if (!node.parsed) node.parsed = {}
     node.parsed.attributes = attributes

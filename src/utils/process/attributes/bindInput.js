@@ -4,7 +4,7 @@ import wire from '../../connection/wire.js'
 // ex: :value=[count]
 const bindInput = (nue, node, attribute) => {
   const isNumber = node.type === 'number' || node.type === 'range'
-  const { getValue, deps } = attribute.placeholder
+  const { getValue, deps } = attribute.value
   const { name } = attribute
 
   const setProp = () => {

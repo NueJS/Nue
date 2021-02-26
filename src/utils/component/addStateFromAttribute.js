@@ -2,8 +2,7 @@ import subscribe from '../state/subscribe'
 import { hasSlice } from '../state/slice'
 
 const addStateFromAttribute = (parentNue, nue, attribute) => {
-  const { name, placeholder } = attribute
-  const { getValue, deps } = placeholder
+  const { name, value: { getValue, deps } } = attribute
 
   const cb = () => {
     nue.$[name] = getValue(parentNue, nue.loopClosure)

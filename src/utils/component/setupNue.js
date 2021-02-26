@@ -20,9 +20,10 @@ const setupNue = (node) => {
 
       if (attributes) {
         attributes.forEach(at => {
-          if (at.type === STATE) addStateFromAttribute(closure, nue, at)
-          else if (at.type === STATIC_STATE) nue.initState[at.name] = at.placeholder
-          else if (at.type === FUNCTION_ATTRIBUTE) nue.fn[at.name] = nue.closure.fn[at.placeholder]
+          const { value, name, type } = at
+          if (type === STATE) addStateFromAttribute(closure, nue, at)
+          else if (type === STATIC_STATE) nue.initState[name] = value
+          else if (type === FUNCTION_ATTRIBUTE) nue.fn[name] = nue.closure.fn[value]
         })
       }
     }

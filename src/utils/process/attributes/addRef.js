@@ -1,5 +1,5 @@
-const addRef = (nue, node, { placeholder }) => {
-  nue.refs[placeholder] = node
+const addRef = (nue, node, { value }) => {
+  nue.refs[value] = node
 }
 
 export default addRef

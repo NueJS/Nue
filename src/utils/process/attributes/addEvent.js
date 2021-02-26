@@ -3,7 +3,7 @@ import DEV from '../../dev/DEV.js'
 import errors from '../../dev/errors.js'
 
 const addEvent = (nue, node, info) => {
-  const { name, placeholder: fnName } = info
+  const { name, value: fnName } = info
 
   const handler = nue.fn[fnName]
   if (DEV && !handler) throw errors.METHOD_NOT_FOUND(nue.name, fnName)
