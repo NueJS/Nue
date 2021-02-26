@@ -9,6 +9,10 @@ const subscribe = (baseNue, path, cb, batchName) => {
   // get the nue where the state referred by path is coming from
   const nue = origin(baseNue, path)
 
+  if (nue !== baseNue && cb.node) {
+    baseNue.nodesUsingClosure.add(cb.node)
+  }
+
   // throw if no origin is found
   if (DEV && !nue) throw errors.STATE_NOT_FOUND(baseNue.name, path.join('.'))
 

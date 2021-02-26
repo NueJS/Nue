@@ -9,7 +9,9 @@ const initNue = (node, common) => ({
   },
   common,
   deferred: [],
-  initState: {}
+  initState: {},
+  processedNodes: new Set(),
+  nodesUsingClosure: new Set()
 })
 
 export default initNue

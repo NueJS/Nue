@@ -1,4 +1,3 @@
-import { connectTree, disconnectTree } from '../connection/recursive.js'
 import runScript from './runScript.js'
 import addLifecycles, { runEvent } from './lifecycle.js'
 import buildShadowDOM from './buildShadowDOM.js'
@@ -9,6 +8,8 @@ import { createElement } from '../node/dom.js'
 import parseTemplate from '../parse/parseTemplate'
 import initNue from './initNue.js'
 import setupNue from './setupNue.js'
+import disconnectNode from '../connection/disconnectNode.js'
+import connectNode from '../connection/connectNode.js'
 
 const defineCustomElement = (component) => {
   const { name, template = '', script, style = '', children } = component
@@ -51,24 +52,21 @@ const defineCustomElement = (component) => {
       // if the connection change is due to reordering, ignore
       if (node.reordering) return
 
-      // node check is added to make sure, processing only happens once
-      // and not again when component is disconnected and connected back
+      // if first time connecting
       if (!node.shadowRoot) {
         setupNue(node)
         if (script) runScript(nue, script)
         // process childNodes (DOM) and shadow DOM
         node.childNodes.forEach(n => processNode(nue, n))
         buildShadowDOM(nue)
+        // connect all processedNodes
+        nue.processedNodes.forEach(connectNode)
+      } else {
+        // only connect nodes that were previously disconnected
+        nue.nodesUsingClosure.forEach(connectNode)
       }
 
-      // run mount callbacks first and then connectTree the DOM to state
-      // node allows state to set by onMount callbacks to be used directly by the DOM without having to initialize with null values
-
       runEvent(nue, 'onMount')
-      // connectTree shadow DOM and slots to the component state
-      connectTree(node.shadowRoot, true)
-      connectTree(node)
-
       node.ignoreDisconnect = false
     }
 
@@ -81,9 +79,8 @@ const defineCustomElement = (component) => {
       if (node.reordering) return
       // run onDestroy callbacks
       runEvent(nue, 'onDestroy')
-      // disconnectTree the shadow DOM and slots from component state
-      disconnectTree(node.shadowRoot, true)
-      disconnectTree(node, true)
+      // only disconnect nodes that are using closure, no need to disconnect nodes that use local state only
+      nue.nodesUsingClosure.forEach(disconnectNode)
     }
   }
 

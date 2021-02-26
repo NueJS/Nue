@@ -6,6 +6,7 @@ import processLoop from './loop/processLoop.js'
 const processNode = (nue, node) => {
   const { parsed, nodeType } = node
   if (parsed) {
+    nue.processedNodes.add(node)
     // save the nue as closure of component
     if (parsed.isComp) {
       parsed.closure = nue
