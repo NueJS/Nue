@@ -4,6 +4,7 @@ import computedState from '../state/computedState.js'
 import { accessed } from '../state/detectStateUsage.js'
 import deepEqual from '../deepEqual.js'
 import { TARGET } from '../symbols.js'
+import { DETECTIVE_MODE, NO_OVERRIDE_MODE, REACTIVE_MODE } from '../constants.js'
 
 const isObject = x => typeof x === 'object' && x !== null
 
@@ -32,7 +33,7 @@ const reactify = (nue, obj, path = [], closure$) => {
       let value = newValue
 
       // do not override the state set by parent component by default value of the state added in component
-      if (modes.noOverride) {
+      if (modes[NO_OVERRIDE_MODE]) {
         // ignore set
         if (propInTarget) return true
         if (typeof value === 'function') value = computedState(nue, value, prop)
@@ -48,7 +49,7 @@ const reactify = (nue, obj, path = [], closure$) => {
         value = reactify(nue, value, [...path, prop])
       }
 
-      if (modes.reactive) {
+      if (modes[REACTIVE_MODE]) {
         if (!(prop === 'length' && Array.isArray(target))) {
           if (!deepEqual(target[prop], value)) {
             success = Reflect.set(target, prop, value)
@@ -61,14 +62,14 @@ const reactify = (nue, obj, path = [], closure$) => {
     },
 
     deleteProperty (target, prop) {
-      if (modes.reactive) onMutate(nue, [...path, prop])
+      if (modes[REACTIVE_MODE]) onMutate(nue, [...path, prop])
       return Reflect.deleteProperty(target, prop)
     },
 
     get (target, prop) {
       if (prop === '__reactive__') return true
       if (prop === TARGET) return target
-      if (modes.detective) {
+      if (modes[DETECTIVE_MODE]) {
         if (path.length !== 0) accessed.paths[accessed.paths.length - 1] = [...path, prop]
         else accessed.paths.push([...path, prop])
       }

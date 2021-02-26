@@ -1,3 +1,4 @@
+import { DETECTIVE_MODE } from '../constants.js'
 import modes from '../reactivity/modes.js'
 
 // when detection mode is enabled is records all the keys that are accessed in state
@@ -9,9 +10,9 @@ export const accessed = {
 // call the function and detect what keys it is using of this.$
 // also get the return value and send it as well
 const detectStateUsage = (fn) => {
-  modes.detective = true
+  modes[DETECTIVE_MODE] = true
   const returnVal = fn()
-  modes.detective = false
+  modes[DETECTIVE_MODE] = false
   const paths = [...accessed.paths] // copy
   accessed.paths = []
   return [returnVal, paths]

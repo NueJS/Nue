@@ -15,3 +15,8 @@ export const REF = 9
 export const REACTIVE = 10
 export const FN = 11
 export const TEXT = 12
+
+// modes
+export const DETECTIVE_MODE = 100
+export const REACTIVE_MODE = 101
+export const NO_OVERRIDE_MODE = 102
