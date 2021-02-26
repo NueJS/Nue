@@ -2,6 +2,7 @@ import { subscribeMultiple } from '../state/subscribe.js'
 import processNode from './processNode.js'
 import { animate, animatedRemove, onAnimationEnd } from '../node/dom.js'
 import getClone from '../node/clone.js'
+import { BEFORE_DOM_BATCH } from '../constants.js'
 
 const processIf = (nue, ifNode, parsed) => {
   const group = [ifNode]
@@ -65,7 +66,7 @@ const processIf = (nue, ifNode, parsed) => {
   }
 
   // since this modifies the DOM, it should be done in dom batches
-  subscribeMultiple(nue, groupDeps, onGroupDepChange, 'computed')
+  subscribeMultiple(nue, groupDeps, onGroupDepChange, BEFORE_DOM_BATCH)
 
   nue.deferred.push(() => {
     ifNode.remove()

@@ -1,5 +1,6 @@
 import { runBatch } from './batch'
 import { runEvent } from './component/lifecycle.js'
+import { BEFORE_DOM_BATCH, DOM_BATCH } from './constants'
 
 // wait for all the callbacks to be batched,
 // then flush all events and batches in one go in proper order
@@ -11,9 +12,8 @@ const flush = (nue) => {
   setTimeout(() => {
     runEvent(nue, 'beforeUpdate')
     // run batch
-    const { computed, dom } = nue.batches
-    runBatch(computed)
-    runBatch(dom)
+    runBatch(nue.batches[BEFORE_DOM_BATCH])
+    runBatch(nue.batches[DOM_BATCH])
     // clear batch
     runEvent(nue, 'afterUpdate')
     // allow the batches to being built for next state mutation

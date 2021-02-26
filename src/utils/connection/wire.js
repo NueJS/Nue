@@ -1,3 +1,4 @@
+import { DOM_BATCH } from '../constants'
 import { subscribeMultiple } from '../state/subscribe'
 import { addSubscriber } from './addSubscriber'
 
@@ -11,7 +12,7 @@ const wire = (nue, node, deps, update) => {
   // and return unsubscriber function to removed the added subscription
   const subscriber = () => {
     update()
-    return subscribeMultiple(nue, deps, update, 'dom')
+    return subscribeMultiple(nue, deps, update, DOM_BATCH)
   }
 
   addSubscriber(node, subscriber)

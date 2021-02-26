@@ -17,6 +17,10 @@ export const FN = 11
 export const TEXT = 12
 
 // modes
-export const DETECTIVE_MODE = 100
-export const REACTIVE_MODE = 101
-export const NO_OVERRIDE_MODE = 102
+export const DETECTIVE_MODE = 20
+export const REACTIVE_MODE = 21
+export const NO_OVERRIDE_MODE = 22
+
+// batch names
+export const BEFORE_DOM_BATCH = 31
+export const DOM_BATCH = 32

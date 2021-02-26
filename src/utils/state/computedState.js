@@ -1,6 +1,7 @@
 import { mutate } from '../reactivity/mutate.js'
 import { subscribeMultiple } from './subscribe.js'
 import detectStateUsage from './detectStateUsage.js'
+import { BEFORE_DOM_BATCH } from '../constants.js'
 
 // when initializing the state, if a function is given
 // call that function, detect the state keys it depends on, get the initial value
@@ -16,7 +17,7 @@ const computedState = (nue, fn, prop) => {
 
   const deps = paths.map(path => path.length === 1 ? path : path.slice(0, -1))
 
-  subscribeMultiple(nue, deps, compute, 'computed')
+  subscribeMultiple(nue, deps, compute, BEFORE_DOM_BATCH)
   return initValue
 }
 

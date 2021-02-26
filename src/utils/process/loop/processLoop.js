@@ -8,6 +8,7 @@ import reconcile from './diff/reconcile.js'
 import deepClone from '../../deepClone.js'
 import { saveOffsets } from './animate/offset.js'
 import { createComment } from '../../node/dom.js'
+import { DOM_BATCH } from '../../constants.js'
 
 const processLoop = (nue, loopedComp, parsed) => {
   const { attributes } = parsed
@@ -81,7 +82,7 @@ const processLoop = (nue, loopedComp, parsed) => {
   // @TODO optimize this
   // handleArrayChange should be called only the entire array is mutated
   // else only update the state of exact item in array
-  subscribe(nue, map.deps[0], handleArrayChange, 'dom')
+  subscribe(nue, map.deps[0], handleArrayChange, DOM_BATCH)
 }
 
 export default processLoop

@@ -1,6 +1,7 @@
 import { subscribeMultiple } from '../state/subscribe.js'
 import errors from '../dev/errors.js'
 import DEV from '../dev/DEV.js'
+import { BEFORE_DOM_BATCH } from '../constants.js'
 
 export const runEvent = (nue, name) => nue.cbs[name].forEach(cb => cb())
 
@@ -20,8 +21,7 @@ const addLifecycles = (nue) => {
       // add the state dependency after the component is mounted
       onMount.push(() => {
         const deps = slices.map(slice => slice.split('.'))
-        // since the callback is not about DOM manipulation and only requires the state, do it in computed batches
-        subscribeMultiple(nue, deps, cb, 'computed')
+        subscribeMultiple(nue, deps, cb, BEFORE_DOM_BATCH)
       })
     }
   }

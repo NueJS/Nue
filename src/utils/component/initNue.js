@@ -1,11 +1,13 @@
+import { BEFORE_DOM_BATCH, DOM_BATCH } from '../constants'
+
 const initNue = (node, common) => ({
   node,
   refs: {},
   subscriptions: { $: new Set() },
   fn: {},
   batches: {
-    computed: new Set(),
-    dom: new Set()
+    [BEFORE_DOM_BATCH]: new Set(),
+    [DOM_BATCH]: new Set()
   },
   common,
   deferred: [],

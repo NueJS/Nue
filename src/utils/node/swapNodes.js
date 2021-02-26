@@ -1,3 +1,5 @@
+import { createElement } from './dom'
+
 // const swapNodes = (node1, node2) => {
 //   let type = 'before'
 //   let anchor = node2.nextSibling
@@ -8,8 +10,6 @@
 //   node1.replaceWith(node2)
 //   anchor[type](node1)
 // }
-
-import { createElement } from './dom'
 
 // @TODO update this with upper one
 const swapDom = (a, b) => {
