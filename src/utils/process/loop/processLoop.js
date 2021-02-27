@@ -8,7 +8,7 @@ import reconcile from './diff/reconcile.js'
 import deepClone from '../../deepClone.js'
 import { saveOffsets } from './animate/offset.js'
 import { createComment } from '../../node/dom.js'
-import { DOM_BATCH } from '../../constants.js'
+import { DOM_BATCH, STATE } from '../../constants.js'
 
 const processLoop = (nue, loopedComp, parsed) => {
   const { attributes } = parsed
@@ -20,12 +20,11 @@ const processLoop = (nue, loopedComp, parsed) => {
   const getKey = (value, index) => key.getValue(nue, getClosure(value, index))
   const getKeys = () => getArray().map(getKey)
 
-  const propsUsingIndex = []
+  const stateAttributes = attributes.filter(at => at[2] === STATE)
+
   // find props that are using indexes
-  attributes.forEach(attr => {
-    if (attr.placeholder.deps.some(dep => dep[0] === at)) {
-      propsUsingIndex.push(attr.name)
-    }
+  const propsUsingIndex = stateAttributes.filter(attribute => {
+    return attribute[0].deps.some(dep => dep[0] === at)
   })
 
   const blob = {
@@ -34,6 +33,7 @@ const processLoop = (nue, loopedComp, parsed) => {
     oldState: { values: [], keys: [], keyHash: {} },
     anchorNode: null,
     attributes,
+    stateAttributes,
     ...forInfo,
     loopedComp,
     getArray,
@@ -47,9 +47,9 @@ const processLoop = (nue, loopedComp, parsed) => {
   }
 
   nue.deferred.push(() => {
-    blob.anchorNode = createComment('loop')
+    blob.anchorNode = createComment('---')
     loopedComp.before(blob.anchorNode)
-    loopedComp.before(createComment('/loop'))
+    loopedComp.before(createComment('---'))
     loopedComp.remove()
     handleArrayChange()
     blob.initialized = true

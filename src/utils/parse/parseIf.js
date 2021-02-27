@@ -1,3 +1,4 @@
+import { ELSE_ATTRIBUTE, IF_ATTRIBUTE } from '../constants'
 import { createComment } from '../node/dom'
 
 const parseIf = (ifNodes) => {
@@ -14,7 +15,7 @@ const parseIf = (ifNodes) => {
       // get the conditionType of the node
       const type = node && node.parsed && node.parsed.conditionType
       // if the node is not a condition node or is a separate condition, break the loop
-      if (!type || (type === 'if')) break
+      if (!type || (type === IF_ATTRIBUTE)) break
       group.push(node)
       node = node.nextElementSibling
     }
@@ -28,7 +29,7 @@ const parseIf = (ifNodes) => {
 
     const groupDeps = [ifNode.parsed.condition.deps]
     group.forEach(node => {
-      if (node.parsed.conditionType !== 'else') {
+      if (node.parsed.conditionType !== ELSE_ATTRIBUTE) {
         groupDeps.push(node.parsed.condition.deps)
       }
     })

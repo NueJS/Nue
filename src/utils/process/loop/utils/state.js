@@ -18,15 +18,14 @@ export const getNewState = (blob) => {
 
 // @todo - do not update index - we need to update props now
 export const updateCompState = (newState, blob) => {
-  const { comps, attributes, oldState, initialized, nue, getArray, getClosure, propsUsingIndex } = blob
+  const { comps, stateAttributes, oldState, initialized, nue, getArray, getClosure, propsUsingIndex } = blob
   if (!comps.length || !initialized) return
 
   // update props which are using index
   comps.forEach((comp, i) => {
     propsUsingIndex.forEach(prop => {
-      if (comp.nue.$[prop] !== i) {
-        comp.nue.$[prop] = i
-      }
+      const { $ } = comp.nue
+      if ($[prop] !== i) $[prop] = i
     })
   })
 
@@ -34,10 +33,11 @@ export const updateCompState = (newState, blob) => {
   // for each component whose state has updated
   diffIndexes.forEach(i => {
     // update props
-    attributes.forEach(attribute => {
+    stateAttributes.forEach(attribute => {
+      const [propValue, propName] = attribute
       const arr = getArray()
       const closure = getClosure(arr[i], i)
-      comps[i].nue.$[attribute.name] = attribute.placeholder.getValue(nue, closure)
+      comps[i].nue.$[propName] = propValue.getValue(nue, closure)
     })
   })
 }

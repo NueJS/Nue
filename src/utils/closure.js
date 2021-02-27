@@ -1,5 +1,5 @@
 import { hasSlice } from './state/slice'
-import { TARGET } from './symbols'
+import { TARGET } from './constants'
 
 // get the origin component where the value of the state is coming from
 // @todo replace with a custom mode in reactify?

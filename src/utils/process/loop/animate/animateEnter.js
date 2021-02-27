@@ -5,11 +5,9 @@ const animateEnter = ({ createdComps, enter }) => {
 
   createdComps.forEach(comp => {
     comp.style.visibility = null
-    // run enter animation for each created component
     animate(comp, enter, true)
   })
 
-  // clear array
   createdComps.length = 0
 }
 

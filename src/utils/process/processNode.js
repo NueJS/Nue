@@ -2,6 +2,7 @@ import processTextNode from './processTextNode.js'
 import processAttributes from './attributes/processAttributes.js'
 import processIf from './processIf.js'
 import processLoop from './loop/processLoop.js'
+import { IF_ATTRIBUTE } from '../constants.js'
 
 const processNode = (nue, node) => {
   const { parsed, nodeType } = node
@@ -13,7 +14,7 @@ const processNode = (nue, node) => {
     if (parsed.isComp) {
       parsed.closure = nue
       if (parsed.for) return processLoop(nue, node, parsed)
-      if (conditionType === 'if') processIf(nue, node, parsed)
+      if (conditionType === IF_ATTRIBUTE) processIf(nue, node, parsed)
     }
     else if (nodeType === Node.TEXT_NODE) processTextNode(nue, node, parsed)
     if (attributes) processAttributes(nue, node, attributes)

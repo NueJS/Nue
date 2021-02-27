@@ -1,6 +1,6 @@
 import { isBracketed } from '../string/bracket.js'
 import processPlaceholder from '../string/placeholder/processPlaceholder.js'
-import { STATE, EVENT, BIND, NORMAL, CONDITIONAL, STATIC_STATE, FUNCTION_ATTRIBUTE, REF } from '../constants.js'
+import { STATE, EVENT, BIND, NORMAL, CONDITIONAL, STATIC_STATE, FUNCTION_ATTRIBUTE, REF, REF_ATTRIBUTE } from '../constants.js'
 import isComp from '../node/isComp.js'
 
 const parseAttributes = (node) => {
@@ -14,7 +14,7 @@ const parseAttributes = (node) => {
     let name, type, value
     const firstChar = attributeName[0]
 
-    if (attributeName === 'ref') {
+    if (attributeName === REF_ATTRIBUTE) {
       type = REF
       name = attributeName
       value = attributeValue

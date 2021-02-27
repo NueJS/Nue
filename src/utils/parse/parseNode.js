@@ -1,3 +1,4 @@
+import { ELSE_ATTRIBUTE, ELSE_IF_ATTRIBUTE, FOR_ATTRIBUTE, IF_ATTRIBUTE, KEY_ATTRIBUTE } from '../constants'
 import DEV from '../dev/DEV'
 import errors from '../dev/errors'
 import { attr } from '../node/dom'
@@ -5,6 +6,14 @@ import parseAttributes from './parseAttributes'
 import parseConditionNode from './parseConditionNode'
 import parseLoop from './parseLoop'
 import parseTextNode from './parseTextNode'
+
+const conditionalAttributes = [IF_ATTRIBUTE, ELSE_IF_ATTRIBUTE, ELSE_ATTRIBUTE]
+const isConditionalNode = node => {
+  for (const attributeName of conditionalAttributes) {
+    const value = attr(node, attributeName)
+    if (value !== null) return [attributeName, value]
+  }
+}
 
 const parseNode = (node, parsingInfo) => {
   const isComp = node.nodeName in parsingInfo.component.childrenHash
@@ -14,20 +23,16 @@ const parseNode = (node, parsingInfo) => {
       isComp: true
     }
 
-    const forAttribute = attr(node, 'for')
+    const forAttribute = attr(node, FOR_ATTRIBUTE)
     if (forAttribute) {
       parseLoop(node, forAttribute, parsingInfo)
-    }
-
-    let type
-    if (node.hasAttribute('if')) type = 'if'
-    else if (node.hasAttribute('else-if')) type = 'else-if'
-    else if (node.hasAttribute('else')) type = 'else'
-    if (type) {
-      parseConditionNode(node, type)
-    }
-    if (type === 'if') {
-      parsingInfo.ifNodes.push(node)
+    } else {
+      const typeAndValue = isConditionalNode(node)
+      if (typeAndValue) {
+        const [type, value] = typeAndValue
+        parseConditionNode(node, type, value)
+        if (type === IF_ATTRIBUTE) parsingInfo.ifNodes.push(node)
+      }
     }
   }
 
@@ -40,13 +45,15 @@ const parseNode = (node, parsingInfo) => {
   if (node.hasAttribute) {
     parseAttributes(node)
 
-    if (DEV) {
-      ['for', 'key', 'if', 'else-if', 'else'].forEach(attrName => {
-        if (attr(node, attrName)) {
-          throw errors.RESERVED_ATTRIBUTE_USED_ON_NON_COMPONENT(parsingInfo.component.name, node, attrName)
-        }
-      })
-    }
+    // if component specific attributes are used on non-component nodes
+    // if (DEV) {
+    //   const compOnlyAttributes = [FOR_ATTRIBUTE, KEY_ATTRIBUTE, IF_ATTRIBUTE, ELSE_IF_ATTRIBUTE, ELSE_ATTRIBUTE]
+    //   compOnlyAttributes.forEach(attrName => {
+    //     if (attr(node, attrName)) {
+    //       throw errors.RESERVED_ATTRIBUTE_USED_ON_NON_COMPONENT(parsingInfo.component.name, node, attrName)
+    //     }
+    //   })
+    // }
   }
 
   if (node.hasChildNodes()) {

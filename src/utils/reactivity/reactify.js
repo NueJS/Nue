@@ -3,8 +3,7 @@ import modes from './modes.js'
 import computedState from '../state/computedState.js'
 import { accessed } from '../state/detectStateUsage.js'
 import deepEqual from '../deepEqual.js'
-import { TARGET } from '../symbols.js'
-import { DETECTIVE_MODE, NO_OVERRIDE_MODE, REACTIVE_MODE } from '../constants.js'
+import { DETECTIVE_MODE, NO_OVERRIDE_MODE, REACTIVE_MODE, TARGET } from '../constants.js'
 
 const isObject = x => typeof x === 'object' && x !== null
 
