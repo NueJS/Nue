@@ -1,3 +1,4 @@
+import { CREATE, REMOVE, SWAP } from '../../../constants.js'
 import swapNodes from '../../../node/swapNodes.js'
 import { swap } from '../../../others.js'
 import markAsMoved from '../animate/markAsMoved.js'
@@ -11,17 +12,17 @@ const executeSteps = (steps, blob) => {
   steps.forEach(step => {
     const { type, index, value, indexes } = step
 
-    if (type === 'create') {
+    if (type === CREATE) {
       executeCreate(index, value, blob)
       if (reorder) markAsMoved(index + 1, comps)
     }
 
-    else if (type === 'remove') {
+    else if (type === REMOVE) {
       executeRemove(index, blob)
       if (reorder) markAsMoved(index, comps)
     }
 
-    if (type === 'swap') {
+    if (type === SWAP) {
       const [i, j] = indexes
       swapNodes(comps[i], comps[j])
       swap(comps, i, j)

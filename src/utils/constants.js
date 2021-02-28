@@ -41,3 +41,8 @@ export const REORDER_TRANSITION = '*reorder'
 export const TARGET = /*#__PURE__*/ Symbol()
 export const UPDATE_INDEX = /*#__PURE__*/ Symbol()
 export const IS_REACTIVE = /*#__PURE__*/ Symbol()
+
+// reconcile step types
+export const SWAP = 50
+export const CREATE = 51
+export const REMOVE = 52
