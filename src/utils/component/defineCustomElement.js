@@ -10,6 +10,7 @@ import initNue from './initNue.js'
 import setupNue from './setupNue.js'
 import disconnectNode from '../connection/disconnectNode.js'
 import connectNode from '../connection/connectNode.js'
+import { ON_DESTROY_CBS, ON_MOUNT_CBS } from '../constants.js'
 
 const defineCustomElement = (component) => {
   const { name, template = '', script, style = '', children } = component
@@ -66,7 +67,7 @@ const defineCustomElement = (component) => {
         nue.nodesUsingClosure.forEach(connectNode)
       }
 
-      runEvent(nue, 'onMount')
+      runEvent(nue, ON_MOUNT_CBS)
       node.ignoreDisconnect = false
     }
 
@@ -78,7 +79,7 @@ const defineCustomElement = (component) => {
       // do nothing, if the connection change is due to reordering
       if (node.reordering) return
       // run onDestroy callbacks
-      runEvent(nue, 'onDestroy')
+      runEvent(nue, ON_DESTROY_CBS)
       // only disconnect nodes that are using closure, no need to disconnect nodes that use local state only
       nue.nodesUsingClosure.forEach(disconnectNode)
     }

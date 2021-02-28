@@ -18,6 +18,7 @@ const addStateFromAttribute = (parentNue, nue, attribute) => {
       const unsubscribe = subscribe(parentNue, dep, cb, BEFORE_DOM_BATCH)
       // when the nue is destroyed, unsubscribe from parentNue
       nue.events.onDestroy(unsubscribe)
+      // @todo use -> nue.cbs[ON_DESTROY_CBS].push(unsubscribe)
     }
   })
 }
