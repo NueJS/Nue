@@ -9,7 +9,7 @@ import getPartialMutationInfo from './utils/getPartialMutationInfo.js'
 const processLoop = (nue, loopedComp, parsed) => {
   const { attributes } = parsed
   const forInfo = parsed.for
-  const { map, at, as, key } = forInfo
+  const { map, at, as, key, enter, exit } = forInfo
 
   const getClosure = (value, index) => ({ [at]: index, [as]: value })
   const getArray = () => map.getValue(nue)
@@ -27,31 +27,27 @@ const processLoop = (nue, loopedComp, parsed) => {
   const arrayPathString = arrayPath.join('.')
   const anchorNode = createComment('---')
 
+  const oldState = { values: [], keys: [], keyHash: {} }
   const blob = {
     comps: [],
-    oldState: { values: [], keys: [], keyHash: {} },
-    attributes,
     anchorNode,
-    stateAttributes,
-    indexAttributes,
     ...forInfo,
     loopedComp,
     getArray,
     getClosure,
     getKeys,
-    nue,
-    deferred: [],
-    createdComps: [],
-    removedComps: [],
-    movedIndexes: []
+    nue
   }
+
+  if (enter) blob.createdComps = []
+  if (exit) blob.removedComps = []
 
   nue.deferred.push(() => {
     loopedComp.before(anchorNode)
     loopedComp.before(createComment('---'))
     loopedComp.remove()
     const n = getArray().length
-    handleArrayChange(blob, zeroToNSet(n), zeroToNSet(n), indexAttributes, stateAttributes)
+    handleArrayChange(blob, zeroToNSet(n), zeroToNSet(n), indexAttributes, stateAttributes, oldState)
     blob.initialized = true
   })
 
@@ -61,11 +57,11 @@ const processLoop = (nue, loopedComp, parsed) => {
     if (newArrayAssigned) {
       // full reconciliation
       const n = getArray().length
-      handleArrayChange(blob, zeroToNSet(n), zeroToNSet(n), indexAttributes, stateAttributes)
+      handleArrayChange(blob, zeroToNSet(n), zeroToNSet(n), indexAttributes, stateAttributes, oldState)
     } else {
       // partial reconciliation
       const [dirtyIndexes, stateUpdatedIndexes] = getPartialMutationInfo(mutations, arrayPathString, arrayPath)
-      handleArrayChange(blob, dirtyIndexes, stateUpdatedIndexes, indexAttributes, stateAttributes)
+      handleArrayChange(blob, dirtyIndexes, stateUpdatedIndexes, indexAttributes, stateAttributes, oldState)
     }
   }, DOM_BATCH)
 }

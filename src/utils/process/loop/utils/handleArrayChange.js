@@ -7,8 +7,8 @@ import executeSteps from '../executeSteps/executeSteps'
 import getNewState from './getNewState'
 import updateCompsState from './updateCompsState'
 
-const handleArrayChange = (blob, dirtyIndexes, stateUpdatedIndexes, indexAttributes, stateAttributes) => {
-  const { comps, oldState, initialized, reorder } = blob
+const handleArrayChange = (blob, dirtyIndexes, stateUpdatedIndexes, indexAttributes, stateAttributes, oldState) => {
+  const { comps, initialized, reorder } = blob
   const newState = getNewState(blob)
 
   // if nodes are added, removed or swapped
