@@ -14,6 +14,7 @@ module.exports = {
   rules: {
     'brace-style': 'off',
     'no-throw-literal': 'off',
-    'spaced-comment': 'off'
+    'spaced-comment': 'off',
+    'symbol-description': 'off'
   }
 }
