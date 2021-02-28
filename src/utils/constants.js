@@ -38,4 +38,6 @@ export const EXIT_ANIMATION = '*exit'
 export const REORDER_TRANSITION = '*reorder'
 
 // symbols
-export const TARGET = /*#__PURE__*/ Symbol('__target__')
+export const TARGET = /*#__PURE__*/ Symbol()
+export const UPDATE_INDEX = /*#__PURE__*/ Symbol()
+export const IS_REACTIVE = /*#__PURE__*/ Symbol()
