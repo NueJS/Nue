@@ -32,3 +32,11 @@ export const executeAndClear = (arr) => {
   arr.forEach(fn => fn())
   arr.length = 0
 }
+
+// checks if two arrays of primitive values are equal or not
+export const arraysAreShallowEqual = (arr1, arr2) => {
+  if (arr1.length !== arr2.length) return false
+  return arr1.every((item, index) => item === arr2[index])
+}
+
+export const isObject = x => typeof x === 'object' && x !== null
