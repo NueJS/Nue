@@ -9,6 +9,7 @@ const initNue = (node, common) => ({
     [BEFORE_DOM_BATCH]: new Set(),
     [DOM_BATCH]: new Set()
   },
+  batchInfo: [],
   common,
   deferred: [],
   initState: {},

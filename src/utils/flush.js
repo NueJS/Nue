@@ -10,14 +10,17 @@ const flush = (nue) => {
 
   // after all the callbacks are triggered by state mutation, call callbacks in proper order
   setTimeout(() => {
-    runEvent(nue, 'beforeUpdate')
+    // do a shallow clone because nue.batchInfo will be cleared out
+    const batchInfo = [...nue.batchInfo]
+    runEvent(nue, 'beforeUpdate', batchInfo)
     // run batch
-    runBatch(nue.batches[BEFORE_DOM_BATCH])
-    runBatch(nue.batches[DOM_BATCH])
+    runBatch(nue.batches[BEFORE_DOM_BATCH], batchInfo)
+    runBatch(nue.batches[DOM_BATCH], batchInfo)
     // clear batch
-    runEvent(nue, 'afterUpdate')
+    runEvent(nue, 'afterUpdate', batchInfo)
     // allow the batches to being built for next state mutation
     nue.batching = false
+    nue.batchInfo.length = 0
   }, 0)
 }
 

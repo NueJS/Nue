@@ -3,7 +3,7 @@ import errors from '../dev/errors.js'
 import DEV from '../dev/DEV.js'
 import { BEFORE_DOM_BATCH } from '../constants.js'
 
-export const runEvent = (nue, name) => nue.cbs[name].forEach(cb => cb())
+export const runEvent = (nue, name, batchInfo) => nue.cbs[name].forEach(cb => cb(batchInfo))
 
 const addLifecycles = (nue) => {
   nue.cbs = { onMount: [], onDestroy: [], beforeUpdate: [], afterUpdate: [] }
