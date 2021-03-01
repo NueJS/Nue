@@ -10,12 +10,13 @@ const animateRemove = (blob) => {
     // if no exit animation or no components, skip this
     if (!exit || !removedComps.length) next()
     else {
-      removedComps.forEach((comp) => {
+      const lastIndex = removedComps.length - 1
+      removedComps.forEach((comp, i) => {
         // run exit animation for each removed components
         animate(comp, exit, true, () => {
           // @todo use animatedRemove instead ?
+          if (i === lastIndex) next()
           comp.remove()
-          next()
         })
       })
 
