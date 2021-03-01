@@ -42,23 +42,24 @@ const processLoop = (nue, loopedComp, parsed) => {
   if (enter) blob.createdComps = []
   if (exit) blob.removedComps = []
 
+  const fullReconcile = () => {
+    const n = getArray().length
+    handleArrayChange(blob, zeroToNSet(n), zeroToNSet(n), indexAttributes, stateAttributes, oldState)
+  }
+
   nue.deferred.push(() => {
     loopedComp.before(anchorNode)
     loopedComp.before(createComment('---'))
     loopedComp.remove()
-    const n = getArray().length
-    handleArrayChange(blob, zeroToNSet(n), zeroToNSet(n), indexAttributes, stateAttributes, oldState)
+    fullReconcile()
     blob.initialized = true
   })
 
   subscribe(nue, arrayPath, (mutations) => {
     // if some mutation in batch assigned a new array
     const newArrayAssigned = mutations.some(mutation => arraysAreShallowEqual(mutation.path, arrayPath))
-    if (newArrayAssigned) {
-      // full reconciliation
-      const n = getArray().length
-      handleArrayChange(blob, zeroToNSet(n), zeroToNSet(n), indexAttributes, stateAttributes, oldState)
-    } else {
+    if (newArrayAssigned) fullReconcile()
+    else {
       // partial reconciliation
       const [dirtyIndexes, stateUpdatedIndexes] = getPartialMutationInfo(mutations, arrayPathString, arrayPath)
       handleArrayChange(blob, dirtyIndexes, stateUpdatedIndexes, indexAttributes, stateAttributes, oldState)
