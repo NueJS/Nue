@@ -2,9 +2,9 @@ import subscribe from '../../state/subscribe.js'
 import { createComment } from '../../node/dom.js'
 import { DOM_BATCH, STATE } from '../../constants.js'
 import handleArrayChange from './utils/handleArrayChange.js'
-import zeroToNSet from './utils/zeroToNSet.js'
 import { arraysAreShallowEqual } from '../../others.js'
 import getPartialMutationInfo from './utils/getPartialMutationInfo.js'
+import zeroToNArray from './utils/zeroToNArray.js'
 
 const processLoop = (nue, loopedComp, parsed) => {
   const { attributes } = parsed
@@ -44,7 +44,7 @@ const processLoop = (nue, loopedComp, parsed) => {
 
   const fullReconcile = () => {
     const n = getArray().length
-    handleArrayChange(blob, zeroToNSet(n), zeroToNSet(n), indexAttributes, stateAttributes, oldState)
+    handleArrayChange(blob, zeroToNArray(n), zeroToNArray(n), indexAttributes, stateAttributes, oldState)
   }
 
   nue.deferred.push(() => {

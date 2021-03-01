@@ -5,8 +5,8 @@
 // dirtyIndexes are the indexes at which new items are assigned
 // stateUpdatedIndexes are the indexes at which items are mutated
 const getPartialMutationInfo = (mutations, arrayPathString, arrayPath) => {
-  const dirtyIndexes = new Set()
-  const stateUpdatedIndexes = new Set()
+  const _dirtyIndexes = new Set()
+  const _stateUpdatedIndexes = new Set()
   const arrayPathLength = arrayPath.length
 
   mutations.forEach(mutation => {
@@ -35,18 +35,22 @@ const getPartialMutationInfo = (mutations, arrayPathString, arrayPath) => {
         // which means that items it index newValue, newValue + 1, ... oldValue - 1 are removed
         if (key === 'length') {
           // add the removed indexes in dirtyIndexes
-          for (let i = newValue; i < oldValue; i++) dirtyIndexes.add(i)
+          for (let i = newValue; i < oldValue; i++) _dirtyIndexes.add(i)
         }
-        else dirtyIndexes.add(Number(key))
+        else _dirtyIndexes.add(Number(key))
       }
 
       // if the mutation path does not end with index, but goes deeper than that
       // means that item itself was mutated
       // ex: users[2].name = 'Manan'
-      else stateUpdatedIndexes.add(Number(key))
+      else _stateUpdatedIndexes.add(Number(key))
     }
   })
 
+  // convert _dirtyIndexes to array for sorting
+  // then convert the sorted array to set so that we can get
+  const dirtyIndexes = [..._dirtyIndexes].sort((a, b) => a - b)
+  const stateUpdatedIndexes = [..._stateUpdatedIndexes]
   return [dirtyIndexes, stateUpdatedIndexes]
 }
 
