@@ -1,24 +1,49 @@
+// mutations is the batchInfo - an array of mutations done in one sync batch
+// arrayPath is the path of the array in state
+// arrayPathString is arrayPath.join('.')
+
+// dirtyIndexes are the indexes at which new items are assigned
+// stateUpdatedIndexes are the indexes at which items are mutated
 const getPartialMutationInfo = (mutations, arrayPathString, arrayPath) => {
   const dirtyIndexes = new Set()
   const stateUpdatedIndexes = new Set()
   const arrayPathLength = arrayPath.length
 
   mutations.forEach(mutation => {
-    const { path } = mutation
+    const { newValue, oldValue, path } = mutation
+
+    // if the mutation path startsWith same path as of array's path
+    // it means the array is the target, array mutated
     const arrayMutated = path.join('.').startsWith(arrayPathString)
 
+    // if the mutation updates the array
     if (arrayMutated) {
-      const endsWithIndex = path.length === arrayPathLength + 1
-      const arrayProp = path[arrayPathLength]
-      // when manually length is set, indexes from newValue to oldValue-1 are removed
-      if (arrayProp === 'length') {
-        const { newValue, oldValue } = mutation
-        for (let i = newValue; i < oldValue; i++) dirtyIndexes.add(i)
-      } else {
-        const index = Number(arrayProp)
-        if (endsWithIndex) dirtyIndexes.add(index)
-        else stateUpdatedIndexes.add(index)
+      // from index 0 to arrayPathLength - 1, arrayPath matches
+      // at index: arrayPathLength, we get the key at which mutation happened
+      const key = path[arrayPathLength]
+
+      // if mutation path's length is just 1 more than array's path,
+      // it means that it is assigning a newVale to key
+      const pathEndsWithKey = path.length === arrayPathLength + 1
+
+      // if a new item is assigned at key
+      // ex: users[2] = someUser or users.length = 4
+      if (pathEndsWithKey) {
+        // when length is set, it means that it was manually set to shorten the array from length oldValue to newValue
+        // and newValue < oldValue
+        // if newValue becomes the new length, last item in array would be at index newValue - 1
+        // which means that items it index newValue, newValue + 1, ... oldValue - 1 are removed
+        if (key === 'length') {
+          // add the removed indexes in dirtyIndexes
+          for (let i = newValue; i < oldValue; i++) dirtyIndexes.add(i)
+        }
+        else dirtyIndexes.add(Number(key))
       }
+
+      // if the mutation path does not end with index, but goes deeper than that
+      // means that item itself was mutated
+      // ex: users[2].name = 'Manan'
+      else stateUpdatedIndexes.add(Number(key))
     }
   })
 
