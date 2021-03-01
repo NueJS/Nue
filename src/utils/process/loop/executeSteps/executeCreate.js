@@ -2,7 +2,7 @@ import { saveOffset } from '../animate/offset'
 import createComp from '../utils/createComp'
 
 const executeCreate = (index, value, blob) => {
-  const { reorder, comps, anchorNode, enter } = blob
+  const { reorder, comps, anchorNode, enter, initialized } = blob
 
   // create new comp
   const newComp = createComp(blob, value, index)
@@ -22,7 +22,7 @@ const executeCreate = (index, value, blob) => {
   comps.splice(index, 0, newComp)
 
   // if it should have animated enter, hide it first
-  if (enter) {
+  if (enter && initialized) {
     newComp.style.visibility = 'hidden'
     // record it in created Comps
     blob.createdComps.push(newComp)

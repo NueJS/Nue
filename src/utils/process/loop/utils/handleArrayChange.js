@@ -18,12 +18,12 @@ const handleArrayChange = (blob, dirtyIndexes, stateUpdatedIndexes, indexAttribu
     if (reorder) saveOffsets(comps)
     // add, remove and move the components
     executeSteps(steps, blob)
-    // if there are any kind of animations specified, run them in this order
-    animateRemove(blob).then(animateMove).then(animateEnter)
 
-    // update indexes
     if (initialized) {
+      // update state attributes of components that are using indexes
       updateCompsState(blob, dirtyIndexes, indexAttributes)
+      // if there are any kind of animations specified, run them in this order
+      animateRemove(blob).then(animateMove).then(animateEnter)
     }
   }
 
