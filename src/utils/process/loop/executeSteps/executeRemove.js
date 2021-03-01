@@ -8,7 +8,10 @@ const executeRemove = async (index, blob) => {
   comps.splice(index, 1)
 
   // if it should have animated exit, record it in removedComps
-  if (exit) removedComps.push(removedComp)
+  if (exit) {
+    removedComp.style.display = 'none'
+    removedComps.push(removedComp)
+  }
   // else remove it immediately
   else removedComp.remove()
 }

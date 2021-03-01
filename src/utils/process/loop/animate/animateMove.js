@@ -1,48 +1,27 @@
-import { getOffset } from './offset'
+import transitionNode from './transitionNode'
 
-const animateCompMove = (node, oldBox, newBox, reorder, transitionEnded) => {
-  // @TODO throw here instead
-  if (!oldBox) return
-  const deltaX = oldBox.left - newBox.left
-  const deltaY = oldBox.top - newBox.top
-
-  if (!(deltaX || deltaY)) return false
-
-  // @TODO - don't add event listener if promise is resolved
-  node.addEventListener('transitionend', transitionEnded, { once: true })
-  // cancel new position before paint using css
-  // after the new position are set, trigger animation to new position
-  requestAnimationFrame(() => {
-    node.style.transition = null
-    node.style.transform = `translate(${deltaX}px, ${deltaY}px)`
-    requestAnimationFrame(() => {
-      node.style.transform = null
-      node.style.transition = `transform ${reorder}`
-    })
-  })
-
-  return true
-}
-
-export const animateMove = (blob) => {
+export const animateMove = ([blob, dirtyIndexes]) => {
   const { reorder, comps } = blob
-  const movedComps = comps.filter(c => c.isMoved)
 
   return new Promise(resolve => {
-    const next = () => resolve(blob)
+    const next = () => resolve([blob, dirtyIndexes])
+
+    // move on to next animation if reorder is not to be animated
     if (!reorder) next()
+
     else {
-      let compWillMove = false
-
-      movedComps.forEach((c, i) => {
-        const added = animateCompMove(c, c.prev, getOffset(c), reorder, next)
-        if (added) compWillMove = true
+      const movedIndexes = dirtyIndexes.filter(i => comps[i] && comps[i].prevOffset && comps[i].afterOffset)
+      // if no moved components, move on to next animation
+      if (!movedIndexes.length) return next()
+      // else
+      const lastIndex = movedIndexes.length - 1
+      movedIndexes.forEach((i, idx) => {
+        const comp = comps[i]
+        const { prevOffset, afterOffset } = comp
+        transitionNode(comp, prevOffset, afterOffset, reorder, () => {
+          if (idx === lastIndex) next()
+        })
       })
-
-      // reset marks
-      comps.forEach(c => { c.isMoved = false })
-
-      if (!compWillMove) next()
     }
   })
 }

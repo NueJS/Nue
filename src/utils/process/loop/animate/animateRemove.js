@@ -1,22 +1,22 @@
 import { animate } from '../../../node/dom'
 
-const animateRemove = (blob) => {
+const animateRemove = ([blob, dirtyIndexes]) => {
   const { exit, removedComps } = blob
 
   return new Promise(resolve => {
     // go to next animation
-    const next = () => resolve(blob)
+    const next = () => resolve([blob, dirtyIndexes])
 
     // if no exit animation or no components, skip this
     if (!exit || !removedComps.length) next()
     else {
       const lastIndex = removedComps.length - 1
+
       removedComps.forEach((comp, i) => {
-        // run exit animation for each removed components
+        comp.style.display = null
         animate(comp, exit, true, () => {
-          // @todo use animatedRemove instead ?
-          if (i === lastIndex) next()
           comp.remove()
+          if (i === lastIndex) next()
         })
       })
 

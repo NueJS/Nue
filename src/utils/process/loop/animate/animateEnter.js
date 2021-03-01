@@ -1,6 +1,7 @@
 import { animate } from '../../../node/dom'
 
-const animateEnter = ({ createdComps, enter }) => {
+// add enter animation of createdComps
+const animateEnter = ([{ createdComps, enter }]) => {
   if (!enter) return
 
   createdComps.forEach(comp => {

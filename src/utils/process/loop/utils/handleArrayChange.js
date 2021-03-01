@@ -12,23 +12,33 @@ const handleArrayChange = (blob, dirtyIndexes, stateUpdatedIndexes, indexAttribu
   const newState = getNewState(blob)
 
   // if nodes are added, removed or swapped
-  if (dirtyIndexes.size) {
+  if (dirtyIndexes.length) {
     const steps = reconcile(oldState, newState, dirtyIndexes)
-    // to show reorder animation - we have to save offsets before updating nodes
-    if (reorder) saveOffsets(comps)
-    // add, remove and move the components
+
+    // record offsets before DOM is updated
+    if (initialized && reorder) {
+      saveOffsets(dirtyIndexes, comps, 'prevOffset')
+    }
+
+    // update DOM
     executeSteps(steps, blob)
+
+    // record offsets after DOM is updated
+    if (initialized && reorder) {
+      saveOffsets(dirtyIndexes, comps, 'afterOffset')
+    }
 
     if (initialized) {
       // update state attributes of components that are using indexes
       updateCompsState(blob, dirtyIndexes, indexAttributes)
-      // if there are any kind of animations specified, run them in this order
-      animateRemove(blob).then(animateMove).then(animateEnter)
+
+      // run animations, if anu
+      animateRemove([blob, dirtyIndexes]).then(animateMove).then(animateEnter)
     }
   }
 
   // if some component's state is updated
-  if (stateUpdatedIndexes.size && initialized) {
+  if (stateUpdatedIndexes.length && initialized) {
     updateCompsState(blob, stateUpdatedIndexes, stateAttributes)
   }
 
