@@ -24,6 +24,9 @@ const reactify = (nue, obj, _path = [], closure$) => {
     },
 
     set (target, prop, newValue) {
+      // short circuit if the set is redundant
+      if (target[prop] === newValue) return true
+
       // change the reactive object's path, because it has been moved to a different key
       if (prop === UPDATE_INDEX) {
         // newValue is the index at which the reactive is moved
@@ -67,7 +70,8 @@ const reactify = (nue, obj, _path = [], closure$) => {
         const success = set()
         if (oldValue !== newValue) {
           const mutatedPath = [...path, prop]
-          nue.batchInfo.push({ oldValue, newValue, path: mutatedPath })
+          // path may have changed of reactive object, so add a getPath property to fetch the fresh path
+          nue.batchInfo.push({ oldValue, newValue, path: mutatedPath, getPath: () => [...path, prop] })
           onMutate(nue, mutatedPath)
         }
 
