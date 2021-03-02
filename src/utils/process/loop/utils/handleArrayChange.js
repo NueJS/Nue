@@ -10,8 +10,12 @@ const handleArrayChange = (blob, dirtyIndexes, stateUpdatedIndexes, indexAttribu
   const { comps, initialized, reorder, exit } = blob
   const newState = getNewState(blob)
 
-  if (stateUpdatedIndexes.length && initialized) {
-    updateCompsState(blob, stateUpdatedIndexes, stateAttributes)
+  // update states must happen after executeSteps to ensure the order of nodes in comps array
+  // matches the order of values in array
+  const updateStates = () => {
+    if (stateUpdatedIndexes.length && initialized) {
+      updateCompsState(blob, stateUpdatedIndexes, stateAttributes)
+    }
   }
 
   // if nodes are added, removed or swapped
@@ -26,10 +30,14 @@ const handleArrayChange = (blob, dirtyIndexes, stateUpdatedIndexes, indexAttribu
     const executeAndMove = () => {
       // update DOM
       executeSteps(steps, blob)
-      // update state of components
-      if (indexAttributes.length && initialized) {
-        updateCompsState(blob, indexAttributes, stateAttributes)
+      // update states
+      updateStates()
+
+      // updateCompsState must be done after the execute and Move
+      if (stateUpdatedIndexes.length && initialized) {
+        updateCompsState(blob, stateUpdatedIndexes, stateAttributes)
       }
+
       // run move animations
       if (reorder) animateMove(blob, dirtyIndexes)
     }
@@ -43,7 +51,7 @@ const handleArrayChange = (blob, dirtyIndexes, stateUpdatedIndexes, indexAttribu
     } else {
       executeAndMove()
     }
-  }
+  } else updateStates()
 
   // save newState as oldState
   // only shallow clone required because we only care about indexes of oldState, not the deeply nested value
