@@ -1,15 +1,18 @@
-import animateEnter from '../animate/animateEnter'
-import animateMove from '../animate/animateMove'
-import animateRemove from '../animate/animateRemove'
 import { saveOffsets } from '../animate/offset'
 import reconcile from './reconcile'
 import executeSteps from '../executeSteps/executeSteps'
 import getNewState from './getNewState'
 import updateCompsState from './updateCompsState'
+import { animateAll } from '../../../node/dom'
+import animateMove from '../animate/animateMove'
 
 const handleArrayChange = (blob, dirtyIndexes, stateUpdatedIndexes, indexAttributes, stateAttributes, oldState) => {
-  const { comps, initialized, reorder } = blob
+  const { comps, initialized, reorder, exit } = blob
   const newState = getNewState(blob)
+
+  if (stateUpdatedIndexes.length && initialized) {
+    updateCompsState(blob, stateUpdatedIndexes, stateAttributes)
+  }
 
   // if nodes are added, removed or swapped
   if (dirtyIndexes.length) {
@@ -17,29 +20,29 @@ const handleArrayChange = (blob, dirtyIndexes, stateUpdatedIndexes, indexAttribu
 
     // record offsets before DOM is updated
     if (initialized && reorder) {
-      saveOffsets(dirtyIndexes, comps, 'prevOffset')
+      saveOffsets(dirtyIndexes, comps)
     }
 
-    // update DOM
-    executeSteps(steps, blob)
-
-    // record offsets after DOM is updated
-    if (initialized && reorder) {
-      saveOffsets(dirtyIndexes, comps, 'afterOffset')
+    const executeAndMove = () => {
+      // update DOM
+      executeSteps(steps, blob)
+      // update state of components
+      if (indexAttributes.length && initialized) {
+        updateCompsState(blob, indexAttributes, stateAttributes)
+      }
+      // run move animations
+      if (reorder) animateMove(blob, dirtyIndexes)
     }
 
-    if (initialized) {
-      // update state attributes of components that are using indexes
-      updateCompsState(blob, dirtyIndexes, indexAttributes)
-
-      // run animations, if anu
-      animateRemove([blob, dirtyIndexes]).then(animateMove).then(animateEnter)
+    // if exit animations are specified and we have to remove some nodes, run exit animations
+    // else directly call executeAndMove
+    if (exit && steps.remove.length) {
+      // to get actual index valueIndex, arrayIndex need to be added
+      const nodes = steps.remove.map((valueIndex, arrayIndex) => comps[valueIndex + arrayIndex])
+      animateAll(nodes, exit, executeAndMove)
+    } else {
+      executeAndMove()
     }
-  }
-
-  // if some component's state is updated
-  if (stateUpdatedIndexes.length && initialized) {
-    updateCompsState(blob, stateUpdatedIndexes, stateAttributes)
   }
 
   // save newState as oldState

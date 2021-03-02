@@ -1,13 +1,14 @@
 // transit node from one prevOffset to currentOffset
 // call cb when the transition is complete
 
+import { getOffset } from './offset'
+
 // offset is an object with left and top keys
 // cssTransition is the transition information - minus the property
-const transitionNode = (node, prevOffset, currentOffset, cssTransition, cb) => {
+const transitionNode = (node, prevOffset, cssTransition) => {
+  const currentOffset = getOffset(node)
   const deltaX = prevOffset.left - currentOffset.left
   const deltaY = prevOffset.top - currentOffset.top
-
-  node.addEventListener('transitionend', cb, { once: true })
 
   requestAnimationFrame(() => {
     // apply a "inverse" transform to place the node in prev position
@@ -23,8 +24,6 @@ const transitionNode = (node, prevOffset, currentOffset, cssTransition, cb) => {
       node.style.transition = `transform ${cssTransition}`
     })
   })
-
-  return true
 }
 
 export default transitionNode
