@@ -10,8 +10,9 @@ const getPartialMutationInfo = (mutations, arrayPathString, arrayPath) => {
   const arrayPathLength = arrayPath.length
 
   mutations.forEach(mutation => {
-    const { newValue, oldValue, path } = mutation
-
+    const { newValue, oldValue, getPath } = mutation
+    // get the fresh path instead of old path
+    const path = getPath()
     // if the mutation path startsWith same path as of array's path
     // it means the array is the target, array mutated
     const arrayMutated = path.join('.').startsWith(arrayPathString)
