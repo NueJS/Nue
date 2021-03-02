@@ -33,9 +33,9 @@ const handleArrayChange = (blob, dirtyIndexes, stateUpdatedIndexes, indexAttribu
       // update states
       updateStates()
 
-      // updateCompsState must be done after the execute and Move
-      if (stateUpdatedIndexes.length && initialized) {
-        updateCompsState(blob, stateUpdatedIndexes, stateAttributes)
+      // update attributes that are using index
+      if (indexAttributes.length && initialized) {
+        updateCompsState(blob, dirtyIndexes, indexAttributes)
       }
 
       // run move animations
