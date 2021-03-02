@@ -1,4 +1,4 @@
-import { FUNCTION_ATTRIBUTE, STATE, STATIC_STATE } from '../constants.js'
+import { FUNCTION_ATTRIBUTE, NORMAL, STATE, STATIC_STATE } from '../constants.js'
 import addStateFromAttribute from './addStateFromAttribute.js'
 import reactify from '../reactivity/reactify.js'
 
@@ -23,6 +23,7 @@ const setupNue = (node) => {
           const [value, name, type] = attribute
           if (type === STATE) addStateFromAttribute(closure, nue, attribute)
           else if (type === STATIC_STATE) nue.initState[name] = value
+          else if (type === NORMAL && loopClosure) node.setAttribute(name, value.getValue(closure.$, loopClosure))
           else if (type === FUNCTION_ATTRIBUTE) nue.fn[name] = nue.closure.fn[value]
         })
       }

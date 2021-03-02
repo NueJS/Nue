@@ -1,6 +1,6 @@
 import subscribe from '../../state/subscribe.js'
 import { createComment } from '../../node/dom.js'
-import { DOM_BATCH, STATE } from '../../constants.js'
+import { DOM_BATCH, STATE, NORMAL } from '../../constants.js'
 import handleArrayChange from './utils/handleArrayChange.js'
 import { arraysAreShallowEqual } from '../../others.js'
 import getPartialMutationInfo from './utils/getPartialMutationInfo.js'
@@ -17,7 +17,8 @@ const processLoop = (nue, loopedComp, parsed) => {
   const getKeys = () => getArray().map(getKey)
 
   // get state attributes
-  const stateAttributes = attributes.filter(at => at[2] === STATE)
+  const stateAttributes = attributes.filter(at => at[2] === STATE || at[2] === NORMAL)
+
   // find attributes that depends on index
   const indexAttributes = stateAttributes.filter(attribute => {
     return attribute[0].deps.some(dep => dep[0] === at)
