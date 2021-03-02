@@ -1,12 +1,12 @@
-import { CREATE, REMOVE, SWAP } from '../../../constants'
+// import { CREATE, REMOVE, SWAP } from '../../../constants'
 import { arrayToHash, insert, isDefined, swap } from '../../../others'
 
-export const removed = (index) => ({ type: REMOVE, index })
-export const created = (index, value) => ({ type: CREATE, index, value })
-export const swapped = (i, j) => ({ type: SWAP, indexes: [i, j] })
-
 const reconcile = (oldState, newState, dirtyIndexes) => {
-  const steps = []
+  const steps = {
+    remove: [],
+    add: [],
+    swap: []
+  }
   // remove, removed items from oldState O(dirtyIndexes)
   for (const di of dirtyIndexes) {
     // keep checking for di if we keep finding that di was removed
@@ -16,7 +16,7 @@ const reconcile = (oldState, newState, dirtyIndexes) => {
       if (!isDefined(keyInOld)) break
       // if the key was present in the oldState, but not in newState, then this key was removed
       if (!(keyInOld in newState.keyHash)) {
-        steps.push(removed(di))
+        steps.remove.push(di)
         oldState.keys.splice(di, 1)
         oldState.values.splice(di, 1)
       } else {
@@ -32,7 +32,7 @@ const reconcile = (oldState, newState, dirtyIndexes) => {
     if (!isDefined(key)) continue
     // if the key does not exist in oldState, it's a newly added item
     if (!(key in oldState.keyHash)) {
-      steps.push(created(di, newState.values[di]))
+      steps.add.push([di, newState.values[di]])
       insert(oldState.keys, di, key)
       insert(oldState.values, di, newState.values[di])
     }
@@ -44,7 +44,7 @@ const reconcile = (oldState, newState, dirtyIndexes) => {
     if (key !== newState.keys[di]) {
       // find where its position in new oldState.keys
       const iShouldBe = newState.keyHash[key]
-      steps.push(swapped(di, iShouldBe))
+      steps.swap.push([di, iShouldBe])
       swap(oldState.keys, di, iShouldBe)
       swap(oldState.values, di, iShouldBe)
       // x-- // keep checking current index, till we set correct item it this index
