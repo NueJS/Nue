@@ -22,3 +22,14 @@ export const animatedRemove = (comp, animation) => {
   comp.ignoreDisconnect = true
   animate(comp, animation, true, () => comp.remove())
 }
+
+// run animation on all nodes
+// and call onAnimationEnd when last animation is completed
+export const animateAll = (nodes, cssAnimation, onLastAnimationEnd) => {
+  const lastIndex = nodes.length - 1
+  nodes.forEach((comp, i) => {
+    animate(comp, cssAnimation, true, () => {
+      if (i === lastIndex) onLastAnimationEnd()
+    })
+  })
+}
