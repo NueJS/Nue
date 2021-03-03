@@ -1,22 +1,10 @@
 import { executeAndClear } from '../others'
-import parseIf from './parseIf'
 import parseNode from './parseNode'
 
-const parseTemplate = (templateNode, component) => {
-  const parsingInfo = {
-    uselessNodes: [],
-    ifNodes: [],
-    deferred: [],
-    component
-  }
-
-  templateNode.content.childNodes.forEach(node => parseNode(node, parsingInfo))
-
-  const { deferred, uselessNodes, ifNodes } = parsingInfo
+const parseTemplate = (templateNode, childCompNodeNames, name) => {
+  const deferred = []
+  templateNode.content.childNodes.forEach(node => parseNode(node, childCompNodeNames, deferred, name))
   executeAndClear(deferred)
-  uselessNodes.forEach(n => n.remove())
-
-  parseIf(ifNodes)
 }
 
 export default parseTemplate

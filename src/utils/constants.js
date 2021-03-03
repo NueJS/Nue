@@ -53,3 +53,9 @@ export const ON_DESTROY_CBS = 61
 export const BEFORE_UPDATE_CBS = 62
 export const AFTER_UPDATE_CBS = 63
 export const ON_MUTATE_CBS = 64
+
+// compNode internal only properties
+export const BATCH_INFO = /*#__PURE__*/ Symbol()
+export const IS_BATCHING = /*#__PURE__*/ Symbol()
+export const IGNORE_DISCONNECT = /*#__PURE__*/ Symbol()
+export const DEFERRED_WORK = /*#__PURE__*/ Symbol()

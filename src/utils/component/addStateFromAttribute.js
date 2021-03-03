@@ -2,23 +2,20 @@ import subscribe from '../state/subscribe'
 import { hasSlice } from '../state/slice'
 import { BEFORE_DOM_BATCH } from '../constants'
 
-const addStateFromAttribute = (parentNue, nue, attribute) => {
-  const [{ getValue, deps }, stateName] = attribute
+const addStateFromAttribute = (parentCompNode, compNode, attribute) => {
+  const [{ getValue, deps }, name] = attribute
+  const { loopClosure, events, init$ } = compNode
+  const value = () => getValue(parentCompNode, loopClosure)
 
-  const cb = () => {
-    nue.$[stateName] = getValue(parentNue, nue.loopClosure)
-  }
+  const cb = () => { compNode.$[name] = value() }
+  init$[name] = value()
 
-  nue.initState[stateName] = getValue(parentNue, nue.loopClosure)
-
-  // if the attribute value depends on some part of state from parentNue
-  // when that part of state is changed update the state of nue
+  // if the attribute value depends on some part of state from parentCompNode
+  // when that part of state is changed update the state of compNode
   deps.forEach(dep => {
-    if (hasSlice(parentNue.$, dep)) {
-      const unsubscribe = subscribe(parentNue, dep, cb, BEFORE_DOM_BATCH)
-      // when the nue is destroyed, unsubscribe from parentNue
-      nue.events.onDestroy(unsubscribe)
-      // @todo use -> nue.cbs[ON_DESTROY_CBS].push(unsubscribe)
+    if (hasSlice(parentCompNode.$, dep)) {
+      const unsubscribe = subscribe(parentCompNode, dep, cb, BEFORE_DOM_BATCH)
+      events.onDestroy(unsubscribe)
     }
   })
 }

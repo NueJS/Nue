@@ -1,22 +1,20 @@
+import { DEFERRED_WORK } from '../constants.js'
 import getClone from '../node/clone.js'
 import { executeAndClear } from '../others.js'
 import processNode from '../process/processNode.js'
 
-const buildShadowDOM = (nue) => {
-  const { deferred, node } = nue
-  const { templateNode } = nue.common
+const buildShadowDOM = (compNode) => {
+  const rootNode = getClone(compNode.templateNode.content)
 
-  const fragment = getClone(templateNode.content)
+  processNode(compNode, rootNode)
+  executeAndClear(compNode[DEFERRED_WORK])
 
-  processNode(nue, fragment)
-  executeAndClear(deferred)
-
-  // add fragment to shadow DOM
-  node.attachShadow({ mode: 'open' });
+  // add rootNode to shadow DOM
+  compNode.attachShadow({ mode: 'open' });
 
   // must use spread here even though childNodes is an array
-  // because, appending node to shadowRoot, removes it from childNodes array
-  [...fragment.childNodes].forEach(childNode => node.shadowRoot.append(childNode))
+  // because, appending rootNode to shadowRoot, removes it from childNodes array
+  [...rootNode.childNodes].forEach(childNode => compNode.shadowRoot.append(childNode))
 }
 
 export default buildShadowDOM

@@ -6,17 +6,20 @@ import parseAttributes from './parseAttributes'
 import parseConditionNode from './parseConditionNode'
 import parseLoop from './parseLoop'
 import parseTextNode from './parseTextNode'
+import parseIf from './parseIf'
 
 const conditionalAttributes = [IF_ATTRIBUTE, ELSE_IF_ATTRIBUTE, ELSE_ATTRIBUTE]
-const isConditionalNode = node => {
+
+const usesConditionalAttribute = compNode => {
   for (const attributeName of conditionalAttributes) {
-    const value = attr(node, attributeName)
+    const value = attr(compNode, attributeName)
     if (value !== null) return [attributeName, value]
   }
 }
 
-const parseNode = (node, parsingInfo) => {
-  const isComp = node.nodeName in parsingInfo.component.childrenHash
+const parseNode = (node, childCompNodeNames, deferred, name) => {
+  // it is a component if the node's nodeName is in the childCompNodeNames set
+  const isComp = childCompNodeNames.has(node.nodeName)
 
   if (isComp) {
     node.parsed = {
@@ -24,21 +27,24 @@ const parseNode = (node, parsingInfo) => {
     }
 
     const forAttribute = attr(node, FOR_ATTRIBUTE)
+
+    // if the component has FOR_ATTRIBUTE on it, it is looped component
     if (forAttribute) {
-      parseLoop(node, forAttribute, parsingInfo)
+      parseLoop(node, forAttribute)
     } else {
-      const typeAndValue = isConditionalNode(node)
+      const typeAndValue = usesConditionalAttribute(node)
       if (typeAndValue) {
         const [type, value] = typeAndValue
         parseConditionNode(node, type, value)
-        if (type === IF_ATTRIBUTE) parsingInfo.ifNodes.push(node)
+        if (type === IF_ATTRIBUTE) deferred.push(() => parseIf(node))
       }
     }
   }
 
   else if (node.nodeType === Node.TEXT_NODE) {
-    if (!node.textContent.trim()) parsingInfo.uselessNodes.push(node)
-    else parseTextNode(node, parsingInfo)
+    // @todo maybe we need to remove first then parseIf
+    if (!node.textContent.trim()) deferred.push(() => node.remove())
+    else parseTextNode(node, deferred)
     return
   }
 
@@ -46,18 +52,18 @@ const parseNode = (node, parsingInfo) => {
     parseAttributes(node)
 
     // if component specific attributes are used on non-component nodes
-    // if (DEV) {
-    //   const compOnlyAttributes = [FOR_ATTRIBUTE, KEY_ATTRIBUTE, IF_ATTRIBUTE, ELSE_IF_ATTRIBUTE, ELSE_ATTRIBUTE]
-    //   compOnlyAttributes.forEach(attrName => {
-    //     if (attr(node, attrName)) {
-    //       throw errors.RESERVED_ATTRIBUTE_USED_ON_NON_COMPONENT(parsingInfo.component.name, node, attrName)
-    //     }
-    //   })
-    // }
+    if (DEV && !isComp) {
+      const compOnlyAttributes = [FOR_ATTRIBUTE, KEY_ATTRIBUTE, IF_ATTRIBUTE, ELSE_IF_ATTRIBUTE, ELSE_ATTRIBUTE]
+      compOnlyAttributes.forEach(attrName => {
+        if (attr(node, attrName)) {
+          throw errors.RESERVED_ATTRIBUTE_USED_ON_NON_COMPONENT(name, node, attrName)
+        }
+      })
+    }
   }
 
   if (node.hasChildNodes()) {
-    node.childNodes.forEach(childNode => parseNode(childNode, parsingInfo))
+    node.childNodes.forEach(childNode => parseNode(childNode, childCompNodeNames, deferred, name))
   }
 }
 

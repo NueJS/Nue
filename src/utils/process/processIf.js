@@ -2,11 +2,11 @@ import { subscribeMultiple } from '../state/subscribe.js'
 import processNode from './processNode.js'
 import { animate, animatedRemove, onAnimationEnd } from '../node/dom.js'
 import getClone from '../node/clone.js'
-import { BEFORE_DOM_BATCH } from '../constants.js'
+import { BEFORE_DOM_BATCH, DEFERRED_WORK } from '../constants.js'
 
-const processIf = (nue, ifNode, parsed) => {
+const processIf = (compNode, ifNode, parsed) => {
+  // @todo shorten this
   const group = [ifNode]
-
   if (parsed.group) {
     parsed.group.forEach(node => {
       group.push(getClone(node))
@@ -28,7 +28,7 @@ const processIf = (nue, ifNode, parsed) => {
     group.forEach(conditionNode => {
       const { isProcessed, isConnected } = conditionNode
       const { condition, enter, exit } = conditionNode.parsed
-      const satisfied = condition ? condition.getValue(nue) : true
+      const satisfied = condition ? condition.getValue(compNode) : true
 
       // if this component should be mounted
       if (!foundSatisfied && satisfied) {
@@ -38,7 +38,7 @@ const processIf = (nue, ifNode, parsed) => {
         if (!isConnected) {
           // if this node is not processed
           if (!isProcessed) {
-            processNode(nue, conditionNode)
+            processNode(compNode, conditionNode)
             conditionNode.isProcessed = true
           }
 
@@ -66,9 +66,9 @@ const processIf = (nue, ifNode, parsed) => {
   }
 
   // since this modifies the DOM, it should be done in dom batches
-  subscribeMultiple(nue, groupDeps, onGroupDepChange, BEFORE_DOM_BATCH)
+  subscribeMultiple(compNode, groupDeps, onGroupDepChange, BEFORE_DOM_BATCH)
 
-  nue.deferred.push(() => {
+  compNode[DEFERRED_WORK].push(() => {
     ifNode.remove()
     onGroupDepChange()
   })

@@ -4,24 +4,23 @@ import DEV from '../dev/DEV.js'
 import errors from '../dev/errors.js'
 
 // subscribe to slice of state pointed by the path in baseNue
-// when that slice is updated, call the callback in "batchName" batches
-const subscribe = (baseNue, path, cb, batchName) => {
-  // get the nue where the state referred by path is coming from
-  const nue = origin(baseNue, path)
+// when that slice is updated, call the callback in "batchName" batch
+const subscribe = (baseCompNode, path, cb, batchName) => {
+  // get the originCompNode where the state referred by path is coming from
+  const originCompNode = origin(baseCompNode, path)
 
-  if (nue !== baseNue && cb.node) {
-    baseNue.nodesUsingClosure.add(cb.node)
+  if (originCompNode !== baseCompNode && cb.node) {
+    baseCompNode.nodesUsingClosure.add(cb.node)
   }
 
   // throw if no origin is found
-  if (DEV && !nue) throw errors.STATE_NOT_FOUND(baseNue.name, path.join('.'))
+  if (DEV && !originCompNode) throw errors.STATE_NOT_FOUND(baseCompNode.name, path.join('.'))
 
   // get the higher order cb that will only call the cb once every batch
-  const batch = nue.batches[batchName]
-  const batchCb = batchify(cb, batch)
+  const batchCb = batchify(cb, originCompNode[batchName])
 
   // start from the root of subscriptions
-  let target = nue.subscriptions
+  let target = originCompNode.subscriptions
 
   // add batchCb in path table at appropriate location
   // map is used to unsubscribe in constant time
@@ -37,8 +36,8 @@ const subscribe = (baseNue, path, cb, batchName) => {
 }
 
 // returns an array of removeDep functions
-export const subscribeMultiple = (nue, paths, cb, batchName) => {
-  const unsubscribeFunctions = paths.map(path => subscribe(nue, path, cb, batchName))
+export const subscribeMultiple = (compNode, paths, cb, batchName) => {
+  const unsubscribeFunctions = paths.map(path => subscribe(compNode, path, cb, batchName))
   // return unsubscribeMultiple
   return () => unsubscribeFunctions.forEach(c => c())
 }

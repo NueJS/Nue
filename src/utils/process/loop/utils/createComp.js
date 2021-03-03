@@ -3,9 +3,10 @@ import getClone from '../../../node/clone'
 // create a clone of loopedComp
 // get the closure for this component using the value and index
 const createComp = (blob, value, i) => {
-  const { loopedComp, getClosure } = blob
+  const { loopedComp, getClosure, compNode } = blob
   const newComp = getClone(loopedComp)
-  newComp.parsed.loopClosure = getClosure(value, i)
+  newComp.loopClosure = getClosure(value, i)
+  newComp.closure = compNode
   return newComp
 }
 

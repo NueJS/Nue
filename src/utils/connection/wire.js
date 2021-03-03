@@ -3,7 +3,7 @@ import { subscribeMultiple } from '../state/subscribe'
 import { addSubscriber } from './addSubscriber'
 
 // create subscriber and add to subscribers array
-const wire = (nue, node, deps, update) => {
+const wire = (compNode, node, deps, update) => {
   // attach which node the update method is for so that when the update is called in batches
   // it can check whether to invoke it or not based on whether the node is subscribed or not
   update.node = node
@@ -12,7 +12,7 @@ const wire = (nue, node, deps, update) => {
   // and return unsubscriber function to removed the added subscription
   const subscriber = () => {
     update()
-    return subscribeMultiple(nue, deps, update, DOM_BATCH)
+    return subscribeMultiple(compNode, deps, update, DOM_BATCH)
   }
 
   addSubscriber(node, subscriber)

@@ -68,8 +68,8 @@ export default {
     }
   },
 
-  MISSING_KEY_ATTRIBUTE (compName, node) {
-    const loopCompName = node.nue.name
+  MISSING_KEY_ATTRIBUTE (compName, compNode) {
+    const loopCompName = compNode.name
     return {
       message: `Missing "key" attribute on <${loopCompName}>`,
       fix: `<${loopCompName}> is looped and needs a key attribute for efficient reconciliation`,

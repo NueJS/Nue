@@ -1,41 +1,39 @@
 import { ELSE_ATTRIBUTE, IF_ATTRIBUTE } from '../constants'
 import { createComment } from '../node/dom'
 
-const parseIf = (ifNodes) => {
-  ifNodes.forEach(ifNode => {
-    const group = []
-    let node = ifNode.nextElementSibling
+const parseIf = (ifNode) => {
+  const group = []
+  let node = ifNode.nextElementSibling
 
-    // create a starting marker which will be used to add conditional nodes to DOM
-    const anchorNode = createComment('if')
-    ifNode.before(anchorNode)
+  // create a starting marker which will be used to add conditional nodes to DOM
+  const anchorNode = createComment('if')
+  ifNode.before(anchorNode)
 
-    // keep checking the next node
-    while (true) {
-      // get the conditionType of the node
-      const type = node && node.parsed && node.parsed.conditionType
-      // if the node is not a condition node or is a separate condition, break the loop
-      if (!type || (type === IF_ATTRIBUTE)) break
-      group.push(node)
-      node = node.nextElementSibling
+  // keep checking the next node
+  while (true) {
+    // get the conditionType of the node
+    const type = node && node.parsed && node.parsed.conditionType
+    // if the node is not a condition node or is a separate condition, break the loop
+    if (!type || (type === IF_ATTRIBUTE)) break
+    group.push(node)
+    node = node.nextElementSibling
+  }
+
+  // add a end if marker after the last node in group
+  // if ifNode is alone, add after it
+  (group[group.length - 1] || ifNode).after(createComment('/if'))
+
+  // remove other nodes from template
+  group.forEach(n => n.remove())
+
+  const groupDeps = [ifNode.parsed.condition.deps]
+  group.forEach(node => {
+    if (node.parsed.conditionType !== ELSE_ATTRIBUTE) {
+      groupDeps.push(node.parsed.condition.deps)
     }
-
-    // add a end if marker after the last node in group
-    // if ifNode is alone, add after it
-    (group[group.length - 1] || ifNode).after(createComment('/if'))
-
-    // remove other nodes from template
-    group.forEach(n => n.remove())
-
-    const groupDeps = [ifNode.parsed.condition.deps]
-    group.forEach(node => {
-      if (node.parsed.conditionType !== ELSE_ATTRIBUTE) {
-        groupDeps.push(node.parsed.condition.deps)
-      }
-    })
-
-    ifNode.parsed = { ...ifNode.parsed, group, groupDeps, anchorNode }
   })
+
+  ifNode.parsed = { ...ifNode.parsed, group, groupDeps, anchorNode }
 }
 
 export default parseIf

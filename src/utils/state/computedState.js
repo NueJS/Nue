@@ -7,17 +7,16 @@ import { BEFORE_DOM_BATCH } from '../constants.js'
 // call that function, detect the state keys it depends on, get the initial value
 // update its value whenever its deps changes
 
-const computedState = (nue, fn, prop) => {
+const computedState = (compNode, fn, prop) => {
   const [initValue, paths] = detectStateUsage(fn)
 
   const compute = () => {
     const value = fn()
-    mutate(nue.$, [prop], value)
+    mutate(compNode.$, [prop], value)
   }
 
   const deps = paths.map(path => path.length === 1 ? path : path.slice(0, -1))
-
-  subscribeMultiple(nue, deps, compute, BEFORE_DOM_BATCH)
+  subscribeMultiple(compNode, deps, compute, BEFORE_DOM_BATCH)
   return initValue
 }
 

@@ -1,28 +1,25 @@
-// only trigger cbs in $ Map
-export const trigger$Cbs = (nue, target) => {
-  target.$.forEach(cb => cb())
-}
+import { isObject } from './others'
 
 // trigger all the cbs in the object
-export const triggerAllCbs = (nue, target) => {
+export const triggerAllCbs = (target) => {
   for (const k in target) {
-    if (k === '$') trigger$Cbs(nue, target)
-    else triggerAllCbs(nue, target[k])
+    if (k === '$') target.$.forEach(cb => cb())
+    else triggerAllCbs(target[k])
   }
 }
 
 // find callbacks that are subscribed to given path and trigger them
-export const triggerDeps = (nue, path) => {
-  let target = nue.subscriptions
+export const triggerDeps = (subscriptions, path) => {
+  let target = subscriptions
   path.forEach((c, i) => {
     // if primitive, return
-    if (typeof target !== 'object') return
+    if (!isObject(target)) return
     target = target[c]
     if (target) {
       // if last index, trigger cbs of target.$
-      if (i !== path.length - 1) trigger$Cbs(nue, target)
+      if (i !== path.length - 1) target.$.forEach(cb => cb())
       // deeply trigger all inside target.*
-      triggerAllCbs(nue, target)
+      triggerAllCbs(target)
     }
   })
 }

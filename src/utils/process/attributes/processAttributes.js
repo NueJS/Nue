@@ -12,11 +12,11 @@ const typeToFn = {
   [REF]: addRef
 }
 
-const processAttributes = (nue, node, attributes) => {
+const processAttributes = (compNode, node, attributes) => {
   attributes.forEach(attribute => {
     const type = attribute[2]
     const fn = typeToFn[type]
-    if (fn) fn(nue, node, attribute)
+    if (fn) fn(compNode, node, attribute)
   })
 }
 

@@ -1,16 +1,16 @@
 import flush from '../flush.js'
 import { triggerDeps } from '../callbacks.js'
+import { IS_BATCHING } from '../constants.js'
 
-// when state is mutated, find cbs that should be triggered for given path
-// triggering callbacks in beforeUpdate and afterUpdate may mutate the state further
-// which would trigger some more callbacks, to avoid calling the same cb more than once, build a batches
-// once a cb is added in batches it is not added again
-const onMutate = (nue, path) => {
-  // if batches is being built, don't invoke, invoke once the building is stopped
-  if (!nue.batching) flush(nue)
-
-  // don't use if else - value of nue.batching will be changed by flush
-  if (nue.batching) triggerDeps(nue, path)
+// when state is mutated
+// if the batching is complete flush the changes to DOM
+// else build the batch
+const onMutate = (compNode, path) => {
+  // don't flush if the batch is not complete
+  if (!compNode[IS_BATCHING]) flush(compNode)
+  // ** don't use if else here **
+  // value of compNode[IS_BATCHING] may be be changed if flush() is called
+  if (compNode[IS_BATCHING]) triggerDeps(compNode.subscriptions, path)
 }
 
 export default onMutate

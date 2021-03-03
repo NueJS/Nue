@@ -3,15 +3,13 @@ import { attr } from '../node/dom'
 import processPlaceholder from '../string/placeholder/processPlaceholder'
 
 const parseConditionNode = (node, type, value) => {
-  console.log({ type, value })
-  const condition = type !== ELSE_ATTRIBUTE && processPlaceholder(value)
   node.parsed = {
     ...node.parsed,
     conditionType: type,
     enter: attr(node, ENTER_ANIMATION),
-    exit: attr(node, EXIT_ANIMATION),
-    condition
+    exit: attr(node, EXIT_ANIMATION)
   }
+  if (type !== ELSE_ATTRIBUTE) node.parsed.condition = processPlaceholder(value)
   node.removeAttribute(type)
 }
 

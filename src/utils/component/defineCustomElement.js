@@ -6,87 +6,91 @@ import stats from '../stats'
 import { upper } from '../others.js'
 import { createElement } from '../node/dom.js'
 import parseTemplate from '../parse/parseTemplate'
-import initNue from './initNue.js'
 import setupNue from './setupNue.js'
 import disconnectNode from '../connection/disconnectNode.js'
 import connectNode from '../connection/connectNode.js'
-import { ON_DESTROY_CBS, ON_MOUNT_CBS } from '../constants.js'
+import { BATCH_INFO, BEFORE_DOM_BATCH, DEFERRED_WORK, DOM_BATCH, IGNORE_DISCONNECT, ON_DESTROY_CBS, ON_MOUNT_CBS } from '../constants.js'
 
-const defineCustomElement = (component) => {
-  const { name, template = '', script, style = '', children } = component
-  // return if already defined
+const defineCustomElement = (compObj) => {
+  const { name, template = '', script, style = '', children } = compObj
   const { components, config } = stats
-  if (components[name]) return
-  else components[name] = true
+  // return if already defined
+  if (name in components) return
 
-  // create hash from component.children array for constant time checking to decide if the node is a component or not
-  const childrenHash = {}
-  if (children) {
-    children.forEach(childComp => {
-      childrenHash[upper(childComp.name)] = true
-    })
-  }
+  components[name] = compObj
 
-  component.childrenHash = childrenHash
+  // create hash from compObj.children array for constant time checking to decide if the node is a compObj or not
+
+  // set of names that are children
+  const childCompNodeNames = new Set(children ? children.map(childCompObj => upper(childCompObj.name)) : [])
 
   // create templateNode using template, style, and defaultStyle
   const templateNode = createElement('template')
   templateNode.innerHTML = template + `<style default> ${config.defaultStyle} </style>` + '<style scoped >' + style + '</style>'
 
   // parse the template and create templateNode which has all the parsed info
-  parseTemplate(templateNode, component)
+  parseTemplate(templateNode, childCompNodeNames, name)
 
-  // node object contains the data that is common for all instances
-  const common = { templateNode, component }
-
-  class Nue extends HTMLElement {
-    // construct basic nue structure
+  class NueComp extends HTMLElement {
     constructor () {
       super()
-      const nue = this.nue = initNue(this, common)
-      addLifecycles(nue)
+      const compNode = this
+      compNode.refs = {}
+      compNode.subscriptions = { $: new Set() }
+      // batches
+      compNode[BEFORE_DOM_BATCH] = new Set()
+      compNode[DOM_BATCH] = new Set()
+
+      compNode[BATCH_INFO] = []
+      compNode[DEFERRED_WORK] = []
+      compNode.templateNode = templateNode
+      compNode.component = compObj
+      compNode.processedNodes = new Set()
+      compNode.nodesUsingClosure = new Set()
+
+      if (!compNode.init$) compNode.init$ = {}
+
+      addLifecycles(compNode)
     }
 
     connectedCallback () {
-      const node = this
-      const nue = node.nue
+      const compNode = this
       // if the connection change is due to reordering, ignore
-      if (node.reordering) return
+      if (compNode.reordering) return
 
       // if first time connecting
-      if (!node.shadowRoot) {
-        setupNue(node)
-        if (script) runScript(nue, script)
+      if (!compNode.shadowRoot) {
+        setupNue(compNode)
+        if (script) runScript(compNode, script)
         // process childNodes (DOM) and shadow DOM
-        node.childNodes.forEach(n => processNode(nue, n))
-        buildShadowDOM(nue)
+        compNode.childNodes.forEach(n => processNode(compNode, n))
+        buildShadowDOM(compNode)
         // connect all processedNodes
-        nue.processedNodes.forEach(connectNode)
+        compNode.processedNodes.forEach(connectNode)
       } else {
         // only connect nodes that were previously disconnected
-        nue.nodesUsingClosure.forEach(connectNode)
+        compNode.nodesUsingClosure.forEach(connectNode)
       }
 
-      runEvent(nue, ON_MOUNT_CBS)
-      node.ignoreDisconnect = false
+      runEvent(compNode, ON_MOUNT_CBS)
+      compNode[IGNORE_DISCONNECT] = false
     }
 
     disconnectedCallback () {
-      const node = this
-      const nue = node.nue
+      const compNode = this
       // if disconnectedCallback was manually called earlier, no need to call it again when node is removed
-      if (node.ignoreDisconnect) return
+      if (compNode[IGNORE_DISCONNECT]) return
       // do nothing, if the connection change is due to reordering
-      if (node.reordering) return
+      if (compNode.reordering) return
       // run onDestroy callbacks
-      runEvent(nue, ON_DESTROY_CBS)
+      runEvent(compNode, ON_DESTROY_CBS)
       // only disconnect nodes that are using closure, no need to disconnect nodes that use local state only
-      nue.nodesUsingClosure.forEach(disconnectNode)
+      compNode.nodesUsingClosure.forEach(disconnectNode)
     }
   }
 
-  // define current component and then it's children
-  customElements.define(name, Nue)
+  // define current compObj and then it's children
+  customElements.define(name, NueComp)
   if (children) children.forEach(defineCustomElement)
 }
 

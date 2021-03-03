@@ -1,3 +1,5 @@
+import { IGNORE_DISCONNECT } from '../constants'
+
 export const attr = (node, name) => node.getAttribute(name)
 
 export const animate = (node, name, clearAnimation = false, cb) => {
@@ -19,7 +21,7 @@ export const createComment = (text) => document.createComment(text)
 
 export const animatedRemove = (comp, animation) => {
   comp.disconnectedCallback()
-  comp.ignoreDisconnect = true
+  comp[IGNORE_DISCONNECT] = true
   animate(comp, animation, true, () => comp.remove())
 }
 

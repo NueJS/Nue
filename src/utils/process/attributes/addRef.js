@@ -1,5 +1,5 @@
-const addRef = (nue, node, [refName]) => {
-  nue.refs[refName] = node
+const addRef = (compNode, node, [refName]) => {
+  compNode.refs[refName] = node
 }
 
 export default addRef

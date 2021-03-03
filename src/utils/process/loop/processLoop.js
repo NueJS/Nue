@@ -1,19 +1,19 @@
 import subscribe from '../../state/subscribe.js'
 import { createComment } from '../../node/dom.js'
-import { DOM_BATCH, STATE, NORMAL } from '../../constants.js'
+import { DOM_BATCH, STATE, NORMAL, DEFERRED_WORK } from '../../constants.js'
 import handleArrayChange from './utils/handleArrayChange.js'
 import { arraysAreShallowEqual } from '../../others.js'
 import getPartialMutationInfo from './utils/getPartialMutationInfo.js'
 import zeroToNArray from './utils/zeroToNArray.js'
 
-const processLoop = (nue, loopedComp, parsed) => {
+const processLoop = (compNode, loopedComp, parsed) => {
   const { attributes } = parsed
   const forInfo = parsed.for
-  const { map, at, as, key, enter, exit } = forInfo
+  const { map, at, as, key } = forInfo
 
   const getClosure = (value, index) => ({ [at]: index, [as]: value })
-  const getArray = () => map.getValue(nue)
-  const getKey = (value, index) => key.getValue(nue, getClosure(value, index))
+  const getArray = () => map.getValue(compNode)
+  const getKey = (value, index) => key.getValue(compNode, getClosure(value, index))
   const getKeys = () => getArray().map(getKey)
 
   // get state attributes
@@ -26,7 +26,7 @@ const processLoop = (nue, loopedComp, parsed) => {
 
   const arrayPath = map.deps[0]
   const arrayPathString = arrayPath.join('.')
-  const anchorNode = createComment('---')
+  const anchorNode = createComment('loop/')
 
   const oldState = { values: [], keys: [], keyHash: {} }
   const blob = {
@@ -37,26 +37,23 @@ const processLoop = (nue, loopedComp, parsed) => {
     getArray,
     getClosure,
     getKeys,
-    nue
+    compNode
   }
-
-  if (enter) blob.createdComps = []
-  if (exit) blob.removedComps = []
 
   const fullReconcile = () => {
     const n = getArray().length
     handleArrayChange(blob, zeroToNArray(n), zeroToNArray(n), indexAttributes, stateAttributes, oldState)
   }
 
-  nue.deferred.push(() => {
+  compNode[DEFERRED_WORK].push(() => {
     loopedComp.before(anchorNode)
-    loopedComp.before(createComment('---'))
+    loopedComp.before(createComment('/loop'))
     loopedComp.remove()
     fullReconcile()
     blob.initialized = true
   })
 
-  subscribe(nue, arrayPath, (mutations) => {
+  subscribe(compNode, arrayPath, (mutations) => {
     // if some mutation in batch assigned a new array
     const newArrayAssigned = mutations.some(mutation => arraysAreShallowEqual(mutation.path, arrayPath))
     if (newArrayAssigned) fullReconcile()
