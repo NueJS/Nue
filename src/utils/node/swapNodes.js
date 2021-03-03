@@ -1,3 +1,4 @@
+import { REORDERING } from '../constants'
 import { createElement } from './dom'
 
 // const swapNodes = (node1, node2) => {
@@ -13,8 +14,8 @@ import { createElement } from './dom'
 
 // @TODO update this with upper one
 const swapDom = (a, b) => {
-  a.reordering = true
-  b.reordering = true
+  a[REORDERING] = true
+  b[REORDERING] = true
 
   const aParent = a.parentNode
   const bParent = b.parentNode
@@ -28,8 +29,8 @@ const swapDom = (a, b) => {
   aParent.replaceChild(b, aHolder)
   bParent.replaceChild(a, bHolder)
 
-  a.reordering = false
-  b.reordering = false
+  a[REORDERING] = false
+  b[REORDERING] = false
 }
 
 export default swapDom

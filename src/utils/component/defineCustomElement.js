@@ -9,7 +9,7 @@ import parseTemplate from '../parse/parseTemplate'
 import setupNue from './setupNue.js'
 import disconnectNode from '../connection/disconnectNode.js'
 import connectNode from '../connection/connectNode.js'
-import { BATCH_INFO, BEFORE_DOM_BATCH, DEFERRED_WORK, DOM_BATCH, IGNORE_DISCONNECT, NODES_USING_CLOSURE, ON_DESTROY_CBS, ON_MOUNT_CBS, PROCESSED_NODES, SUBSCRIPTIONS } from '../constants.js'
+import { BATCH_INFO, BEFORE_DOM_BATCH, DEFERRED_WORK, DOM_BATCH, IGNORE_DISCONNECT, NODES_USING_CLOSURE, ON_DESTROY_CBS, ON_MOUNT_CBS, PROCESSED_NODES, REORDERING, SUBSCRIPTIONS } from '../constants.js'
 
 const defineCustomElement = (compObj) => {
   const { name, template = '', script, style = '', children } = compObj
@@ -56,7 +56,7 @@ const defineCustomElement = (compObj) => {
     connectedCallback () {
       const compNode = this
       // if the connection change is due to reordering, ignore
-      if (compNode.reordering) return
+      if (compNode[REORDERING]) return
 
       // if first time connecting
       if (!compNode.shadowRoot) {
@@ -81,7 +81,7 @@ const defineCustomElement = (compObj) => {
       // if disconnectedCallback was manually called earlier, no need to call it again when node is removed
       if (compNode[IGNORE_DISCONNECT]) return
       // do nothing, if the connection change is due to reordering
-      if (compNode.reordering) return
+      if (compNode[REORDERING]) return
       // run onDestroy callbacks
       runEvent(compNode, ON_DESTROY_CBS)
       // only disconnect nodes that are using closure, no need to disconnect nodes that use local state only
