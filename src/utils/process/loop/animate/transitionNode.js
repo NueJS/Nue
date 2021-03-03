@@ -1,7 +1,7 @@
+import { getOffset } from './offset'
+
 // transit node from one prevOffset to currentOffset
 // call cb when the transition is complete
-
-import { getOffset } from './offset'
 
 // offset is an object with left and top keys
 // cssTransition is the transition information - minus the property
