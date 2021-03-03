@@ -1,4 +1,4 @@
-import { TEXT } from '../constants.js'
+import { PARSED, TEXT } from '../constants.js'
 import split from '../string/split.js'
 
 const parseTextNode = (node, deferred) => {
@@ -7,7 +7,7 @@ const parseTextNode = (node, deferred) => {
 
   placeholders.forEach(placeholder => {
     const textNode = document.createTextNode(placeholder.text)
-    if (placeholder.type !== TEXT) textNode.parsed = { placeholder }
+    if (placeholder.type !== TEXT) textNode[PARSED] = { placeholder }
     textNodes.push(textNode)
   })
 

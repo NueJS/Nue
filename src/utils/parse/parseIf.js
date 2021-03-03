@@ -1,4 +1,4 @@
-import { ELSE_ATTRIBUTE, IF_ATTRIBUTE } from '../constants'
+import { ELSE_ATTRIBUTE, IF_ATTRIBUTE, PARSED } from '../constants'
 import { createComment } from '../node/dom'
 
 const parseIf = (ifNode) => {
@@ -12,7 +12,7 @@ const parseIf = (ifNode) => {
   // keep checking the next node
   while (true) {
     // get the conditionType of the node
-    const type = node && node.parsed && node.parsed.conditionType
+    const type = node && node[PARSED] && node[PARSED].conditionType
     // if the node is not a condition node or is a separate condition, break the loop
     if (!type || (type === IF_ATTRIBUTE)) break
     group.push(node)
@@ -26,14 +26,14 @@ const parseIf = (ifNode) => {
   // remove other nodes from template
   group.forEach(n => n.remove())
 
-  const groupDeps = [ifNode.parsed.condition.deps]
+  const groupDeps = [ifNode[PARSED].condition.deps]
   group.forEach(node => {
-    if (node.parsed.conditionType !== ELSE_ATTRIBUTE) {
-      groupDeps.push(node.parsed.condition.deps)
+    if (node[PARSED].conditionType !== ELSE_ATTRIBUTE) {
+      groupDeps.push(node[PARSED].condition.deps)
     }
   })
 
-  ifNode.parsed = { ...ifNode.parsed, group, groupDeps, anchorNode }
+  ifNode[PARSED] = { ...ifNode[PARSED], group, groupDeps, anchorNode }
 }
 
 export default parseIf

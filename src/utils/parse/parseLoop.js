@@ -1,4 +1,4 @@
-import { ENTER_ANIMATION, EXIT_ANIMATION, FOR_ATTRIBUTE, KEY_ATTRIBUTE, REORDER_TRANSITION } from '../constants'
+import { ENTER_ANIMATION, EXIT_ANIMATION, FOR_ATTRIBUTE, KEY_ATTRIBUTE, PARSED, REORDER_TRANSITION } from '../constants'
 // import DEV from '../dev/DEV'
 import { attr } from '../node/dom'
 import { isDefined } from '../others'
@@ -12,7 +12,7 @@ const parseLoop = (node, forAttribute) => {
   // ['item', 'arr']
   const indexUsed = isDefined(c)
 
-  node.parsed.for = {
+  node[PARSED].for = {
     // @todo rename map to itemArray
     map: processPlaceholder(indexUsed ? c : b, true),
     // @todo rename to itemValue

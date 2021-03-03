@@ -2,7 +2,7 @@ import { subscribeMultiple } from '../state/subscribe.js'
 import processNode from './processNode.js'
 import { animate, animatedRemove, onAnimationEnd } from '../node/dom.js'
 import getClone from '../node/clone.js'
-import { BEFORE_DOM_BATCH, DEFERRED_WORK } from '../constants.js'
+import { BEFORE_DOM_BATCH, DEFERRED_WORK, PARSED } from '../constants.js'
 
 const processIf = (compNode, ifNode, parsed) => {
   // @todo shorten this
@@ -27,7 +27,7 @@ const processIf = (compNode, ifNode, parsed) => {
 
     group.forEach(conditionNode => {
       const { isProcessed, isConnected } = conditionNode
-      const { condition, enter, exit } = conditionNode.parsed
+      const { condition, enter, exit } = conditionNode[PARSED]
       const satisfied = condition ? condition.getValue(compNode) : true
 
       // if this component should be mounted
@@ -48,7 +48,7 @@ const processIf = (compNode, ifNode, parsed) => {
           }
 
           // if it should wait for active component's animation to end
-          const waitForAnimationEnd = active && active.parsed.exit && conditionNode !== active
+          const waitForAnimationEnd = active && active[PARSED].exit && conditionNode !== active
 
           // wait if needed, else mount it right now
           waitForAnimationEnd ? onAnimationEnd(active, mount) : mount()

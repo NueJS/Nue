@@ -1,11 +1,11 @@
-import { FUNCTION_ATTRIBUTE, NORMAL, STATE, STATIC_STATE } from '../constants.js'
+import { FUNCTION_ATTRIBUTE, NORMAL, PARSED, STATE, STATIC_STATE } from '../constants.js'
 import addStateFromAttribute from './addStateFromAttribute.js'
 import reactify from '../reactivity/reactify.js'
 
 const setupNue = (compNode) => {
-  const { parsed, closure, loopClosure } = compNode
+  const { closure, loopClosure } = compNode
   if (closure) {
-    const { attributes } = parsed
+    const { attributes } = compNode[PARSED]
     compNode.fn = Object.create(closure.fn)
 
     if (attributes) {

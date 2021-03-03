@@ -1,4 +1,4 @@
-import { ELSE_ATTRIBUTE, ELSE_IF_ATTRIBUTE, FOR_ATTRIBUTE, IF_ATTRIBUTE, KEY_ATTRIBUTE } from '../constants'
+import { ELSE_ATTRIBUTE, ELSE_IF_ATTRIBUTE, FOR_ATTRIBUTE, IF_ATTRIBUTE, KEY_ATTRIBUTE, PARSED } from '../constants'
 import DEV from '../dev/DEV'
 import errors from '../dev/errors'
 import { attr } from '../node/dom'
@@ -22,7 +22,7 @@ const parseNode = (node, childCompNodeNames, deferred, name) => {
   const isComp = childCompNodeNames.has(node.nodeName)
 
   if (isComp) {
-    node.parsed = {
+    node[PARSED] = {
       isComp: true
     }
 

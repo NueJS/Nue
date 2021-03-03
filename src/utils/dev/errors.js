@@ -62,7 +62,7 @@ export default {
 
   EXIT_ANIMATION_NOT_FOUND (compName, animationName, node) {
     return {
-      message: `exit animation: "${animationName}" used on <${node.parsed.name}> but not defined in CSS. \nThis will result in component never being removed, as nue.js keeps waiting for the animation to end which does not exist`,
+      message: `exit animation: "${animationName}" used on <${node.name}> but not defined in CSS. \nThis will result in component never being removed, as nue.js keeps waiting for the animation to end which does not exist`,
       fix: `To fix this: define animation "${animationName}" in CSS using @keyframes`,
       compName
     }

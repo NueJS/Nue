@@ -8,7 +8,7 @@
 //     throw errors.INVALID_FOR_ATTRIBUTE(component.name, node)
 //   }
 
-//   const { key, exit } = node.parsed.for
+//   const { key, exit } = node[PARSED].for
 
 //   // if exit animation is specified, but not defined in style, throw error
 //   // if (exit) {

@@ -1,6 +1,6 @@
 import { isBracketed } from '../string/bracket.js'
 import processPlaceholder from '../string/placeholder/processPlaceholder.js'
-import { STATE, EVENT, BIND, NORMAL, CONDITIONAL, STATIC_STATE, FUNCTION_ATTRIBUTE, REF, REF_ATTRIBUTE } from '../constants.js'
+import { STATE, EVENT, BIND, NORMAL, CONDITIONAL, STATIC_STATE, FUNCTION_ATTRIBUTE, REF, REF_ATTRIBUTE, PARSED } from '../constants.js'
 import isComp from '../node/isComp.js'
 
 const parseAttributes = (node) => {
@@ -80,8 +80,8 @@ const parseAttributes = (node) => {
 
   // if value attributes found
   if (attributes.length) {
-    if (!node.parsed) node.parsed = {}
-    node.parsed.attributes = attributes
+    if (!node[PARSED]) node[PARSED] = {}
+    node[PARSED].attributes = attributes
   }
 }
 
