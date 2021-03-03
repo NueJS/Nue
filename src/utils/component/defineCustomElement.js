@@ -9,7 +9,7 @@ import parseTemplate from '../parse/parseTemplate'
 import setupNue from './setupNue.js'
 import disconnectNode from '../connection/disconnectNode.js'
 import connectNode from '../connection/connectNode.js'
-import { BATCH_INFO, BEFORE_DOM_BATCH, DEFERRED_WORK, DOM_BATCH, IGNORE_DISCONNECT, ON_DESTROY_CBS, ON_MOUNT_CBS, SUBSCRIPTIONS } from '../constants.js'
+import { BATCH_INFO, BEFORE_DOM_BATCH, DEFERRED_WORK, DOM_BATCH, IGNORE_DISCONNECT, ON_DESTROY_CBS, ON_MOUNT_CBS, PROCESSED_NODES, SUBSCRIPTIONS } from '../constants.js'
 
 const defineCustomElement = (compObj) => {
   const { name, template = '', script, style = '', children } = compObj
@@ -45,7 +45,7 @@ const defineCustomElement = (compObj) => {
       compNode[DEFERRED_WORK] = []
       compNode.templateNode = templateNode
       compNode.component = compObj
-      compNode.processedNodes = new Set()
+      compNode[PROCESSED_NODES] = new Set()
       compNode.nodesUsingClosure = new Set()
 
       if (!compNode.init$) compNode.init$ = {}
@@ -66,7 +66,7 @@ const defineCustomElement = (compObj) => {
         compNode.childNodes.forEach(n => processNode(compNode, n))
         buildShadowDOM(compNode)
         // connect all processedNodes
-        compNode.processedNodes.forEach(connectNode)
+        compNode[PROCESSED_NODES].forEach(connectNode)
       } else {
         // only connect nodes that were previously disconnected
         compNode.nodesUsingClosure.forEach(connectNode)
