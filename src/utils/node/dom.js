@@ -1,6 +1,8 @@
 import { IGNORE_DISCONNECT } from '../constants'
 
 export const attr = (node, name) => node.getAttribute(name)
+export const removeAttr = (node, name) => node.removeAttribute(name)
+export const setAttr = (node, name, value) => node.setAttribute(name, value)
 
 export const animate = (node, name, clearAnimation = false, cb) => {
   node.style.animation = name

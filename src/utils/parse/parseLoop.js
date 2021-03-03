@@ -1,6 +1,6 @@
 import { ENTER_ANIMATION, EXIT_ANIMATION, FOR_ATTRIBUTE, KEY_ATTRIBUTE, PARSED, REORDER_TRANSITION } from '../constants'
 // import DEV from '../dev/DEV'
-import { attr } from '../node/dom'
+import { attr, removeAttr } from '../node/dom'
 import { isDefined } from '../others'
 import processPlaceholder from '../string/placeholder/processPlaceholder'
 // import { checkParsedLoop } from './checkParsed'
@@ -27,10 +27,13 @@ const parseLoop = (node, forAttribute) => {
   };
 
   // if (DEV) checkParsedLoop(parsingInfo.component, node, info);
-
-  [EXIT_ANIMATION, ENTER_ANIMATION, REORDER_TRANSITION, FOR_ATTRIBUTE, KEY_ATTRIBUTE].forEach(name => {
-    node.removeAttribute(name)
-  })
+  [
+    EXIT_ANIMATION,
+    ENTER_ANIMATION,
+    REORDER_TRANSITION,
+    FOR_ATTRIBUTE,
+    KEY_ATTRIBUTE
+  ].forEach(name => removeAttr(node, name))
 }
 
 export default parseLoop

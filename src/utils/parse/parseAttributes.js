@@ -2,6 +2,7 @@ import { isBracketed } from '../string/bracket.js'
 import processPlaceholder from '../string/placeholder/processPlaceholder.js'
 import { STATE, EVENT, BIND, NORMAL, CONDITIONAL, STATIC_STATE, FUNCTION_ATTRIBUTE, REF, REF_ATTRIBUTE, PARSED } from '../constants.js'
 import isComp from '../node/isComp.js'
+import { removeAttr } from '../node/dom.js'
 
 const parseAttributes = (node) => {
   const attributes = []
@@ -74,7 +75,7 @@ const parseAttributes = (node) => {
     if (value) {
       // saving to array instead of object for better minification
       attributes.push([value, name, type])
-      node.removeAttribute(attributeName)
+      removeAttr(node, attributeName)
     }
   }
 

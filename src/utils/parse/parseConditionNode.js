@@ -1,5 +1,5 @@
 import { ELSE_ATTRIBUTE, ENTER_ANIMATION, EXIT_ANIMATION, PARSED } from '../constants'
-import { attr } from '../node/dom'
+import { attr, removeAttr } from '../node/dom'
 import processPlaceholder from '../string/placeholder/processPlaceholder'
 
 const parseConditionNode = (node, type, value) => {
@@ -10,7 +10,7 @@ const parseConditionNode = (node, type, value) => {
     exit: attr(node, EXIT_ANIMATION)
   }
   if (type !== ELSE_ATTRIBUTE) node[PARSED].condition = processPlaceholder(value)
-  node.removeAttribute(type)
+  removeAttr(node, type)
 }
 
 export default parseConditionNode
