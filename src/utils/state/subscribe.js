@@ -1,6 +1,6 @@
 import { batchify } from '../batch'
 import { origin } from '../closure.js'
-import { SUBSCRIPTIONS } from '../constants'
+import { NODES_USING_CLOSURE, SUBSCRIPTIONS } from '../constants'
 import DEV from '../dev/DEV.js'
 import errors from '../dev/errors.js'
 
@@ -11,7 +11,7 @@ const subscribe = (baseCompNode, path, cb, batchName) => {
   const originCompNode = origin(baseCompNode, path)
 
   if (originCompNode !== baseCompNode && cb.node) {
-    baseCompNode.nodesUsingClosure.add(cb.node)
+    baseCompNode[NODES_USING_CLOSURE].add(cb.node)
   }
 
   // throw if no origin is found

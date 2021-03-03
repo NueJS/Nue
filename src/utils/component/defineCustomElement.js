@@ -9,7 +9,7 @@ import parseTemplate from '../parse/parseTemplate'
 import setupNue from './setupNue.js'
 import disconnectNode from '../connection/disconnectNode.js'
 import connectNode from '../connection/connectNode.js'
-import { BATCH_INFO, BEFORE_DOM_BATCH, DEFERRED_WORK, DOM_BATCH, IGNORE_DISCONNECT, ON_DESTROY_CBS, ON_MOUNT_CBS, PROCESSED_NODES, SUBSCRIPTIONS } from '../constants.js'
+import { BATCH_INFO, BEFORE_DOM_BATCH, DEFERRED_WORK, DOM_BATCH, IGNORE_DISCONNECT, NODES_USING_CLOSURE, ON_DESTROY_CBS, ON_MOUNT_CBS, PROCESSED_NODES, SUBSCRIPTIONS } from '../constants.js'
 
 const defineCustomElement = (compObj) => {
   const { name, template = '', script, style = '', children } = compObj
@@ -46,7 +46,7 @@ const defineCustomElement = (compObj) => {
       compNode.templateNode = templateNode
       compNode.component = compObj
       compNode[PROCESSED_NODES] = new Set()
-      compNode.nodesUsingClosure = new Set()
+      compNode[NODES_USING_CLOSURE] = new Set()
 
       if (!compNode.init$) compNode.init$ = {}
 
@@ -69,7 +69,7 @@ const defineCustomElement = (compObj) => {
         compNode[PROCESSED_NODES].forEach(connectNode)
       } else {
         // only connect nodes that were previously disconnected
-        compNode.nodesUsingClosure.forEach(connectNode)
+        compNode[NODES_USING_CLOSURE].forEach(connectNode)
       }
 
       runEvent(compNode, ON_MOUNT_CBS)
@@ -85,7 +85,7 @@ const defineCustomElement = (compObj) => {
       // run onDestroy callbacks
       runEvent(compNode, ON_DESTROY_CBS)
       // only disconnect nodes that are using closure, no need to disconnect nodes that use local state only
-      compNode.nodesUsingClosure.forEach(disconnectNode)
+      compNode[NODES_USING_CLOSURE].forEach(disconnectNode)
     }
   }
 
