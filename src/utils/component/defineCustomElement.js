@@ -9,7 +9,7 @@ import parseTemplate from '../parse/parseTemplate'
 import setupNue from './setupNue.js'
 import disconnectNode from '../connection/disconnectNode.js'
 import connectNode from '../connection/connectNode.js'
-import { BATCH_INFO, BEFORE_DOM_BATCH, DEFERRED_WORK, DOM_BATCH, IGNORE_DISCONNECT, ON_DESTROY_CBS, ON_MOUNT_CBS } from '../constants.js'
+import { BATCH_INFO, BEFORE_DOM_BATCH, DEFERRED_WORK, DOM_BATCH, IGNORE_DISCONNECT, ON_DESTROY_CBS, ON_MOUNT_CBS, SUBSCRIPTIONS } from '../constants.js'
 
 const defineCustomElement = (compObj) => {
   const { name, template = '', script, style = '', children } = compObj
@@ -36,7 +36,7 @@ const defineCustomElement = (compObj) => {
       super()
       const compNode = this
       compNode.refs = {}
-      compNode.subscriptions = { $: new Set() }
+      compNode[SUBSCRIPTIONS] = { $: new Set() }
       // batches
       compNode[BEFORE_DOM_BATCH] = new Set()
       compNode[DOM_BATCH] = new Set()

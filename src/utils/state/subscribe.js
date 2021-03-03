@@ -1,5 +1,6 @@
 import { batchify } from '../batch'
 import { origin } from '../closure.js'
+import { SUBSCRIPTIONS } from '../constants'
 import DEV from '../dev/DEV.js'
 import errors from '../dev/errors.js'
 
@@ -20,7 +21,7 @@ const subscribe = (baseCompNode, path, cb, batchName) => {
   const batchCb = batchify(cb, originCompNode[batchName])
 
   // start from the root of subscriptions
-  let target = originCompNode.subscriptions
+  let target = originCompNode[SUBSCRIPTIONS]
 
   // add batchCb in path table at appropriate location
   // map is used to unsubscribe in constant time
