@@ -1,4 +1,5 @@
 import devtools from '../apis/devtools'
+import { IS_SUBSCRIBED } from './constants'
 import DEV from './dev/DEV'
 
 // return function which when called adds the cb to given batch
@@ -9,7 +10,7 @@ export const runBatch = (batch, batchInfo) => {
   batch.forEach(cb => {
     const { node } = cb
     // if cb is for updating a node, only call cb if node is subscribed
-    if ((node && node.isSubscribed) || !node) {
+    if ((node && node[IS_SUBSCRIBED]) || !node) {
       cb(batchInfo)
       if (DEV && node && devtools.showUpdates) devtools.onNodeUpdate(node)
     }
