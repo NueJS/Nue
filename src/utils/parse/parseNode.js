@@ -1,7 +1,7 @@
 import { ELSE_ATTRIBUTE, ELSE_IF_ATTRIBUTE, FOR_ATTRIBUTE, IF_ATTRIBUTE, KEY_ATTRIBUTE, PARSED } from '../constants'
 import DEV from '../dev/DEV'
 import errors from '../dev/errors'
-import { attr } from '../node/dom'
+import { getAttr } from '../node/dom'
 import parseAttributes from './parseAttributes'
 import parseConditionNode from './parseConditionNode'
 import parseLoop from './parseLoop'
@@ -12,7 +12,7 @@ const conditionalAttributes = [IF_ATTRIBUTE, ELSE_IF_ATTRIBUTE, ELSE_ATTRIBUTE]
 
 const usesConditionalAttribute = compNode => {
   for (const attributeName of conditionalAttributes) {
-    const value = attr(compNode, attributeName)
+    const value = getAttr(compNode, attributeName)
     if (value !== null) return [attributeName, value]
   }
 }
@@ -26,7 +26,7 @@ const parseNode = (node, childCompNodeNames, deferred, name) => {
       isComp: true
     }
 
-    const forAttribute = attr(node, FOR_ATTRIBUTE)
+    const forAttribute = getAttr(node, FOR_ATTRIBUTE)
 
     // if the component has FOR_ATTRIBUTE on it, it is looped component
     if (forAttribute) {
@@ -55,7 +55,7 @@ const parseNode = (node, childCompNodeNames, deferred, name) => {
     if (DEV && !isComp) {
       const compOnlyAttributes = [FOR_ATTRIBUTE, KEY_ATTRIBUTE, IF_ATTRIBUTE, ELSE_IF_ATTRIBUTE, ELSE_ATTRIBUTE]
       compOnlyAttributes.forEach(attrName => {
-        if (attr(node, attrName)) {
+        if (getAttr(node, attrName)) {
           throw errors.RESERVED_ATTRIBUTE_USED_ON_NON_COMPONENT(name, node, attrName)
         }
       })

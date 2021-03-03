@@ -1,6 +1,6 @@
 import { ENTER_ANIMATION, EXIT_ANIMATION, FOR_ATTRIBUTE, KEY_ATTRIBUTE, PARSED, REORDER_TRANSITION } from '../constants'
 // import DEV from '../dev/DEV'
-import { attr, removeAttr } from '../node/dom'
+import { getAttr, removeAttr } from '../node/dom'
 import { isDefined } from '../others'
 import processPlaceholder from '../string/placeholder/processPlaceholder'
 // import { checkParsedLoop } from './checkParsed'
@@ -19,11 +19,11 @@ const parseLoop = (node, forAttribute) => {
     as: a,
     // @todo rename to itemIndex
     at: indexUsed && b,
-    key: processPlaceholder(attr(node, KEY_ATTRIBUTE)),
+    key: processPlaceholder(getAttr(node, KEY_ATTRIBUTE)),
     // @todo wrap in animations object ?
-    enter: attr(node, ENTER_ANIMATION),
-    reorder: attr(node, REORDER_TRANSITION),
-    exit: attr(node, EXIT_ANIMATION)
+    enter: getAttr(node, ENTER_ANIMATION),
+    reorder: getAttr(node, REORDER_TRANSITION),
+    exit: getAttr(node, EXIT_ANIMATION)
   };
 
   // if (DEV) checkParsedLoop(parsingInfo.component, node, info);

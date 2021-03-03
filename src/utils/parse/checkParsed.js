@@ -1,6 +1,6 @@
 // import { KEY_ATTRIBUTE } from '../constants'
 // import errors from '../dev/errors'
-// import { attr } from '../node/dom'
+// import { getAttr } from '../node/dom'
 // import { isBracketed } from '../string/bracket'
 
 // export const checkParsedLoop = (component, node, arr) => {
@@ -27,6 +27,6 @@
 //   }
 
 //   else {
-//     if (!isBracketed(attr(node, KEY_ATTRIBUTE))) throw errors.KEY_NOT_BRACKETED(component.name, node, key)
+//     if (!isBracketed(getAttr(node, KEY_ATTRIBUTE))) throw errors.KEY_NOT_BRACKETED(component.name, node, key)
 //   }
 // }
