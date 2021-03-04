@@ -1,6 +1,6 @@
 import { batchify } from '../batch'
 import { origin } from '../closure.js'
-import { NODES_USING_CLOSURE, SUBSCRIPTIONS } from '../constants'
+import { ITSELF, NODES_USING_CLOSURE, SUBSCRIPTIONS } from '../constants'
 import DEV from '../dev/DEV.js'
 import errors from '../dev/errors.js'
 
@@ -27,13 +27,13 @@ const subscribe = (baseCompNode, path, cb, batchName) => {
   // map is used to unsubscribe in constant time
   const lastIndex = path.length - 1
   path.forEach((key, i) => {
-    if (!target[key]) target[key] = { $: new Set() }
+    if (!target[key]) target[key] = { [ITSELF]: new Set() }
     target = target[key]
-    if (i === lastIndex) target.$.add(batchCb)
+    if (i === lastIndex) target[ITSELF].add(batchCb)
   })
 
   // return unsubscribe function to remove subscription
-  return () => target.$.delete(batchCb)
+  return () => target[ITSELF].delete(batchCb)
 }
 
 // returns an array of removeDep functions
