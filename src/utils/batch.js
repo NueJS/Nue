@@ -6,7 +6,7 @@ import DEV from './dev/DEV'
 export const batchify = (cb, batch) => () => batch.add(cb)
 
 // @todo reduce the amount of functions in this file - they all are very similar
-export const runBatch = (batch, batchInfo) => {
+export const flushBatch = (batch, batchInfo) => {
   batch.forEach(cb => {
     const { node } = cb
     // if cb is for updating a node, only call cb if node is subscribed

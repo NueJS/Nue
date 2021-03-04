@@ -1,4 +1,4 @@
-import { runBatch } from './batch'
+import { flushBatch } from './batch'
 import { runEvent } from './component/lifecycle.js'
 import { AFTER_UPDATE_CBS, BATCH_INFO, BEFORE_DOM_BATCH, BEFORE_UPDATE_CBS, DOM_BATCH, FLUSH_SCHEDULED } from './constants'
 
@@ -7,8 +7,8 @@ const flush = (compNode, batchInfo) => {
   // run before update event
   runEvent(compNode, BEFORE_UPDATE_CBS, batchInfo)
   // run and clear batches
-  runBatch(compNode[BEFORE_DOM_BATCH], batchInfo)
-  runBatch(compNode[DOM_BATCH], batchInfo)
+  flushBatch(compNode[BEFORE_DOM_BATCH], batchInfo)
+  flushBatch(compNode[DOM_BATCH], batchInfo)
   // run after update event
   runEvent(compNode, AFTER_UPDATE_CBS, batchInfo)
 }
