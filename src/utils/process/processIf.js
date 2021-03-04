@@ -2,14 +2,14 @@ import { subscribeMultiple } from '../state/subscribe.js'
 import processNode from './processNode.js'
 import { animate, animatedRemove, onAnimationEnd } from '../node/dom.js'
 import getClone from '../node/clone.js'
-import { BEFORE_DOM_BATCH, DEFERRED_WORK, PARSED } from '../constants.js'
+import { BEFORE_DOM_BATCH, DEFERRED_WORK, IS_PROCESSED, PARSED } from '../constants.js'
 
 const processIf = (compNode, ifNode, parsed) => {
   // @todo shorten this
   const group = [ifNode]
   if (parsed.group) parsed.group.forEach(node => group.push(getClone(node)))
 
-  ifNode.isProcessed = true
+  ifNode[IS_PROCESSED] = true
 
   const { groupDeps } = parsed
   const anchorNode = ifNode.previousSibling
@@ -22,7 +22,7 @@ const processIf = (compNode, ifNode, parsed) => {
     let foundSatisfied = false
 
     group.forEach(conditionNode => {
-      const { isProcessed, isConnected } = conditionNode
+      const { [IS_PROCESSED]: isProcessed, isConnected } = conditionNode
       const { condition, enter, exit } = conditionNode[PARSED]
       const satisfied = condition ? condition.getValue(compNode) : true
 
@@ -35,7 +35,7 @@ const processIf = (compNode, ifNode, parsed) => {
           // if this node is not processed
           if (!isProcessed) {
             processNode(compNode, conditionNode)
-            conditionNode.isProcessed = true
+            conditionNode[IS_PROCESSED] = true
           }
 
           const mount = () => {
