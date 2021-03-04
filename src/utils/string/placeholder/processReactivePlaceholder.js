@@ -15,7 +15,7 @@ const processReactivePlaceholder = (content) => {
     const getValueFrom = (source) => {
       if (!source) return
       const [target, prop] = targetProp(source, path)
-      return target && target[prop]
+      if (target) return target[prop]
     }
     // check in closure first
     const valueFromClosure = getValueFrom(closure)
