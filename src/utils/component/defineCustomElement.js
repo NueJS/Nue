@@ -8,7 +8,7 @@ import { createElement } from '../node/dom.js'
 import parseTemplate from '../parse/parseTemplate'
 import disconnectNode from '../connection/disconnectNode.js'
 import connectNode from '../connection/connectNode.js'
-import { BATCH_INFO, BEFORE_DOM_BATCH, DEFERRED_WORK, DOM_BATCH, IGNORE_DISCONNECT, NODES_USING_CLOSURE, ON_DESTROY_CBS, ON_MOUNT_CBS, PARSED, PROCESSED_NODES, REORDERING, SUBSCRIPTIONS } from '../constants.js'
+import { BATCH_INFO, BEFORE_DOM_BATCH, DEFERRED_WORK, DOM_BATCH, IGNORE_DISCONNECT, INIT_$, NODES_USING_CLOSURE, ON_DESTROY_CBS, ON_MOUNT_CBS, PARSED, PROCESSED_NODES, REORDERING, SUBSCRIPTIONS } from '../constants.js'
 import processAttributes from '../process/attributes/processAttributes.js'
 import reactify from '../reactivity/reactify.js'
 
@@ -47,7 +47,7 @@ const defineCustomElement = (compObj) => {
       compNode[PROCESSED_NODES] = new Set()
       compNode[NODES_USING_CLOSURE] = new Set()
 
-      if (!compNode.init$) compNode.init$ = {}
+      if (!compNode[INIT_$]) compNode[INIT_$] = {}
       addLifecycles(compNode)
     }
 
@@ -63,7 +63,7 @@ const defineCustomElement = (compObj) => {
         compNode.fn = closure ? Object.create(closure.fn) : {}
         // add $
         const closure$ = closure && closure.$
-        compNode.$ = reactify(compNode, compNode.init$, [], closure$)
+        compNode.$ = reactify(compNode, compNode[INIT_$], [], closure$)
 
         // process attributes
         if (compNode[PARSED]) {
