@@ -1,4 +1,3 @@
-import { mutate } from '../reactivity/mutate.js'
 import { subscribeMultiple } from '../subscription/subscribe'
 import detectStateUsage from './detectStateUsage.js'
 import { BEFORE_DOM_BATCH } from '../constants.js'
@@ -12,7 +11,7 @@ const computedState = (compNode, fn, prop) => {
 
   const compute = () => {
     const value = fn()
-    mutate(compNode.$, [prop], value)
+    compNode.$[prop] = value
   }
 
   const deps = paths.map(path => path.length === 1 ? path : path.slice(0, -1))

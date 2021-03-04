@@ -1,9 +1,12 @@
-import { mutate } from '../../reactivity/mutate.js'
 import { syncNode } from '../../subscription/node.js'
 
 // ex: :value=[count]
 const bindInput = (compNode, node, [{ getValue, deps }, propName]) => {
   const isNumber = node.type === 'number' || node.type === 'range'
+  const key = deps[0]
+  const updateState = value => {
+    compNode.$[key] = value
+  }
 
   const setProp = () => {
     node[propName] = getValue(compNode, node)
@@ -20,7 +23,7 @@ const bindInput = (compNode, node, [{ getValue, deps }, propName]) => {
   }
 
   if (node.matches('[contenteditable]')) {
-    const handler = () => mutate(compNode.$, deps[0], node.textContent)
+    const handler = () => updateState(node.textContent)
     addHandler(handler)
     syncNode(compNode, node, deps, setText)
     return // must return
@@ -30,7 +33,7 @@ const bindInput = (compNode, node, [{ getValue, deps }, propName]) => {
     const handler = () => {
       let value = node[propName]
       value = isNumber ? Number(value) : value
-      mutate(compNode.$, deps[0], value)
+      updateState(value)
     }
 
     addHandler(handler)
