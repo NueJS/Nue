@@ -5,7 +5,7 @@ import { PARSED } from '../constants'
 
 // sweetify is used to add those properties back in the cloneNode
 const copyParsed = (node, cloneNode) => {
-  // @QUESTION ? is shallow clone enough ?
+  // @todo if parsed is not messed with - no need to shallow clone
   if (node[PARSED]) cloneNode[PARSED] = { ...node[PARSED] }
   if (node.hasChildNodes()) {
     node.childNodes.forEach((n, i) => {

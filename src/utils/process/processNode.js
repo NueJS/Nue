@@ -3,6 +3,7 @@ import processAttributes from './attributes/processAttributes.js'
 import processIf from './processIf.js'
 import processLoop from './loop/processLoop.js'
 import { IF_ATTRIBUTE, PARSED, PROCESSED_NODES } from '../constants.js'
+import isComp from '../node/isComp.js'
 
 const processNode = (compNode, node) => {
   const { [PARSED]: parsed, nodeType } = node
@@ -21,7 +22,7 @@ const processNode = (compNode, node) => {
   }
 
   // if it a component, do not process it's child nodes
-  if (!(parsed && parsed.isComp) && node.hasChildNodes()) {
+  if (!isComp(node) && node.hasChildNodes()) {
     node.childNodes.forEach(childNode => processNode(compNode, childNode))
   }
 }

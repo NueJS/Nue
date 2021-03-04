@@ -1,6 +1,6 @@
 import subscribe from '../../state/subscribe.js'
 import { createComment } from '../../node/dom.js'
-import { DOM_BATCH, STATE, NORMAL, DEFERRED_WORK } from '../../constants.js'
+import { DOM_BATCH, DEFERRED_WORK } from '../../constants.js'
 import handleArrayChange from './utils/handleArrayChange.js'
 import { arraysAreShallowEqual } from '../../others.js'
 import getPartialMutationInfo from './utils/getPartialMutationInfo.js'

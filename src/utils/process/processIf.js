@@ -7,11 +7,7 @@ import { BEFORE_DOM_BATCH, DEFERRED_WORK, PARSED } from '../constants.js'
 const processIf = (compNode, ifNode, parsed) => {
   // @todo shorten this
   const group = [ifNode]
-  if (parsed.group) {
-    parsed.group.forEach(node => {
-      group.push(getClone(node))
-    })
-  }
+  if (parsed.group) parsed.group.forEach(node => group.push(getClone(node)))
 
   ifNode.isProcessed = true
 

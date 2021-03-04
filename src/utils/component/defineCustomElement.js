@@ -36,14 +36,15 @@ const defineCustomElement = (compObj) => {
       const compNode = this
       compNode.name = name
       compNode.refs = {}
+
       compNode[SUBSCRIPTIONS] = { $: new Set() }
+
       // batches
       compNode[BEFORE_DOM_BATCH] = new Set()
       compNode[DOM_BATCH] = new Set()
 
       compNode[BATCH_INFO] = []
       compNode[DEFERRED_WORK] = []
-      // compNode.component = compObj
       compNode[PROCESSED_NODES] = new Set()
       compNode[NODES_USING_CLOSURE] = new Set()
 
