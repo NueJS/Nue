@@ -6,10 +6,11 @@ import stats from '../stats'
 import { upper } from '../others.js'
 import { createElement } from '../node/dom.js'
 import parseTemplate from '../parse/parseTemplate'
-import setupNue from './setupNue.js'
 import disconnectNode from '../connection/disconnectNode.js'
 import connectNode from '../connection/connectNode.js'
-import { BATCH_INFO, BEFORE_DOM_BATCH, DEFERRED_WORK, DOM_BATCH, IGNORE_DISCONNECT, NODES_USING_CLOSURE, ON_DESTROY_CBS, ON_MOUNT_CBS, PROCESSED_NODES, REORDERING, SUBSCRIPTIONS } from '../constants.js'
+import { BATCH_INFO, BEFORE_DOM_BATCH, DEFERRED_WORK, DOM_BATCH, IGNORE_DISCONNECT, NODES_USING_CLOSURE, ON_DESTROY_CBS, ON_MOUNT_CBS, PARSED, PROCESSED_NODES, REORDERING, SUBSCRIPTIONS } from '../constants.js'
+import processAttributes from '../process/attributes/processAttributes.js'
+import reactify from '../reactivity/reactify.js'
 
 const defineCustomElement = (compObj) => {
   const { name, template = '', script, style = '', children } = compObj
@@ -18,8 +19,6 @@ const defineCustomElement = (compObj) => {
   if (name in components) return
 
   components[name] = compObj
-
-  // create hash from compObj.children array for constant time checking to decide if the node is a compObj or not
 
   // set of names that are children
   const childCompNodeNames = new Set(children ? children.map(childCompObj => upper(childCompObj.name)) : [])
@@ -49,7 +48,6 @@ const defineCustomElement = (compObj) => {
       compNode[NODES_USING_CLOSURE] = new Set()
 
       if (!compNode.init$) compNode.init$ = {}
-
       addLifecycles(compNode)
     }
 
@@ -60,13 +58,27 @@ const defineCustomElement = (compObj) => {
 
       // if first time connecting
       if (!compNode.shadowRoot) {
-        setupNue(compNode)
+        const { closure } = compNode
+        // add fn
+        compNode.fn = closure ? Object.create(closure.fn) : {}
+        // add $
+        const closure$ = closure && closure.$
+        compNode.$ = reactify(compNode, compNode.init$, [], closure$)
+
+        // process attributes
+        if (compNode[PARSED]) {
+          const { attributes } = compNode[PARSED]
+          if (attributes) processAttributes(compNode, compNode, attributes)
+        }
+
         if (script) runScript(compNode, script)
         // process childNodes (DOM) and shadow DOM
         compNode.childNodes.forEach(n => processNode(compNode, n))
         buildShadowDOM(compNode)
         // connect all processedNodes
         compNode[PROCESSED_NODES].forEach(connectNode)
+        // mark the node as connected so that attributes can be updated
+        connectNode(compNode)
       } else {
         // only connect nodes that were previously disconnected
         compNode[NODES_USING_CLOSURE].forEach(connectNode)
@@ -86,6 +98,7 @@ const defineCustomElement = (compObj) => {
       runEvent(compNode, ON_DESTROY_CBS)
       // only disconnect nodes that are using closure, no need to disconnect nodes that use local state only
       compNode[NODES_USING_CLOSURE].forEach(disconnectNode)
+      disconnectNode(compNode)
     }
   }
 

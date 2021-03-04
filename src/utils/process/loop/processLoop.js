@@ -7,7 +7,6 @@ import getPartialMutationInfo from './utils/getPartialMutationInfo.js'
 import zeroToNArray from './utils/zeroToNArray.js'
 
 const processLoop = (compNode, loopedComp, parsed) => {
-  const { attributes } = parsed
   const forInfo = parsed.for
   const { map, at, as, key } = forInfo
 
@@ -15,14 +14,6 @@ const processLoop = (compNode, loopedComp, parsed) => {
   const getArray = () => map.getValue(compNode)
   const getKey = (value, index) => key.getValue(compNode, getClosure(value, index))
   const getKeys = () => getArray().map(getKey)
-
-  // get state attributes
-  const stateAttributes = attributes.filter(at => at[2] === STATE || at[2] === NORMAL)
-
-  // find attributes that depends on index
-  const indexAttributes = stateAttributes.filter(attribute => {
-    return attribute[0].deps.some(dep => dep[0] === at)
-  })
 
   const arrayPath = map.deps[0]
   const arrayPathString = arrayPath.join('.')
@@ -42,7 +33,7 @@ const processLoop = (compNode, loopedComp, parsed) => {
 
   const fullReconcile = () => {
     const n = getArray().length
-    handleArrayChange(blob, zeroToNArray(n), zeroToNArray(n), indexAttributes, stateAttributes, oldState)
+    handleArrayChange(blob, zeroToNArray(n), {}, oldState)
   }
 
   compNode[DEFERRED_WORK].push(() => {
@@ -59,8 +50,8 @@ const processLoop = (compNode, loopedComp, parsed) => {
     if (newArrayAssigned) fullReconcile()
     else {
       // partial reconciliation
-      const [dirtyIndexes, stateUpdatedIndexes] = getPartialMutationInfo(mutations, arrayPathString, arrayPath)
-      handleArrayChange(blob, dirtyIndexes, stateUpdatedIndexes, indexAttributes, stateAttributes, oldState)
+      const [dirtyIndexes, stateUpdatePaths] = getPartialMutationInfo(mutations, arrayPathString, arrayPath)
+      handleArrayChange(blob, dirtyIndexes, stateUpdatePaths, oldState)
     }
   }, DOM_BATCH)
 }

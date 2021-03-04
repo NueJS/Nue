@@ -2,43 +2,51 @@ import { saveOffsets } from '../animate/offset'
 import reconcile from './reconcile'
 import executeSteps from '../executeSteps/executeSteps'
 import getNewState from './getNewState'
-import updateCompsState from './updateCompsState'
 import { animateAll } from '../../../node/dom'
 import animateMove from '../animate/animateMove'
+import { targetProp } from '../../../state/slice'
 
-const handleArrayChange = (blob, dirtyIndexes, stateUpdatedIndexes, indexAttributes, stateAttributes, oldState) => {
-  const { comps, initialized, reorder, exit } = blob
-  const newState = getNewState(blob)
+const handleArrayChange = (blob, dirtyIndexes, stateUpdatePaths, oldState) => {
+  const { comps, initialized, reorder, exit, at, as } = blob
+  const updatedStateKeys = Object.keys(stateUpdatePaths)
 
-  // update states must happen after executeSteps to ensure the order of nodes in comps array
-  // matches the order of values in array
   const updateStates = () => {
-    if (stateUpdatedIndexes.length && initialized) {
-      updateCompsState(blob, stateUpdatedIndexes, stateAttributes)
-    }
+    if (!updatedStateKeys.length) return
+    updatedStateKeys.forEach(index => {
+      const comp = comps[index]
+      if (comp) {
+        stateUpdatePaths[index].forEach(info => {
+          const [target, prop] = targetProp(comp.$[as], info.path)
+          target[prop] = info.newValue
+        })
+      }
+    })
   }
 
-  // if nodes are added, removed or swapped
-  if (dirtyIndexes.length) {
+  const handleDirtyIndexes = () => {
+    const newState = getNewState(blob)
     const steps = reconcile(oldState, newState, dirtyIndexes)
 
-    // record offsets before DOM is updated
-    if (initialized && reorder) {
-      saveOffsets(dirtyIndexes, comps)
+    // if reorder animation is to be played, record offsets before DOM is updated
+    if (reorder && initialized) saveOffsets(dirtyIndexes, comps)
+
+    const updateIndexes = () => {
+      dirtyIndexes.forEach(i => {
+        if (comps[i]) comps[i].$[at] = i
+      })
     }
 
     const executeAndMove = () => {
+      // Note: update states must happen after executeSteps
+
       // update DOM
       executeSteps(steps, blob)
-      // update states
-      updateStates()
 
-      // update attributes that are using index
-      if (indexAttributes.length && initialized) {
-        updateCompsState(blob, dirtyIndexes, indexAttributes)
+      if (initialized) {
+        updateIndexes()
+        updateStates()
       }
 
-      // run move animations
       if (reorder) animateMove(blob, dirtyIndexes)
     }
 
@@ -48,16 +56,16 @@ const handleArrayChange = (blob, dirtyIndexes, stateUpdatedIndexes, indexAttribu
       // to get actual index valueIndex, arrayIndex need to be added
       const nodes = steps.remove.map((valueIndex, arrayIndex) => comps[valueIndex + arrayIndex])
       animateAll(nodes, exit, executeAndMove)
-    } else {
-      executeAndMove()
-    }
-  } else updateStates()
+    } else executeAndMove()
+    // ---------------------
 
-  // save newState as oldState
-  // only shallow clone required because we only care about indexes of oldState, not the deeply nested value
-  oldState.values = [...newState.values]
-  oldState.keys = newState.keys
-  oldState.keyHash = newState.keyHash
+    // save newState as oldState
+    oldState.values = [...newState.values] // only shallow clone required because we only care about indexes of oldState, not the deeply nested value
+    oldState.keys = newState.keys
+    oldState.keyHash = newState.keyHash
+  }
+
+  dirtyIndexes.length ? handleDirtyIndexes() : updateStates()
 }
 
 export default handleArrayChange

@@ -6,7 +6,8 @@
 // stateUpdatedIndexes are the indexes at which items are mutated
 const getPartialMutationInfo = (mutations, arrayPathString, arrayPath) => {
   const _dirtyIndexes = new Set()
-  const _stateUpdatedIndexes = new Set()
+  // const _stateUpdatedIndexes = new Set()
+  const stateUpdatePaths = {}
   const arrayPathLength = arrayPath.length
 
   mutations.forEach(mutation => {
@@ -44,15 +45,24 @@ const getPartialMutationInfo = (mutations, arrayPathString, arrayPath) => {
       // if the mutation path does not end with index, but goes deeper than that
       // means that item itself was mutated
       // ex: users[2].name = 'Manan'
-      else _stateUpdatedIndexes.add(Number(key))
+      else {
+        // _stateUpdatedIndexes.add(Number(key))
+        const info = {
+          path: path.slice(arrayPathLength + 1),
+          newValue
+        }
+        if (key in stateUpdatePaths) stateUpdatePaths.push(info)
+        else stateUpdatePaths[key] = [info]
+      }
     }
   })
 
   // convert _dirtyIndexes to array for sorting
   // then convert the sorted array to set so that we can get
   const dirtyIndexes = [..._dirtyIndexes].sort((a, b) => a - b)
-  const stateUpdatedIndexes = [..._stateUpdatedIndexes]
-  return [dirtyIndexes, stateUpdatedIndexes]
+  // const stateUpdatedIndexes = [..._stateUpdatedIndexes]
+
+  return [dirtyIndexes, stateUpdatePaths]
 }
 
 export default getPartialMutationInfo
