@@ -1,5 +1,5 @@
 import { BEFORE_DOM_BATCH } from '../../constants'
-import { subscribeMultiple } from '../../state/subscribe'
+import { subscribeMultiple } from '../../subscription/subscribe'
 
 const addState = (compNode, node, attribute) => {
   const [{ getValue, deps }, name] = attribute

@@ -1,5 +1,5 @@
 import { mutate } from '../../reactivity/mutate.js'
-import wire from '../../connection/wire.js'
+import { syncNode } from '../../subscription/node.js'
 
 // ex: :value=[count]
 const bindInput = (compNode, node, [{ getValue, deps }, propName]) => {
@@ -22,7 +22,7 @@ const bindInput = (compNode, node, [{ getValue, deps }, propName]) => {
   if (node.matches('[contenteditable]')) {
     const handler = () => mutate(compNode.$, deps[0], node.textContent)
     addHandler(handler)
-    wire(compNode, node, deps, setText)
+    syncNode(compNode, node, deps, setText)
     return // must return
   }
 
@@ -36,7 +36,7 @@ const bindInput = (compNode, node, [{ getValue, deps }, propName]) => {
     addHandler(handler)
   }
 
-  wire(compNode, node, deps, setProp)
+  syncNode(compNode, node, deps, setProp)
 }
 
 export default bindInput

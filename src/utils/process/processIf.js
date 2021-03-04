@@ -1,4 +1,4 @@
-import { subscribeMultiple } from '../state/subscribe.js'
+import { subscribeMultiple } from '../subscription/subscribe.js'
 import processNode from './processNode.js'
 import { animate, animatedRemove, onAnimationEnd } from '../node/dom.js'
 import getClone from '../node/clone.js'

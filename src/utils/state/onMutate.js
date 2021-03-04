@@ -1,5 +1,5 @@
 import { scheduleFlush } from '../flush.js'
-import notify from '../notify'
+import notify from '../subscription/notify'
 import { FLUSH_SCHEDULED, SUBSCRIPTIONS } from '../constants.js'
 
 // when state is mutated, add the cb in batch

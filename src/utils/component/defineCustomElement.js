@@ -6,11 +6,10 @@ import stats from '../stats'
 import { upper } from '../others.js'
 import { createElement } from '../node/dom.js'
 import parseTemplate from '../parse/parseTemplate'
-import disconnectNode from '../connection/disconnectNode.js'
-import connectNode from '../connection/connectNode.js'
 import { BATCH_INFO, BEFORE_DOM_BATCH, DEFERRED_WORK, DOM_BATCH, IGNORE_DISCONNECT, INIT_$, NODES_USING_CLOSURE, ON_DESTROY_CBS, ON_MOUNT_CBS, PARSED, PROCESSED_NODES, REORDERING, SUBSCRIPTIONS } from '../constants.js'
 import processAttributes from '../process/attributes/processAttributes.js'
 import reactify from '../reactivity/reactify.js'
+import { subscribeNode, unsubscribeNode } from '../subscription/node.js'
 
 const defineCustomElement = (compObj) => {
   const { name, template = '', script, style = '', children } = compObj
@@ -77,12 +76,12 @@ const defineCustomElement = (compObj) => {
         compNode.childNodes.forEach(n => processNode(compNode, n))
         buildShadowDOM(compNode, templateNode)
         // connect all processedNodes
-        compNode[PROCESSED_NODES].forEach(connectNode)
+        compNode[PROCESSED_NODES].forEach(subscribeNode)
         // mark the node as connected so that attributes can be updated
-        connectNode(compNode)
+        subscribeNode(compNode)
       } else {
         // only connect nodes that were previously disconnected
-        compNode[NODES_USING_CLOSURE].forEach(connectNode)
+        compNode[NODES_USING_CLOSURE].forEach(subscribeNode)
       }
 
       runEvent(compNode, ON_MOUNT_CBS)
@@ -98,8 +97,8 @@ const defineCustomElement = (compObj) => {
       // run onDestroy callbacks
       runEvent(compNode, ON_DESTROY_CBS)
       // only disconnect nodes that are using closure, no need to disconnect nodes that use local state only
-      compNode[NODES_USING_CLOSURE].forEach(disconnectNode)
-      disconnectNode(compNode)
+      compNode[NODES_USING_CLOSURE].forEach(unsubscribeNode)
+      unsubscribeNode(compNode)
     }
   }
 

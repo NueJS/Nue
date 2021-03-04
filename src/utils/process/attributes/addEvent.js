@@ -1,7 +1,8 @@
-import { addSubscriber } from '../../connection/addSubscriber.js'
+
 import DEV from '../../dev/DEV.js'
 import errors from '../../dev/errors.js'
 import stats from '../../stats.js'
+import { addSubscriber } from '../../subscription/node.js'
 
 const addEvent = (compNode, node, [fnName, eventName]) => {
   const handler = compNode.fn[fnName]

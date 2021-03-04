@@ -1,4 +1,4 @@
-import { subscribeMultiple } from '../state/subscribe.js'
+import { subscribeMultiple } from '../subscription/subscribe.js'
 import errors from '../dev/errors.js'
 import DEV from '../dev/DEV.js'
 import { AFTER_UPDATE_CBS, BEFORE_DOM_BATCH, BEFORE_UPDATE_CBS, ON_DESTROY_CBS, ON_MOUNT_CBS } from '../constants.js'

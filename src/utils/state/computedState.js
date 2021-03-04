@@ -1,5 +1,5 @@
 import { mutate } from '../reactivity/mutate.js'
-import { subscribeMultiple } from './subscribe.js'
+import { subscribeMultiple } from '../subscription/subscribe'
 import detectStateUsage from './detectStateUsage.js'
 import { BEFORE_DOM_BATCH } from '../constants.js'
 

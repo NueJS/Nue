@@ -1,5 +1,5 @@
-import { ITSELF } from './constants'
-import { isObject } from './others'
+import { ITSELF } from '../constants'
+import { isObject } from '../others'
 
 // notify all the callbacks that are in given tree
 const notifyAll = (tree) => {
