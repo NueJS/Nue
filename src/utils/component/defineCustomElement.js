@@ -34,6 +34,7 @@ const defineCustomElement = (compObj) => {
     constructor () {
       super()
       const compNode = this
+      compNode.name = name
       compNode.refs = {}
       compNode[SUBSCRIPTIONS] = { $: new Set() }
       // batches
@@ -42,8 +43,7 @@ const defineCustomElement = (compObj) => {
 
       compNode[BATCH_INFO] = []
       compNode[DEFERRED_WORK] = []
-      compNode.templateNode = templateNode
-      compNode.component = compObj
+      // compNode.component = compObj
       compNode[PROCESSED_NODES] = new Set()
       compNode[NODES_USING_CLOSURE] = new Set()
 
@@ -74,7 +74,7 @@ const defineCustomElement = (compObj) => {
         if (script) runScript(compNode, script)
         // process childNodes (DOM) and shadow DOM
         compNode.childNodes.forEach(n => processNode(compNode, n))
-        buildShadowDOM(compNode)
+        buildShadowDOM(compNode, templateNode)
         // connect all processedNodes
         compNode[PROCESSED_NODES].forEach(connectNode)
         // mark the node as connected so that attributes can be updated

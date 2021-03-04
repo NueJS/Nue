@@ -3,8 +3,8 @@ import getClone from '../node/clone.js'
 import { executeAndClear } from '../others.js'
 import processNode from '../process/processNode.js'
 
-const buildShadowDOM = (compNode) => {
-  const rootNode = getClone(compNode.templateNode.content)
+const buildShadowDOM = (compNode, templateNode) => {
+  const rootNode = getClone(templateNode.content)
 
   processNode(compNode, rootNode)
   executeAndClear(compNode[DEFERRED_WORK])
