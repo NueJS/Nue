@@ -56,7 +56,7 @@ export const ON_MUTATE_CBS = 64
 
 // compNode internal only properties
 export const BATCH_INFO = /*#__PURE__*/ Symbol()
-export const IS_BATCHING = /*#__PURE__*/ Symbol()
+export const FLUSH_SCHEDULED = /*#__PURE__*/ Symbol()
 export const IGNORE_DISCONNECT = /*#__PURE__*/ Symbol()
 export const DEFERRED_WORK = /*#__PURE__*/ Symbol()
 export const PARSED = /*#__PURE__*/ Symbol()
