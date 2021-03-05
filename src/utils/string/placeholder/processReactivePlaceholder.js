@@ -9,22 +9,20 @@ const processReactivePlaceholder = (content) => {
 
   // return the value of placeholder in given component
   // @TODO clean this up
-  const getValue = (compNode, closure) => {
-    const state = compNode.$
-
-    const getValueFrom = (source) => {
-      if (!source) return
-      const [target, prop] = targetProp(source, path)
-      if (target) return target[prop]
+  const getValue = (compNode) => {
+    if (DEV) {
+      try {
+        const [target, prop] = targetProp(compNode.$, path)
+        const value = target[prop]
+        if (!isDefined(value)) throw value
+        else return value
+      } catch (e) {
+        throw errors.STATE_NOT_FOUND(compNode.name, content)
+      }
+    } else {
+      const [target, prop] = targetProp(compNode.$, path)
+      return target[prop]
     }
-    // check in closure first
-    const valueFromClosure = getValueFrom(closure)
-    if (isDefined(valueFromClosure)) return valueFromClosure
-    // else
-    const valueFromState = getValueFrom(state)
-    if (isDefined(valueFromState)) return valueFromState
-    // if not found in both of them, throw
-    if (DEV) throw errors.STATE_NOT_FOUND(compNode.name, content)
   }
 
   return {
