@@ -15,7 +15,7 @@ const processIf = (compNode, ifNode, parsed) => {
   const anchorNode = ifNode.previousSibling
 
   // group that is currently rendered
-  let active
+  let active, initialized
 
   const onGroupDepChange = () => {
     // if a group's condition is foundSatisfied, this becomes true
@@ -40,7 +40,7 @@ const processIf = (compNode, ifNode, parsed) => {
 
           const mount = () => {
             anchorNode.after(conditionNode)
-            if (enter) animate(conditionNode, enter, true)
+            if (enter && initialized) animate(conditionNode, enter, true)
           }
 
           // if it should wait for active component's animation to end
@@ -67,6 +67,7 @@ const processIf = (compNode, ifNode, parsed) => {
   compNode[DEFERRED_WORK].push(() => {
     ifNode.remove()
     onGroupDepChange()
+    initialized = true
   })
 }
 
