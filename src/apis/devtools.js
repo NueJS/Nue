@@ -1,6 +1,8 @@
 const devtools = {
   showUpdates: false,
-  onNodeUpdate: null
+  onNodeUpdate: (cb) => {
+    if (devtools.showUpdates) cb()
+  }
 }
 
 export default devtools
