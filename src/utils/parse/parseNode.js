@@ -19,11 +19,12 @@ const usesConditionalAttribute = compNode => {
 
 const parseNode = (node, childCompNodeNames, deferred, name) => {
   // it is a component if the node's nodeName is in the childCompNodeNames set
-  const isComp = childCompNodeNames.has(node.nodeName)
+  const compName = childCompNodeNames[node.nodeName]
 
-  if (isComp) {
+  if (compName) {
     node[PARSED] = {
-      isComp: true
+      isComp: true,
+      name: compName
     }
 
     const forAttribute = getAttr(node, FOR_ATTRIBUTE)
@@ -52,7 +53,7 @@ const parseNode = (node, childCompNodeNames, deferred, name) => {
     parseAttributes(node)
 
     // if component specific attributes are used on non-component nodes
-    if (DEV && !isComp) {
+    if (DEV && !compName) {
       const compOnlyAttributes = [FOR_ATTRIBUTE, KEY_ATTRIBUTE, IF_ATTRIBUTE, ELSE_IF_ATTRIBUTE, ELSE_ATTRIBUTE]
       compOnlyAttributes.forEach(attrName => {
         if (getAttr(node, attrName)) {

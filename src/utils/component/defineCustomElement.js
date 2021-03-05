@@ -19,8 +19,14 @@ const defineCustomElement = (compObj) => {
 
   components[name] = compObj
 
-  // set of names that are children
-  const childCompNodeNames = new Set(children ? children.map(childCompObj => upper(childCompObj.name)) : [])
+  let childCompNodeNames = {}
+  if (children) {
+    childCompNodeNames = children.reduce((acc, child) => {
+      const { name } = child
+      acc[upper(name)] = name
+      return acc
+    }, {})
+  }
 
   // create templateNode using template, style, and defaultStyle
   const templateNode = createElement('template')
