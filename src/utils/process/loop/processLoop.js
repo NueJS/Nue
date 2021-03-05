@@ -12,7 +12,7 @@ const processLoop = (compNode, loopedComp, parsed) => {
 
   const getClosure = (value, index) => ({ [at]: index, [as]: value })
   const getArray = () => map.getValue(compNode)
-  const getKey = (value, index) => key.getValue(compNode, getClosure(value, index))
+  const getKey = (value, index) => key.getValue({ name: parsed.name, $: getClosure(value, index) })
   const getKeys = () => getArray().map(getKey)
 
   const arrayPath = map.deps[0]
