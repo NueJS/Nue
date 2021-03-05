@@ -1,4 +1,6 @@
+import devtools from '../../apis/devtools'
 import { DOM_BATCH, IS_SUBSCRIBED } from '../constants'
+import DEV from '../dev/DEV'
 import { subscribeMultiple } from './subscribe'
 
 export const subscribeNode = (node) => {
@@ -29,6 +31,8 @@ export const syncNode = (compNode, node, deps, update) => {
   // returns unsubscriber function which removes subscription from compNode subscriptions to prevent unnecessary dom updates
   const subscriber = () => {
     update()
+
+    if (DEV) devtools.onNodeUpdate(node)
     return subscribeMultiple(compNode, deps, update, DOM_BATCH)
   }
 
