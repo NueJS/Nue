@@ -9,11 +9,11 @@ const bindInput = (compNode, node, [{ getValue, deps }, propName]) => {
   }
 
   const setProp = () => {
-    node[propName] = getValue(compNode, node)
+    node[propName] = getValue(compNode)
   }
 
   const setText = () => {
-    node.textContent = getValue(compNode, node)
+    node.textContent = getValue(compNode)
   }
 
   const addHandler = (handler) => {
