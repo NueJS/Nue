@@ -16,7 +16,7 @@
     "web components"
   ],
   "author": "Manan Tank",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@babel/core": "^7.12.9",
     "@babel/plugin-transform-modules-commonjs": "^7.12.1",
