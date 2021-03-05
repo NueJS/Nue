@@ -1,7 +1,10 @@
 import { animate, createElement } from '../../node/dom'
+import stats from '../../stats'
 import html from './html'
 
 const handleErrors = (error) => {
+  // if already showing error, return
+  if (stats.error) return
   class errorOverlay extends HTMLElement {
     constructor () {
       super()
@@ -23,15 +26,22 @@ const handleErrors = (error) => {
 
   window.customElements.define('nuejs-error-overlay', errorOverlay)
 
-  const $errorOverlay = createElement('nuejs-error-overlay')
-  document.body.append($errorOverlay)
+  const overlay = createElement('nuejs-error-overlay')
+  document.body.append(overlay)
 
-  const $message = $errorOverlay.shadowRoot.querySelector('.message')
-  const errorMessage = `${error.message}\n\n${error.fix || ''}`
-  $message.textContent = errorMessage
+  const message = overlay.shadowRoot.querySelector('.message')
 
-  const $componentName = $errorOverlay.shadowRoot.querySelector('.title')
-  $componentName.textContent = `error in <${error.compName}>`
+  const title = overlay.shadowRoot.querySelector('.title')
+  if (error.compName) {
+    title.textContent = `error in <${error.compName}>`
+    const errorMessage = `${error.message}\n\n${error.fix || ''}`
+    message.textContent = errorMessage
+  } else {
+    title.textContent = error.constructor.name
+    message.textContent = error.message
+  }
+
+  stats.error = true
 }
 
 export default handleErrors
