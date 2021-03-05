@@ -1,32 +1,36 @@
-import { createElement } from '../../node/dom'
+import { animate, createElement } from '../../node/dom'
 import html from './html'
 
 const handleErrors = (error) => {
-  class sweetErrorOverlay extends HTMLElement {
+  class errorOverlay extends HTMLElement {
     constructor () {
       super()
-      this.attachShadow({ mode: 'open' })
-      this.shadowRoot.innerHTML = html
+      const shadowRoot = this.attachShadow({ mode: 'open' })
+      shadowRoot.innerHTML = html
     }
 
     connectedCallback () {
       const closeButton = this.shadowRoot.querySelector('.parsed-error__close-icon')
       closeButton.addEventListener('click', e => {
-        this.remove()
+        const modal = this.shadowRoot.querySelector('.parsed-error__card')
+
+        animate(modal, 'pop-out 400ms ease', true, () => {
+          this.remove()
+        })
       })
     }
   }
 
-  window.customElements.define('parsed-error-overlay', sweetErrorOverlay)
+  window.customElements.define('nuejs-error-overlay', errorOverlay)
 
-  const $sweetErrorOverlay = createElement('parsed-error-overlay')
-  document.body.append($sweetErrorOverlay)
+  const $errorOverlay = createElement('nuejs-error-overlay')
+  document.body.append($errorOverlay)
 
-  const $message = $sweetErrorOverlay.shadowRoot.querySelector('.message')
+  const $message = $errorOverlay.shadowRoot.querySelector('.message')
   const errorMessage = `${error.message}\n\n${error.fix || ''}`
   $message.textContent = errorMessage
 
-  const $componentName = $sweetErrorOverlay.shadowRoot.querySelector('.title')
+  const $componentName = $errorOverlay.shadowRoot.querySelector('.title')
   $componentName.textContent = `error in <${error.compName}>`
 }
 

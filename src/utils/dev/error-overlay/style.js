@@ -7,7 +7,7 @@ export default /* html */`
     position: fixed;
     top: 0;
     left: 0;
-    font-family: 'Monolisa', 'Fira Code', 'Dank Mono', consolas, monospace;
+    font-family: consolas, monospace;
     width: 100vw;
     height: 100vh;
   }
@@ -21,6 +21,14 @@ export default /* html */`
     animation: fade-in 300ms ease;
     position: relative;
     box-shadow: 2px 2px 20px rgba(0,0,0,0.1);
+  }
+
+
+  @keyframes pop-out {
+    to {
+      opacity: 0;
+      transform: scale(0.8);
+    }
   }
 
   .parsed-error__close-icon {
@@ -45,12 +53,6 @@ export default /* html */`
     cursor: pointer;
   }
 
-  @keyframes fade-in {
-    from {
-      opacity: 0;
-    }
-  }
-
   @keyframes spin {
     to {
       transform: translate(40%, -40%) rotate(1turn);
@@ -65,6 +67,11 @@ export default /* html */`
     box-sizing: border-box;
   }
 
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+  }
   .title {
     font-size: 24px;
     margin-bottom: 16px;
