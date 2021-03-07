@@ -1,4 +1,4 @@
-import bindInput from './bindInput.js'
+import addProp from './addProp.js'
 import addAttribute from './addAttribute.js'
 import addEvent from './addEvent.js'
 import { EVENT, BIND, NORMAL, CONDITIONAL, REF, STATE, STATIC_STATE, FUNCTION_ATTRIBUTE } from '../../constants.js'
@@ -9,7 +9,7 @@ import addFn from './addFn.js'
 
 const typeToFn = {
   [EVENT]: addEvent,
-  [BIND]: bindInput,
+  [BIND]: addProp,
   [NORMAL]: addAttribute,
   [CONDITIONAL]: addAttribute,
   [FUNCTION_ATTRIBUTE]: addFn,

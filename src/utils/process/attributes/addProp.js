@@ -1,32 +1,20 @@
+import mutate from '../../state/mutate.js'
 import { syncNode } from '../../subscription/node.js'
 
 // ex: :value=[count]
 const bindInput = (compNode, node, [{ getValue, deps }, propName]) => {
   const isNumber = node.type === 'number' || node.type === 'range'
-  const key = deps[0]
+
   const updateState = value => {
-    compNode.$[key] = value
+    mutate(compNode.$, deps[0], value)
   }
 
   const setProp = () => {
     node[propName] = getValue(compNode)
   }
 
-  const setText = () => {
-    node.textContent = getValue(compNode)
-  }
-
   const addHandler = (handler) => {
-    const { onMount, onDestroy } = compNode.events
-    onMount(() => node.addEventListener('input', handler))
-    onDestroy(() => node.removeEventListener('input', handler))
-  }
-
-  if (node.matches('[contenteditable]')) {
-    const handler = () => updateState(node.textContent)
-    addHandler(handler)
-    syncNode(compNode, node, deps, setText)
-    return // must return
+    node.addEventListener('input', handler)
   }
 
   if (node.matches('input, textarea')) {
