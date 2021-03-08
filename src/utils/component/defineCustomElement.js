@@ -6,7 +6,7 @@ import stats from '../stats'
 import { upper } from '../others.js'
 import { createElement } from '../node/dom.js'
 import parseTemplate from '../parse/parseTemplate'
-import { BATCH_INFO, BEFORE_DOM_BATCH, DEFERRED_WORK, DOM_BATCH, IGNORE_DISCONNECT, INIT_$, NODES_USING_CLOSURE, ON_DESTROY_CBS, ON_MOUNT_CBS, PARSED, PROCESSED_NODES, REORDERING, SUBSCRIPTIONS } from '../constants.js'
+import { BATCH_INFO, BEFORE_DOM_BATCH, DEFERRED_WORK, DOM_BATCH, IGNORE_DISCONNECT, INIT_$, ITSELF, NODES_USING_CLOSURE, ON_DESTROY_CBS, ON_MOUNT_CBS, PARSED, PROCESSED_NODES, REORDERING, SUBSCRIPTIONS, TARGET } from '../constants.js'
 import processAttributes from '../process/attributes/processAttributes.js'
 import reactify from '../reactivity/reactify.js'
 import { subscribeNode, unsubscribeNode } from '../subscription/node.js'
@@ -42,7 +42,7 @@ const defineCustomElement = (compObj) => {
       compNode.name = name
       compNode.refs = {}
 
-      compNode[SUBSCRIPTIONS] = { $: new Set() }
+      compNode[SUBSCRIPTIONS] = { [ITSELF]: new Set() }
 
       // batches
       compNode[BEFORE_DOM_BATCH] = new Set()
