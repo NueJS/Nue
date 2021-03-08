@@ -2,6 +2,12 @@ import { PARSED, TEXT } from '../constants.js'
 import split from '../string/split.js'
 
 const parseTextNode = (node, deferred) => {
+  // @todo maybe we need to remove first then parseIf
+  if (!node.textContent.trim()) {
+    deferred.push(() => node.remove())
+    return
+  }
+
   const placeholders = split(node.textContent.trim())
   const textNodes = []
 

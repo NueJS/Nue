@@ -1,12 +1,24 @@
+
 import { isBracketed } from '../string/bracket.js'
 import processPlaceholder from '../string/placeholder/processPlaceholder.js'
-import { STATE, EVENT, BIND, NORMAL, CONDITIONAL, STATIC_STATE, FUNCTION_ATTRIBUTE, REF, REF_ATTRIBUTE, PARSED } from '../constants.js'
-import isComp from '../node/isComp.js'
-import { removeAttr } from '../node/dom.js'
+import { STATE, EVENT, BIND, NORMAL, CONDITIONAL, STATIC_STATE, FUNCTION_ATTRIBUTE, REF, REF_ATTRIBUTE, PARSED, FOR_ATTRIBUTE, KEY_ATTRIBUTE, IF_ATTRIBUTE, ELSE_IF_ATTRIBUTE, ELSE_ATTRIBUTE } from '../constants.js'
+import { getAttr, removeAttr } from '../node/dom.js'
+import errors from '../dev/errors.js'
+import DEV from '../dev/DEV.js'
 
-const parseAttributes = (node) => {
+const parseAttributes = (node, compName) => {
+  // if component specific attributes are used on non-component nodes
+  if (DEV && !compName) {
+    const compOnlyAttributes = [FOR_ATTRIBUTE, KEY_ATTRIBUTE, IF_ATTRIBUTE, ELSE_IF_ATTRIBUTE, ELSE_ATTRIBUTE]
+    compOnlyAttributes.forEach(attrName => {
+      if (getAttr(node, attrName)) {
+        throw errors.RESERVED_ATTRIBUTE_USED_ON_NON_COMPONENT(name, node, attrName)
+      }
+    })
+  }
+
   const attributes = []
-  const nodeIsComp = isComp(node)
+  const nodeIsComp = !!compName
 
   for (const attributeName of node.getAttributeNames()) {
     const attributeValue = node.getAttribute(attributeName)
