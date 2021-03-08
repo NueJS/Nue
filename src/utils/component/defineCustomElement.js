@@ -83,8 +83,6 @@ const defineCustomElement = (compObj) => {
         buildShadowDOM(compNode, templateNode)
         // connect all processedNodes
         compNode[PROCESSED_NODES].forEach(subscribeNode)
-        // mark the node as connected so that attributes can be updated
-        subscribeNode(compNode)
       } else {
         // only connect nodes that were previously disconnected
         compNode[NODES_USING_CLOSURE].forEach(subscribeNode)
@@ -92,6 +90,8 @@ const defineCustomElement = (compObj) => {
 
       runEvent(compNode, ON_MOUNT_CBS)
       compNode[IGNORE_DISCONNECT] = false
+      // mark the node as connected so that attributes can be updated
+      subscribeNode(compNode)
     }
 
     disconnectedCallback () {
