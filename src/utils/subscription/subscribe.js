@@ -10,12 +10,12 @@ const subscribe = (baseCompNode, path, cb, batchName) => {
   // get the originCompNode where the state referred by path is coming from
   const originCompNode = origin(baseCompNode, path)
 
-  if (originCompNode !== baseCompNode && cb.node) {
-    baseCompNode[NODES_USING_CLOSURE].add(cb.node)
-  }
-
   // throw if no origin is found
   if (DEV && !originCompNode) throw errors.STATE_NOT_FOUND(baseCompNode.name, path.join('.'))
+
+  if (cb.node && originCompNode !== baseCompNode) {
+    baseCompNode[NODES_USING_CLOSURE].add(cb.node)
+  }
 
   // get the higher order cb that will only call the cb once every batch
   const batchCb = batchify(cb, originCompNode[batchName])

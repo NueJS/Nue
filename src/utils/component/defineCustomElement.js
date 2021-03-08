@@ -6,7 +6,7 @@ import stats from '../stats'
 import { upper } from '../others.js'
 import { createElement } from '../node/dom.js'
 import parseTemplate from '../parse/parseTemplate'
-import { BATCH_INFO, BEFORE_DOM_BATCH, DEFERRED_WORK, DOM_BATCH, IGNORE_DISCONNECT, INIT_$, ITSELF, NODES_USING_CLOSURE, ON_DESTROY_CBS, ON_MOUNT_CBS, PARSED, PROCESSED_NODES, REORDERING, SUBSCRIPTIONS, TARGET } from '../constants.js'
+import { BATCH_INFO, BEFORE_DOM_BATCH, DEFERRED_WORK, DOM_BATCH, IGNORE_DISCONNECT, INIT_$, ITSELF, NODES_USING_CLOSURE, ON_DESTROY_CBS, ON_MOUNT_CBS, PARSED, NODES_USING_STATE, REORDERING, SUBSCRIPTIONS, TARGET } from '../constants.js'
 import processAttributes from '../process/attributes/processAttributes.js'
 import reactify from '../reactivity/reactify.js'
 import { subscribeNode, unsubscribeNode } from '../subscription/node.js'
@@ -39,18 +39,28 @@ const defineCustomElement = (compObj) => {
     constructor () {
       super()
       const compNode = this
+      // name of the custom element
       compNode.name = name
+      // refs of child nodes with *ref='xyz' attribute
       compNode.refs = {}
-
+      // subscription tree which contains the callbacks stored at various dependency paths
       compNode[SUBSCRIPTIONS] = { [ITSELF]: new Set() }
 
       // batches
+      // this batch's callbacks are run first
       compNode[BEFORE_DOM_BATCH] = new Set()
+      // and then this batch's callback runs
       compNode[DOM_BATCH] = new Set()
 
+      // array of mutation info that happened in a flush
+      // mutation info is an object with oldValue, newValue, path and getPath keys
       compNode[BATCH_INFO] = []
+
+      // array of callbacks that should be run after some process is done
       compNode[DEFERRED_WORK] = []
-      compNode[PROCESSED_NODES] = new Set()
+      // nodes that are using the state
+      compNode[NODES_USING_STATE] = new Set()
+      // nodes that are using the closure state
       compNode[NODES_USING_CLOSURE] = new Set()
 
       if (!compNode[INIT_$]) compNode[INIT_$] = {}
@@ -59,10 +69,14 @@ const defineCustomElement = (compObj) => {
 
     connectedCallback () {
       const compNode = this
+
       // if the connection change is due to reordering, ignore
       if (compNode[REORDERING]) return
 
-      // if first time connecting
+      // do not ignore disconnect
+      compNode[IGNORE_DISCONNECT] = false
+
+      // when component is being connected for the first time
       if (!compNode.shadowRoot) {
         const { closure } = compNode
         // add fn
@@ -78,20 +92,25 @@ const defineCustomElement = (compObj) => {
         }
 
         if (script) runScript(compNode, script)
+
         // process childNodes (DOM) and shadow DOM
         compNode.childNodes.forEach(n => processNode(compNode, n))
         buildShadowDOM(compNode, templateNode)
-        // connect all processedNodes
-        compNode[PROCESSED_NODES].forEach(subscribeNode)
-      } else {
-        // only connect nodes that were previously disconnected
+
+        // connect all nodes using state (local + closure)
+        compNode[NODES_USING_STATE].forEach(subscribeNode)
+
+        // subscribe node, so that it's attributes are in sync
+        subscribeNode(compNode)
+      }
+
+      // only connect nodes that were previously disconnected (nodes using closure state)
+      else {
         compNode[NODES_USING_CLOSURE].forEach(subscribeNode)
       }
 
+      // run onMount callbacks
       runEvent(compNode, ON_MOUNT_CBS)
-      compNode[IGNORE_DISCONNECT] = false
-      // mark the node as connected so that attributes can be updated
-      subscribeNode(compNode)
     }
 
     disconnectedCallback () {
@@ -104,7 +123,8 @@ const defineCustomElement = (compObj) => {
       runEvent(compNode, ON_DESTROY_CBS)
       // only disconnect nodes that are using closure, no need to disconnect nodes that use local state only
       compNode[NODES_USING_CLOSURE].forEach(unsubscribeNode)
-      unsubscribeNode(compNode)
+
+      // unsubscribeNode(compNode) (not needed)
     }
   }
 
