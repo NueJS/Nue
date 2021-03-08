@@ -28,7 +28,7 @@ export const lower = (s) => s.toLowerCase()
 export const upper = (s) => s.toUpperCase()
 
 // execute all functions in array and clear array
-export const executeAndClear = (arr) => {
+export const flushArray = (arr) => {
   arr.forEach(fn => fn())
   arr.length = 0
 }

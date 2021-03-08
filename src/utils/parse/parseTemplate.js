@@ -1,10 +1,10 @@
-import { executeAndClear } from '../others'
+import { flushArray } from '../others'
 import parseNode from './parseNode'
 
-const parseTemplate = (templateNode, childCompNodeNames, name) => {
+const parseTemplate = (templateNode, childCompNodeNames) => {
   const deferred = []
-  parseNode(templateNode.content, childCompNodeNames, deferred, name)
-  executeAndClear(deferred)
+  parseNode(templateNode.content, childCompNodeNames, deferred)
+  flushArray(deferred)
 }
 
 export default parseTemplate

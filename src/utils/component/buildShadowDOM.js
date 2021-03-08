@@ -1,13 +1,13 @@
 import { DEFERRED_WORK } from '../constants.js'
 import getClone from '../node/clone.js'
-import { executeAndClear } from '../others.js'
+import { flushArray } from '../others.js'
 import processNode from '../process/processNode.js'
 
 const buildShadowDOM = (compNode, templateNode) => {
   const rootNode = getClone(templateNode.content)
 
   processNode(compNode, rootNode)
-  executeAndClear(compNode[DEFERRED_WORK])
+  flushArray(compNode[DEFERRED_WORK])
 
   // add rootNode to shadow DOM
   compNode.attachShadow({ mode: 'open' });
