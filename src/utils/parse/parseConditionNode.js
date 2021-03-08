@@ -11,6 +11,8 @@ const parseConditionNode = (node, type, value) => {
   }
   if (type !== ELSE_ATTRIBUTE) node[PARSED].condition = processPlaceholder(value)
   removeAttr(node, type)
+  removeAttr(node, ENTER_ANIMATION)
+  removeAttr(node, EXIT_ANIMATION)
 }
 
 export default parseConditionNode
