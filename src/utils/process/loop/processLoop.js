@@ -8,14 +8,14 @@ import zeroToNArray from './utils/zeroToNArray.js'
 
 const processLoop = (compNode, loopedComp, parsed) => {
   const forInfo = parsed.for
-  const { map, at, as, key } = forInfo
+  const { itemArray, itemIndex, item, key } = forInfo
 
-  const getClosure = (value, index) => ({ [at]: index, [as]: value })
-  const getArray = () => map.getValue(compNode)
+  const getClosure = (value, index) => ({ [itemIndex]: index, [item]: value })
+  const getArray = () => itemArray.getValue(compNode)
   const getKey = (value, index) => key.getValue({ name: parsed.name, $: getClosure(value, index) })
   const getKeys = () => getArray().map(getKey)
 
-  const arrayPath = map.deps[0]
+  const arrayPath = itemArray.deps[0]
   const arrayPathString = arrayPath.join('.')
   const anchorNode = createComment('loop/')
 

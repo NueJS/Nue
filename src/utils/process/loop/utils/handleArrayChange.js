@@ -7,7 +7,7 @@ import animateMove from '../animate/animateMove'
 import { targetProp } from '../../../state/slice'
 
 const handleArrayChange = (blob, dirtyIndexes, stateUpdatePaths, oldState) => {
-  const { comps, initialized, reorder, exit, at, as } = blob
+  const { comps, initialized, reorder, exit, itemIndex, item } = blob
   const updatedStateKeys = Object.keys(stateUpdatePaths)
 
   const updateStates = () => {
@@ -16,7 +16,7 @@ const handleArrayChange = (blob, dirtyIndexes, stateUpdatePaths, oldState) => {
       const comp = comps[index]
       if (comp) {
         stateUpdatePaths[index].forEach(info => {
-          const [target, prop] = targetProp(comp.$[as], info.path)
+          const [target, prop] = targetProp(comp.$[item], info.path)
           target[prop] = info.newValue
         })
       }
@@ -32,7 +32,7 @@ const handleArrayChange = (blob, dirtyIndexes, stateUpdatePaths, oldState) => {
 
     const updateIndexes = () => {
       dirtyIndexes.forEach(i => {
-        if (comps[i]) comps[i].$[at] = i
+        if (comps[i]) comps[i].$[itemIndex] = i
       })
     }
 

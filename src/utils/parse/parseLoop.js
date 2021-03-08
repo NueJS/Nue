@@ -13,12 +13,12 @@ const parseLoop = (node, forAttribute) => {
   const indexUsed = isDefined(c)
 
   node[PARSED].for = {
-    // @todo rename map to itemArray
-    map: processPlaceholder(indexUsed ? c : b, true),
+    // @todo rename itemArray to itemArray
+    itemArray: processPlaceholder(indexUsed ? c : b, true),
     // @todo rename to itemValue
-    as: a,
+    item: a,
     // @todo rename to itemIndex
-    at: indexUsed && b,
+    itemIndex: indexUsed && b,
     key: processPlaceholder(getAttr(node, KEY_ATTRIBUTE)),
     // @todo wrap in animations object ?
     enter: getAttr(node, ENTER_ANIMATION),
