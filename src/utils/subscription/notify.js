@@ -15,13 +15,12 @@ const notify = (subscriptions, path) => {
   path.forEach((edge, i) => {
     // if primitive, return
     if (!isObject(tree)) return
+    // for non-leaf node, notify parent path subscribers
+    if (i !== leafIndex) tree[ITSELF].forEach(cb => cb())
+    // notify child path subscribers
+    notifyAll(tree)
+
     tree = tree[edge]
-    if (tree) {
-      // for non-leaf node, notify parent path subscribers
-      if (i !== leafIndex) tree[ITSELF].forEach(cb => cb())
-      // notify child path subscribers
-      notifyAll(tree)
-    }
   })
 }
 
