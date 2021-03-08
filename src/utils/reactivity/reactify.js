@@ -2,7 +2,7 @@ import onMutate from '../state/onMutate.js'
 import modes from './modes.js'
 import computedState from '../state/computedState.js'
 import { accessed } from '../state/detectStateUsage.js'
-import { BATCH_INFO, DETECTIVE_MODE, IS_REACTIVE, NO_OVERRIDE_MODE, REACTIVE_MODE, TARGET, UPDATE_INDEX } from '../constants.js'
+import { BATCH_INFO, DETECTIVE_MODE, IS_REACTIVE, NO_OVERRIDE_MODE, ORIGIN, REACTIVE_MODE, TARGET, UPDATE_INDEX } from '../constants.js'
 import { isObject } from '../others.js'
 
 // create a reactive object which when mutated calls the on_change function
@@ -86,6 +86,7 @@ const reactify = (compNode, obj, _path = [], closure$) => {
     },
 
     get (target, prop) {
+      if (prop === ORIGIN) return compNode
       if (prop === IS_REACTIVE) return true
       if (prop === TARGET) return target
       if (modes[DETECTIVE_MODE]) {
