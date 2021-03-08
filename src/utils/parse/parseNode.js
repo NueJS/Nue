@@ -2,7 +2,7 @@ import parseAttributes from './parseAttributes'
 import parseTextNode from './parseTextNode'
 import parseComp from './parseComp'
 
-const parseNode = (node, childCompNodeNames, deferred, name) => {
+const parseNode = (node, childCompNodeNames, deferred) => {
   // if node is component, get it's name else it will be undefined
   const compName = childCompNodeNames[node.nodeName]
   // #text
@@ -12,9 +12,7 @@ const parseNode = (node, childCompNodeNames, deferred, name) => {
   // attributes on component or simple node
   if (node.hasAttribute) parseAttributes(node, compName)
   // child nodes of component or simple node
-  if (node.hasChildNodes()) {
-    node.childNodes.forEach(childNode => parseNode(childNode, childCompNodeNames, deferred, name))
-  }
+  if (node.hasChildNodes()) node.childNodes.forEach(childNode => parseNode(childNode, childCompNodeNames, deferred))
 }
 
 export default parseNode

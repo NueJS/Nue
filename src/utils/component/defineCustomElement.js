@@ -33,7 +33,7 @@ const defineCustomElement = (compObj) => {
   templateNode.innerHTML = template + `<style default> ${config.defaultStyle} </style>` + '<style scoped >' + style + '</style>'
 
   // parse the template and create templateNode which has all the parsed info
-  parseTemplate(templateNode, childCompNodeNames, name)
+  parseTemplate(templateNode, childCompNodeNames)
 
   class NueComp extends HTMLElement {
     constructor () {
