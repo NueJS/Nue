@@ -4,17 +4,16 @@ import { flushArray } from '../others.js'
 import processNode from '../process/processNode.js'
 
 const buildShadowDOM = (compNode, templateNode) => {
-  const rootNode = getClone(templateNode.content)
-
-  processNode(compNode, rootNode)
+  // clone templateNode
+  const fragment = getClone(templateNode.content)
+  // process nodes
+  processNode(compNode, fragment)
+  // run deferred work
   flushArray(compNode[DEFERRED_WORK])
-
-  // add rootNode to shadow DOM
-  compNode.attachShadow({ mode: 'open' });
-
-  // must use spread here even though childNodes is an array
-  // because, appending rootNode to shadowRoot, removes it from childNodes array
-  [...rootNode.childNodes].forEach(childNode => compNode.shadowRoot.append(childNode))
+  // create shadowRoot
+  compNode.attachShadow({ mode: 'open' })
+  // add fragment nodes to shadowRoot
+  compNode.shadowRoot.append(fragment)
 }
 
 export default buildShadowDOM
