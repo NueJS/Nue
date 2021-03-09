@@ -1,6 +1,4 @@
-import { upper } from '../others'
-
-export const dashify = s => upper(s) + '-'
+export const dashify = s => s + '-'
 
 export const dashifyComponentNames = (html, components) =>
   components.reduce(
