@@ -21,6 +21,7 @@ export const TEXT = 32
 export const DETECTIVE_MODE = 40
 export const REACTIVE_MODE = 41
 export const NO_OVERRIDE_MODE = 42
+export const ORIGIN_MODE = 43
 
 // batch names
 export const BEFORE_DOM_BATCH = 31
@@ -69,4 +70,3 @@ export const PREV_OFFSET = /*#__PURE__*/ Symbol()
 export const INIT_$ = /*#__PURE__*/ Symbol()
 export const IS_PROCESSED = /*#__PURE__*/ Symbol()
 export const ITSELF = /*#__PURE__*/ Symbol()
-export const ORIGIN = /*#__PURE__*/ Symbol()
