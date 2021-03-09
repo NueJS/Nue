@@ -42,3 +42,13 @@ export const getAnimationAttributes = (node) => ({
   enter: getAttr(node, ENTER_ANIMATION),
   exit: getAttr(node, EXIT_ANIMATION)
 })
+
+const node = /*#__PURE__*/ document.createElement('div')
+
+export const dashCaseToCamelCase = (name) => {
+  const attributeName = 'data-' + name
+  setAttr(node, attributeName, '')
+  const camelCaseName = Object.keys(node.dataset)[0]
+  removeAttr(node, attributeName)
+  return camelCaseName
+}

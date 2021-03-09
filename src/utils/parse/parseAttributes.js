@@ -2,7 +2,7 @@
 import { isBracketed } from '../string/bracket.js'
 import processPlaceholder from '../string/placeholder/processPlaceholder.js'
 import { STATE, EVENT, BIND, NORMAL, CONDITIONAL, STATIC_STATE, FUNCTION_ATTRIBUTE, REF, REF_ATTRIBUTE, PARSED, FOR_ATTRIBUTE, KEY_ATTRIBUTE, IF_ATTRIBUTE, ELSE_IF_ATTRIBUTE, ELSE_ATTRIBUTE } from '../constants.js'
-import { getAttr, removeAttr } from '../node/dom.js'
+import { getAttr, removeAttr, dashCaseToCamelCase } from '../node/dom.js'
 import errors from '../dev/errors.js'
 import DEV from '../dev/DEV.js'
 
@@ -85,8 +85,11 @@ const parseAttributes = (node, compName) => {
     }
 
     if (value) {
+      let camelCaseName = name
+
+      if (name.includes('-')) camelCaseName = dashCaseToCamelCase(name)
       // saving to array instead of object for better minification
-      attributes.push([value, name, type])
+      attributes.push([value, camelCaseName, type])
       removeAttr(node, attributeName)
     }
   }
