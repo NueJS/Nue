@@ -1,18 +1,15 @@
 import { ELSE_ATTRIBUTE, ENTER_ANIMATION, EXIT_ANIMATION, PARSED } from '../constants'
-import { getAttr, removeAttr } from '../node/dom'
+import { removeAttr, getAnimationAttributes } from '../node/dom'
 import processPlaceholder from '../string/placeholder/processPlaceholder'
 
 const parseConditionNode = (node, type, value) => {
   node[PARSED] = {
     ...node[PARSED],
     conditionType: type,
-    enter: getAttr(node, ENTER_ANIMATION),
-    exit: getAttr(node, EXIT_ANIMATION)
+    ...getAnimationAttributes(node)
   }
-  if (type !== ELSE_ATTRIBUTE) node[PARSED].condition = processPlaceholder(value)
-  removeAttr(node, type)
-  removeAttr(node, ENTER_ANIMATION)
-  removeAttr(node, EXIT_ANIMATION)
+  if (type !== ELSE_ATTRIBUTE) node[PARSED].condition = processPlaceholder(value);
+  [ENTER_ANIMATION, EXIT_ANIMATION, type].forEach(att => removeAttr(node, att))
 }
 
 export default parseConditionNode

@@ -1,4 +1,4 @@
-import { IGNORE_DISCONNECT } from '../constants'
+import { ENTER_ANIMATION, EXIT_ANIMATION, IGNORE_DISCONNECT } from '../constants'
 
 export const getAttr = (node, name) => node.getAttribute(name)
 export const removeAttr = (node, name) => node.removeAttribute(name)
@@ -37,3 +37,8 @@ export const animateAll = (nodes, cssAnimation, onLastAnimationEnd) => {
     })
   })
 }
+
+export const getAnimationAttributes = (node) => ({
+  enter: getAttr(node, ENTER_ANIMATION),
+  exit: getAttr(node, EXIT_ANIMATION)
+})
