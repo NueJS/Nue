@@ -10,6 +10,7 @@ import processAttributes from '../process/attributes/processAttributes.js'
 import reactify from '../reactivity/reactify.js'
 import { subscribeNode, unsubscribeNode } from '../subscription/node.js'
 import { dashify } from '../string/dashify.js'
+import { upper } from '../others.js'
 
 const defineCustomElement = (component) => {
   const { name } = component
@@ -83,7 +84,7 @@ const defineCustomElement = (component) => {
           if (childComponents) {
             childCompNodeNames = childComponents.reduce((acc, child) => {
               const { name } = child
-              acc[dashify(name)] = name
+              acc[dashify(upper(name))] = name
               return acc
             }, {})
           }
@@ -95,12 +96,12 @@ const defineCustomElement = (component) => {
           // parse the template and create templateNode which has all the parsed info
           parseTemplate(templateNode, childCompNodeNames)
 
-          // process childNodes (DOM) and shadow DOM
-          compNode.childNodes.forEach(n => processNode(compNode, n))
-          buildShadowDOM(compNode, templateNode)
-
           childComponents.forEach(defineCustomElement)
         }
+
+        // process childNodes (DOM) and shadow DOM
+        compNode.childNodes.forEach(n => processNode(compNode, n))
+        buildShadowDOM(compNode, templateNode)
 
         // connect all nodes using state (local + closure)
         compNode[NODES_USING_STATE].forEach(subscribeNode)
