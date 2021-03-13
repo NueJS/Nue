@@ -34,7 +34,8 @@ const processFnPlaceholder = (content) => {
   return {
     type: FN,
     deps,
-    getValue
+    getValue,
+    content
   }
 }
 

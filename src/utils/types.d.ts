@@ -45,10 +45,21 @@ export interface attribute {
 
 export interface attributes extends Array<attribute> {}
 
+export interface placeholder {
+  type: number, // @todo use enum instead
+  getValue: () => any,
+  deps: path,
+  content: string
+}
+
 export interface parsedInfo {
   attributes?: attributes,
   isComp?: boolean,
-  name?: string
+  name?: string,
+  conditionType?: string,
+  condition?: placeholder,
+  enter?: string | null,
+  exit?: string | null
 }
 
 export interface parsedElement extends Element {
