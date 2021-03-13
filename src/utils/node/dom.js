@@ -1,50 +1,110 @@
 import { ENTER_ANIMATION, EXIT_ANIMATION, IGNORE_DISCONNECT } from '../constants'
 
-export const getAttr = (node, name) => node.getAttribute(name)
-export const removeAttr = (node, name) => node.removeAttribute(name)
-export const setAttr = (node, name, value) => node.setAttribute(name, value)
+/**
+ * get name attribute from element
+ * @param {Element} element
+ * @param {string} name
+ */
+export const getAttr = (element, name) => element.getAttribute(name)
 
-export const animate = (node, name, clearAnimation = false, cb) => {
-  node.style.animation = name
+/**
+ * remove name attribute from element
+ * @param {Element} element
+ * @param {string} name
+ */
+export const removeAttr = (element, name) => element.removeAttribute(name)
+
+/**
+ * remove name attribute from element
+ * @param {Element} element
+ * @param {string} name
+ * @param {string} value
+ */
+export const setAttr = (element, name, value) => element.setAttribute(name, value)
+
+/**
+ * remove name attribute from element
+ * @param {HTMLElement} element
+ * @param {string} name
+ * @param {boolean} [clearAnimation]
+ * @param {Function} [cb]
+ */
+export const animate = (element, name, clearAnimation = false, cb) => {
+  element.style.animation = name
   if (clearAnimation) {
-    onAnimationEnd(node, () => {
-      node.style.animation = null
+    onAnimationEnd(element, () => {
+      element.style.animation = ''
       if (cb) cb()
     })
   }
 }
 
-export const onAnimationEnd = (node, cb) => {
-  node.addEventListener('animationend', cb, { once: true })
+/**
+ * when animation ends on element run callback
+ * @param {HTMLElement} element
+ * @param {() => any} cb
+ */
+export const onAnimationEnd = (element, cb) => {
+  element.addEventListener('animationend', cb, { once: true })
 }
 
-export const createElement = (name) => document.createElement(name)
-export const createComment = (text) => document.createComment(text)
+/**
+ * returns newly created element of given tag name
+ * @param {string} tagName
+ * @returns {Element}
+ */
+export const createElement = (tagName) => document.createElement(tagName)
 
+/**
+ * returns a comment node with given text
+ * @param {string} data
+ * @returns {Comment}
+ */
+export const createComment = (data) => document.createComment(data)
+
+/**
+ * call disconnectedCallback and then play remove animation
+ * @param {import('../types').compNode} comp
+ * @param {string} animation
+ */
 export const animatedRemove = (comp, animation) => {
   comp.disconnectedCallback()
   comp[IGNORE_DISCONNECT] = true
+  // @todo use comp.remove only
   animate(comp, animation, true, () => comp.remove())
 }
 
-// run animation on all nodes
-// and call onAnimationEnd when last animation is completed
-export const animateAll = (nodes, cssAnimation, onLastAnimationEnd) => {
-  const lastIndex = nodes.length - 1
-  nodes.forEach((comp, i) => {
+/**
+ * run animation on all elements, and call onAnimationEnd when last animation is completed
+ * @param {Array<HTMLElement>} elements
+ * @param {*} cssAnimation
+ * @param {*} onLastAnimationEnd
+ */
+export const animateAll = (elements, cssAnimation, onLastAnimationEnd) => {
+  const lastIndex = elements.length - 1
+  elements.forEach((comp, i) => {
     animate(comp, cssAnimation, true, () => {
       if (i === lastIndex) onLastAnimationEnd()
     })
   })
 }
 
-export const getAnimationAttributes = (node) => ({
-  enter: getAttr(node, ENTER_ANIMATION),
-  exit: getAttr(node, EXIT_ANIMATION)
+/**
+ * return object containing enter and exit animation info
+ * @param {Element} element
+ */
+export const getAnimationAttributes = (element) => ({
+  enter: getAttr(element, ENTER_ANIMATION),
+  exit: getAttr(element, EXIT_ANIMATION)
 })
 
 const node = /*#__PURE__*/ document.createElement('div')
 
+/**
+ * convert dash case to camel case
+ * @param {string} name
+ * @returns {string}
+ */
 export const dashCaseToCamelCase = (name) => {
   const attributeName = 'data-' + name
   setAttr(node, attributeName, '')

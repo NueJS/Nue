@@ -51,7 +51,8 @@ export interface parsedInfo {
   attributes: Array<attribute>
 }
 
-export interface compNode extends Element {
+export interface compNode extends HTMLElement {
+  disconnectedCallback: Function,
   name: string,
   refs: Record<string, Element>,
   closure?: compNode,
