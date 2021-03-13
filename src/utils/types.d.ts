@@ -11,6 +11,11 @@ import {
   REORDERING,
   IGNORE_DISCONNECT,
   PARSED,
+  CBS,
+  ON_DESTROY_CBS,
+  ON_MOUNT_CBS,
+  BEFORE_UPDATE_CBS,
+  AFTER_UPDATE_CBS,
 } from './constants'
 
 export interface batchInfo {
@@ -62,5 +67,18 @@ export interface compNode extends Element {
   [NODES_USING_CLOSURE]: Set<Node>,
   [INIT_$]: Object,
   [REORDERING]?: boolean,
-  [IGNORE_DISCONNECT]?: boolean
+  [IGNORE_DISCONNECT]?: boolean,
+  [CBS]: {
+    [ON_MOUNT_CBS]: Array<Function>,
+    [ON_DESTROY_CBS]: Array<Function>,
+    [BEFORE_UPDATE_CBS]: Array<Function>,
+    [AFTER_UPDATE_CBS]: Array<Function>,
+  },
+  events: {
+    onMount: (cb: Function) => void,
+    onDestroy: (cb: Function) => void,
+    onMutate: (cb: Function, ...slices: Array<string>) => void,
+    beforeUpdate: (cb: Function) => void,
+    afterUpdate: (cb: Function) => void
+  }
 }

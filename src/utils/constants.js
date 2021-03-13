@@ -53,7 +53,7 @@ export const ON_MOUNT_CBS = 60
 export const ON_DESTROY_CBS = 61
 export const BEFORE_UPDATE_CBS = 62
 export const AFTER_UPDATE_CBS = 63
-export const ON_MUTATE_CBS = 64
+export const CBS = 65
 
 // compNode internal only properties
 export const BATCH_INFO = /*#__PURE__*/ Symbol()
