@@ -62,7 +62,16 @@ export interface parsedInfo {
   exit?: string | null,
   group?: Array<compNode>,
   groupDeps?: Array<path>,
-  anchorNode?: Comment
+  anchorNode?: Comment,
+  for?: {
+    itemArray: placeholder,
+    item: string,
+    itemIndex: string | undefined,
+    key: placeholder,
+    enter?: string | null,
+    exit?: string | null,
+    reorder: string | null
+  }
 }
 
 export interface parsedElement extends Element {

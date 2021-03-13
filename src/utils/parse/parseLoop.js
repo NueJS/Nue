@@ -5,30 +5,37 @@ import { isDefined } from '../others'
 import processPlaceholder from '../string/placeholder/processPlaceholder'
 // import { checkParsedLoop } from './checkParsed'
 
-const parseLoop = (node, forAttribute) => {
+/** @typedef {import('../types').compNode} compNode*/
+
+/**
+ *
+ * @param {compNode} compNode
+ * @param {string} forAttribute
+ */
+const parseLoop = (compNode, forAttribute) => {
   // replace ' in ', '(' ')' ',' with space, split with space, and remove empty strings
   const [a, b, c] = forAttribute.replace(/\(|\)|,|(\sin\s)/g, ' ').split(/\s+/).filter(t => t)
   // ['item', 'index', 'arr']
   // ['item', 'arr']
   const indexUsed = isDefined(c)
 
-  node[PARSED].for = {
+  compNode[PARSED].for = {
     itemArray: processPlaceholder(indexUsed ? c : b, true),
     item: a,
-    itemIndex: indexUsed && b,
-    key: processPlaceholder(getAttr(node, KEY_ATTRIBUTE)),
-    ...getAnimationAttributes(node),
-    reorder: getAttr(node, REORDER_TRANSITION)
+    itemIndex: indexUsed ? b : undefined,
+    key: processPlaceholder(getAttr(compNode, KEY_ATTRIBUTE)),
+    ...getAnimationAttributes(compNode),
+    reorder: getAttr(compNode, REORDER_TRANSITION)
   };
 
-  // if (DEV) checkParsedLoop(parsingInfo.component, node, info);
+  // if (DEV) checkParsedLoop(parsingInfo.component, compNode, info);
   [
     EXIT_ANIMATION,
     ENTER_ANIMATION,
     REORDER_TRANSITION,
     FOR_ATTRIBUTE,
     KEY_ATTRIBUTE
-  ].forEach(name => removeAttr(node, name))
+  ].forEach(name => removeAttr(compNode, name))
 }
 
 export default parseLoop
