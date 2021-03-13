@@ -2,7 +2,11 @@ import { animate, createElement } from '../../node/dom'
 import stats from '../../stats'
 import html from './html'
 
-const handleErrors = (error) => {
+/**
+ * show error overlay
+ * @param {{ message: string, fix: string, compName: string }} error
+ */
+const showErrorOverlay = (error) => {
   // if already showing error, return
   if (stats.error) return
   class errorOverlay extends HTMLElement {
@@ -13,9 +17,13 @@ const handleErrors = (error) => {
     }
 
     connectedCallback () {
-      const closeButton = this.shadowRoot.querySelector('.parsed-error__close-icon')
-      closeButton.addEventListener('click', e => {
-        const modal = this.shadowRoot.querySelector('.parsed-error__card')
+      const shadowRoot = this.shadowRoot
+      /** @type {Element} */
+      // @ts-ignore
+      const closeButton = shadowRoot.querySelector('.parsed-error__close-icon')
+      closeButton.addEventListener('click', () => {
+        // @ts-ignore
+        const modal = shadowRoot.querySelector('.parsed-error__card')
 
         animate(modal, 'pop-out 400ms ease', true, () => {
           this.remove()
@@ -30,8 +38,8 @@ const handleErrors = (error) => {
   document.body.append(overlay)
 
   const message = overlay.shadowRoot.querySelector('.message')
-
   const title = overlay.shadowRoot.querySelector('.title')
+
   if (error.compName) {
     title.textContent = `error in <${error.compName}>`
     const errorMessage = `${error.message}\n\n${error.fix || ''}`
@@ -44,4 +52,4 @@ const handleErrors = (error) => {
   stats.error = true
 }
 
-export default handleErrors
+export default showErrorOverlay
