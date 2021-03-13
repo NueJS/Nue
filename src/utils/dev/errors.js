@@ -1,8 +1,21 @@
 import { lower } from '../others'
 
+/**
+ * return the "<x>" for xNode
+ * @param {Element} node
+ * @returns {string}
+ */
 const getNodeName = (node) => `<${lower(node.nodeName)}>`
-export default {
 
+/** @typedef {{ message: string, fix: string, compName: string }} error */
+
+const errors = {
+
+  /**
+   * @param {string} compName
+   * @param {string} content
+   * @returns {error}
+   */
   STATE_NOT_FOUND (compName, content) {
     return {
       message: `Could not find value of [${content}]`,
@@ -11,8 +24,19 @@ export default {
     }
   },
 
+  /**
+   * @param {string} compName
+   * @param {Array<string>} keys
+   * @returns {error}
+   */
   KEYS_ARE_NOT_UNIQUE (compName, keys) {
+    /**
+     * convert to json
+     * @param {any} v
+     * @returns {string}
+     */
     const toJSON = v => JSON.stringify(v)
+
     const nonUniqueKeys = keys.filter((key, i) => {
       return keys.indexOf(key, i) !== keys.lastIndexOf(key)
     })
@@ -34,7 +58,12 @@ export default {
     }
   },
 
-  KEY_NOT_BRACKETED (compName, node, key) {
+  /**
+   * @param {string} compName
+   * @param {Element} node
+   * @returns {error}
+   */
+  KEY_NOT_BRACKETED (compName, node) {
     const nodeName = getNodeName(node)
     return {
       message: `"Key" attribute on ${nodeName} is hard-coded`,
@@ -43,6 +72,10 @@ export default {
     }
   },
 
+  /**
+   * @param {string} compName
+   * @returns {error}
+   */
   MISSING_DEPENDENCIES_IN_ON_MUTATE (compName) {
     return {
       message: 'Missing dependencies in onMutate()',
@@ -51,6 +84,11 @@ export default {
     }
   },
 
+  /**
+   * @param {string} compName
+   * @param {Element} node
+   * @returns {error}
+   */
   INVALID_FOR_ATTRIBUTE (compName, node) {
     const nodeName = getNodeName(node)
     return {
@@ -60,23 +98,38 @@ export default {
     }
   },
 
-  EXIT_ANIMATION_NOT_FOUND (compName, animationName, node) {
+  /**
+   * @param {string} compName
+   * @param {string} animationName
+   * @param {string} loopedCompName
+   * @returns {error}
+   */
+  EXIT_ANIMATION_NOT_FOUND (compName, animationName, loopedCompName) {
     return {
-      message: `exit animation: "${animationName}" used on <${node.name}> but not defined in CSS. \nThis will result in component never being removed, as nue.js keeps waiting for the animation to end which does not exist`,
+      message: `exit animation: "${animationName}" used on <${loopedCompName}> but not defined in CSS. \nThis will result in component never being removed, as nue.js keeps waiting for the animation to end which does not exist`,
       fix: `To fix this: define animation "${animationName}" in CSS using @keyframes`,
       compName
     }
   },
 
-  MISSING_KEY_ATTRIBUTE (compName, compNode) {
-    const loopCompName = compNode.name
+  /**
+   * @param {string} parentCompName
+   * @param {string} compName
+   * @returns {error}
+   */
+  MISSING_KEY_ATTRIBUTE (parentCompName, compName) {
     return {
-      message: `Missing "key" attribute on <${loopCompName}>`,
-      fix: `<${loopCompName}> is looped and needs a key attribute for efficient reconciliation`,
-      compName
+      message: `Missing "key" attribute on <${compName}>`,
+      fix: `<${compName}> is looped and needs a key attribute for efficient reconciliation`,
+      compName: parentCompName
     }
   },
 
+  /**
+   * @param {string} compName
+   * @param {string} fnName
+   * @returns {error}
+   */
   METHOD_NOT_FOUND (compName, fnName) {
     return {
       message: `invalid method "${fnName}" used`,
@@ -85,6 +138,12 @@ export default {
     }
   },
 
+  /**
+   * @param {string} compName
+   * @param {Element} node
+   * @param {string} attributeName
+   * @returns {error}
+   */
   RESERVED_ATTRIBUTE_USED_ON_NON_COMPONENT (compName, node, attributeName) {
     const nodeName = getNodeName(node)
     return {
@@ -95,3 +154,5 @@ export default {
   }
 
 }
+
+export default errors
