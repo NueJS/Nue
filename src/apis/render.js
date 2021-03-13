@@ -4,18 +4,28 @@ import DEV from '../utils/dev/DEV'
 import stats from '../utils/stats'
 import { dashify } from '../utils/string/dashify'
 
-// define the custom element of given name
-const render = (component, el, config) => {
+/**
+ * define the custom element of given name
+ * @param {Function} component
+ * @param {Element} element
+ * @param {{defaultStyle: string}} config
+ */
+const render = (component, element, config) => {
   if (DEV) {
     window.onerror = (message, filename, lineno, colno, error) => {
       showError(error)
     }
   }
+
   // override config with default config
   if (config) stats.config = { ...stats.config, ...config }
+
+  // define the component
   defineCustomElement(component)
-  const compEl = document.createElement(dashify(component.name))
-  el.replaceWith(compEl)
+
+  // replace the element with customElement
+  const customElement = document.createElement(dashify(component.name))
+  element.replaceWith(customElement)
 }
 
 export default render
