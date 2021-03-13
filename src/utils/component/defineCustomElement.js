@@ -109,6 +109,12 @@ const defineCustomElement = (component) => {
           let childCompNodeNames = {}
           if (childComponents) {
             childCompNodeNames = childComponents.reduce(
+              /**
+               *
+               * @param {Record<string, any>} acc
+               * @param {Function} child
+               * @returns {Record<string, any>}
+               */
               (acc, child) => {
                 const { name } = child
                 acc[dashify(upper(name))] = name
@@ -143,7 +149,7 @@ const defineCustomElement = (component) => {
       }
 
       // run onMount callbacks
-      runEvent(compNode, ON_MOUNT_CBS)
+      runEvent(compNode, ON_MOUNT_CBS, compNode[BATCH_INFO])
     }
 
     disconnectedCallback () {
@@ -155,7 +161,7 @@ const defineCustomElement = (component) => {
       // do nothing, if the connection change is due to reordering
       if (compNode[REORDERING]) return
       // run onDestroy callbacks
-      runEvent(compNode, ON_DESTROY_CBS)
+      runEvent(compNode, ON_DESTROY_CBS, compNode[BATCH_INFO])
       // only disconnect nodes that are using closure, no need to disconnect nodes that use local state only
       compNode[NODES_USING_CLOSURE].forEach(unsubscribeNode)
 
