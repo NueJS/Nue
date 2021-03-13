@@ -13,6 +13,12 @@ import { createElement } from './dom'
 // }
 
 // @TODO update this with upper one
+
+/**
+ * swap component a and b
+ * @param {import('../types').compNode} a
+ * @param {import('../types').compNode} b
+ */
 const swapDom = (a, b) => {
   a[REORDERING] = true
   b[REORDERING] = true
@@ -23,10 +29,14 @@ const swapDom = (a, b) => {
   const aHolder = createElement('div')
   const bHolder = createElement('div')
 
+  // @ts-ignore
   aParent.replaceChild(aHolder, a)
+  // @ts-ignore
   bParent.replaceChild(bHolder, b)
 
+  // @ts-ignore
   aParent.replaceChild(b, aHolder)
+  // @ts-ignore
   bParent.replaceChild(a, bHolder)
 
   a[REORDERING] = false
