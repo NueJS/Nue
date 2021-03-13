@@ -48,6 +48,7 @@ export interface attributes extends Array<attribute> {}
 export interface parsedInfo {
   attributes?: attributes,
   isComp?: boolean,
+  name?: string
 }
 
 export interface parsedElement extends Element {

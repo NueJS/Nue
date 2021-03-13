@@ -6,30 +6,46 @@ import parseLoop from './parseLoop'
 
 const conditionalAttributes = [IF_ATTRIBUTE, ELSE_IF_ATTRIBUTE, ELSE_ATTRIBUTE]
 
+/** @typedef {import('../types').compNode} compNode */
+
+/**
+ * if the compNode has conditional Attribute, return [attributeName, value] else false
+ * @param {compNode} compNode
+ * @returns {[string, string] | false}
+ */
 const usesConditionalAttribute = compNode => {
   for (const attributeName of conditionalAttributes) {
     const value = getAttr(compNode, attributeName)
     if (value !== null) return [attributeName, value]
   }
+  return false
 }
 
-const parseComp = (node, compName, deferred) => {
-  node[PARSED] = {
+/**
+ * parse component node
+ * @param {compNode} compNode
+ * @param {string} compName
+ * @param {Array<Function>} deferred
+ */
+const parseComp = (compNode, compName, deferred) => {
+  compNode[PARSED] = {
     isComp: true,
     name: compName
   }
 
-  const forAttribute = getAttr(node, FOR_ATTRIBUTE)
+  const forAttribute = getAttr(compNode, FOR_ATTRIBUTE)
 
   // if the component has FOR_ATTRIBUTE on it, it is looped component
   if (forAttribute) {
-    parseLoop(node, forAttribute)
-  } else {
-    const typeAndValue = usesConditionalAttribute(node)
+    parseLoop(compNode, forAttribute)
+  }
+
+  else {
+    const typeAndValue = usesConditionalAttribute(compNode)
     if (typeAndValue) {
       const [type, value] = typeAndValue
-      parseConditionNode(node, type, value)
-      if (type === IF_ATTRIBUTE) deferred.push(() => parseIf(node))
+      parseConditionNode(compNode, type, value)
+      if (type === IF_ATTRIBUTE) deferred.push(() => parseIf(compNode))
     }
   }
 }
