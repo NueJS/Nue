@@ -102,7 +102,7 @@ const defineCustomElement = (component) => {
           if (attributes) processAttributes(compNode, compNode, attributes)
         }
 
-        const [templateString, cssString, childComponents] = runScript(compNode, component, templateNode)
+        const [templateString, cssString, childComponents] = runScript(compNode, component, !!templateNode)
 
         // do this only once per component ------------------
         if (!templateNode) {
@@ -110,10 +110,10 @@ const defineCustomElement = (component) => {
           if (childComponents) {
             childCompNodeNames = childComponents.reduce(
               /**
-               *
-               * @param {Record<string, any>} acc
+               * use the upper case dashed name of child function as key and save the original name
+               * @param {Record<string, string>} acc
                * @param {Function} child
-               * @returns {Record<string, any>}
+               * @returns {Record<string, string>}
                */
               (acc, child) => {
                 const { name } = child
