@@ -43,13 +43,15 @@ export interface attribute {
   2: any // @todo use enum here
 }
 
+export interface attributes extends Array<attribute> {}
+
 export interface parsedInfo {
-  type: any, // @todo use enum here
-  getValue: () => any,
-  deps: Array<path>,
-  content: string,
-  attributes?: Array<attribute>,
+  attributes?: attributes,
   isComp?: boolean,
+}
+
+export interface parsedElement extends Element {
+  [PARSED]: parsedInfo
 }
 
 export interface compNode extends HTMLElement {

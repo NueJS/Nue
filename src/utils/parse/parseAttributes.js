@@ -6,36 +6,42 @@ import { getAttr, removeAttr, dashCaseToCamelCase } from '../node/dom.js'
 import errors from '../dev/errors.js'
 import DEV from '../dev/DEV.js'
 
-const parseAttributes = (node, compName) => {
-  // if component specific attributes are used on non-component nodes
+/**
+ * parse attributes on element if any
+ * @param {import('../types').parsedElement} element
+ * @param {string} compName
+ */
+const parseAttributes = (element, compName) => {
+  // if component specific attributes are used on non-component elements
   if (DEV && !compName) {
     const compOnlyAttributes = [FOR_ATTRIBUTE, KEY_ATTRIBUTE, IF_ATTRIBUTE, ELSE_IF_ATTRIBUTE, ELSE_ATTRIBUTE]
     compOnlyAttributes.forEach(attrName => {
-      if (getAttr(node, attrName)) {
-        throw errors.RESERVED_ATTRIBUTE_USED_ON_NON_COMPONENT(name, node, attrName)
+      if (getAttr(element, attrName)) {
+        throw errors.RESERVED_ATTRIBUTE_USED_ON_NON_COMPONENT(attrName, element, attrName)
       }
     })
   }
 
+  /** @type {import('../types').attributes} */
   const attributes = []
-  const nodeIsComp = !!compName
+  const elementIsComp = !!compName
 
-  for (const attributeName of node.getAttributeNames()) {
-    const attributeValue = node.getAttribute(attributeName)
+  for (const attributeName of element.getAttributeNames()) {
+    const attributeValue = element.getAttribute(attributeName)
     const variableValue = isBracketed(attributeValue)
 
-    let name, type, value
+    let name = attributeName
+    let type, value
     const firstChar = attributeName[0]
 
     if (attributeName === REF_ATTRIBUTE) {
       type = REF
-      name = attributeName
       value = attributeValue
     }
 
     // SETTING FN OF COMPONENT
     else if (attributeName.startsWith('fn.')) {
-      if (!nodeIsComp) continue
+      if (!elementIsComp) continue
       type = FUNCTION_ATTRIBUTE
       name = attributeName.slice(3)
       value = attributeValue
@@ -43,8 +49,9 @@ const parseAttributes = (node, compName) => {
 
     // SETTING STATE OF COMPONENT
     else if (attributeName.startsWith('$.')) {
-      if (!nodeIsComp) continue
+      if (!elementIsComp) continue
       name = attributeName.slice(2)
+
       if (variableValue) {
         type = STATE
         value = processPlaceholder(attributeValue)
@@ -77,7 +84,6 @@ const parseAttributes = (node, compName) => {
 
       // normal attribute
       else {
-        name = attributeName
         type = NORMAL
       }
 
@@ -90,14 +96,14 @@ const parseAttributes = (node, compName) => {
       if (name.includes('-')) camelCaseName = dashCaseToCamelCase(name)
       // saving to array instead of object for better minification
       attributes.push([value, camelCaseName, type])
-      removeAttr(node, attributeName)
+      removeAttr(element, attributeName)
     }
   }
 
   // if value attributes found
   if (attributes.length) {
-    if (!node[PARSED]) node[PARSED] = {}
-    node[PARSED].attributes = attributes
+    if (!element[PARSED]) element[PARSED] = {}
+    element[PARSED].attributes = attributes
   }
 }
 
