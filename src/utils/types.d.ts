@@ -59,7 +59,10 @@ export interface parsedInfo {
   conditionType?: string,
   condition?: placeholder,
   enter?: string | null,
-  exit?: string | null
+  exit?: string | null,
+  group?: Array<compNode>,
+  groupDeps?: Array<path>,
+  anchorNode?: Comment
 }
 
 export interface parsedElement extends Element {

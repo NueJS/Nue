@@ -1,8 +1,16 @@
 import { ELSE_ATTRIBUTE, IF_ATTRIBUTE, PARSED } from '../constants'
 import { createComment } from '../node/dom'
 
+/** @typedef {import('../types').compNode} compNode */
+
+/**
+ * parse if condition node
+ * @param {compNode} ifNode
+ */
 const parseIf = (ifNode) => {
+  /** @type {Array<compNode>} */
   const group = []
+
   let node = ifNode.nextElementSibling
 
   // create a starting marker which will be used to add conditional nodes to DOM
@@ -12,10 +20,13 @@ const parseIf = (ifNode) => {
   // keep checking the next node
   while (true) {
     // get the conditionType of the node
+    // @ts-ignore
     const type = node && node[PARSED] && node[PARSED].conditionType
     // if the node is not a condition node or is a separate condition, break the loop
     if (!type || (type === IF_ATTRIBUTE)) break
+    // @ts-ignore
     group.push(node)
+    // @ts-ignore
     node = node.nextElementSibling
   }
 
@@ -26,9 +37,12 @@ const parseIf = (ifNode) => {
   // remove other nodes from template
   group.forEach(n => n.remove())
 
+  // @ts-ignore
   const groupDeps = [ifNode[PARSED].condition.deps]
   group.forEach(node => {
+    // @ts-ignore
     if (node[PARSED].conditionType !== ELSE_ATTRIBUTE) {
+      // @ts-ignore
       groupDeps.push(node[PARSED].condition.deps)
     }
   })
