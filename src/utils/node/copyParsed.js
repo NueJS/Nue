@@ -3,13 +3,20 @@
 
 import { PARSED } from '../constants'
 
-// sweetify is used to add those properties back in the cloneNode
+/**
+ * @param {Node} node
+ * @param {Node} cloneNode
+ */
 const copyParsed = (node, cloneNode) => {
-  // @todo if parsed is not messed with - no need to shallow clone
-  if (node[PARSED]) cloneNode[PARSED] = { ...node[PARSED] }
+  if (PARSED in node) {
+    // @todo if parsed is not messed with - no need to shallow clone
+    // @ts-ignore
+    cloneNode[PARSED] = { ...node[PARSED] }
+  }
+
   if (node.hasChildNodes()) {
-    node.childNodes.forEach((n, i) => {
-      copyParsed(n, cloneNode.childNodes[i])
+    node.childNodes.forEach((childNode, i) => {
+      copyParsed(childNode, cloneNode.childNodes[i])
     })
   }
 }
