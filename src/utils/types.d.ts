@@ -48,7 +48,8 @@ export interface parsedInfo {
   getValue: () => any,
   deps: Array<path>,
   content: string,
-  attributes: Array<attribute>
+  attributes?: Array<attribute>,
+  isComp?: boolean,
 }
 
 export interface compNode extends HTMLElement {
