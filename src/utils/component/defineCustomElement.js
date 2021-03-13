@@ -12,17 +12,30 @@ import { subscribeNode, unsubscribeNode } from '../subscription/node.js'
 import { dashify } from '../string/dashify.js'
 import { upper } from '../others.js'
 
+/**
+ * @typedef {import('../types').compNode} compNode
+ */
+
+/**
+ * defines a custom element using the function component
+ * @param {Function} component
+ */
+
 const defineCustomElement = (component) => {
   const { name } = component
   const { components, config } = stats
   // return if already defined
   if (name in components) return
   components[name] = component
+
+  /** @type {Element}*/
   let templateNode
 
   class NueComp extends HTMLElement {
     constructor () {
       super()
+      /** @type {compNode} */
+      // @ts-expect-error
       const compNode = this
       // name of the custom element
       compNode.name = name
@@ -34,25 +47,38 @@ const defineCustomElement = (component) => {
       // batches
       // this batch's callbacks are run first
       compNode[BEFORE_DOM_BATCH] = new Set()
+
       // and then this batch's callback runs
       compNode[DOM_BATCH] = new Set()
 
-      // array of mutation info that happened in a flush
-      // mutation info is an object with oldValue, newValue, path and getPath keys
+      // Array of mutation info that happened in a flush
+      /** @type {import('../types').batchInfoArray } */
       compNode[BATCH_INFO] = []
 
       // array of callbacks that should be run after some process is done
+      /** @type {Array<Function>} */
       compNode[DEFERRED_WORK] = []
-      // nodes that are using the state
+
+      /**
+       * nodes that are using the state
+       * @type {Set<Node>}
+       */
       compNode[NODES_USING_STATE] = new Set()
-      // nodes that are using the closure state
+
+      /**
+       * nodes that are using the closure state
+       * @type {Set<Node>}
+       */
       compNode[NODES_USING_CLOSURE] = new Set()
 
       if (!compNode[INIT_$]) compNode[INIT_$] = {}
+
       addLifecycles(compNode)
     }
 
     connectedCallback () {
+      /** @type {compNode} */
+      // @ts-expect-error
       const compNode = this
 
       // if the connection change is due to reordering, ignore
@@ -82,11 +108,12 @@ const defineCustomElement = (component) => {
         if (!templateNode) {
           let childCompNodeNames = {}
           if (childComponents) {
-            childCompNodeNames = childComponents.reduce((acc, child) => {
-              const { name } = child
-              acc[dashify(upper(name))] = name
-              return acc
-            }, {})
+            childCompNodeNames = childComponents.reduce(
+              (acc, child) => {
+                const { name } = child
+                acc[dashify(upper(name))] = name
+                return acc
+              }, {})
           }
 
           // create templateNode using template, style, and defaultStyle
@@ -120,6 +147,8 @@ const defineCustomElement = (component) => {
     }
 
     disconnectedCallback () {
+      /** @type {compNode} */
+      // @ts-expect-error
       const compNode = this
       // if disconnectedCallback was manually called earlier, no need to call it again when node is removed
       if (compNode[IGNORE_DISCONNECT]) return
