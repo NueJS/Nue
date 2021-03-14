@@ -2,14 +2,22 @@
 import { TEXT } from '../constants.js'
 import processPlaceholder from './placeholder/processPlaceholder.js'
 
-// take the string text and split it into placeholders and strings
-// processes the placeholders and returns the array
+/**
+ * @typedef {import('../types').placeholder} placeholder
+*/
+
+/**
+ * take the string text and split it into placeholders and strings
+ * @param {string} text
+ * @returns {Array<placeholder>} parts
+ */
 const split = (text) => {
   const parts = []
   let collectingVar = false
   let collectedString = ''
   let i = -1
 
+  /** @param {boolean} cv */
   const reset = (cv) => {
     collectedString = ''
     collectingVar = cv
@@ -26,7 +34,7 @@ const split = (text) => {
 
     else if (char === '[') {
       // save current collected string (if any)
-      if (collectedString) parts.push({ text: collectedString, type: TEXT })
+      if (collectedString) parts.push({ content: collectedString, type: TEXT })
       reset(true)
     }
 
@@ -42,7 +50,7 @@ const split = (text) => {
   }
 
   // add the remaining text
-  if (collectedString) parts.push({ text: collectedString, type: TEXT })
+  if (collectedString) parts.push({ content: collectedString, type: TEXT })
   return parts
 }
 
