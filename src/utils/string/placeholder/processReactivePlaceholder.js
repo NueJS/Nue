@@ -5,7 +5,7 @@ import { isDefined } from '../../others.js'
 import { targetProp } from '../../state/slice.js'
 
 /**
- *
+ * process reactive placeholder
  * @param {string} content
  * @returns {import('../../types.js').placeholder}
  */
