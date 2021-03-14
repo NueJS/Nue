@@ -13,6 +13,7 @@ const parseNode = (node, childCompNodeNames, deferred) => {
   const compName = childCompNodeNames[node.nodeName]
 
   // #text
+  // @ts-ignore
   if (node.nodeType === Node.TEXT_NODE) return parseTextNode(node, deferred)
 
   // component
