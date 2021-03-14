@@ -22,17 +22,22 @@ const processFnPlaceholder = (content) => {
   // [ ['bar', 'baz'], ['fizz'], ['buzz'] ]
   const deps = args.map(a => a.split('.'))
 
-  // using the deps and comp - get the value of foo(bar.baz, fizz, buzz)
-  const getValue = (comp) => {
-    const fn = comp.fn[fnName]
+  /**
+   * get the value of function placeholder
+   * @param {import('../../types').compNode} compNode
+   * @returns {any}
+   */
+  const getValue = (compNode) => {
+    const fn = compNode.fn[fnName]
+    // @todo move this to errors
     if (DEV && !fn) {
       throw {
-        comp,
+        compName: compNode.name,
         message: `invalid method "${fnName}" used in [${content}] placeholder in template`,
-        fix: `make sure "${fnName}" method exists in the 'fn' object of <${comp.name}/> or its closure`
+        fix: `make sure "${fnName}" method exists in the 'fn' object of <${compNode.name}/> or its closure`
       }
     }
-    const tps = deps.map(path => targetProp(comp.$, path))
+    const tps = deps.map(path => targetProp(compNode.$, path))
     const values = tps.map(([t, p]) => t[p])
     return fn(...values)
   }
