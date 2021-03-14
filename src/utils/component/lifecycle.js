@@ -4,15 +4,10 @@ import DEV from '../dev/DEV.js'
 import { AFTER_UPDATE_CBS, BEFORE_DOM_BATCH, BEFORE_UPDATE_CBS, ON_DESTROY_CBS, ON_MOUNT_CBS, CBS } from '../constants.js'
 
 /**
- * @typedef {import('../types').compNode} compNode
- * @typedef {import('../types').batchInfoArray} batchInfoArray
- * */
-
-/**
- *
- * @param {compNode} compNode
+ * execute event of given name with batchInfoArray
+ * @param {import('../types').compNode} compNode
  * @param {number} name
- * @param {batchInfoArray} batchInfoArray
+ * @param {import('../types').batchInfoArray} batchInfoArray
  * @returns
  */
 // @ts-expect-error
@@ -20,7 +15,7 @@ export const runEvent = (compNode, name, batchInfoArray) => compNode[CBS][name].
 
 /**
  *
- * @param {compNode} compNode
+ * @param {import('../types').compNode} compNode
  */
 const addLifecycles = (compNode) => {
   compNode[CBS] = {

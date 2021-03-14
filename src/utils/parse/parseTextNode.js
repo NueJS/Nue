@@ -1,10 +1,8 @@
 import { PARSED, TEXT } from '../constants.js'
 import split from '../string/split.js'
 
-/** @typedef {import('../types').parsedText} parsedText */
-
 /**
- *
+ * parse text node
  * @param {Text} node
  * @param {Array<Function>} deferred
  * @returns
@@ -21,13 +19,13 @@ const parseTextNode = (node, deferred) => {
 
   const parts = split(text)
 
-  /** @type {Array<parsedText>} */
+  /** @type {Array<import('../types').parsedText>} */
   const textNodes = []
 
   // for each part create a text node
   // if it's not TEXT type, save the part info in parsed.placeholder
   parts.forEach(part => {
-    /** @type {parsedText} */
+    /** @type {import('../types').parsedText} */
     const textNode = document.createTextNode(part.content)
     if (part.type !== TEXT) textNode[PARSED] = { placeholder: part }
     textNodes.push(textNode)

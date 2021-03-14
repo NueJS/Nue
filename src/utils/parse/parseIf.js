@@ -1,14 +1,12 @@
 import { ELSE_ATTRIBUTE, IF_ATTRIBUTE, PARSED } from '../constants'
 import { createComment } from '../node/dom'
 
-/** @typedef {import('../types').compNode} compNode */
-
 /**
  * parse if condition node
- * @param {compNode} ifNode
+ * @param {import('../types').compNode} ifNode
  */
 const parseIf = (ifNode) => {
-  /** @type {Array<compNode>} */
+  /** @type {Array<import('../types').compNode}>} */
   const group = []
 
   let node = ifNode.nextElementSibling

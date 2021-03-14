@@ -2,24 +2,26 @@ import { NO_OVERRIDE_MODE, REACTIVE_MODE } from '../constants.js'
 import modes from '../reactivity/modes.js'
 import { dashifyComponentNames } from '../string/dashify.js'
 
-/** @typedef {import('../types').compNode} compNode */
-
+// @todo move it to other file
 /**
  *
  * @param {Array<string>} strings
  * @param  {...string} exprs
  * @returns
  */
-const tag = (strings, ...exprs) => exprs.reduce((acc, expr, i) => acc + strings[i] + expr, '') + strings[strings.length - 1]
+const tag = (strings, ...exprs) =>
+  exprs.reduce(
+    (acc, expr, i) => acc + strings[i] + expr, ''
+  ) + strings[strings.length - 1]
 
 /**
- *
- * @param {compNode} compNode
+ * run component
+ * @param {import('../types').compNode} compNode
  * @param {Function} component
  * @param {boolean} parsed
  * @returns {[string, string, Array<Function>]}
  */
-const runScript = (compNode, component, parsed) => {
+const runComponent = (compNode, component, parsed) => {
   /** @type {Array<Function>} */
   let childComponents = []
   let templateString = ''
@@ -62,4 +64,4 @@ const runScript = (compNode, component, parsed) => {
   ]
 }
 
-export default runScript
+export default runComponent

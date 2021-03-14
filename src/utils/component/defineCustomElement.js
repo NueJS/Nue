@@ -13,10 +13,6 @@ import { dashify } from '../string/dashify.js'
 import { upper } from '../others.js'
 
 /**
- * @typedef {import('../types').compNode} compNode
- */
-
-/**
  * defines a custom element using the function component
  * @param {Function} component
  */
@@ -28,13 +24,13 @@ const defineCustomElement = (component) => {
   if (name in components) return
   components[name] = component
 
-  /** @type {Element}*/
+  /** @type {HTMLTemplateElement}*/
   let templateNode
 
   class NueComp extends HTMLElement {
     constructor () {
       super()
-      /** @type {compNode} */
+      /** @type {import('../types').compNode} */
       // @ts-expect-error
       const compNode = this
       // name of the custom element
@@ -77,7 +73,7 @@ const defineCustomElement = (component) => {
     }
 
     connectedCallback () {
-      /** @type {compNode} */
+      /** @type {import('../types').compNode} */
       // @ts-expect-error
       const compNode = this
 
@@ -106,6 +102,7 @@ const defineCustomElement = (component) => {
 
         // do this only once per component ------------------
         if (!templateNode) {
+          /** @type {Record<string, string>} */
           let childCompNodeNames = {}
           if (childComponents) {
             childCompNodeNames = childComponents.reduce(
@@ -123,6 +120,7 @@ const defineCustomElement = (component) => {
           }
 
           // create templateNode using template, style, and defaultStyle
+          // @ts-ignore
           templateNode = createElement('template')
           templateNode.innerHTML = templateString + `<style default> ${config.defaultStyle} </style>` + '<style scoped >' + cssString + '</style>'
 
@@ -153,7 +151,7 @@ const defineCustomElement = (component) => {
     }
 
     disconnectedCallback () {
-      /** @type {compNode} */
+      /** @type {import('../types').compNode} */
       // @ts-expect-error
       const compNode = this
       // if disconnectedCallback was manually called earlier, no need to call it again when node is removed
@@ -170,7 +168,7 @@ const defineCustomElement = (component) => {
   }
 
   // define current component and then it's children
-  customElements.define(name + '-', NueComp)
+  customElements.define(dashify(name), NueComp)
 }
 
 export default defineCustomElement

@@ -6,16 +6,14 @@ import { BATCH_INFO, DETECTIVE_MODE, IS_REACTIVE, NO_OVERRIDE_MODE, REACTIVE_MOD
 import { isObject } from '../others.js'
 
 /**
- * @typedef {import('../types').compNode} compNode
- * @typedef {import('../types').path} path
  * @typedef {Record<string|number|symbol, any>} target
  */
 
 /**
  * create a reactive state on compNode
- * @param {compNode} compNode
+ * @param {import('../types').compNode} compNode
  * @param {target} obj
- * @param {path} _path
+ * @param {import('../types').path} _path
  * @param {Record<string, any>} [closure$]
  * @returns {target}
  */
@@ -90,6 +88,7 @@ const reactify = (compNode, obj, _path = [], closure$) => {
           // path may have changed of reactive object, so add a getPath property to fetch the fresh path
           // @ts-ignore
           compNode[BATCH_INFO].push({ oldValue, newValue, path: mutatedPath, getPath })
+          // @ts-ignore
           onMutate(compNode, mutatedPath)
         }
 
@@ -100,6 +99,7 @@ const reactify = (compNode, obj, _path = [], closure$) => {
     },
 
     deleteProperty (target, prop) {
+      // @ts-ignore
       if (modes[REACTIVE_MODE]) onMutate(compNode, [...path, prop])
       return Reflect.deleteProperty(target, prop)
     },
@@ -108,7 +108,7 @@ const reactify = (compNode, obj, _path = [], closure$) => {
       if (prop === IS_REACTIVE) return true
       if (prop === TARGET) return target
       if (modes[DETECTIVE_MODE]) {
-        /** @type {path} */
+        /** @type {import('../types').path} */
         // @ts-ignore
         const fullPath = [...path, prop]
         // @ts-ignore

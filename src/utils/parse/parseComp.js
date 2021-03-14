@@ -6,11 +6,9 @@ import parseLoop from './parseLoop'
 
 const conditionalAttributes = [IF_ATTRIBUTE, ELSE_IF_ATTRIBUTE, ELSE_ATTRIBUTE]
 
-/** @typedef {import('../types').compNode} compNode */
-
 /**
  * if the compNode has conditional Attribute, return [attributeName, value] else false
- * @param {compNode} compNode
+ * @param {import('../types').compNode} compNode
  * @returns {[string, string] | false}
  */
 const usesConditionalAttribute = compNode => {
@@ -23,7 +21,7 @@ const usesConditionalAttribute = compNode => {
 
 /**
  * parse component node
- * @param {compNode} compNode
+ * @param {import('../types').compNode} compNode
  * @param {string} compName
  * @param {Array<Function>} deferred
  */

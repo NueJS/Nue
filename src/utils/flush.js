@@ -2,11 +2,9 @@ import { flushBatch } from './batch'
 import { runEvent } from './component/lifecycle.js'
 import { AFTER_UPDATE_CBS, BATCH_INFO, BEFORE_DOM_BATCH, BEFORE_UPDATE_CBS, DOM_BATCH, FLUSH_SCHEDULED } from './constants'
 
-/** @typedef {import('./types').compNode} compNode */
-
 /**
  * flush events and batched callbacks to outside world
- * @param {compNode} compNode
+ * @param {import('./types').compNode} compNode
  * @param {import('./types').batchInfoArray} batchInfoArray
  */
 const flush = (compNode, batchInfoArray) => {
@@ -23,7 +21,7 @@ const flush = (compNode, batchInfoArray) => {
 
 /**
  * schedule the flush
- * @param {compNode} compNode
+ * @param {import('./types').compNode} compNode
  */
 export const scheduleFlush = (compNode) => {
   // schedule flush

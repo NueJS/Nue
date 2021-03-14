@@ -1,14 +1,10 @@
 import { DETECTIVE_MODE } from '../constants.js'
 import modes from '../reactivity/modes.js'
 
-/**
- * @typedef {import('../types').path} path
- */
-
 // when detection mode is enabled is records all the keys that are accessed in state
 // if state.a.b and state.c.d.e is accessed it becomes [['a', 'b'], ['c', 'd', 'e']]
 /**
- * @type {{ paths: Array<path>}}
+ * @type {{ paths: Array<import('../types').path>}}
  */
 export const accessed = {
   paths: []

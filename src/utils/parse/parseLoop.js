@@ -5,11 +5,9 @@ import { isDefined } from '../others'
 import processPlaceholder from '../string/placeholder/processPlaceholder'
 // import { checkParsedLoop } from './checkParsed'
 
-/** @typedef {import('../types').compNode} compNode*/
-
 /**
  *
- * @param {compNode} compNode
+ * @param {import('../types').compNode} compNode
  * @param {string} forAttribute
  */
 const parseLoop = (compNode, forAttribute) => {

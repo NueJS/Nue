@@ -3,13 +3,9 @@ import { TEXT } from '../constants.js'
 import processPlaceholder from './placeholder/processPlaceholder.js'
 
 /**
- * @typedef {import('../types').placeholder} placeholder
-*/
-
-/**
  * take the string text and split it into placeholders and strings
  * @param {string} text
- * @returns {Array<placeholder>} parts
+ * @returns {Array<import('../types').placeholder>} parts
  */
 const split = (text) => {
   const parts = []
