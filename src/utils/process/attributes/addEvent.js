@@ -4,9 +4,9 @@ import { addSubscriber } from '../../subscription/node.js'
 
 /**
  * add event listener on element
- * @param {import('../../types').compNode} compNode
+ * @param {import('../../types.js').compNode} compNode
  * @param {Element} element
- * @param {import('../../types').attribute} param2
+ * @param {import('../../types.js').attribute} param2
  */
 const addEvent = (compNode, element, [fnName, eventName]) => {
   const handler = compNode.fn[fnName]
