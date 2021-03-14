@@ -5,23 +5,30 @@ import { getOffset } from './offset'
 
 // offset is an object with left and top keys
 // cssTransition is the transition information - minus the property
-const transitionNode = (node, prevOffset, cssTransition) => {
-  const currentOffset = getOffset(node)
+
+/**
+ *
+ * @param {HTMLElement} element
+ * @param {{ left: number, top: number }} prevOffset
+ * @param {string} cssTransition
+ */
+const transitionNode = (element, prevOffset, cssTransition) => {
+  const currentOffset = getOffset(element)
   const deltaX = prevOffset.left - currentOffset.left
   const deltaY = prevOffset.top - currentOffset.top
 
   requestAnimationFrame(() => {
-    // apply a "inverse" transform to place the node in prev position
-    node.style.transform = `translate(${deltaX}px, ${deltaY}px)`
+    // apply a "inverse" transform to place the element in prev position
+    element.style.transform = `translate(${deltaX}px, ${deltaY}px)`
     // remove transition so that transform applied above is not smoothly transitioned, it should be instant
-    node.style.transition = null
+    element.style.transition = ''
 
     // for the next repaint
     requestAnimationFrame(() => {
-      // remove the "inverse" transform to put the node back in current position
-      node.style.transform = null
+      // remove the "inverse" transform to put the element back in current position
+      element.style.transform = ''
       // set transform transition to smoothly transit from old to new position
-      node.style.transition = `transform ${cssTransition}`
+      element.style.transition = `transform ${cssTransition}`
     })
   })
 }
