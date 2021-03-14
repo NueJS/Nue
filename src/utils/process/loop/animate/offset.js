@@ -1,17 +1,31 @@
 import { PREV_OFFSET } from '../../../constants'
 
-export const getOffset = (node) => ({
-  left: node.offsetLeft,
-  top: node.offsetTop
+/**
+ * get the left and top offset
+ * @param {HTMLElement} element
+ * @returns
+ */
+export const getOffset = (element) => ({
+  left: element.offsetLeft,
+  top: element.offsetTop
 })
 
-export const saveOffset = (node) => {
-  node[PREV_OFFSET] = getOffset(node)
+/**
+ * save offset on compNode
+ * @param {import('../../../types').compNode} compNode
+ */
+export const saveOffset = (compNode) => {
+  compNode[PREV_OFFSET] = getOffset(compNode)
 }
 
+/**
+ * save offsets for all comps
+ * @param {Array<number>} indexes
+ * @param {Array<import('../../../types').compNode>} comps
+ */
 export const saveOffsets = (indexes, comps) => {
-  indexes.forEach(index => {
+  for (const index of indexes) {
     const comp = comps[index]
-    if (comp) comp[PREV_OFFSET] = getOffset(comp)
-  })
+    comp[PREV_OFFSET] = getOffset(comp)
+  }
 }
