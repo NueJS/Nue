@@ -41,11 +41,7 @@ export interface subscriptions {
 export interface path extends Array<string> {}
 
 // attribute -----------------------------
-export interface attribute {
-  0: any, // value
-  1: string, // name
-  2: any // @todo use enum here
-}
+export type attribute = [any, string, any]
 
 export interface attributes extends Array<attribute> {}
 
