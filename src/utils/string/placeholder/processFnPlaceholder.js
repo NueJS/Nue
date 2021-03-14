@@ -2,8 +2,14 @@ import { FN } from '../../constants.js'
 import { targetProp } from '../../state/slice.js'
 import DEV from '../../dev/DEV'
 
-// 'foo(bar.baz, fizz, buzz)'
+/**
+ * process fn placeholder
+ * @param {string} content
+ * @returns {import('../../types.js').placeholder}
+ */
 const processFnPlaceholder = (content) => {
+  // 'foo(bar.baz, fizz, buzz)'
+
   // 'foo(bar.baz, fizz, buzz'
   const closeParenRemoved = content.slice(0, -1)
 
