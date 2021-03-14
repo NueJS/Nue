@@ -1,9 +1,15 @@
 import { flushArray } from '../others'
 import parseNode from './parseNode'
 
-const parseTemplate = (templateNode, childCompNodeNames) => {
+/**
+ * parse template element
+ * @param {HTMLTemplateElement} templateElement
+ * @param {Record<string, string>} childCompNodeNames
+ */
+const parseTemplate = (templateElement, childCompNodeNames) => {
+  /** @type {Array<Function>} */
   const deferred = []
-  parseNode(templateNode.content, childCompNodeNames, deferred)
+  parseNode(templateElement.content, childCompNodeNames, deferred)
   flushArray(deferred)
 }
 
