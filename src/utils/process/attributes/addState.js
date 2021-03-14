@@ -1,11 +1,17 @@
 import { BEFORE_DOM_BATCH } from '../../constants'
 import { subscribeMultiple } from '../../subscription/subscribe'
 
-const addState = (compNode, node, attribute) => {
+/**
+ * add state on compNode
+ * @param {import('../../types').compNode} parentCompNode
+ * @param {*} compNode
+ * @param {import('../../types').attribute} attribute
+ */
+const addState = (parentCompNode, compNode, attribute) => {
   const [{ getValue, deps }, name] = attribute
 
   const update = () => {
-    compNode.$[name] = getValue(compNode)
+    compNode.$[name] = getValue(parentCompNode)
   }
 
   update()
