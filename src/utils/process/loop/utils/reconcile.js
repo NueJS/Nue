@@ -1,15 +1,24 @@
 // import { CREATE, REMOVE, SWAP } from '../../../constants'
 import { arrayToHash, insert, isDefined, swap } from '../../../others'
 
-const reconcile = (oldState, newState, dirtyIndexes) => {
+/**
+ *
+ * @param {import('../../../types').loopState} oldState
+ * @param {import('../../../types').loopState} newState
+ * @param {Array<number>} indexes
+ * @returns {import('../../../types').steps}
+ */
+const reconcile = (oldState, newState, indexes) => {
+  /** @type {import('../../../types').steps} */
   const steps = {
     remove: [],
     add: [],
     swap: []
   }
-  // remove, removed items from oldState O(dirtyIndexes)
-  for (const di of dirtyIndexes) {
+  // remove, removed items from oldState O(indexes)
+  for (const di of indexes) {
     // keep checking for di if we keep finding that di was removed
+    // @todo use x-- method instead of using while loop
     while (true) {
       const keyInOld = oldState.keys[di]
       // if the key can not be found it means that this key is a new key
@@ -26,7 +35,7 @@ const reconcile = (oldState, newState, dirtyIndexes) => {
   }
 
   // insert, new items from oldState O(n)
-  for (const di of dirtyIndexes) {
+  for (const di of indexes) {
     const key = newState.keys[di]
     // if the key is not present in the newState it means it was removed
     if (!isDefined(key)) continue
@@ -39,7 +48,7 @@ const reconcile = (oldState, newState, dirtyIndexes) => {
   }
 
   // swap, swapped values in newState.keys in arr
-  for (const di of dirtyIndexes) {
+  for (const di of indexes) {
     const key = oldState.keys[di]
     if (key !== newState.keys[di]) {
       // find where its position in new oldState.keys
