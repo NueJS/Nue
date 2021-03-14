@@ -1,3 +1,4 @@
+import { compNode, forInfo } from './types.d';
 import {
   SUBSCRIPTIONS,
   ITSELF,
@@ -16,7 +17,8 @@ import {
   ON_MOUNT_CBS,
   BEFORE_UPDATE_CBS,
   AFTER_UPDATE_CBS,
-  FLUSH_SCHEDULED
+  FLUSH_SCHEDULED,
+  PREV_OFFSET
 } from './constants'
 
 // batch ------------------------------
@@ -54,6 +56,16 @@ export interface placeholder {
 }
 
 // parsed --------------------------
+
+export interface forInfo {
+  itemArray: placeholder,
+  item: string,
+  itemIndex: string | undefined,
+  key: placeholder,
+  enter?: string | null,
+  exit?: string | null,
+  reorder: string | null
+}
 export interface parsedInfo {
   attributes?: attributes,
   isComp?: boolean,
@@ -66,15 +78,7 @@ export interface parsedInfo {
   groupDeps?: Array<path>,
   anchorNode?: Comment,
   placeholder?: placeholder,
-  for?: {
-    itemArray: placeholder,
-    item: string,
-    itemIndex: string | undefined,
-    key: placeholder,
-    enter?: string | null,
-    exit?: string | null,
-    reorder: string | null
-  }
+  for?: forInfo
 }
 
 export interface parsedText extends Text {
@@ -105,6 +109,10 @@ export interface compNode extends HTMLElement {
   [REORDERING]?: boolean,
   [IGNORE_DISCONNECT]?: boolean,
   [FLUSH_SCHEDULED]: boolean,
+  [PREV_OFFSET]?: {
+    left: number,
+    top: number
+  }
   [CBS]: {
     [ON_MOUNT_CBS]: Array<Function>,
     [ON_DESTROY_CBS]: Array<Function>,
@@ -118,4 +126,15 @@ export interface compNode extends HTMLElement {
     beforeUpdate: (cb: Function) => void,
     afterUpdate: (cb: Function) => void
   }
+}
+
+
+interface loopInfo extends forInfo {
+  comps: Array<compNode>,
+  anchorNode: Comment,
+  loopedComp: compNode,
+  getArray: () => Array<any>,
+  getClosure: () => Record<string, any>,
+  getKeys: () => Array<string>,
+  compNode: compNode
 }

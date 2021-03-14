@@ -1,16 +1,20 @@
 import { PREV_OFFSET } from '../../../constants'
 import transitionNode from './transitionNode'
 
-export const animateMove = (blob, dirtyIndexes) => {
+/**
+ * animateMove comps at indexes
+ * @param {import('../../../types').loopInfo} blob
+ * @param {Array<number>} indexes
+ */
+
+// @todo second arg should be comps instead of indexes
+export const animateMove = (blob, indexes) => {
   const { reorder, comps } = blob
 
-  // @todo remove check for comps[i].prevOffset
-  const movedIndexes = dirtyIndexes.filter(i => comps[i] && comps[i][PREV_OFFSET])
-
-  movedIndexes.forEach(index => {
+  for (const index of indexes) {
     const comp = comps[index]
     transitionNode(comp, comp[PREV_OFFSET], reorder)
-  })
+  }
 }
 
 export default animateMove
