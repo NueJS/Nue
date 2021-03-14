@@ -1,11 +1,17 @@
 import { syncNode } from '../subscription/node'
 
-const processTextNode = (compNode, node, parsed) => {
+/**
+ * process the text node
+ * @param {import('../types').compNode} compNode
+ * @param {import('../types').parsedNode} textNode
+ * @param {*} parsed
+ */
+const processTextNode = (compNode, textNode, parsed) => {
   const { getValue, deps } = parsed.placeholder
   const update = () => {
-    node.textContent = getValue(compNode)
+    textNode.textContent = getValue(compNode)
   }
-  syncNode(compNode, node, deps, update)
+  syncNode(compNode, textNode, deps, update)
 }
 
 export default processTextNode
