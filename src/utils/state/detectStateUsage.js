@@ -15,6 +15,7 @@ export const accessed = {
 /**
  *
  * @param {Function} fn
+ * @returns {[any, Array<import('../types').path>]}
  */
 const detectStateUsage = (fn) => {
   modes[DETECTIVE_MODE] = true

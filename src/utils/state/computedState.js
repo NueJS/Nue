@@ -6,9 +6,17 @@ import { BEFORE_DOM_BATCH } from '../constants.js'
 // call that function, detect the state keys it depends on, get the initial value
 // update its value whenever its deps changes
 
+/**
+ *
+ * @param {import('../types').compNode} compNode
+ * @param {Function} fn
+ * @param {string} prop
+ * @returns
+ */
 const computedState = (compNode, fn, prop) => {
   const [initValue, paths] = detectStateUsage(fn)
 
+  /** @type {import('../types').subscribeCallback} */
   const compute = () => {
     const value = fn()
     compNode.$[prop] = value

@@ -100,7 +100,7 @@ export interface parsedNode extends Node, connectionProps {
 }
 
 export interface subscribeCallback extends Function {
-  node: Node
+  node?: Node
 }
 
 // compNode ----------------------------
