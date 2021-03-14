@@ -55,6 +55,7 @@ const reactify = (compNode, obj, _path = [], closure$) => {
       if (modes[NO_OVERRIDE_MODE]) {
         // ignore set
         if (propInTarget) return true
+        // @ts-ignore
         if (typeof value === 'function') value = computedState(compNode, value, prop)
       }
 
