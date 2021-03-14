@@ -1,4 +1,3 @@
-import { compNode } from './types.d';
 import {
   SUBSCRIPTIONS,
   ITSELF,
