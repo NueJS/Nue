@@ -4,7 +4,7 @@ import { subscribeMultiple } from '../../subscription/subscribe'
 /**
  * add state on compNode
  * @param {import('../../types').compNode} parentCompNode
- * @param {*} compNode
+ * @param {import('../../types').compNode} compNode
  * @param {import('../../types').attribute} attribute
  */
 const addState = (parentCompNode, compNode, attribute) => {

@@ -1,10 +1,10 @@
 /**
  *
+ * @param {import('../../types').compNode} parentCompNode
  * @param {import('../../types').compNode} compNode
- * @param {import('../../types').compNode} compNodeAgain
  * @param {import('../../types').attribute} param2
  */
-const addStaticState = (compNode, compNodeAgain, [value, name]) => {
+const addStaticState = (parentCompNode, compNode, [value, name]) => {
   compNode.$[name] = value
 }
 

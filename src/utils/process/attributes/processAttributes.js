@@ -18,11 +18,18 @@ const typeToFn = {
   [REF]: addRef
 }
 
-const processAttributes = (compNode, node, attributes) => {
+/**
+ *
+ * @param {import('../../types.js').compNode} compNode
+ * @param {Element} element
+ * @param {Array<import('../../types.js').attribute>} attributes
+ */
+const processAttributes = (compNode, element, attributes) => {
   attributes.forEach(attribute => {
     const type = attribute[2]
+    // @ts-ignore
     const fn = typeToFn[type]
-    if (fn) fn(compNode, node, attribute)
+    if (fn) fn(compNode, element, attribute)
   })
 }
 
