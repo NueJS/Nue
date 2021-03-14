@@ -101,7 +101,9 @@ export interface parsedNode extends Node, connectionProps {
   [PARSED]: parsedInfo,
 }
 
-export interface subscribeCallback extends Function {
+
+export interface subscribeCallback  {
+  (batchInfoArray: batchInfoArray) : void,
   node?: Node
 }
 
@@ -146,12 +148,28 @@ export interface compNode extends HTMLElement, connectionProps {
 }
 
 
-interface loopInfo extends forInfo {
+export interface loopInfo extends forInfo {
   comps: Array<compNode>,
   anchorNode: Comment,
   loopedComp: compNode,
   getArray: () => Array<any>,
   getClosure: (value: any, index: number) => Record<string, any>,
   getKeys: () => Array<string>,
-  compNode: compNode
+  compNode: compNode,
+  initialized: boolean
+}
+
+export interface steps {
+  remove: Array<number>,
+  add: Array<[number, any]>,
+  swap: Array<[number, number]>
+}
+
+
+export type obj = Record<string, any>
+
+export interface loopState  {
+  keyHash: Record<string, any>,
+  keys: Array<string>,
+  values: Array<any>
 }
