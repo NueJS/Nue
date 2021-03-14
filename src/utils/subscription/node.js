@@ -40,7 +40,7 @@ export const addSubscriber = (node, subscriber) => {
  * @param {import('../types').compNode} compNode
  * @param {import('../types').parsedNode} node
  * @param {Array<import('../types').path>} deps
- * @param {Function} update
+ * @param {import('../types').subscribeCallback} update
  */
 export const syncNode = (compNode, node, deps, update) => {
   // attach which node the update method is for so that when the update is called in batches

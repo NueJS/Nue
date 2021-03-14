@@ -11,7 +11,7 @@ import errors from '../dev/errors.js'
  * @param {import('../types').compNode} baseCompNode
  * @param {import('../types').path} path
  * @param {import('../types').subscribeCallback} cb
- * @param {string} batchName // @todo use enum instead
+ * @param {number} batchName // @todo use enum instead
  * @returns {Function}
  */
 const subscribe = (baseCompNode, path, cb, batchName) => {
@@ -53,7 +53,7 @@ export default subscribe
  * @param {import('../types').compNode} compNode
  * @param {Array<import('../types').path>} paths
  * @param {import('../types').subscribeCallback} cb
- * @param {string} batchName
+ * @param {number} batchName
  * @returns {Function}
  */
 
