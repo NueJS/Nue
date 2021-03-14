@@ -4,18 +4,31 @@ import { animate, animatedRemove, onAnimationEnd } from '../node/dom.js'
 import getClone from '../node/clone.js'
 import { BEFORE_DOM_BATCH, DEFERRED_WORK, IS_PROCESSED, PARSED } from '../constants.js'
 
+/**
+ *
+ * @param {import('../types').compNode} compNode
+ * @param {import('../types').compNode} ifNode
+ * @param {import('../types').parsedInfo} parsed
+ */
 const processIf = (compNode, ifNode, parsed) => {
   // @todo shorten this
+  /** @type {Array<import('../types').compNode>} */
   const group = [ifNode]
+  // @ts-ignore
   if (parsed.group) parsed.group.forEach(node => group.push(getClone(node)))
 
   ifNode[IS_PROCESSED] = true
 
   const { groupDeps } = parsed
-  const anchorNode = ifNode.previousSibling
+
+  const anchorNode = /** @type {Comment} */(ifNode.previousSibling)
 
   // group that is currently rendered
-  let active, initialized
+  /** @type {import('../types').compNode} */
+  let active
+
+  /** @type {boolean} */
+  let initialized
 
   const onGroupDepChange = () => {
     // if a group's condition is foundSatisfied, this becomes true
@@ -24,6 +37,7 @@ const processIf = (compNode, ifNode, parsed) => {
     group.forEach(conditionNode => {
       const { [IS_PROCESSED]: isProcessed, isConnected } = conditionNode
       const { condition, enter, exit } = conditionNode[PARSED]
+      // @ts-ignore
       const satisfied = condition ? condition.getValue(compNode) : true
 
       // if this component should be mounted
@@ -62,6 +76,7 @@ const processIf = (compNode, ifNode, parsed) => {
   }
 
   // since this modifies the DOM, it should be done in dom batches
+  // @ts-ignore
   subscribeMultiple(compNode, groupDeps, onGroupDepChange, BEFORE_DOM_BATCH)
 
   compNode[DEFERRED_WORK].push(() => {

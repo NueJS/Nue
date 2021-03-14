@@ -18,7 +18,8 @@ import {
   AFTER_UPDATE_CBS,
   FLUSH_SCHEDULED,
   PREV_OFFSET,
-  IS_SUBSCRIBED
+  IS_SUBSCRIBED,
+  IS_PROCESSED
 } from './constants'
 
 // batch ------------------------------
@@ -89,9 +90,10 @@ export interface connectionProps {
   subscribers: Array<Function>,
   unsubscribers: Array<Function>,
   [IS_SUBSCRIBED]: boolean,
+  [IS_PROCESSED]: boolean,
 }
 
-export interface parsedElement extends Element, connectionProps {
+export interface parsedElement extends HTMLElement, connectionProps {
   [PARSED]: parsedInfo,
 }
 
@@ -104,13 +106,14 @@ export interface subscribeCallback extends Function {
 }
 
 // compNode ----------------------------
-export interface compNode extends HTMLElement {
+export interface compNode extends HTMLElement, connectionProps {
   disconnectedCallback: Function,
   name: string,
   refs: Record<string, Element>,
   closure?: compNode,
   fn: Record<string, Function>,
   $: Record<string, any>,
+
   [PARSED]: parsedInfo,
   [SUBSCRIPTIONS]: subscriptions,
   [BEFORE_DOM_BATCH]: batch,
