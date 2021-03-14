@@ -1,3 +1,4 @@
+import { compNode } from './types.d';
 import {
   SUBSCRIPTIONS,
   ITSELF,
@@ -50,8 +51,8 @@ export interface attributes extends Array<attribute> {}
 // placeholder --------------------------
 export interface placeholder {
   type: number, // @todo use enum instead
-  getValue?: () => any,
-  deps?: path,
+  getValue?: (compNode: compNode) => any,
+  deps?: Array<path>,
   content: string
 }
 

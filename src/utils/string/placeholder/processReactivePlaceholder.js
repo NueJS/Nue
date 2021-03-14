@@ -4,11 +4,19 @@ import errors from '../../dev/errors.js'
 import { isDefined } from '../../others.js'
 import { targetProp } from '../../state/slice.js'
 
+/**
+ *
+ * @param {string} content
+ * @returns {import('../../types.js').placeholder}
+ */
 const processReactivePlaceholder = (content) => {
   const path = content.split('.')
 
-  // return the value of placeholder in given component
-  // @TODO clean this up
+  /**
+   * return the value of placeholder in given component
+   * @param {import('../../types').compNode} compNode
+   * @returns any
+   */
   const getValue = (compNode) => {
     if (DEV) {
       try {
