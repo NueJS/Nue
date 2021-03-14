@@ -92,7 +92,7 @@ export interface compNode extends HTMLElement {
   refs: Record<string, Element>,
   closure?: compNode,
   fn: Record<string, Function>,
-  $: Object,
+  $: Record<string, any>,
   [PARSED]: parsedInfo,
   [SUBSCRIPTIONS]: subscriptions,
   [BEFORE_DOM_BATCH]: batch,
