@@ -99,6 +99,10 @@ export interface parsedNode extends Node, connectionProps {
   [PARSED]: parsedInfo,
 }
 
+export interface subscribeCallback extends Function {
+  node: Node
+}
+
 // compNode ----------------------------
 export interface compNode extends HTMLElement {
   disconnectedCallback: Function,
