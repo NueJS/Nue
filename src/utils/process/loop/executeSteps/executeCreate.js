@@ -1,8 +1,13 @@
 import { animate } from '../../../node/dom'
 import createComp from '../utils/createComp'
 
-const executeCreate = (step, blob) => {
-  const [index, value] = step
+/**
+ *
+ * @param {[number, any]} info
+ * @param {*} blob
+ */
+const executeCreate = (info, blob) => {
+  const [index, value] = info
   const { comps, anchorNode, enter, initialized } = blob
 
   // create newComp and add to DOM

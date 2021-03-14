@@ -134,7 +134,7 @@ interface loopInfo extends forInfo {
   anchorNode: Comment,
   loopedComp: compNode,
   getArray: () => Array<any>,
-  getClosure: () => Record<string, any>,
+  getClosure: (value: any, index: number) => Record<string, any>,
   getKeys: () => Array<string>,
   compNode: compNode
 }
