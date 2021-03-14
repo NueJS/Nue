@@ -1,7 +1,7 @@
 import { PARSED } from '../constants'
 
 /**
- * @param {import('../types').compNode} node
+ * @param {import('../types').parsedNode} node
  */
 const isComp = node => node[PARSED] && node[PARSED].isComp
 
