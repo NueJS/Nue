@@ -5,12 +5,26 @@ import { accessed } from '../state/detectStateUsage.js'
 import { BATCH_INFO, DETECTIVE_MODE, IS_REACTIVE, NO_OVERRIDE_MODE, REACTIVE_MODE, TARGET, UPDATE_INDEX, ORIGIN_MODE } from '../constants.js'
 import { isObject } from '../others.js'
 
-// create a reactive object which when mutated calls the on_change function
+/**
+ * @typedef {import('../types').compNode} compNode
+ * @typedef {import('../types').path} path
+ * @typedef {Record<string|number|symbol, any>} target
+ */
+
+/**
+ * create a reactive state on compNode
+ * @param {compNode} compNode
+ * @param {target} obj
+ * @param {path} _path
+ * @param {Record<string, any>} [closure$]
+ * @returns {target}
+ */
 const reactify = (compNode, obj, _path = [], closure$) => {
   let path = _path
   if (!isObject(obj)) return obj
 
   // make the child objects reactive
+  /** @type {target} */
   const target = Array.isArray(obj) ? [] : {}
   Object.keys(obj).forEach(key => {
     target[key] = reactify(compNode, obj[key], [...path, key])
@@ -24,6 +38,7 @@ const reactify = (compNode, obj, _path = [], closure$) => {
 
     set (target, prop, newValue) {
       // short circuit if the set is redundant
+      // @ts-ignore
       if (target[prop] === newValue) return true
 
       // change the reactive object's path, because it has been moved to a different key
@@ -53,6 +68,7 @@ const reactify = (compNode, obj, _path = [], closure$) => {
 
       if (isObject(value)) {
         // if value is not reactive, make it reactive
+        // @ts-ignore
         if (!value[IS_REACTIVE]) value = reactify(compNode, value, [...path, prop])
         // when a reactive value is set on some index(prop) in target array
         // we have to update that reactive object's path - because we are changing the index it was created at
@@ -64,13 +80,16 @@ const reactify = (compNode, obj, _path = [], closure$) => {
 
       if (modes[REACTIVE_MODE]) {
         // push to BATCH_INFO and call onMutate
+        // @ts-ignore
         const oldValue = target[prop]
         const newValue = value
         const success = set()
         if (oldValue !== newValue) {
-          const mutatedPath = [...path, prop]
+          const getPath = () => [...path, prop]
+          const mutatedPath = getPath()
           // path may have changed of reactive object, so add a getPath property to fetch the fresh path
-          compNode[BATCH_INFO].push({ oldValue, newValue, path: mutatedPath, getPath: () => [...path, prop] })
+          // @ts-ignore
+          compNode[BATCH_INFO].push({ oldValue, newValue, path: mutatedPath, getPath })
           onMutate(compNode, mutatedPath)
         }
 
@@ -89,8 +108,12 @@ const reactify = (compNode, obj, _path = [], closure$) => {
       if (prop === IS_REACTIVE) return true
       if (prop === TARGET) return target
       if (modes[DETECTIVE_MODE]) {
-        if (path.length !== 0) accessed.paths[accessed.paths.length - 1] = [...path, prop]
-        else accessed.paths.push([...path, prop])
+        /** @type {path} */
+        // @ts-ignore
+        const fullPath = [...path, prop]
+        // @ts-ignore
+        if (path.length !== 0) accessed.paths[accessed.paths.length - 1] = fullPath
+        else accessed.paths.push(fullPath)
       }
 
       // closure state API
