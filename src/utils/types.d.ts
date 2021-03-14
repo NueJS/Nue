@@ -18,6 +18,7 @@ import {
   AFTER_UPDATE_CBS,
 } from './constants'
 
+// batch ------------------------------
 export interface batchInfo {
   oldValue: any,
   newValue: any,
@@ -29,14 +30,16 @@ interface batch extends Set<Function> {}
 
 export interface batchInfoArray extends Array<batchInfo> {}
 
+// subscriptions ------------------------
 export interface subscriptions {
   [ITSELF]: Set<Function>,
   [key: string]: subscriptions
 }
 
-
+// string ------------------------
 export interface path extends Array<string> {}
 
+// attribute -----------------------------
 export interface attribute {
   0: any, // value
   1: string, // name
@@ -45,13 +48,15 @@ export interface attribute {
 
 export interface attributes extends Array<attribute> {}
 
+// placeholder --------------------------
 export interface placeholder {
   type: number, // @todo use enum instead
-  getValue: () => any,
-  deps: path,
+  getValue?: () => any,
+  deps?: path,
   content: string
 }
 
+// parsed --------------------------
 export interface parsedInfo {
   attributes?: attributes,
   isComp?: boolean,
@@ -63,6 +68,7 @@ export interface parsedInfo {
   group?: Array<compNode>,
   groupDeps?: Array<path>,
   anchorNode?: Comment,
+  placeholder?: placeholder,
   for?: {
     itemArray: placeholder,
     item: string,
@@ -74,10 +80,15 @@ export interface parsedInfo {
   }
 }
 
+export interface parsedText extends Text {
+  [PARSED]?: parsedInfo
+}
+
 export interface parsedElement extends Element {
   [PARSED]: parsedInfo
 }
 
+// compNode ----------------------------
 export interface compNode extends HTMLElement {
   disconnectedCallback: Function,
   name: string,
