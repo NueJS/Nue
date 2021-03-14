@@ -1,4 +1,3 @@
-import { compNode, forInfo } from './types.d';
 import {
   SUBSCRIPTIONS,
   ITSELF,
@@ -18,7 +17,8 @@ import {
   BEFORE_UPDATE_CBS,
   AFTER_UPDATE_CBS,
   FLUSH_SCHEDULED,
-  PREV_OFFSET
+  PREV_OFFSET,
+  IS_SUBSCRIBED
 } from './constants'
 
 // batch ------------------------------
@@ -85,8 +85,18 @@ export interface parsedText extends Text {
   [PARSED]?: parsedInfo
 }
 
-export interface parsedElement extends Element {
-  [PARSED]: parsedInfo
+export interface connectionProps {
+  subscribers: Array<Function>,
+  unsubscribers: Array<Function>,
+  [IS_SUBSCRIBED]: boolean,
+}
+
+export interface parsedElement extends Element, connectionProps {
+  [PARSED]: parsedInfo,
+}
+
+export interface parsedNode extends Node, connectionProps {
+  [PARSED]: parsedInfo,
 }
 
 // compNode ----------------------------
