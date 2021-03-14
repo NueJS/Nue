@@ -16,6 +16,7 @@ import {
   ON_MOUNT_CBS,
   BEFORE_UPDATE_CBS,
   AFTER_UPDATE_CBS,
+  FLUSH_SCHEDULED
 } from './constants'
 
 // batch ------------------------------
@@ -107,6 +108,7 @@ export interface compNode extends HTMLElement {
   [INIT_$]: Object,
   [REORDERING]?: boolean,
   [IGNORE_DISCONNECT]?: boolean,
+  [FLUSH_SCHEDULED]: boolean,
   [CBS]: {
     [ON_MOUNT_CBS]: Array<Function>,
     [ON_DESTROY_CBS]: Array<Function>,

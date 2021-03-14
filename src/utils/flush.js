@@ -2,24 +2,36 @@ import { flushBatch } from './batch'
 import { runEvent } from './component/lifecycle.js'
 import { AFTER_UPDATE_CBS, BATCH_INFO, BEFORE_DOM_BATCH, BEFORE_UPDATE_CBS, DOM_BATCH, FLUSH_SCHEDULED } from './constants'
 
-// flush events and batched callbacks to outside world
-const flush = (compNode, batchInfo) => {
+/** @typedef {import('./types').compNode} compNode */
+
+/**
+ * flush events and batched callbacks to outside world
+ * @param {compNode} compNode
+ * @param {import('./types').batchInfoArray} batchInfoArray
+ */
+const flush = (compNode, batchInfoArray) => {
   // run before update event
-  runEvent(compNode, BEFORE_UPDATE_CBS, batchInfo)
+  runEvent(compNode, BEFORE_UPDATE_CBS, batchInfoArray)
+
   // run and clear batches
-  flushBatch(compNode[BEFORE_DOM_BATCH], batchInfo)
-  flushBatch(compNode[DOM_BATCH], batchInfo)
+  flushBatch(compNode[BEFORE_DOM_BATCH], batchInfoArray)
+  flushBatch(compNode[DOM_BATCH], batchInfoArray)
+
   // run after update event
-  runEvent(compNode, AFTER_UPDATE_CBS, batchInfo)
+  runEvent(compNode, AFTER_UPDATE_CBS, batchInfoArray)
 }
 
+/**
+ * schedule the flush
+ * @param {compNode} compNode
+ */
 export const scheduleFlush = (compNode) => {
   // schedule flush
   setTimeout(() => {
     // do a shallow clone because compNode.batchInfo will be cleared out
-    const batchInfo = [...compNode[BATCH_INFO]]
+    const batchInfoArray = [...compNode[BATCH_INFO]]
 
-    flush(compNode, batchInfo)
+    flush(compNode, batchInfoArray)
     // clear batch info
     compNode[BATCH_INFO].length = 0
     // reset flag
