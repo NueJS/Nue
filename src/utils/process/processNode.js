@@ -21,6 +21,7 @@ const processNode = (compNode, node) => {
     if (parsed.isComp) {
       // @ts-ignore
       node.closure = compNode
+      // @ts-ignore
       if (parsed.for) return processLoop(compNode, node, parsed)
       // @ts-ignore
       if (conditionType === IF_ATTRIBUTE) processIf(compNode, node, parsed)
