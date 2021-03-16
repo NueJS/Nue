@@ -1,21 +1,27 @@
 const { REACTIVE, TEXT } = require('../constants')
 const { default: split } = require('./split')
 
+/**
+ * @type {import('../types').compNode}
+ */
+// @ts-expect-error
+const mockComp = {}
+
 it('can split the plain text only', () => {
-  const parts = split('this is just plain text')
+  const parts = split(mockComp, 'this is just plain text')
   expect(parts[0].content).toEqual('this is just plain text')
   expect(parts[0].type).toBe(TEXT)
 })
 
 it('can split the reactive placeholder only', () => {
-  const parts = split('[name]')
+  const parts = split(mockComp, '[name]')
   expect(parts[0].type).toEqual(REACTIVE)
   expect(parts[0].deps).toEqual([['name']])
   expect(parts[0].content).toBe('name')
 })
 
 it('can split the plain text and simple reactive placeholder', () => {
-  const parts = split('my name is [name]')
+  const parts = split(mockComp, 'my name is [name]')
   expect(parts[0]).toEqual({
     type: TEXT,
     content: 'my name is '
@@ -27,7 +33,7 @@ it('can split the plain text and simple reactive placeholder', () => {
 })
 
 test('it can split the plain text and complex reactive placeholder', () => {
-  const parts = split('my name is [ user.name.first ], [user.name.last].')
+  const parts = split(mockComp, 'my name is [ user.name.first ], [user.name.last].')
   // 'my name is '
   expect(parts[0]).toEqual({
     type: TEXT,
@@ -52,13 +58,13 @@ test('it can split the plain text and complex reactive placeholder', () => {
 })
 
 it('ignores the bracket if prefixed with ! character and removes the ! character', () => {
-  const parts = split('my name is ![name]')
+  const parts = split(mockComp, 'my name is ![name]')
   expect(parts[0].content).toEqual('my name is [name]')
   expect(parts[0].type).toBe(TEXT)
 })
 
 it('throws if the un-prefixed bracket is started but not closed', () => {
   expect(() => {
-    split('my name is [name')
+    split(mockComp, 'my name is [name')
   }).toThrow()
 })
