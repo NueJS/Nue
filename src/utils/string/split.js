@@ -1,13 +1,14 @@
-
-import { TEXT } from '../constants.js'
-import processPlaceholder from './placeholder/processPlaceholder.js'
+import { TEXT } from '../constants'
+import errors from '../dev/errors'
+import processPlaceholder from './placeholder/processPlaceholder'
 
 /**
  * take the string text and split it into placeholders and strings
+ * @param {import('../types').compNode} compNode
  * @param {string} text
- * @returns {Array<import('../types').placeholder>} parts
+ * @returns {import('../types').placeholder[]} parts
  */
-const split = (text) => {
+const split = (compNode, text) => {
   const parts = []
   let collectingVar = false
   let collectedString = ''
@@ -22,6 +23,7 @@ const split = (text) => {
   while (++i < text.length) {
     const char = text[i]
     const nextChar = text[i + 1]
+
     // if current char is ! and next [, ignore ! and don't make the
     if (char === '!' && nextChar === '[') {
       collectedString += '['
@@ -46,7 +48,10 @@ const split = (text) => {
   }
 
   // add the remaining text
-  if (collectedString) parts.push({ content: collectedString, type: TEXT })
+  if (collectedString) {
+    if (collectingVar) throw errors.BRACKET_NOT_CLOSED(compNode.name, collectedString)
+    parts.push({ content: collectedString, type: TEXT })
+  }
   return parts
 }
 
