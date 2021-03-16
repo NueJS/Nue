@@ -169,6 +169,20 @@ const errors = {
       fix: `${ifNotPlaceholder}\n\n${ifPlaceholder}`,
       compName
     }
+  },
+
+  /**
+   *
+   * @param {string} compName
+   * @param {string} content
+   * @returns {error}
+   */
+  INVALID_INPUT_BINDING (compName, content) {
+    return {
+      compName,
+      message: `functional placeholder used on input binding: \n:input=[${content}]`,
+      fix: 'Input binding must be a state placeholder. \nEXAMPLE \n✔ :input=[foo] \n✖ :input=[someFn(bar)] '
+    }
   }
 
 }
