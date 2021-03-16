@@ -42,8 +42,8 @@ const runComponent = (compNode, component, parsed) => {
     cssString = tag(...args)
   }
 
-  /** @param {...Function} _childComponents */
-  const components = (..._childComponents) => {
+  /** @param {Array<Function>} _childComponents */
+  const components = _childComponents => {
     if (parsed) return
     childComponents = _childComponents
   }
