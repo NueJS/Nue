@@ -85,7 +85,7 @@ export default /* html */`
   }
 
   .message {
-    line-height: 2;
+    line-height: 1.6;
     background: hsl(193, 20%, 92%, 1);
     padding: 10px;
     font-size: 16px;

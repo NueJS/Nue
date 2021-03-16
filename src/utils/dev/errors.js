@@ -147,8 +147,15 @@ const errors = {
   RESERVED_ATTRIBUTE_USED_ON_NON_COMPONENT (compName, node, attributeName) {
     const nodeName = getNodeName(node)
     return {
-      message: `"${attributeName}" attribute can only be used on a nue component, but is used on a non-component node ${nodeName}`,
-      fix: `Remove this attribute if ${nodeName} is not a component. \nIf ${nodeName} is actually a nue component, make sure you have added it in ${compName}.uses array so that it can be parsed as a nue component`,
+      message: `conditional rendering attribute "${attributeName}" can only be used on a component element, \nbut it is used on a non-component element ${nodeName}`,
+      fix: `Remove this attribute if ${nodeName} is not a component. \nIf ${nodeName} is actually a component, make sure to declare it in components([ ]) array.
+
+EXAMPLE:
+
+const app = ({ components }) => {
+  components([ comp1, comp2 ... ])
+  ...
+}`,
       compName
     }
   },

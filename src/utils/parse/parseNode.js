@@ -23,7 +23,7 @@ const parseNode = (node, childCompNodeNames, deferred, compNode) => {
 
   // attributes on component or simple node
   // @ts-ignore
-  if (node.hasAttribute) parseAttributes(node, compName)
+  if (node.hasAttribute) parseAttributes(node, compName, compNode)
 
   // child nodes of component or simple node
   if (node.hasChildNodes()) node.childNodes.forEach(childNode => parseNode(childNode, childCompNodeNames, deferred, compNode))

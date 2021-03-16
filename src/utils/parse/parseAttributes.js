@@ -10,14 +10,15 @@ import DEV from '../dev/DEV.js'
  * parse attributes on element if any
  * @param {import('../types').parsedElement} element
  * @param {string} compName
+ * @param {import('../types').compNode} compNode
  */
-const parseAttributes = (element, compName) => {
+const parseAttributes = (element, compName, compNode) => {
   // if component specific attributes are used on non-component elements
   if (DEV && !compName) {
     const compOnlyAttributes = [FOR_ATTRIBUTE, KEY_ATTRIBUTE, IF_ATTRIBUTE, ELSE_IF_ATTRIBUTE, ELSE_ATTRIBUTE]
     compOnlyAttributes.forEach(attrName => {
       if (getAttr(element, attrName)) {
-        throw errors.RESERVED_ATTRIBUTE_USED_ON_NON_COMPONENT(attrName, element, attrName)
+        throw errors.RESERVED_ATTRIBUTE_USED_ON_NON_COMPONENT(compNode.name, element, attrName)
       }
     })
   }
@@ -27,7 +28,7 @@ const parseAttributes = (element, compName) => {
   const elementIsComp = !!compName
 
   for (const attributeName of element.getAttributeNames()) {
-    const attributeValue = element.getAttribute(attributeName)
+    const attributeValue = /** @type {string} */ (element.getAttribute(attributeName))
     const variableValue = isBracketed(attributeValue)
 
     let name = attributeName
