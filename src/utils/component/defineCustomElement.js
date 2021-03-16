@@ -125,7 +125,7 @@ const defineCustomElement = (component) => {
           templateNode.innerHTML = templateString + `<style default> ${config.defaultStyle} </style>` + '<style scoped >' + cssString + '</style>'
 
           // parse the template and create templateNode which has all the parsed info
-          parseTemplate(templateNode, childCompNodeNames)
+          parseTemplate(compNode, templateNode, childCompNodeNames)
 
           childComponents.forEach(defineCustomElement)
         }

@@ -5,9 +5,10 @@ import split from '../string/split.js'
  * parse text node
  * @param {Text} node
  * @param {Array<Function>} deferred
+ * @param {import('../types').compNode} compNode
  * @returns
  */
-const parseTextNode = (node, deferred) => {
+const parseTextNode = (node, deferred, compNode) => {
   const text = node.textContent || ''
   const trimmedText = text.trim()
 
@@ -17,7 +18,7 @@ const parseTextNode = (node, deferred) => {
     return
   }
 
-  const parts = split(text)
+  const parts = split(compNode, text)
 
   /** @type {Array<import('../types').parsedText>} */
   const textNodes = []
