@@ -151,6 +151,24 @@ const errors = {
       fix: `Remove this attribute if ${nodeName} is not a component. \nIf ${nodeName} is actually a nue component, make sure you have added it in ${compName}.uses array so that it can be parsed as a nue component`,
       compName
     }
+  },
+
+  /**
+   *
+   * @param {string} compName
+   * @param {string} collectedString
+   * @returns {error}
+   */
+  BRACKET_NOT_CLOSED (compName, collectedString) {
+    const text = `"[${collectedString}"`
+    const trimmed = `"${collectedString.trim()}"`
+    const ifNotPlaceholder = `if ${trimmed} is not a state placeholder: \nprefix the bracket with "!" \n${text} => "![${collectedString}" `
+    const ifPlaceholder = `if ${trimmed} is a placeholder: \nInsert closing bracket after ${text}\n${text} => "[${collectedString}]"`
+    return {
+      message: `Bracket started but not closed \n"[${collectedString}"`,
+      fix: `${ifNotPlaceholder}\n\n${ifPlaceholder}`,
+      compName
+    }
   }
 
 }
