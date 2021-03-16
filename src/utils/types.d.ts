@@ -124,7 +124,7 @@ export interface compNode extends HTMLElement, connectionProps {
   [DEFERRED_WORK]: Array<Function>,
   [NODES_USING_STATE]: Set<Node>,
   [NODES_USING_CLOSURE]: Set<Node>,
-  [INIT_$]: Object,
+  [INIT_$]: Record<string, any>,
   [REORDERING]?: boolean,
   [IGNORE_DISCONNECT]?: boolean,
   [FLUSH_SCHEDULED]: boolean,
