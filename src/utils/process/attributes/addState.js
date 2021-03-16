@@ -1,4 +1,4 @@
-import { BEFORE_DOM_BATCH } from '../../constants'
+import { BEFORE_DOM_BATCH, INIT_$ } from '../../constants'
 import { subscribeMultiple } from '../../subscription/subscribe'
 
 /**
@@ -11,11 +11,15 @@ const addState = (parentCompNode, compNode, attribute) => {
   const [{ getValue, deps }, name] = attribute
 
   const update = () => {
-    compNode.$[name] = getValue(parentCompNode)
+    if (compNode === parentCompNode) compNode.$[name] = getValue(parentCompNode)
+    else {
+      if (!compNode[INIT_$]) compNode[INIT_$] = {}
+      compNode[INIT_$][name] = getValue(parentCompNode)
+    }
   }
 
   update()
-  subscribeMultiple(compNode, deps, update, BEFORE_DOM_BATCH)
+  subscribeMultiple(parentCompNode, deps, update, BEFORE_DOM_BATCH)
 }
 
 export default addState
