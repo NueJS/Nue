@@ -1,4 +1,4 @@
-import { animate, createElement } from '../../node/dom'
+import { createElement } from '../../node/dom'
 import stats from '../../stats'
 import html from './html'
 
@@ -22,12 +22,7 @@ const showErrorOverlay = (error) => {
       // @ts-ignore
       const closeButton = shadowRoot.querySelector('.parsed-error__close-icon')
       closeButton.addEventListener('click', () => {
-        // @ts-ignore
-        const modal = shadowRoot.querySelector('.parsed-error__card')
-
-        animate(modal, 'pop-out 400ms ease', true, () => {
-          this.remove()
-        })
+        this.remove()
       })
     }
   }
@@ -41,7 +36,7 @@ const showErrorOverlay = (error) => {
   const title = overlay.shadowRoot.querySelector('.title')
 
   if (error.compName) {
-    title.textContent = `error in <${error.compName}>`
+    title.textContent = `error in ${error.compName}`
     const errorMessage = `${error.message}\n\n${error.fix || ''}`
     message.textContent = errorMessage
   } else {
