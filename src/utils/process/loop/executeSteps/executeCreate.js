@@ -4,7 +4,7 @@ import createComp from '../utils/createComp'
 /**
  *
  * @param {[number, any]} info
- * @param {*} blob
+ * @param {import('../../../types').loopInfo} blob
  */
 const executeCreate = (info, blob) => {
   const [index, value] = info

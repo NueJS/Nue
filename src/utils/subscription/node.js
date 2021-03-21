@@ -51,6 +51,7 @@ export const syncNode = (compNode, node, deps, update) => {
   // when node is subscribed, call update so that node is up-to-date with state
   // returns unsubscriber function which removes subscription from compNode subscriptions to prevent unnecessary dom updates
   const subscriber = () => {
+    // @ts-ignore
     update()
 
     if (DEV) devtools.onNodeUpdate(node)

@@ -6,7 +6,7 @@ import { createComment } from '../node/dom'
  * @param {import('../types').compNode} ifNode
  */
 const parseIf = (ifNode) => {
-  /** @type {Array<import('../types').compNode}>} */
+  /** @type {import('../types').compNode[]}} */
   const group = []
 
   let node = ifNode.nextElementSibling
@@ -45,7 +45,13 @@ const parseIf = (ifNode) => {
     }
   })
 
-  ifNode[PARSED] = { ...ifNode[PARSED], group, groupDeps, anchorNode }
+  ifNode[PARSED] = {
+    ...ifNode[PARSED],
+    group,
+    // @ts-ignore - groupDeps will not be undefined
+    groupDeps,
+    anchorNode
+  }
 }
 
 export default parseIf

@@ -5,7 +5,7 @@ import { syncNode } from '../../subscription/node.js'
 /**
  *
  * @param {import('../../types.js').compNode} compNode
- * @param {Element} element
+ * @param {import('../../types.js').parsedElement} element
  * @param {import('../../types.js').attribute} attribute
  */
 const addAttribute = (compNode, element, attribute) => {

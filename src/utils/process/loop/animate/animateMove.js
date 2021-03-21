@@ -13,6 +13,7 @@ export const animateMove = (blob, indexes) => {
 
   for (const index of indexes) {
     const comp = comps[index]
+    // @ts-ignore - comp will have PREV_OFFSET
     transitionNode(comp, comp[PREV_OFFSET], reorder)
   }
 }

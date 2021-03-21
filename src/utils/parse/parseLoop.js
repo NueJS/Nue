@@ -21,6 +21,7 @@ const parseLoop = (compNode, forAttribute) => {
     itemArray: processPlaceholder(indexUsed ? c : b, true),
     item: a,
     itemIndex: indexUsed ? b : undefined,
+    // @ts-ignore - key attribute will be available
     key: processPlaceholder(getAttr(compNode, KEY_ATTRIBUTE)),
     ...getAnimationAttributes(compNode),
     reorder: getAttr(compNode, REORDER_TRANSITION)

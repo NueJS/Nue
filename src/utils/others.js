@@ -20,15 +20,16 @@ export const insert = (arr, i, value) => {
 
 // convert array to hash with hash key as item's value and hash value as item's index
 /**
- * @template X
- * @param {Array<X>} arr
- * @returns {{[key: X]: number}}
+ * @param {string[]} arr
+ * @returns {Record<string, number>}
  */
-export const arrayToHash = (arr) =>
-  arr.reduce((hash, value, i) => {
-    hash[value] = i // why ts-error ?
+export const arrayToHash = (arr) => {
+  const init = /** @type {Record<string, number>} */({})
+  return arr.reduce((hash, value, i) => {
+    hash[value] = i
     return hash
-  }, {})
+  }, init)
+}
 
 /**
  * return true if the x is defined
