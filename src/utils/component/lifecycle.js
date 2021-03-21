@@ -48,7 +48,14 @@ const addLifecycles = (compNode) => {
       // addCb the state dependency after the component is mounted
       const subOnMount = () => {
         const deps = slices.map(slice => slice.split('.'))
-        subscribeMultiple(compNode, deps, cb, BEFORE_DOM_BATCH)
+
+        subscribeMultiple(
+          compNode,
+          deps,
+          // @ts-ignore
+          cb,
+          BEFORE_DOM_BATCH
+        )
       }
 
       addCb(ON_MOUNT_CBS, subOnMount)

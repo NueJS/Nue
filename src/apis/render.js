@@ -13,6 +13,7 @@ import { dashify } from '../utils/string/dashify'
 const render = (component, element, config) => {
   if (DEV) {
     window.onerror = (message, filename, lineno, colno, error) => {
+      // @ts-ignore
       showError(error)
     }
   }

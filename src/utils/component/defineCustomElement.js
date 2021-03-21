@@ -121,7 +121,10 @@ const defineCustomElement = (component) => {
 
         // process childNodes (DOM) and shadow DOM
         // TODO: processNode should be able to take the fragment node
-        compNode.childNodes.forEach(node => processNode(compNode, node))
+        compNode.childNodes.forEach(node =>
+          // @ts-ignore
+          processNode(compNode, node)
+        )
         buildShadowDOM(compNode, templateNode)
 
         // connect all nodes using state (local + closure)

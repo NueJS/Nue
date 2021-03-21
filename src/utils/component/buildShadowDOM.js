@@ -6,7 +6,7 @@ import processNode from '../process/processNode.js'
 /**
  * process templateNode and add it in shadowDOM of compNode
  * @param {import('../types').compNode} compNode
- * @param {Element} templateNode
+ * @param {HTMLTemplateElement} templateNode
  */
 const buildShadowDOM = (compNode, templateNode) => {
   // clone templateNode

@@ -107,6 +107,8 @@ export interface subscribeCallback  {
   node?: parsedNode
 }
 
+export type subscribeCallbackArray = subscribeCallback[]
+
 // compNode ----------------------------
 export interface compNode extends HTMLElement, connectionProps {
   disconnectedCallback: Function,
@@ -129,10 +131,10 @@ export interface compNode extends HTMLElement, connectionProps {
   [FLUSH_SCHEDULED]: boolean,
 
   [CBS]: {
-    [ON_MOUNT_CBS]: Array<Function>,
-    [ON_DESTROY_CBS]: Array<Function>,
-    [BEFORE_UPDATE_CBS]: Array<Function>,
-    [AFTER_UPDATE_CBS]: Array<Function>,
+    [ON_MOUNT_CBS]: subscribeCallbackArray,
+    [ON_DESTROY_CBS]: subscribeCallbackArray,
+    [BEFORE_UPDATE_CBS]: subscribeCallbackArray,
+    [AFTER_UPDATE_CBS]: subscribeCallbackArray,
   },
 
   events: {

@@ -1,8 +1,14 @@
+/**
+ * @type {{ nodeUpdated: (node: import("../utils/types").parsedNode) => void, onNodeUpdate: Function | undefined }}
+ */
+
 const devtools = {
-  showUpdates: false,
-  onNodeUpdate: (cb) => {
-    if (devtools.showUpdates) cb()
-  }
+  nodeUpdated: (node) => {
+    if (devtools.onNodeUpdate) {
+      devtools.onNodeUpdate(node)
+    }
+  },
+  onNodeUpdate: undefined
 }
 
 export default devtools

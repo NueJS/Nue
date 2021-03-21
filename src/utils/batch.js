@@ -22,7 +22,7 @@ export const flushBatch = (batch, batchInfo) => {
     // if cb is for updating a node, only call cb if node is subscribed
     if ((node && node[IS_SUBSCRIBED]) || !node) {
       cb(batchInfo)
-      if (DEV && node) devtools.onNodeUpdate(node)
+      if (DEV && node) devtools.nodeUpdated(node)
     }
   })
   // once all callbacks are run clear the batch
