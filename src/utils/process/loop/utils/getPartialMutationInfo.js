@@ -1,30 +1,45 @@
-// mutations is the batchInfo - an array of mutations done in one sync batch
-// arrayPath is the path of the array in state
-// arrayPathString is arrayPath.join('.')
+/** @typedef {{ path: import('../../../types').path, newValue: any }} mutationInfo */
 
-// dirtyIndexes are the indexes at which new items are assigned
-// stateUpdatedIndexes are the indexes at which items are mutated
-const getPartialMutationInfo = (mutations, arrayPathString, arrayPath) => {
+/**
+ *
+ * @param {import('../../../types').batchInfoArray} batchInfoArray
+ * @param {string} arrayPathString
+ * @param {import('../../../types').path} arrayPath
+ * @returns
+ */
+
+const getPartialMutationInfo = (batchInfoArray, arrayPathString, arrayPath) => {
+  /**
+   *  set of indexes, where the items are either moved, removed or added
+   *  @type {Set<number>}
+   * */
   const _dirtyIndexes = new Set()
-  // const _stateUpdatedIndexes = new Set()
+
+  /**
+   * object containing information about what parts of state has been mutated
+   * @type {Record<string, Array<mutationInfo> >}
+   * */
   const stateUpdatePaths = {}
+
   const arrayPathLength = arrayPath.length
 
-  mutations.forEach(mutation => {
-    const { newValue, oldValue, getPath } = mutation
-    // get the fresh path instead of old path
+  batchInfoArray.forEach(batchInfo => {
+    const { newValue, oldValue, getPath } = batchInfo
+
+    // get the fresh path
     const path = getPath()
-    // if the mutation path startsWith same path as of array's path
+
+    // if the batchInfo path startsWith same path as of array's path
     // it means the array is the target, array mutated
     const arrayMutated = path.join('.').startsWith(arrayPathString)
 
-    // if the mutation updates the array
+    // if the batchInfo updates the array
     if (arrayMutated) {
       // from index 0 to arrayPathLength - 1, arrayPath matches
-      // at index: arrayPathLength, we get the key at which mutation happened
+      // at index: arrayPathLength, we get the key at which batchInfo happened
       const key = path[arrayPathLength]
 
-      // if mutation path's length is just 1 more than array's path,
+      // if batchInfo path's length is just 1 more than array's path,
       // it means that it is assigning a newVale to key
       const pathEndsWithKey = path.length === arrayPathLength + 1
 
@@ -42,7 +57,7 @@ const getPartialMutationInfo = (mutations, arrayPathString, arrayPath) => {
         else _dirtyIndexes.add(Number(key))
       }
 
-      // if the mutation path does not end with index, but goes deeper than that
+      // if the batchInfo path does not end with index, but goes deeper than that
       // means that item itself was mutated
       // ex: users[2].name = 'Manan'
       else {
@@ -51,16 +66,14 @@ const getPartialMutationInfo = (mutations, arrayPathString, arrayPath) => {
           path: path.slice(arrayPathLength + 1),
           newValue
         }
-        if (key in stateUpdatePaths) stateUpdatePaths.push(info)
+        if (key in stateUpdatePaths) stateUpdatePaths[key].push(info)
         else stateUpdatePaths[key] = [info]
       }
     }
   })
 
-  // convert _dirtyIndexes to array for sorting
-  // then convert the sorted array to set so that we can get
+  // convert _dirtyIndexes to array and then sort
   const dirtyIndexes = [..._dirtyIndexes].sort((a, b) => a - b)
-  // const stateUpdatedIndexes = [..._stateUpdatedIndexes]
 
   return [dirtyIndexes, stateUpdatePaths]
 }

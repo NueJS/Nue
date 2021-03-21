@@ -104,7 +104,7 @@ export interface parsedNode extends Node, connectionProps {
 
 export interface subscribeCallback  {
   (batchInfoArray?: batchInfoArray) : void,
-  node?: Node
+  node?: parsedNode
 }
 
 // compNode ----------------------------
