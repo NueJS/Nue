@@ -26,13 +26,13 @@ import {
 export interface batchInfo {
   oldValue: any,
   newValue: any,
-  path: Array<string>,
-  getPath: () => Array<string>
+  path: string[],
+  getPath: () => string[]
 }
 
-interface batch extends Set<Function> {}
+export type batch = Set<Function>
 
-export interface batchInfoArray extends Array<batchInfo> {}
+export type batchInfoArray = batchInfo[]
 
 // subscriptions ------------------------
 export interface subscriptions {
@@ -41,18 +41,18 @@ export interface subscriptions {
 }
 
 // string ------------------------
-export interface path extends Array<string> {}
+export type path = string[]
 
 // attribute -----------------------------
 export type attribute = [any, string, any]
 
-export type attributes = Array<attribute>
+export type attributes = attribute[]
 
 // placeholder --------------------------
 export interface placeholder {
   type: number, // @todo use enum instead
   getValue?: (compNode: compNode) => any,
-  deps?: Array<path>,
+  deps?: path[],
   content: string
 }
 
@@ -67,7 +67,7 @@ export interface forInfo {
   exit?: string | null,
   reorder: string | null
 }
-export interface parsedInfo {
+export interface Parsed {
   attributes?: attributes,
   isComp?: boolean,
   name?: string,
@@ -75,30 +75,31 @@ export interface parsedInfo {
   condition?: placeholder,
   enter?: string | null,
   exit?: string | null,
-  group?: Array<compNode>,
-  groupDeps?: Array<path>,
+  group?: compNode[],
+  groupDeps?: path[],
   anchorNode?: Comment,
   placeholder?: placeholder,
   for?: forInfo
 }
 
-export interface parsedText extends Text {
-  [PARSED]?: parsedInfo
-}
 
 export interface connectionProps {
-  subscribers: Array<Function>,
-  unsubscribers: Array<Function>,
-  [IS_SUBSCRIBED]: boolean,
-  [IS_PROCESSED]: boolean,
+  subscribers: Function[],
+  unsubscribers: Function[],
+  [IS_SUBSCRIBED]?: boolean,
+  [IS_PROCESSED]?: boolean,
+}
+
+export interface parsedText extends Text, connectionProps {
+  [PARSED]: Parsed
 }
 
 export interface parsedElement extends HTMLElement, connectionProps {
-  [PARSED]: parsedInfo,
+  [PARSED]: Parsed,
 }
 
 export interface parsedNode extends Node, connectionProps {
-  [PARSED]: parsedInfo,
+  [PARSED]: Parsed,
 }
 
 
@@ -114,17 +115,18 @@ export interface compNode extends HTMLElement, connectionProps {
   disconnectedCallback: Function,
 
   name: string,
-  refs: Record<string, HTMLElement>,
-  closure?: compNode,
+  refs: Record<string, parsedElement>,
   fn: Record<string, Function>,
   $: Record<string, any>,
 
-  [PARSED]: parsedInfo,
+  closure?: compNode,
+
+  [PARSED]: Parsed,
   [SUBSCRIPTIONS]: subscriptions,
   [BEFORE_DOM_BATCH]: batch,
   [DOM_BATCH]: batch,
   [BATCH_INFO]: batchInfoArray,
-  [DEFERRED_WORK]: Array<Function>,
+  [DEFERRED_WORK]: Function[],
   [NODES_USING_STATE]: Set<parsedNode>,
   [NODES_USING_CLOSURE]: Set<parsedNode>,
   [INIT_$]: Record<string, any>,
@@ -140,7 +142,7 @@ export interface compNode extends HTMLElement, connectionProps {
   events: {
     onMount: (cb: Function) => void,
     onDestroy: (cb: Function) => void,
-    onMutate: (cb: Function, ...slices: Array<string>) => void,
+    onMutate: (cb: Function, ...slices: string[]) => void,
     beforeUpdate: (cb: Function) => void,
     afterUpdate: (cb: Function) => void
   },
@@ -155,20 +157,20 @@ export interface compNode extends HTMLElement, connectionProps {
 
 
 export interface loopInfo extends forInfo {
-  comps: Array<compNode>,
+  comps: compNode[],
   anchorNode: Comment,
   loopedComp: compNode,
-  getArray: () => Array<any>,
+  getArray: () => any[],
   getClosure: (value: any, index: number) => Record<string, any>,
-  getKeys: () => Array<string>,
+  getKeys: () => string[],
   compNode: compNode,
   initialized: boolean
 }
 
 export interface steps {
-  remove: Array<number>,
-  add: Array<[number, any]>,
-  swap: Array<[number, number]>
+  remove: number[],
+  add: [number, any][],
+  swap: [number, number][]
 }
 
 
@@ -176,8 +178,8 @@ export type obj = Record<string, any>
 
 export interface loopState  {
   keyHash: Record<string, any>,
-  keys: Array<string>,
-  values: Array<any>
+  keys: string[],
+  values: any[]
 }
 
 export interface stateUpdate {
@@ -187,4 +189,4 @@ export interface stateUpdate {
 
 
 type stringIndex = string
-export type stateUpdates = Record< stringIndex, Array<stateUpdate> >
+export type stateUpdates = Record< stringIndex, stateUpdate[] >

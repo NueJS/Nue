@@ -26,7 +26,7 @@ const errors = {
 
   /**
    * @param {string} compName
-   * @param {Array<string>} keys
+   * @param {string[]} keys
    * @returns {error}
    */
   KEYS_ARE_NOT_UNIQUE (compName, keys) {

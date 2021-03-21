@@ -10,7 +10,7 @@ import zeroToNArray from './utils/zeroToNArray.js'
  *
  * @param {import('../../types.js').compNode} compNode
  * @param {import('../../types.js').compNode} loopedComp
- * @param {import('../../types.js').parsedInfo} parsed
+ * @param {import('../../types.js').Parsed} parsed
  */
 const processLoop = (compNode, loopedComp, parsed) => {
   /** @type {import('../../types.js').forInfo} */

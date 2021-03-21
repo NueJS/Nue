@@ -4,7 +4,7 @@ import split from '../string/split.js'
 /**
  * parse text node
  * @param {Text} node
- * @param {Array<Function>} deferred
+ * @param {Function[]} deferred
  * @param {import('../types').compNode} compNode
  * @returns
  */
@@ -20,13 +20,14 @@ const parseTextNode = (node, deferred, compNode) => {
 
   const parts = split(compNode, text)
 
-  /** @type {Array<import('../types').parsedText>} */
+  /** @type {import('../types').parsedText[]} */
   const textNodes = []
 
   // for each part create a text node
   // if it's not TEXT type, save the part info in parsed.placeholder
   parts.forEach(part => {
     /** @type {import('../types').parsedText} */
+    // @ts-ignore
     const textNode = document.createTextNode(part.content)
     if (part.type !== TEXT) textNode[PARSED] = { placeholder: part }
     textNodes.push(textNode)

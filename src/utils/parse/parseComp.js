@@ -23,7 +23,7 @@ const usesConditionalAttribute = compNode => {
  * parse component node
  * @param {import('../types').compNode} compNode
  * @param {string} compName
- * @param {Array<Function>} deferred
+ * @param {Function[]} deferred
  */
 const parseComp = (compNode, compName, deferred) => {
   compNode[PARSED] = {

@@ -8,7 +8,7 @@ import parseNode from './parseNode'
  * @param {Record<string, string>} childCompNodeNames
  */
 const parseTemplate = (compNode, templateElement, childCompNodeNames) => {
-  /** @type {Array<Function>} */
+  /** @type {Function[]} */
   const deferred = []
   parseNode(templateElement.content, childCompNodeNames, deferred, compNode)
   flushArray(deferred)

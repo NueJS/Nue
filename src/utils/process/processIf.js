@@ -8,7 +8,7 @@ import { BEFORE_DOM_BATCH, DEFERRED_WORK, IS_PROCESSED, PARSED } from '../consta
  *
  * @param {import('../types').compNode} compNode
  * @param {import('../types').compNode} ifNode
- * @param {import('../types').parsedInfo} parsed
+ * @param {import('../types').Parsed} parsed
  */
 const processIf = (compNode, ifNode, parsed) => {
   // @todo shorten this

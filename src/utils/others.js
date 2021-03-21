@@ -1,6 +1,6 @@
 /**
  * swap items at indexes i and j in array arr
- * @param {Array<any>} arr
+ * @param {any[]} arr
  * @param {number} i
  * @param {number} j
  */
@@ -10,7 +10,7 @@ export const swap = (arr, i, j) => {
 
 /**
  * shorthand to insert value at index i in arr
- * @param {Array<any>} arr
+ * @param {any[]} arr
  * @param {number} i
  * @param {any} value
  */
@@ -61,7 +61,7 @@ export const upper = (str) => str.toUpperCase()
 
 /**
  * execute all functions in array and clear array
- * @param {Array<Function>} arr
+ * @param {Function[]} arr
  */
 export const flushArray = (arr) => {
   arr.forEach(fn => fn())
@@ -70,8 +70,8 @@ export const flushArray = (arr) => {
 
 /**
  * checks if two arrays of primitive values are equal or not
- * @param {Array<string>} arr1
- * @param {Array<string>} arr2
+ * @param {string[]} arr1
+ * @param {string[]} arr2
  * @returns {boolean}
  */
 export const arraysAreShallowEqual = (arr1, arr2) => {

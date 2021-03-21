@@ -5,7 +5,7 @@ import { dashifyComponentNames } from '../string/dashify.js'
 // @todo move it to other file
 /**
  *
- * @param {Array<string>} strings
+ * @param {string[]} strings
  * @param  {...string} exprs
  * @returns
  */
@@ -19,10 +19,10 @@ const tag = (strings, ...exprs) =>
  * @param {import('../types').compNode} compNode
  * @param {Function} component
  * @param {boolean} parsed
- * @returns {[string, string, Array<Function>]}
+ * @returns {[string, string, Function[]]}
  */
 const runComponent = (compNode, component, parsed) => {
-  /** @type {Array<Function>} */
+  /** @type {Function[]} */
   let childComponents = []
   let templateString = ''
   let cssString = ''
@@ -42,7 +42,7 @@ const runComponent = (compNode, component, parsed) => {
     cssString = tag(...args)
   }
 
-  /** @param {Array<Function>} _childComponents */
+  /** @param {Function[]} _childComponents */
   const components = _childComponents => {
     if (parsed) return
     childComponents = _childComponents

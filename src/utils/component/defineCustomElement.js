@@ -13,19 +13,22 @@ import { dashify } from '../string/dashify.js'
 import { upper } from '../others.js'
 
 /**
- * defines a custom element using the function component
+ * defines a custom element using the component function
  * @param {Function} component
  */
 
 const defineCustomElement = (component) => {
-  const { name } = component
   const { components, config } = stats
-  // return if already defined
+
+  // use the function's name as the component's name
+  const { name } = component
+
+  // return early if the component with this name is already defined
   if (name in components) return
   components[name] = component
 
   /** @type {HTMLTemplateElement}*/
-  let templateNode
+  let componentTemplateElement
 
   class NueComp extends HTMLElement {
     constructor () {
@@ -35,7 +38,7 @@ const defineCustomElement = (component) => {
       const compNode = this
       // name of the custom element
       compNode.name = name
-      // refs of child nodes with *ref='xyz' attribute
+      // refs of child nodes with *ref='ref-name' attribute
       compNode.refs = {}
       // subscription tree which contains the callbacks stored at various dependency paths
       compNode[SUBSCRIPTIONS] = { [ITSELF]: new Set() }
@@ -87,10 +90,10 @@ const defineCustomElement = (component) => {
           if (attributes) processAttributes(compNode, compNode, attributes)
         }
 
-        const [templateString, cssString, childComponents] = runScript(compNode, component, !!templateNode)
+        const [templateString, cssString, childComponents] = runScript(compNode, component, !!componentTemplateElement)
 
         // do this only once per component ------------------
-        if (!templateNode) {
+        if (!componentTemplateElement) {
           /** @type {Record<string, string>} */
           let childCompNodeNames = {}
           if (childComponents) {
@@ -108,13 +111,13 @@ const defineCustomElement = (component) => {
               }, {})
           }
 
-          // create templateNode using template, style, and defaultStyle
+          // create componentTemplateElement using template, style, and defaultStyle
           // @ts-ignore
-          templateNode = createElement('template')
-          templateNode.innerHTML = templateString + `<style default> ${config.defaultStyle} </style>` + '<style scoped >' + cssString + '</style>'
+          componentTemplateElement = createElement('template')
+          componentTemplateElement.innerHTML = templateString + `<style default> ${config.defaultStyle} </style>` + '<style scoped >' + cssString + '</style>'
 
-          // parse the template and create templateNode which has all the parsed info
-          parseTemplate(compNode, templateNode, childCompNodeNames)
+          // parse the template and create componentTemplateElement which has all the parsed info
+          parseTemplate(compNode, componentTemplateElement, childCompNodeNames)
 
           childComponents.forEach(defineCustomElement)
         }
@@ -125,7 +128,7 @@ const defineCustomElement = (component) => {
           // @ts-ignore
           processNode(compNode, node)
         )
-        buildShadowDOM(compNode, templateNode)
+        buildShadowDOM(compNode, componentTemplateElement)
 
         // connect all nodes using state (local + closure)
         compNode[NODES_USING_STATE].forEach(subscribeNode)

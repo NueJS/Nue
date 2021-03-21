@@ -13,7 +13,7 @@ const isUniqueArray = (arr) => {
 /**
  *
  * @param {import('../../../types').compNode} compNode
- * @param {Array<string>} keys
+ * @param {string[]} keys
  */
 const checkUniquenessOfKeys = (compNode, keys) => {
   if (!isUniqueArray(keys)) {

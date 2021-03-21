@@ -8,7 +8,7 @@ export const dashify = str => str + '-'
 /**
  * replace component names in html with dashed names
  * @param {string} html
- * @param {Array<Function>} components
+ * @param {Function[]} components
  * @returns {string}
  */
 export const dashifyComponentNames = (html, components) =>

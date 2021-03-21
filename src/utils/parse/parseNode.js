@@ -6,7 +6,7 @@ import parseComp from './parseComp'
  *
  * @param {Node} node
  * @param {Record<string, string>} childCompNodeNames
- * @param {Array<Function>} deferred
+ * @param {Function[]} deferred
  * @param {import('../types').compNode} compNode
  */
 const parseNode = (node, childCompNodeNames, deferred, compNode) => {
