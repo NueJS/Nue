@@ -110,8 +110,9 @@ export interface subscribeCallback  {
 // compNode ----------------------------
 export interface compNode extends HTMLElement, connectionProps {
   disconnectedCallback: Function,
+
   name: string,
-  refs: Record<string, Element>,
+  refs: Record<string, HTMLElement>,
   closure?: compNode,
   fn: Record<string, Function>,
   $: Record<string, any>,
@@ -122,28 +123,31 @@ export interface compNode extends HTMLElement, connectionProps {
   [DOM_BATCH]: batch,
   [BATCH_INFO]: batchInfoArray,
   [DEFERRED_WORK]: Array<Function>,
-  [NODES_USING_STATE]: Set<Node>,
-  [NODES_USING_CLOSURE]: Set<Node>,
+  [NODES_USING_STATE]: Set<parsedNode>,
+  [NODES_USING_CLOSURE]: Set<parsedNode>,
   [INIT_$]: Record<string, any>,
-  [REORDERING]?: boolean,
-  [IGNORE_DISCONNECT]?: boolean,
   [FLUSH_SCHEDULED]: boolean,
-  [PREV_OFFSET]?: {
-    left: number,
-    top: number
-  }
+
   [CBS]: {
     [ON_MOUNT_CBS]: Array<Function>,
     [ON_DESTROY_CBS]: Array<Function>,
     [BEFORE_UPDATE_CBS]: Array<Function>,
     [AFTER_UPDATE_CBS]: Array<Function>,
   },
+
   events: {
     onMount: (cb: Function) => void,
     onDestroy: (cb: Function) => void,
     onMutate: (cb: Function, ...slices: Array<string>) => void,
     beforeUpdate: (cb: Function) => void,
     afterUpdate: (cb: Function) => void
+  },
+
+  [REORDERING]?: boolean,
+  [IGNORE_DISCONNECT]?: boolean,
+  [PREV_OFFSET]?: {
+    left: number,
+    top: number
   }
 }
 

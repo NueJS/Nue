@@ -41,30 +41,19 @@ const defineCustomElement = (component) => {
       compNode[SUBSCRIPTIONS] = { [ITSELF]: new Set() }
 
       // batches
-      // this batch's callbacks are run first
       compNode[BEFORE_DOM_BATCH] = new Set()
-
-      // and then this batch's callback runs
       compNode[DOM_BATCH] = new Set()
 
       // Array of mutation info that happened in a flush
-      /** @type {import('../types').batchInfoArray } */
       compNode[BATCH_INFO] = []
 
       // array of callbacks that should be run after some process is done
-      /** @type {Array<Function>} */
       compNode[DEFERRED_WORK] = []
 
-      /**
-       * nodes that are using the state
-       * @type {Set<Node>}
-       */
+      // nodes that are using the state
       compNode[NODES_USING_STATE] = new Set()
 
-      /**
-       * nodes that are using the closure state
-       * @type {Set<Node>}
-       */
+      // nodes that are using the closure state
       compNode[NODES_USING_CLOSURE] = new Set()
 
       if (!compNode[INIT_$]) compNode[INIT_$] = {}
@@ -131,7 +120,8 @@ const defineCustomElement = (component) => {
         }
 
         // process childNodes (DOM) and shadow DOM
-        compNode.childNodes.forEach(n => processNode(compNode, n))
+        // TODO: processNode should be able to take the fragment node
+        compNode.childNodes.forEach(node => processNode(compNode, node))
         buildShadowDOM(compNode, templateNode)
 
         // connect all nodes using state (local + closure)
@@ -156,14 +146,17 @@ const defineCustomElement = (component) => {
       const compNode = this
       // if disconnectedCallback was manually called earlier, no need to call it again when node is removed
       if (compNode[IGNORE_DISCONNECT]) return
+
       // do nothing, if the connection change is due to reordering
       if (compNode[REORDERING]) return
+
       // run onDestroy callbacks
       runEvent(compNode, ON_DESTROY_CBS, compNode[BATCH_INFO])
+
       // only disconnect nodes that are using closure, no need to disconnect nodes that use local state only
       compNode[NODES_USING_CLOSURE].forEach(unsubscribeNode)
 
-      // unsubscribeNode(compNode) (not needed)
+      // unsubscribeNode(compNode) (not needed ?)
     }
   }
 
