@@ -1,7 +1,8 @@
+import DEV from '../utils/dev/DEV'
+
 /**
  * @type {{ nodeUpdated: (node: import("../utils/types").parsedNode) => void, onNodeUpdate: Function | undefined }}
  */
-
 const devtools = {
   nodeUpdated: (node) => {
     if (devtools.onNodeUpdate) {
@@ -11,4 +12,4 @@ const devtools = {
   onNodeUpdate: undefined
 }
 
-export default devtools
+export default DEV ? devtools : undefined
