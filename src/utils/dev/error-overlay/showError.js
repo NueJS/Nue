@@ -6,6 +6,7 @@ import html from './html'
  * show error overlay
  * @param {{ message: string, fix: string, compName: string }} error
  */
+
 const showErrorOverlay = (error) => {
   // if already showing error, return
   if (stats.error) return
@@ -29,11 +30,12 @@ const showErrorOverlay = (error) => {
 
   window.customElements.define('nuejs-error-overlay', errorOverlay)
 
-  const overlay = createElement('nuejs-error-overlay')
+  const overlay = /** @type {HTMLElement} */(createElement('nuejs-error-overlay'))
   document.body.append(overlay)
 
-  const message = overlay.shadowRoot.querySelector('.message')
-  const title = overlay.shadowRoot.querySelector('.title')
+  const root = /** @type {ShadowRoot}*/ (overlay.shadowRoot)
+  const message = /** @type {HTMLElement}*/(root.querySelector('.message'))
+  const title = /** @type {HTMLElement}*/(root.querySelector('.title'))
 
   if (error.compName) {
     title.textContent = `error in ${error.compName}`
