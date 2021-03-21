@@ -4,6 +4,7 @@
  * @param {import('../../../types').batchInfoArray} batchInfoArray
  * @param {string} arrayPathString
  * @param {import('../../../types').path} arrayPath
+ * @returns {[number[], import('../../../types').stateUpdates]}
  */
 
 const getPartialMutationInfo = (batchInfoArray, arrayPathString, arrayPath) => {
