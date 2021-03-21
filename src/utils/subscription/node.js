@@ -54,7 +54,10 @@ export const syncNode = (compNode, node, deps, update) => {
     // @ts-ignore
     update()
 
-    if (DEV) devtools.nodeUpdated(node)
+    if (DEV) {
+      // @ts-ignore
+      devtools.nodeUpdated(node)
+    }
     return subscribeMultiple(compNode, deps, update, DOM_BATCH)
   }
 
