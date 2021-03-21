@@ -1,11 +1,9 @@
-/** @typedef {{ path: import('../../../types').path, newValue: any }} mutationInfo */
 
 /**
- *
+ * go through batchInfoArray and filter out info that is relevant for updating the looped components
  * @param {import('../../../types').batchInfoArray} batchInfoArray
  * @param {string} arrayPathString
  * @param {import('../../../types').path} arrayPath
- * @returns
  */
 
 const getPartialMutationInfo = (batchInfoArray, arrayPathString, arrayPath) => {
@@ -13,13 +11,13 @@ const getPartialMutationInfo = (batchInfoArray, arrayPathString, arrayPath) => {
    *  set of indexes, where the items are either moved, removed or added
    *  @type {Set<number>}
    * */
-  const _dirtyIndexes = new Set()
+  const dirtyIndexesSet = new Set()
 
   /**
    * object containing information about what parts of state has been mutated
-   * @type {Record<string, Array<mutationInfo> >}
+   * @type {import('../../../types').stateUpdates}
    * */
-  const stateUpdatePaths = {}
+  const stateUpdates = {}
 
   const arrayPathLength = arrayPath.length
 
@@ -46,36 +44,35 @@ const getPartialMutationInfo = (batchInfoArray, arrayPathString, arrayPath) => {
       // if a new item is assigned at key
       // ex: users[2] = someUser or users.length = 4
       if (pathEndsWithKey) {
-        // when length is set, it means that it was manually set to shorten the array from length oldValue to newValue
-        // and newValue < oldValue
-        // if newValue becomes the new length, last item in array would be at index newValue - 1
-        // which means that items it index newValue, newValue + 1, ... oldValue - 1 are removed
         if (key === 'length') {
+          // when length is set, it means that it was manually set to shorten the array from length oldValue to newValue
+          // and newValue < oldValue
+          // if newValue becomes the new length, last item in array would be at index newValue - 1
+          // which means that items it index newValue, newValue + 1, ... oldValue - 1 are removed
           // add the removed indexes in dirtyIndexes
-          for (let i = newValue; i < oldValue; i++) _dirtyIndexes.add(i)
+          for (let i = newValue; i < oldValue; i++) dirtyIndexesSet.add(i)
         }
-        else _dirtyIndexes.add(Number(key))
+        else dirtyIndexesSet.add(Number(key))
       }
 
       // if the batchInfo path does not end with index, but goes deeper than that
       // means that item itself was mutated
       // ex: users[2].name = 'Manan'
       else {
-        // _stateUpdatedIndexes.add(Number(key))
         const info = {
           path: path.slice(arrayPathLength + 1),
           newValue
         }
-        if (key in stateUpdatePaths) stateUpdatePaths[key].push(info)
-        else stateUpdatePaths[key] = [info]
+        if (key in stateUpdates) stateUpdates[key].push(info)
+        else stateUpdates[key] = [info]
       }
     }
   })
 
-  // convert _dirtyIndexes to array and then sort
-  const dirtyIndexes = [..._dirtyIndexes].sort((a, b) => a - b)
+  // convert dirtyIndexesSet to array and then sort
+  const dirtyIndexes = [...dirtyIndexesSet].sort((a, b) => a - b)
 
-  return [dirtyIndexes, stateUpdatePaths]
+  return [dirtyIndexes, stateUpdates]
 }
 
 export default getPartialMutationInfo

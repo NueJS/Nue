@@ -46,7 +46,7 @@ export interface path extends Array<string> {}
 // attribute -----------------------------
 export type attribute = [any, string, any]
 
-export interface attributes extends Array<attribute> {}
+export type attributes = Array<attribute>
 
 // placeholder --------------------------
 export interface placeholder {
@@ -177,3 +177,12 @@ export interface loopState  {
   keys: Array<string>,
   values: Array<any>
 }
+
+export interface stateUpdate {
+  path: path,
+  newValue: any
+}
+
+
+type stringIndex = string
+export type stateUpdates = Record< stringIndex, Array<stateUpdate> >

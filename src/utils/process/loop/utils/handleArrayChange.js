@@ -6,16 +6,24 @@ import { animateAll } from '../../../node/dom'
 import animateMove from '../animate/animateMove'
 import { targetProp } from '../../../state/slice'
 
-const handleArrayChange = (blob, dirtyIndexes, stateUpdatePaths, oldState) => {
+/**
+ *
+ * @param {import('../../../types').loopInfo} blob
+ * @param {Array<number>} dirtyIndexes
+ * @param {import('../../../types').stateUpdates} stateUpdates
+ * @param {import('../../../types').loopState} oldState
+ */
+const handleArrayChange = (blob, dirtyIndexes, stateUpdates, oldState) => {
   const { comps, initialized, reorder, exit, itemIndex, item } = blob
-  const updatedStateKeys = Object.keys(stateUpdatePaths)
+  const updatedStateKeys = Object.keys(stateUpdates)
 
   const updateStates = () => {
     if (!updatedStateKeys.length) return
     updatedStateKeys.forEach(index => {
-      const comp = comps[index]
+      const i = Number(index)
+      const comp = comps[i]
       if (comp) {
-        stateUpdatePaths[index].forEach(info => {
+        stateUpdates[i].forEach(info => {
           const [target, prop] = targetProp(comp.$[item], info.path)
           target[prop] = info.newValue
         })
@@ -31,9 +39,12 @@ const handleArrayChange = (blob, dirtyIndexes, stateUpdatePaths, oldState) => {
     if (reorder && initialized) saveOffsets(dirtyIndexes, comps)
 
     const updateIndexes = () => {
-      dirtyIndexes.forEach(i => {
-        if (comps[i]) comps[i].$[itemIndex] = i
-      })
+      // if index is used, only then update the indexes
+      if (itemIndex) {
+        dirtyIndexes.forEach(i => {
+          if (comps[i]) comps[i].$[itemIndex] = i
+        })
+      }
     }
 
     const executeAndMove = () => {
