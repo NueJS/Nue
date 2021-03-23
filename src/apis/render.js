@@ -1,18 +1,19 @@
 import defineCustomElement from '../utils/component/defineCustomElement'
 import showError from '../utils/dev/error-overlay/showError.js'
-import DEV from '../utils/dev/DEV'
-import stats from '../utils/stats'
+import data from '../utils/data'
 import { dashify } from '../utils/string/dashify'
 
 /**
- * define the custom element of given name
+ * define the custom targetElement of given name
  * @param {Function} component
- * @param {Element} element
- * @param {{defaultStyle: string}} config
+ * @param {HTMLElement} targetElement
+ * @param {import('types/others').Config} [config]
  */
-const render = (component, element, config) => {
+const render = (component, targetElement, config) => {
   // attach error-overlay
-  if (DEV) {
+  if (__DEV__) {
+    // @ts-ignore
+    window.data = data
     window.onerror = (message, filename, lineno, colno, error) => {
       // @ts-ignore
       showError(error)
@@ -20,13 +21,13 @@ const render = (component, element, config) => {
   }
 
   // override config with default config
-  if (config) stats.config = { ...stats.config, ...config }
+  if (config) data.__config = { ...data.__config, ...config }
 
   defineCustomElement(component)
 
-  // replace the element with customElement
+  // replace the targetElement with customElement
   const customElement = document.createElement(dashify(component.name))
-  element.replaceWith(customElement)
+  targetElement.replaceWith(customElement)
 }
 
 export default render
