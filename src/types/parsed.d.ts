@@ -14,8 +14,16 @@ interface AnimationAttributes_ParseInfo {
   __reorder: string | null
 }
 
+export interface Text_ParseInfo {
+  __placeholder: Placeholder
+}
+
+export interface HTMLElement_ParseInfo {
+  __attributes: Attribute_ParseInfo[]
+}
+
 export interface Comp_ParseInfo {
-  __isCompElement: boolean,
+  __isComp: boolean,
   __compName: string,
   __attributes: Attribute_ParseInfo[],
 }
