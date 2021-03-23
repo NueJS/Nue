@@ -16,5 +16,8 @@ module.exports = {
     'no-throw-literal': 'off',
     'spaced-comment': 'off',
     'symbol-description': 'off'
+  },
+  globals: {
+    __DEV__: 'readonly'
   }
 }
