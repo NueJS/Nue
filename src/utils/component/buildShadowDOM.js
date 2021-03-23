@@ -1,26 +1,22 @@
-import { DEFERRED_WORK } from '../constants.js'
 import getClone from '../node/clone.js'
 import { flushArray } from '../others.js'
-import processNode from '../process/processNode.js'
+import { hydrate } from '../hydration/hydrate.js'
 
 /**
- * process templateNode and add it in shadowDOM of compNode
- * @param {import('../types').compNode} compNode
- * @param {HTMLTemplateElement} templateNode
+ * hydrate templateElement and add it in shadowDOM of comp
+ * @param {import('types/dom').Comp} comp
+ * @param {HTMLTemplateElement} templateElement
  */
-const buildShadowDOM = (compNode, templateNode) => {
-  // clone templateNode
-  const fragment = getClone(templateNode.content)
-  // process nodes
-  processNode(compNode, fragment)
-  // run deferred work
-  flushArray(compNode[DEFERRED_WORK])
-  // create shadowRoot
-  compNode.attachShadow({ mode: 'open' })
+const buildShadowDOM = (comp, templateElement) => {
+  const fragment = getClone(templateElement.content)
 
-  // add fragment nodes to shadowRoot
-  // @ts-ignore (shadowRoot will not be null because mode is open)
-  compNode.shadowRoot.append(fragment)
+  hydrate(comp, fragment)
+
+  flushArray(comp.__deferredWork)
+
+  const shadowRoot = comp.attachShadow({ mode: 'open' })
+
+  shadowRoot.append(fragment)
 }
 
 export default buildShadowDOM
