@@ -33,7 +33,7 @@ export interface LoopedComp_ParseInfo extends Comp_ParseInfo {
 /** parsed object type of the component element that has either *else-if or *else attribute */
 interface ConditionalComp_ParseInfo extends Comp_ParseInfo {
   __animationAttributes: AnimationAttributes_ParseInfo,
-  __conditionType: string,
+  __conditionType: 0 | 1 | 2,
 }
 
 /** parsed object type of the component element with *if attribute */

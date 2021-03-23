@@ -49,7 +49,7 @@ export interface Comp extends HTMLElement, ConnectionProps {
   __nodesUsingClosure: NodeSet,
   __initial$: Record<string, any>,
   __flush_scheduled: boolean,
-  __batches: Batch[]
+  __batches: [beforeDOMBatch: Batch, domBatch: Batch]
   __lifecycleCallbacks: {
     __onMount: SubCallBack[],
     __onDestroy: SubCallBack[],
@@ -60,8 +60,8 @@ export interface Comp extends HTMLElement, ConnectionProps {
   __reordering?: boolean,
   __ignoreDisconnect?: boolean,
   __prevOffset?: {
-    left: number,
-    top: number
+    __left: number,
+    __top: number
   }
 }
 
