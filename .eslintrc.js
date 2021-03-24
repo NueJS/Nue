@@ -18,6 +18,6 @@ module.exports = {
     'symbol-description': 'off'
   },
   globals: {
-    __DEV__: 'readonly'
+    _DEV_: 'readonly'
   }
 }
