@@ -1,11 +1,11 @@
 export interface ReconcileState  {
-  __keyHash: Record<string, any>,
-  __keys: string[],
-  __values: any[]
+  _keyHash: Record<string, any>,
+  _keys: string[],
+  _values: any[]
 }
 
 export interface ReconcileSteps {
-  __remove: number[],
-  __add: [number, any][],
-  __swap: [number, number][]
+  _remove: number[],
+  _add: [number, any][],
+  _swap: [number, number][]
 }

@@ -8,6 +8,6 @@ export interface Subscriptions {
 }
 
 export interface SubCallBack  {
-  (Mutations: Mutation[]) : void,
-  __node?: Parsed_Text | Parsed_HTMLElement | Comp
+  (Mutations?: Mutation[]) : void,
+  _node?: Parsed_Text | Parsed_HTMLElement | Comp
 }

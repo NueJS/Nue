@@ -2,53 +2,53 @@ import { StatePath } from './others.d';
 import { Comp, ElseComp, IfComp, ElseIfComp } from './dom.d';
 import { Placeholder } from './placeholder';
 
-export type Attribute_ParseInfo = [
-  attributeValue: any,
-  attributeName: string,
-  attributeType: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7
-]
+export type Attribute_ParseInfo = {
+  _placeholder: Placeholder | string,
+  _name: string,
+  _type: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7
+}
 
 interface AnimationAttributes_ParseInfo {
-  __enter: string | null,
-  __exit: string | null,
-  __reorder: string | null
+  _enter: string | null,
+  _exit: string | null,
+  _reorder: string | null
 }
 
 export interface Text_ParseInfo {
-  __placeholder: Placeholder
+  _placeholder: Placeholder
 }
 
 export interface HTMLElement_ParseInfo {
-  __attributes: Attribute_ParseInfo[]
+  _attributes: Attribute_ParseInfo[]
 }
 
 export interface Comp_ParseInfo {
-  __isComp: boolean,
-  __compName: string,
-  __attributes: Attribute_ParseInfo[],
+  _isComp: boolean,
+  _compName: string,
+  _attributes: Attribute_ParseInfo[],
 }
 
 export interface LoopedComp_ParseInfo extends Comp_ParseInfo {
-  __attributes: Attribute_ParseInfo[],
-  __animationAttributes: AnimationAttributes_ParseInfo,
-  __loopAttributes: {
-    __itemArray: Placeholder,
-    __item: string,
-    __itemIndex?: string,
-    __key: Placeholder
+  _attributes: Attribute_ParseInfo[],
+  _animationAttributes: AnimationAttributes_ParseInfo,
+  _loopAttributes: {
+    _itemArray: Placeholder,
+    _item: string,
+    _itemIndex?: string,
+    _key: Placeholder
   }
 }
 /** parsed object type of the component element that has either *else-if or *else attribute */
 interface ConditionalComp_ParseInfo extends Comp_ParseInfo {
-  __animationAttributes: AnimationAttributes_ParseInfo,
-  __conditionType: 0 | 1 | 2,
+  _animationAttributes: AnimationAttributes_ParseInfo,
+  _conditionType: 0 | 1 | 2,
 }
 
 /** parsed object type of the component element with *if attribute */
 export interface IfComp_ParseInfo extends ConditionalComp_ParseInfo {
-  __conditionAttribute: Placeholder,
-  __conditionGroup: (IfComp | ElseComp | ElseIfComp)[],
-  __conditionGroupStateDeps: StatePath[],
+  _conditionAttribute: Placeholder,
+  _conditionGroup: (IfComp | ElseComp | ElseIfComp)[],
+  _conditionGroupStateDeps: StatePath[],
 }
 
 /** parsed object type of the component element with *else attribute */

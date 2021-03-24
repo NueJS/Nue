@@ -2,8 +2,8 @@ import { Comp, LoopedComp } from './dom.d';
 import { StatePath } from './others.d';
 
 export interface UpdatedSlice {
-  __path: StatePath,
-  __newValue: any
+  _path: StatePath,
+  _newValue: any
 }
 
 // TODO: change this from object to an array
@@ -13,13 +13,13 @@ export type updatedSlices = Record<string, UpdatedSlice[]>
 export type LoopClosure = Record<string, any>
 
 export interface loopInfo {
-  __anchor: Comment,
-  __parentComp: Comp,
-  __loopedComp: LoopedComp,
-  __loopedCompInstances: Comp[],
-  __instanciated: boolean,
-  __getArray: () => any[],
-  __getClosure: (value: any, index: number) => LoopClosure,
-  __getKeys: () => string[],
+  _anchor: Comment,
+  _parentComp: Comp,
+  _loopedComp: LoopedComp,
+  _loopedCompInstances: Comp[],
+  _instanciated: boolean,
+  _getArray: () => any[],
+  _getClosure: (value: any, index: number) => LoopClosure,
+  _getKeys: () => string[],
 }
 
