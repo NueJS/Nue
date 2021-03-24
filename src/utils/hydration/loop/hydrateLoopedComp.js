@@ -1,6 +1,5 @@
 import subscribe from '../../subscription/subscribe.js'
 import { createComment } from '../../node/dom.js'
-import { DOM_BATCH, DEFERRED_WORK } from '../../constants.js'
 import handleArrayChange from './utils/handleArrayChange.js'
 import { arraysAreShallowEqual } from '../../others.js'
 import getPartialMutationInfo from './utils/getPartialMutationInfo.js'
@@ -8,12 +7,12 @@ import zeroToNArray from './utils/zeroToNArray.js'
 
 /**
  *
- * @param {import('../../types.js').compNode} compNode
- * @param {import('../../types.js').compNode} loopedComp
- * @param {import('../../types.js').Parsed} parsed
+ * @param {import('types/dom').Comp} compNode
+ * @param {import('types/types.js').compNode} loopedComp
+ * @param {import('types/types.js').Parsed} parsed
  */
 const processLoop = (compNode, loopedComp, parsed) => {
-  /** @type {import('../../types.js').forInfo} */
+  /** @type {import('types/types.js').forInfo} */
   // @ts-ignore
   const forInfo = parsed.for
   const { itemArray, itemIndex, item, key } = forInfo
@@ -53,7 +52,7 @@ const processLoop = (compNode, loopedComp, parsed) => {
 
   const oldState = { values: [], keys: [], keyHash: {} }
 
-  /** @type {import('../../types.js').loopInfo} */
+  /** @type {import('types/types.js').loopInfo} */
   const blob = {
     comps: [],
     anchorNode,
@@ -79,7 +78,7 @@ const processLoop = (compNode, loopedComp, parsed) => {
     blob.initialized = true
   })
 
-  /** @type {import('../../types.js').subscribeCallback} */
+  /** @type {import('types/types.js').subscribeCallback} */
   const onDepsChange = (batchInfoArray) => {
     // if some mutation in batch assigned a new array
     const newArrayAssigned = batchInfoArray.some(batchInfo => arraysAreShallowEqual(batchInfo.path, arrayPath))
