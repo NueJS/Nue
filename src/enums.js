@@ -1,29 +1,29 @@
 // attribute types
 export const attributeTypes = {
-  __normal: 0,
-  __event: 1,
-  __state: 2,
-  __prop: 3,
-  __conditional: 4,
-  __staticState: 5,
-  __functional: 6,
-  __ref: 7
+  _normal: 0,
+  _event: 1,
+  _state: 2,
+  _prop: 3,
+  _conditional: 4,
+  _staticState: 5,
+  _functional: 6,
+  _ref: 7
 }
 
 export const placeholderTypes = {
-  __reactive: 0,
-  __functional: 1
+  _reactive: 0,
+  _functional: 1
 }
 
 export const reactiveModes = {
-  __detective: 0,
-  __reactive: 1,
-  __noOverride: 2,
-  __returnComp: 3
+  _detective: 0,
+  _reactive: 1,
+  _noOverride: 2,
+  _returnComp: 3
 }
 
 export const conditionTypes = {
-  __if: 0,
-  __elseIf: 1,
-  __else: 2
+  _if: 0,
+  _elseIf: 1,
+  _else: 2
 }

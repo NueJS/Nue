@@ -11,7 +11,7 @@ import { dashify } from '../utils/string/dashify'
  */
 const render = (component, targetElement, config) => {
   // attach error-overlay
-  if (__DEV__) {
+  if (_DEV_) {
     // @ts-ignore
     window.data = data
     window.onerror = (message, filename, lineno, colno, error) => {
@@ -21,7 +21,7 @@ const render = (component, targetElement, config) => {
   }
 
   // override config with default config
-  if (config) data.__config = { ...data.__config, ...config }
+  if (config) data._config = { ...data._config, ...config }
 
   defineCustomElement(component)
 
