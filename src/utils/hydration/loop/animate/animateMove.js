@@ -1,4 +1,4 @@
-import transitionNode from './transitionNode'
+import { transit } from './transit'
 
 /**
  * animateMove comps at indexes
@@ -14,7 +14,7 @@ export const animateMove = (loopInfo, indexes) => {
   for (const index of indexes) {
     const comp = loopedCompInstances[index]
 
-    transitionNode(
+    transit(
       comp,
       /** @type {import('types/others').Offset}  */(comp._prevOffset),
       /** @type {string}*/(moveAnimation)
