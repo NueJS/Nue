@@ -9,7 +9,7 @@ const getNodeName = (node) => `<${lower(node.nodeName)}>`
 
 /** @typedef {{ message: string, fix: string, compName: string }} error */
 
-const errors = {
+export const errors = {
 
   /**
    * @param {string} compName
@@ -193,5 +193,3 @@ const app = ({ components }) => {
   }
 
 }
-
-export default errors
