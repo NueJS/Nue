@@ -1,4 +1,4 @@
-import { ConnectionProps, Mutation } from './others.d';
+import { ConnectionProps, Mutation, Offset } from './others.d';
 import { Comp_ParseInfo, LoopedComp_ParseInfo, IfComp_ParseInfo, ElseComp_ParseInfo, ElseIfComp_ParseInfo, HTMLElement_ParseInfo, Text_ParseInfo } from './parsed.d';
 import { Subscriptions } from './subscription.d';
 
@@ -88,17 +88,13 @@ export interface Comp extends HTMLElement, ConnectionProps {
    * if it has been - no need to run disconnectedCallback again,
    * this is set when we want to perform an animated exit  */
   _manuallyDisconnected?: boolean,
-
-  /** records the previous offset, this is set when a loopedComponent is given a move transition */
-  _prevOffset?: {
-    _left: number,
-    _top: number
-  }
 }
 
 
 export interface LoopedComp extends Comp {
-  _parsedInfo: LoopedComp_ParseInfo
+  _parsedInfo: LoopedComp_ParseInfo,
+  /** records the previous offset, this is set when a loopedComponent is given a move transition */
+  _prevOffset?: Offset
 }
 
 export interface IfComp extends Comp {

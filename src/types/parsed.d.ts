@@ -11,7 +11,7 @@ export type Attribute_ParseInfo = {
 interface AnimationAttributes_ParseInfo {
   _enter: string | null,
   _exit: string | null,
-  _reorder: string | null
+  _move: string | null
 }
 
 export interface Text_ParseInfo {

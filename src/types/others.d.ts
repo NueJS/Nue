@@ -20,3 +20,8 @@ export type StatePath = string[]
 export type Config = {
   defaultStyle?: string,
 }
+
+export type Offset = {
+  _left: number,
+  _top: number
+}
