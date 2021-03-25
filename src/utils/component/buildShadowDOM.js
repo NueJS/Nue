@@ -1,4 +1,4 @@
-import getClone from '../node/clone.js'
+import { getParsedClone } from '../node/clone.js'
 import { flushArray } from '../others.js'
 import { hydrate } from '../hydration/hydrate.js'
 
@@ -7,8 +7,8 @@ import { hydrate } from '../hydration/hydrate.js'
  * @param {import('types/dom').Comp} comp
  * @param {HTMLTemplateElement} templateElement
  */
-const buildShadowDOM = (comp, templateElement) => {
-  const fragment = getClone(templateElement.content)
+export const buildShadowDOM = (comp, templateElement) => {
+  const fragment = getParsedClone(templateElement.content)
 
   hydrate(comp, fragment)
 
@@ -18,5 +18,3 @@ const buildShadowDOM = (comp, templateElement) => {
 
   shadowRoot.append(fragment)
 }
-
-export default buildShadowDOM
