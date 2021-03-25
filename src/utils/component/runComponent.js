@@ -36,14 +36,14 @@ const runComponent = (comp, compFn, parsed) => {
     childComponents = _childComponents
   }
 
-  modes.__reactive = false
-  modes.__noOverride = true
+  modes._reactive = false
+  modes._noOverride = true
 
   const { $, refs, fn, hooks } = comp
   compFn({ $, refs, fn, ...hooks, hooks, html, components, css })
 
-  modes.__reactive = true
-  modes.__noOverride = false
+  modes._reactive = true
+  modes._noOverride = false
 
   return [
     dashifyComponentNames(htmlString, childComponents),
