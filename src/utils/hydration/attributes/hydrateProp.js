@@ -1,6 +1,6 @@
 import { attributeTypes } from '../../../enums.js'
-import errors from '../../dev/errors.js'
-import mutate from '../../state/mutate.js'
+import { errors } from '../../dev/errors.js'
+import { mutate } from '../../state/mutate.js'
 import { syncNode } from '../../subscription/node.js'
 
 /**
