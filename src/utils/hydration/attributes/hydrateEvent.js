@@ -1,4 +1,4 @@
-import errors from '../../dev/errors.js'
+import { errors } from '../../dev/errors.js'
 import { addSubscriber } from '../../subscription/node.js'
 
 /**
