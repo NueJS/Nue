@@ -21,5 +21,3 @@ export const animateMove = (loopInfo, indexes) => {
     )
   }
 }
-
-export default animateMove
