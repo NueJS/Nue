@@ -1,20 +1,20 @@
 
 /**
  * get the left and top offset
- * @param {HTMLElement} element
+ * @param {import('types/dom').LoopedComp} comp
  * @returns {import('types/others').Offset}
  */
-export const getOffset = (element) => ({
-  _left: element.offsetLeft,
-  _top: element.offsetTop
+export const getOffset = (comp) => ({
+  _left: comp.offsetLeft,
+  _top: comp.offsetTop
 })
 
 /**
  * save offset on looped comp
- * @param {import('types/dom').LoopedComp} compNode
+ * @param {import('types/dom').LoopedComp} comp
  */
-export const saveOffset = (compNode) => {
-  compNode._prevOffset = getOffset(compNode)
+export const saveOffset = (comp) => {
+  comp._prevOffset = getOffset(comp)
 }
 
 /**
