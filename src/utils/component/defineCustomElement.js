@@ -1,22 +1,22 @@
 import { ITSELF } from '../../constants.js'
-import data from '../data'
+import { data } from '../data'
 import { createElement } from '../node/dom.js'
-import parseTemplate from '../parse/parseTemplate'
-import reactify from '../reactivity/reactify.js'
+import { reactify } from '../reactivity/reactify.js'
 import { subscribeNode, unsubscribeNode } from '../subscription/node.js'
 import { dashify } from '../string/dashify.js'
-import { upper } from '../others.js'
-import runComponent from './runComponent.js'
-import addLifecycles from './hooks.js'
-import buildShadowDOM from './buildShadowDOM.js'
+import { flushArray, upper } from '../others.js'
+import { runComponent } from './runComponent.js'
+import { addHooks } from './hooks.js'
+import { buildShadowDOM } from './buildShadowDOM.js'
 import { hydrate } from '../hydration/hydrate.js'
+import { parse } from 'utils/parse/parseNode.js'
 // import processAttributes from '../process/attributes/processAttributes.js'
 
 /**
  * defines a custom element using the compFn function
  * @param {Function} compFn
  */
-const defineCustomElement = (compFn) => {
+export const defineCustomElement = (compFn) => {
   const { _components, _config } = data
   const compFnName = compFn.name
 
@@ -59,7 +59,7 @@ const defineCustomElement = (compFn) => {
 
       if (!comp._prop$) comp._prop$ = {}
 
-      addLifecycles(comp)
+      addHooks(comp)
     }
 
     connectedCallback () {
@@ -117,7 +117,11 @@ const defineCustomElement = (compFn) => {
           '<style scoped >' + cssString + '</style>'
 
           // parse the template and create componentTemplateElement which has all the parsed info
-          parseTemplate(comp, componentTemplateElement, childCompNodeNames)
+
+          /** @type {Function[]} */
+          const deferred = []
+          parse(componentTemplateElement.content, childCompNodeNames, deferred, comp)
+          flushArray(deferred)
 
           // define all child components
           childComponents.forEach(defineCustomElement)
@@ -163,5 +167,3 @@ const defineCustomElement = (compFn) => {
   // define current compFn and then it's children
   customElements.define(dashify(compFnName), NueComp)
 }
-
-export default defineCustomElement
