@@ -1,22 +1,22 @@
-import { ENTER_ANIMATION, EXIT_ANIMATION, IGNORE_DISCONNECT } from '../constants'
+import { ENTER_ATTRIBUTE, EXIT_ATTRIBUTE } from '../../constants'
 
 /**
  * get name attribute from element
- * @param {Element} element
+ * @param {HTMLElement} element
  * @param {string} name
  */
 export const getAttr = (element, name) => element.getAttribute(name)
 
 /**
  * remove name attribute from element
- * @param {Element} element
+ * @param {HTMLElement} element
  * @param {string} name
  */
 export const removeAttr = (element, name) => element.removeAttribute(name)
 
 /**
  * remove name attribute from element
- * @param {Element} element
+ * @param {HTMLElement} element
  * @param {string} name
  * @param {string} value
  */
@@ -64,21 +64,20 @@ export const createComment = (data) => document.createComment(data)
 
 /**
  * call disconnectedCallback and then play remove animation
- * @param {import('../types').compNode} comp
+ * @param {import('types/dom').Comp} comp
  * @param {string} animation
  */
 export const animatedRemove = (comp, animation) => {
   comp.disconnectedCallback()
-  comp[IGNORE_DISCONNECT] = true
-  // @todo use comp.remove only
+  comp._manuallyDisconnected = true
   animate(comp, animation, true, () => comp.remove())
 }
 
 /**
  * run animation on all elements, and call onAnimationEnd when last animation is completed
- * @param {Array<HTMLElement>} elements
- * @param {*} cssAnimation
- * @param {*} onLastAnimationEnd
+ * @param {HTMLElement[]} elements
+ * @param {string} cssAnimation
+ * @param {Function} onLastAnimationEnd
  */
 export const animateAll = (elements, cssAnimation, onLastAnimationEnd) => {
   const lastIndex = elements.length - 1
@@ -91,11 +90,11 @@ export const animateAll = (elements, cssAnimation, onLastAnimationEnd) => {
 
 /**
  * return object containing enter and exit animation info
- * @param {Element} element
+ * @param {HTMLElement} element
  */
 export const getAnimationAttributes = (element) => ({
-  enter: getAttr(element, ENTER_ANIMATION),
-  exit: getAttr(element, EXIT_ANIMATION)
+  enter: getAttr(element, ENTER_ATTRIBUTE),
+  exit: getAttr(element, EXIT_ATTRIBUTE)
 })
 
 const node = /*#__PURE__*/ document.createElement('div')
