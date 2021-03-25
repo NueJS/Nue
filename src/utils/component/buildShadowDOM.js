@@ -12,7 +12,7 @@ const buildShadowDOM = (comp, templateElement) => {
 
   hydrate(comp, fragment)
 
-  flushArray(comp.__deferredWork)
+  flushArray(comp._deferredWork)
 
   const shadowRoot = comp.attachShadow({ mode: 'open' })
 
