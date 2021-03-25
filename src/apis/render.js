@@ -1,5 +1,5 @@
 import { defineCustomElement } from '../utils/component/defineCustomElement'
-import { showErrorOverlay } from '../utils/dev/error-overlay/showError.js'
+import { showErrorOverlay } from '../utils/dev/error-overlay/showErrorOverlay.js'
 import { data } from '../utils/data'
 import { dashify } from '../utils/string/dashify'
 

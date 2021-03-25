@@ -1,20 +1,20 @@
 import { createElement } from '../../node/dom'
-import data from '../../data'
-import html from './html'
+import { data } from '../../data'
+import { errorOverlayHTML } from './errorOverlayHTML'
 
 /**
  * show error overlay
  * @param {{ message: string, fix: string, compName: string }} error
  */
 
-const showErrorOverlay = (error) => {
+export const showErrorOverlay = (error) => {
   // if already showing error, return
   if (data._errorThrown) return
   class errorOverlay extends HTMLElement {
     constructor () {
       super()
       const shadowRoot = this.attachShadow({ mode: 'open' })
-      shadowRoot.innerHTML = html
+      shadowRoot.innerHTML = errorOverlayHTML
     }
 
     connectedCallback () {
@@ -50,5 +50,3 @@ const showErrorOverlay = (error) => {
 
   data._errorThrown = true
 }
-
-export default showErrorOverlay
