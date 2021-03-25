@@ -7,7 +7,7 @@ import { addSubscriber } from '../../subscription/node.js'
  * @param {import('types/parsed').Attribute_ParseInfo} attribute
  * @param {import('types/dom').Comp} comp
  */
-const hydrateEvent = (target, attribute, comp) => {
+export const hydrateEvent = (target, attribute, comp) => {
   const fnName = /** @type {string}*/ (attribute._placeholder)
   const eventName = attribute._name
   const fn = comp.fn[fnName]
@@ -26,5 +26,3 @@ const hydrateEvent = (target, attribute, comp) => {
 
   addSubscriber(target, subscriber)
 }
-
-export default hydrateEvent

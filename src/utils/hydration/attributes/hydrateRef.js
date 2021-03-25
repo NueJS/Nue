@@ -4,9 +4,7 @@
  * @param {import('types/parsed').Attribute_ParseInfo} attribute
  * @param {import('types/dom').Comp} comp
  */
-const addRef = (element, attribute, comp) => {
+export const hydrateRef = (element, attribute, comp) => {
   const refName = /** @type {string}*/(attribute._placeholder)
   comp.refs[refName] = element
 }
-
-export default addRef

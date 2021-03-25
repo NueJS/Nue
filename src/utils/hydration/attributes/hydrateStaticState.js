@@ -3,8 +3,7 @@
  * @param {import('types/dom').Comp} target
  * @param {import('types/parsed').Attribute_ParseInfo} attribute
  */
-const addStaticState = (target, attribute) => {
+
+export const hydrateStaticState = (target, attribute) => {
   target.$[attribute._name] = /** @type {string}*/(attribute._placeholder)
 }
-
-export default addStaticState

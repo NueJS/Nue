@@ -9,7 +9,7 @@ import { syncNode } from '../../subscription/node.js'
  * @param {import('types/parsed').Attribute_ParseInfo} attribute
  * @param {import('types/dom').Comp} comp
  */
-const addProp = (target, attribute, comp) => {
+export const hydrateProp = (target, attribute, comp) => {
   // [{ getValue, deps, type, content }, propName]
   const propName = attribute._name
   const { _getValue, _type, _content, _stateDeps } = /** @type {import('types/placeholder').Placeholder} */(attribute._placeholder)
@@ -39,5 +39,3 @@ const addProp = (target, attribute, comp) => {
 
   syncNode(comp, target, _stateDeps, setProp)
 }
-
-export default addProp

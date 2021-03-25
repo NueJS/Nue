@@ -7,7 +7,8 @@ import { subscribeMultiple } from '../../subscription/subscribe'
  * @param {import('types/parsed').Attribute_ParseInfo} attribute
  * @param {import('types/dom').Comp} comp
  */
-const addState = (target, attribute, comp) => {
+
+export const hydrateState = (target, attribute, comp) => {
   const { _placeholder, _name } = attribute
   const { _getValue, _stateDeps } = /** @type {import('types/placeholder').Placeholder}*/(_placeholder)
 
@@ -23,5 +24,3 @@ const addState = (target, attribute, comp) => {
   update()
   subscribeMultiple(comp, _stateDeps, update, batches._beforeDOM)
 }
-
-export default addState
