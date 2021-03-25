@@ -1,5 +1,5 @@
 import { createElement } from '../../node/dom'
-import stats from '../../stats'
+import data from '../../data'
 import html from './html'
 
 /**
@@ -9,7 +9,7 @@ import html from './html'
 
 const showErrorOverlay = (error) => {
   // if already showing error, return
-  if (stats.error) return
+  if (data._errorThrown) return
   class errorOverlay extends HTMLElement {
     constructor () {
       super()
@@ -21,7 +21,7 @@ const showErrorOverlay = (error) => {
       const shadowRoot = this.shadowRoot
       /** @type {Element} */
       // @ts-ignore
-      const closeButton = shadowRoot.querySelector('.parsed-error__close-icon')
+      const closeButton = shadowRoot.querySelector('.parsed-error_close-icon')
       closeButton.addEventListener('click', () => {
         this.remove()
       })
@@ -41,12 +41,14 @@ const showErrorOverlay = (error) => {
     title.textContent = `error in ${error.compName}`
     const errorMessage = `${error.message}\n\n${error.fix || ''}`
     message.textContent = errorMessage
-  } else {
+  }
+
+  else {
     title.textContent = error.constructor.name
     message.textContent = error.message
   }
 
-  stats.error = true
+  data._errorThrown = true
 }
 
 export default showErrorOverlay
