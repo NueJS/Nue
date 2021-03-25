@@ -1,14 +1,11 @@
-import copyParsed from './copyParsed'
+import { copyParsed } from './copyParsed'
 
 /**
  * clone the node and add the parsed prop
- * @param {import('../types').parsedNode | Node} node
- * @returns {import('../types').parsedNode}
+ * @param {import('types/dom').ParsedDOMElement | Node} node
  */
-const getClone = (node) => {
+export const getParsedClone = (node) => {
   const clone = node.cloneNode(true)
   copyParsed(node, clone)
-  return /** @type {import('../types').parsedNode} */(clone)
+  return /** @type {import('types/dom').ParsedDOMElement} */(clone)
 }
-
-export default getClone
