@@ -1,6 +1,6 @@
 import { Comp, LoopedComp } from './dom.d';
 import { StatePath } from './others.d';
-import { AnimationAttributes_ParseInfo } from './parsed';
+import { AnimationAttributes_ParseInfo, LoopAttributes } from './parsed';
 
 export interface UpdatedSlice {
   _path: StatePath,
@@ -18,6 +18,7 @@ export interface LoopInfo {
   _parentComp: Comp,
   _loopedComp: LoopedComp,
   _loopedCompInstances: LoopedComp[],
+  _loopAttributes: LoopAttributes,
   _instanciated: boolean,
   _getArray: () => any[],
   _getClosure: (value: any, index: number) => LoopClosure,
