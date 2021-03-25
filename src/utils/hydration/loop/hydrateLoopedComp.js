@@ -6,6 +6,9 @@ import { getArrayMutationInfo } from './utils/getArrayMutationInfo.js'
 import { zeroToNArray } from './utils/zeroToNArray.js'
 import { batches } from 'enums.js'
 
+/** @typedef {(value: any, index: number) => Record<string, any>} getClosure */
+/** @typedef {(value: any, index: number) => any } getKey */
+
 /**
  * hydrate looped comp
  * @param {import('types/dom').LoopedComp} loopedComp
@@ -17,13 +20,7 @@ export const hydrateLoopedComp = (loopedComp, parentComp) => {
   const loopAttributes = parsed._loopAttributes
   const { _itemArray, _itemIndex, _item, _key } = loopAttributes
 
-  /**
-   * return the closure containing value and index
-   * @param {any} value
-   * @param {number} index
-   * @returns {Record<string, any>}
-   */
-
+  /** @type {getClosure} */
   const getClosure = (value, index) => {
     const closure = {
       [_item]: value
@@ -36,20 +33,13 @@ export const hydrateLoopedComp = (loopedComp, parentComp) => {
   /** @returns {Array<any>} */
   const getArray = () => _itemArray._getValue(loopedComp.$, loopedComp._compFnName)
 
-  /**
-   * return the value of key using the closure information
-   * @param {any} value
-   * @param {number} index
-   * @returns {any}
-   */
-
   // @todo current key can only be from closure, add support for state too
+  /** @type {getKey} */
   const getKey = (value, index) => _key._getValue(getClosure(value, index), loopedComp._compFnName)
 
   const getKeys = () => getArray().map(getKey)
 
-  // @ts-ignore
-  const arrayPath = _itemArray.deps[0]
+  const arrayPath = _itemArray._stateDeps[0]
   const arrayPathString = arrayPath.join('.')
   const anchor = createComment('loop/')
 
