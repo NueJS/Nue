@@ -1,11 +1,11 @@
 import { subscribeMultiple } from '../subscription/subscribe.js'
-import errors from '../dev/errors.js'
+import { errors } from '../dev/errors.js'
 
 /**
  * add lifecycle hooks to comp
  * @param {import('types/dom').Comp} comp
  */
-const addHooks = (comp) => {
+export const addHooks = (comp) => {
   comp._hookCbs = {
     _onMount: [],
     _onDestroy: [],
@@ -31,5 +31,3 @@ const addHooks = (comp) => {
     }
   }
 }
-
-export default addHooks
