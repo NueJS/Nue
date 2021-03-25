@@ -1,5 +1,5 @@
-import joinTagArgs from 'utils/string/joinTagArgs.js'
-import modes from '../reactivity/modes.js'
+import { joinTagArgs } from 'utils/string/joinTagArgs.js'
+import { modes } from '../reactivity/modes.js'
 import { dashifyComponentNames } from '../string/dashify.js'
 
 /** @typedef {(strings: string[], ...exprs: string[] ) => void} TaggedTemplate */
@@ -11,7 +11,7 @@ import { dashifyComponentNames } from '../string/dashify.js'
  * @param {boolean} parsed
  * @returns {[string, string, Function[]]}
  */
-const runComponent = (comp, compFn, parsed) => {
+export const runComponent = (comp, compFn, parsed) => {
   /** @type {Function[]} */
   let childComponents = []
 
@@ -51,5 +51,3 @@ const runComponent = (comp, compFn, parsed) => {
     childComponents
   ]
 }
-
-export default runComponent
