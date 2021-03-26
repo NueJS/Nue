@@ -1,8 +1,8 @@
-import { PARSED } from '../constants'
 
 /**
- * @param {import('../types').parsedNode} node
+ * @param {import('types/dom').ParsedDOMElement} target
  */
-const isComp = node => node[PARSED] && node[PARSED].isComp
-
-export default isComp
+export const isComp = target =>
+  target._parsedInfo &&
+  // @ts-expect-error
+  target._parsedInfo._isComp
