@@ -21,7 +21,10 @@ export const parseComp = (comp, compName, deferred) => {
 
   // if the component has FOR_ATTRIBUTE on it, it is looped component
   if (forAttribute) {
-    parseLoopedComp(comp, forAttribute)
+    parseLoopedComp(
+      /** @type {import('types/dom').LoopedComp} */(comp),
+      forAttribute
+    )
   }
 
   else {
