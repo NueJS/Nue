@@ -3,9 +3,9 @@ import { removeAttr, getAnimationAttributes } from '../node/dom'
 import { processPlaceholder } from '../string/placeholder/processPlaceholder'
 
 /**
- *
+ * parsed conditional component
  * @param {import('types/dom').ConditionalComp} comp
- * @param {import('types/parsed').ConditionAttributes} conditionType
+ * @param {import('types/parsed').ConditionAttribute} conditionType
  * @param {string} attributeValue
  */
 export const parseConditionComp = (comp, conditionType, attributeValue) => {
@@ -14,6 +14,7 @@ export const parseConditionComp = (comp, conditionType, attributeValue) => {
     _conditionType: conditionType,
     _animationAttributes: getAnimationAttributes(comp)
   }
+
   if (conditionType !== ELSE_ATTRIBUTE) {
     /** @type {import('types/dom').IfComp}*/
     (comp)._parsedInfo._conditionAttribute = processPlaceholder(attributeValue)
