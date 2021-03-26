@@ -1,51 +1,49 @@
-import { ELSE_ATTRIBUTE, IF_ATTRIBUTE, ELSE_IF_ATTRIBUTE, PARSED, FOR_ATTRIBUTE } from '../constants'
+import { ELSE_ATTRIBUTE, IF_ATTRIBUTE, ELSE_IF_ATTRIBUTE, FOR_ATTRIBUTE } from '../../constants'
 import { getAttr } from '../node/dom'
-import parseConditionNode from './parseConditionNode'
-import parseIf from './parseIf'
-import parseLoop from './parseLoop'
-
-const conditionalAttributes = [IF_ATTRIBUTE, ELSE_IF_ATTRIBUTE, ELSE_ATTRIBUTE]
-
-/**
- * if the compNode has conditional Attribute, return [attributeName, value] else false
- * @param {import('../types').compNode} compNode
- * @returns {[string, string] | false}
- */
-const usesConditionalAttribute = compNode => {
-  for (const attributeName of conditionalAttributes) {
-    const value = getAttr(compNode, attributeName)
-    if (value !== null) return [attributeName, value]
-  }
-  return false
-}
+import { parseConditionComp } from './parseConditionComp'
+import { parseIfComp } from './parseIfComp'
+import { parseLoopedComp } from './parseLoopedComp'
 
 /**
  * parse component node
- * @param {import('../types').compNode} compNode
+ * @param {import('types/dom').Comp} comp
  * @param {string} compName
  * @param {Function[]} deferred
  */
-const parseComp = (compNode, compName, deferred) => {
-  compNode[PARSED] = {
-    isComp: true,
-    name: compName
+export const parseComp = (comp, compName, deferred) => {
+  comp._parsedInfo = {
+    _isComp: true,
+    _compName: compName,
+    _attributes: []
   }
 
-  const forAttribute = getAttr(compNode, FOR_ATTRIBUTE)
+  const forAttribute = getAttr(comp, FOR_ATTRIBUTE)
 
   // if the component has FOR_ATTRIBUTE on it, it is looped component
   if (forAttribute) {
-    parseLoop(compNode, forAttribute)
+    parseLoopedComp(comp, forAttribute)
   }
 
   else {
-    const typeAndValue = usesConditionalAttribute(compNode)
+    const typeAndValue = usesConditionalAttribute(comp)
     if (typeAndValue) {
       const [type, value] = typeAndValue
-      parseConditionNode(compNode, type, value)
-      if (type === IF_ATTRIBUTE) deferred.push(() => parseIf(compNode))
+      parseConditionComp(/** @type {import('types/dom').ConditionalComp}*/(comp), type, value)
+      if (type === IF_ATTRIBUTE) deferred.push(() => parseIfComp(comp))
     }
   }
 }
 
-export default parseComp
+/**
+ * if the comp has conditional Attribute, return [attributeName, value] else false
+ * @param {import('types/dom').Comp} conditionComp
+ * @returns {[import('types/parsed').ConditionAttribute, string] | false}
+ */
+const usesConditionalAttribute = conditionComp => {
+  const conditionalAttributes = /** @type {import('types/parsed').ConditionAttribute[]}*/([IF_ATTRIBUTE, ELSE_IF_ATTRIBUTE, ELSE_ATTRIBUTE])
+  for (const attributeName of conditionalAttributes) {
+    const value = getAttr(conditionComp, attributeName)
+    if (value !== null) return [attributeName, value]
+  }
+  return false
+}
