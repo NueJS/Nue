@@ -1,4 +1,4 @@
-import { ENTER_ATTRIBUTE, EXIT_ATTRIBUTE } from '../../constants'
+import { ENTER_ATTRIBUTE, EXIT_ATTRIBUTE, MOVE_ATTRIBUTE } from '../../constants'
 
 /**
  * get name attribute from element
@@ -93,8 +93,9 @@ export const animateAll = (elements, cssAnimation, onLastAnimationEnd) => {
  * @param {HTMLElement} element
  */
 export const getAnimationAttributes = (element) => ({
-  enter: getAttr(element, ENTER_ATTRIBUTE),
-  exit: getAttr(element, EXIT_ATTRIBUTE)
+  _enter: getAttr(element, ENTER_ATTRIBUTE),
+  _exit: getAttr(element, EXIT_ATTRIBUTE),
+  _move: getAttr(element, MOVE_ATTRIBUTE)
 })
 
 const node = /*#__PURE__*/ document.createElement('div')
