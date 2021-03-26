@@ -1,29 +1,29 @@
 
 import { isBracketed } from '../string/bracket.js'
-import processPlaceholder from '../string/placeholder/processPlaceholder.js'
-import { STATE, EVENT, BIND, NORMAL, CONDITIONAL, STATIC_STATE, FUNCTION_ATTRIBUTE, REF, REF_ATTRIBUTE, PARSED, FOR_ATTRIBUTE, KEY_ATTRIBUTE, IF_ATTRIBUTE, ELSE_IF_ATTRIBUTE, ELSE_ATTRIBUTE } from '../constants.js'
+import { processPlaceholder } from '../string/placeholder/processPlaceholder.js'
+import { REF_ATTRIBUTE, FOR_ATTRIBUTE, KEY_ATTRIBUTE, IF_ATTRIBUTE, ELSE_IF_ATTRIBUTE, ELSE_ATTRIBUTE } from '../../constants.js'
 import { getAttr, removeAttr, dashCaseToCamelCase } from '../node/dom.js'
-import errors from '../dev/errors.js'
-import DEV from '../dev/DEV.js'
+import { errors } from '../dev/errors.js'
+import { attributeTypes } from 'enums.js'
 
 /**
  * parse attributes on element if any
- * @param {import('../types').parsedElement} element
+ * @param {import('types/dom').Parsed_HTMLElement} element
  * @param {string} compName
- * @param {import('../types').compNode} compNode
+ * @param {import('types/dom').Comp} comp
  */
-const parseAttributes = (element, compName, compNode) => {
+export const parseAttributes = (element, compName, comp) => {
   // if component specific attributes are used on non-component elements
-  if (DEV && !compName) {
+  if (_DEV_ && !compName) {
     const compOnlyAttributes = [FOR_ATTRIBUTE, KEY_ATTRIBUTE, IF_ATTRIBUTE, ELSE_IF_ATTRIBUTE, ELSE_ATTRIBUTE]
     compOnlyAttributes.forEach(attrName => {
       if (getAttr(element, attrName)) {
-        throw errors.RESERVED_ATTRIBUTE_USED_ON_NON_COMPONENT(compNode.name, element, attrName)
+        throw errors.RESERVED_ATTRIBUTE_USED_ON_NON_COMPONENT(comp._compFnName, element, attrName)
       }
     })
   }
 
-  /** @type {import('../types').attributes} */
+  /** @type {import('types/parsed').Attribute_ParseInfo[] } */
   const attributes = []
   const elementIsComp = !!compName
 
@@ -32,18 +32,21 @@ const parseAttributes = (element, compName, compNode) => {
     const variableValue = isBracketed(attributeValue)
 
     let name = attributeName
-    let type, value
+
+    /**  @type {import('types/parsed').AttributeType} */
+    let type = attributeTypes._normal
+    let value
     const firstChar = attributeName[0]
 
     if (attributeName === REF_ATTRIBUTE) {
-      type = REF
+      type = attributeTypes._ref
       value = attributeValue
     }
 
     // SETTING FN OF COMPONENT
     else if (attributeName.startsWith('fn.')) {
       if (!elementIsComp) continue
-      type = FUNCTION_ATTRIBUTE
+      type = attributeTypes._functional
       name = attributeName.slice(3)
       value = attributeValue
     }
@@ -54,17 +57,17 @@ const parseAttributes = (element, compName, compNode) => {
       name = attributeName.slice(2)
 
       if (variableValue) {
-        type = STATE
+        type = attributeTypes._state
         value = processPlaceholder(attributeValue)
       } else {
-        type = STATIC_STATE
+        type = attributeTypes._staticState
         value = attributeValue
       }
     }
 
     // ATTACHING EVENT OR ACTION
     else if (firstChar === '@') {
-      type = EVENT
+      type = attributeTypes._event
       name = attributeName.slice(1)
       value = attributeValue
     }
@@ -73,19 +76,14 @@ const parseAttributes = (element, compName, compNode) => {
     else if (variableValue) {
       // conditionally setting attribute
       if (attributeName.endsWith(':if')) {
-        type = CONDITIONAL
+        type = attributeTypes._conditional
         name = attributeName.slice(0, -3)
       }
 
       // binding property
       else if (firstChar === ':') {
-        type = BIND
+        type = attributeTypes._prop
         name = attributeName.slice(1)
-      }
-
-      // normal attribute
-      else {
-        type = NORMAL
       }
 
       value = processPlaceholder(attributeValue)
@@ -96,16 +94,22 @@ const parseAttributes = (element, compName, compNode) => {
 
       if (name.includes('-')) camelCaseName = dashCaseToCamelCase(name)
       // saving to array instead of object for better minification
-      attributes.push([value, camelCaseName, type])
+
+      attributes.push({
+        _name: camelCaseName,
+        _placeholder: value,
+        _type: type
+      })
       removeAttr(element, attributeName)
     }
   }
 
   // if value attributes found
   if (attributes.length) {
-    if (!element[PARSED]) element[PARSED] = {}
-    element[PARSED].attributes = attributes
+    if (!element._parsedInfo) {
+      // @ts-expect-error
+      element._parsedInfo = {}
+    }
+    element._parsedInfo._attributes = attributes
   }
 }
-
-export default parseAttributes
