@@ -29,7 +29,11 @@ export const parseComp = (comp, compName, deferred) => {
     if (typeAndValue) {
       const [type, value] = typeAndValue
       parseConditionComp(/** @type {import('types/dom').ConditionalComp}*/(comp), type, value)
-      if (type === IF_ATTRIBUTE) deferred.push(() => parseIfComp(comp))
+      if (type === IF_ATTRIBUTE) {
+        deferred.push(
+          () => parseIfComp(/** @type {import('types/dom').IfComp} */(comp))
+        )
+      }
     }
   }
 }
