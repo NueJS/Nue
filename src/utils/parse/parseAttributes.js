@@ -1,21 +1,25 @@
 
 import { isBracketed } from '../string/bracket.js'
 import { processPlaceholder } from '../string/placeholder/processPlaceholder.js'
-import { REF_ATTRIBUTE, FOR_ATTRIBUTE, KEY_ATTRIBUTE, IF_ATTRIBUTE, ELSE_IF_ATTRIBUTE, ELSE_ATTRIBUTE } from '../../constants.js'
 import { getAttr, removeAttr, dashCaseToCamelCase } from '../node/dom.js'
 import { errors } from '../dev/errors.js'
 import { attributeTypes } from 'enums.js'
+import { conditionAttributes, loopAttributes } from 'constants.js'
 
 /**
  * parse attributes on element if any
- * @param {import('types/dom').Parsed_HTMLElement} element
+ * @param {Parsed_HTMLElement} element
  * @param {string} compName
- * @param {import('types/dom').Comp} comp
+ * @param {Comp} comp
  */
 export const parseAttributes = (element, compName, comp) => {
   // if component specific attributes are used on non-component elements
   if (_DEV_ && !compName) {
-    const compOnlyAttributes = [FOR_ATTRIBUTE, KEY_ATTRIBUTE, IF_ATTRIBUTE, ELSE_IF_ATTRIBUTE, ELSE_ATTRIBUTE]
+    // DEV ONLy
+    const { _if, _else, _elseIf } = conditionAttributes
+    const { _for, _ref } = loopAttributes
+    const compOnlyAttributes = [_if, _else, _elseIf, _ref, _for]
+
     compOnlyAttributes.forEach(attrName => {
       if (getAttr(element, attrName)) {
         throw errors.RESERVED_ATTRIBUTE_USED_ON_NON_COMPONENT(comp._compFnName, element, attrName)
@@ -23,7 +27,7 @@ export const parseAttributes = (element, compName, comp) => {
     })
   }
 
-  /** @type {import('types/parsed').Attribute_ParseInfo[] } */
+  /** @type {Attribute_ParseInfo[] } */
   const attributes = []
   const elementIsComp = !!compName
 
@@ -33,12 +37,12 @@ export const parseAttributes = (element, compName, comp) => {
 
     let name = attributeName
 
-    /**  @type {import('types/parsed').AttributeType} */
+    /**  @type {AttributeType} */
     let type = attributeTypes._normal
     let value
     const firstChar = attributeName[0]
 
-    if (attributeName === REF_ATTRIBUTE) {
+    if (attributeName === loopAttributes._ref) {
       type = attributeTypes._ref
       value = attributeValue
     }

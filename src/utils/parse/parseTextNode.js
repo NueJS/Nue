@@ -1,14 +1,12 @@
-import { PARSED, TEXT } from '../constants.js'
-import split from '../string/split.js'
+import { split } from '../string/split.js'
 
 /**
  * parse text node
  * @param {Text} node
  * @param {Function[]} deferred
- * @param {import('../types').compNode} compNode
- * @returns
+ * @param {Comp} comp
  */
-const parseTextNode = (node, deferred, compNode) => {
+export const parseTextNode = (node, deferred, comp) => {
   const text = node.textContent || ''
   const trimmedText = text.trim()
 
@@ -18,18 +16,26 @@ const parseTextNode = (node, deferred, compNode) => {
     return
   }
 
-  const parts = split(compNode, text)
+  const parts = split(comp, text)
 
-  /** @type {import('../types').parsedText[]} */
+  /** @type {Parsed_Text[]} */
   const textNodes = []
 
   // for each part create a text node
   // if it's not TEXT type, save the part info in parsed.placeholder
   parts.forEach(part => {
-    /** @type {import('../types').parsedText} */
-    // @ts-ignore
-    const textNode = document.createTextNode(part.content)
-    if (part.type !== TEXT) textNode[PARSED] = { placeholder: part }
+
+    let textNode
+    if (typeof part === 'string') {
+      textNode = document.createTextNode(part)
+    } else {
+      textNode = document.createTextNode(part._content);
+      /** @type {Parsed_Text} */(textNode)._parsedInfo = {
+        _placeholder: part
+      }
+    }
+
+    // @ts-expect-error
     textNodes.push(textNode)
   })
 
@@ -39,5 +45,3 @@ const parseTextNode = (node, deferred, compNode) => {
     node.remove()
   })
 }
-
-export default parseTextNode

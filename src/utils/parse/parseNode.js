@@ -1,32 +1,48 @@
-import parseAttributes from './parseAttributes'
-import parseTextNode from './parseTextNode'
-import parseComp from './parseComp'
+import { parseAttributes } from './parseAttributes'
+import { parseTextNode } from './parseTextNode'
+import { parseComp } from './parseComp'
 
 /**
- *
- * @param {Node} node
+ * parse all types of nodes
+ * @param {Node} target
  * @param {Record<string, string>} childCompNodeNames
  * @param {Function[]} deferred
- * @param {import('../types').compNode} compNode
+ * @param {Comp} comp
  */
-const parseNode = (node, childCompNodeNames, deferred, compNode) => {
-  // if node is component, get it's name else it will be undefined
-  const compName = childCompNodeNames[node.nodeName]
+
+export const parse = (target, childCompNodeNames, deferred, comp) => {
+
+  // if target is component, get it's name else it will be undefined
+  const compName = childCompNodeNames[target.nodeName]
 
   // #text
-  // @ts-ignore
-  if (node.nodeType === Node.TEXT_NODE) return parseTextNode(node, deferred, compNode)
+  if (target.nodeType === target.TEXT_NODE) {
+    return parseTextNode(
+      /** @type {Text}*/(target),
+      deferred,
+      comp
+    )
+  }
 
   // component
-  // @ts-ignore
-  if (compName) parseComp(node, compName, deferred)
+  if (compName) {
+    parseComp(
+      /** @type {Comp}*/(target),
+      compName,
+      deferred
+    )
+  }
 
-  // attributes on component or simple node
-  // @ts-ignore
-  if (node.hasAttribute) parseAttributes(node, compName, compNode)
+  // attributes on component or simple target
+  // @ts-expect-error
+  if (target.hasAttribute) {
+    parseAttributes(/** @type {Parsed_HTMLElement}*/(target), compName, comp)
+  }
 
-  // child nodes of component or simple node
-  if (node.hasChildNodes()) node.childNodes.forEach(childNode => parseNode(childNode, childCompNodeNames, deferred, compNode))
+  // child nodes of component or simple target
+  if (target.hasChildNodes()) {
+    target.childNodes.forEach(
+      childNode => parse(childNode, childCompNodeNames, deferred, comp)
+    )
+  }
 }
-
-export default parseNode
