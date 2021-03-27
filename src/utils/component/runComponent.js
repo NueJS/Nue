@@ -1,4 +1,4 @@
-import { joinTagArgs } from 'utils/string/joinTagArgs.js'
+import { joinTagArgs } from '../string/joinTagArgs'
 import { modes } from '../reactivity/modes.js'
 import { dashifyComponentNames } from '../string/dashify.js'
 

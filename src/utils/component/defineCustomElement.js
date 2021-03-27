@@ -8,7 +8,7 @@ import { runComponent } from './runComponent.js'
 import { addHooks } from './hooks.js'
 import { buildShadowDOM } from './buildShadowDOM.js'
 import { hydrate } from '../hydration/hydrate.js'
-import { parse } from 'utils/parse/parseNode.js'
+import { parse } from '../parse/parseNode'
 import { ITSELF } from '../../constants'
 // import processAttributes from '../process/attributes/processAttributes.js'
 

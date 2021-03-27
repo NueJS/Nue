@@ -1,4 +1,4 @@
-import { data } from 'utils/data'
+import { data } from '../data'
 
 /**
  * call this function to show that given node is updated

@@ -1,4 +1,4 @@
-import { batches } from 'enums'
+import { batches } from '../../../enums'
 import { subscribeMultiple } from '../../subscription/subscribe'
 
 /**

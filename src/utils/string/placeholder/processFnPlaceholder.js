@@ -1,4 +1,4 @@
-import { placeholderTypes } from 'enums.js'
+import { placeholderTypes } from '../../../enums'
 import { targetProp } from '../../state/slice.js'
 
 /**

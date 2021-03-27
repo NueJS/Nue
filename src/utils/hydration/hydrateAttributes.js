@@ -5,7 +5,7 @@ import { hydrateRef } from './attributes/hydrateRef.js'
 import { hydrateState } from './attributes/hydrateState.js'
 import { hydrateStaticState } from './attributes/hydrateStaticState.js'
 import { hydrateFnProp } from './attributes/hydrateFnProp.js'
-import { attributeTypes } from 'enums.js'
+import { attributeTypes } from '../../enums'
 import { hydrateConditionalAttribute } from './attributes/hydrateConditionalAttribute.js'
 
 const {

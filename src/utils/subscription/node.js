@@ -1,5 +1,5 @@
-import { batches } from 'enums'
-import { nodeUpdated } from 'utils/dev/nodeUpdated'
+import { batches } from '../../enums'
+import { nodeUpdated } from '../dev/nodeUpdated'
 import { subscribeMultiple } from './subscribe'
 
 /**

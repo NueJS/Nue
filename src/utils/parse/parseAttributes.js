@@ -3,8 +3,8 @@ import { isBracketed } from '../string/bracket.js'
 import { processPlaceholder } from '../string/placeholder/processPlaceholder.js'
 import { getAttr, removeAttr, dashCaseToCamelCase } from '../node/dom.js'
 import { errors } from '../dev/errors.js'
-import { attributeTypes } from 'enums.js'
-import { conditionAttributes, loopAttributes } from 'constants.js'
+import { attributeTypes } from '../../enums'
+import { conditionAttributes, loopAttributes } from '../../constants'
 
 /**
  * parse attributes on element if any

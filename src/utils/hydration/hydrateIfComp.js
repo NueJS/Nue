@@ -2,7 +2,7 @@ import { subscribeMultiple } from '../subscription/subscribe.js'
 import { hydrate } from './hydrate.js'
 import { animate, animatedRemove, onAnimationEnd } from '../node/dom.js'
 import { getParsedClone } from '../node/clone.js'
-import { batches } from 'enums.js'
+import { batches } from '../../enums'
 
 /**
  * add conditional rendering
