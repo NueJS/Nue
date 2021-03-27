@@ -21,7 +21,7 @@ export const showErrorOverlay = (error) => {
       const shadowRoot = this.shadowRoot
       /** @type {Element} */
       // @ts-ignore
-      const closeButton = shadowRoot.querySelector('.parsed-error_close-icon')
+      const closeButton = shadowRoot.querySelector('.parsed-error__close-icon')
       closeButton.addEventListener('click', () => {
         this.remove()
       })
