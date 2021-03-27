@@ -15,7 +15,8 @@ module.exports = {
     'brace-style': 'off',
     'no-throw-literal': 'off',
     'spaced-comment': 'off',
-    'symbol-description': 'off'
+    'symbol-description': 'off',
+    'padded-blocks': 'off'
   },
   globals: {
     _DEV_: 'readonly'
