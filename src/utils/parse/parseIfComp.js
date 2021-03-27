@@ -1,15 +1,15 @@
-import { ELSE_ATTRIBUTE, IF_ATTRIBUTE } from '../../constants'
+import { conditionAttributes } from '../../constants'
 import { createComment } from '../node/dom'
 
 /**
  * parse if condition comp
- * @param {import('types/dom').IfComp} ifComp
+ * @param {IfComp} ifComp
  */
 export const parseIfComp = (ifComp) => {
-  /** @type {import('types/dom').ConditionalComp[]}} */
+  /** @type {ConditionalComp[]}} */
   const conditionGroup = []
 
-  let node = /** @type {import('types/dom').ConditionalComp | Node } */(ifComp.nextElementSibling)
+  let node = /** @type {ConditionalComp | Node } */(ifComp.nextElementSibling)
 
   // create a starting marker which will be used to add conditional nodes to DOM
   const anchorNode = createComment('if')
@@ -23,9 +23,9 @@ export const parseIfComp = (ifComp) => {
     const type = node && node._parsedInfo && node._parsedInfo._conditionType
 
     // if the node is not a condition node or is a separate condition, break the loop
-    if (!type || (type === IF_ATTRIBUTE)) break
+    if (!type || (type === conditionAttributes._if)) break
 
-    conditionGroup.push(/** @type {import('types/dom').ConditionalComp } */(node))
+    conditionGroup.push(/** @type {ConditionalComp } */(node))
 
     // @ts-expect-error
     node = node.nextElementSibling
@@ -40,9 +40,9 @@ export const parseIfComp = (ifComp) => {
 
   const conditionGroupStateDeps = [ifComp._parsedInfo._conditionAttribute._stateDeps]
   conditionGroup.forEach(node => {
-    if (node._parsedInfo._conditionType !== ELSE_ATTRIBUTE) {
+    if (node._parsedInfo._conditionType !== conditionAttributes._else) {
       conditionGroupStateDeps.push(
-        /** @type {import('types/dom').IfComp | import('types/dom').ElseIfComp }*/
+        /** @type {IfComp | ElseIfComp }*/
         (node)._parsedInfo._conditionAttribute._stateDeps
       )
     }
