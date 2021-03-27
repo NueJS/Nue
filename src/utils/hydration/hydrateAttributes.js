@@ -32,9 +32,9 @@ const typeToFn = {
 
 /**
  * hydrate all attributes of given target in context of comp
- * @param {import('types/dom').Parsed_HTMLElement | import('types/dom').Comp} target
- * @param {import('types/parsed').Attribute_ParseInfo[]} attributes
- * @param {import('types/dom').Comp} comp
+ * @param {Parsed_HTMLElement | Comp} target
+ * @param {Attribute_ParseInfo[]} attributes
+ * @param {Comp} comp
  */
 export const hydrateAttributes = (target, attributes, comp) => {
   attributes.forEach(attribute => {

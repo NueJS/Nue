@@ -6,16 +6,20 @@ import { batches } from 'enums.js'
 
 /**
  * add conditional rendering
- * @param {import('types/dom').IfComp} ifComp
- * @param {import('types/dom').Comp} parentComp
+ * @param {IfComp} ifComp
+ * @param {Comp} parentComp
  */
 export const hydrateIfComp = (ifComp, parentComp) => {
   const parsed = ifComp._parsedInfo
 
-  /** @type {import('types/dom').ConditionalComp[]} */
+  /** @type {ConditionalComp[]} */
   const group = [ifComp]
 
-  if (parsed._conditionGroup) parsed._conditionGroup.forEach(node => group.push(getParsedClone(node)))
+  if (parsed._conditionGroup) {
+    parsed._conditionGroup.forEach(node => {
+      group.push(getParsedClone(node))
+    })
+  }
 
   ifComp._isProcessed = true
 
@@ -24,7 +28,7 @@ export const hydrateIfComp = (ifComp, parentComp) => {
   const anchorNode = /** @type {Comment} */(ifComp.previousSibling)
 
   // group that is currently rendered
-  /** @type {import('types/dom').ConditionalComp} */
+  /** @type {ConditionalComp} */
   let active
 
   /** @type {boolean} */
