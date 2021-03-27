@@ -7,5 +7,6 @@
 export const hydrateFnProp = (target, attribute, comp) => {
   const propName = attribute._name
   const sourceFnName = /** @type {string}*/(attribute._placeholder)
-  target.fn[propName] = comp.parent.fn[sourceFnName]
+  if (!target.fn) target.fn = Object.create(comp.fn)
+  target.fn[propName] = comp.fn[sourceFnName]
 }

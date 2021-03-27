@@ -56,6 +56,8 @@ export const defineCustomElement = (compFn) => {
       // nodes that are using the closure state
       comp._nodesUsingClosureState = new Set()
 
+      if (!comp.fn) comp.fn = {}
+
       addHooks(comp)
     }
 
@@ -70,10 +72,6 @@ export const defineCustomElement = (compFn) => {
 
       // when compFn is being connected for the first time
       if (!comp.shadowRoot) {
-        const { parent } = comp
-
-        // create fn
-        comp.fn = parent ? Object.create(parent.fn) : {}
 
         // create $
         comp.$ = reactify(comp, comp._prop$ || {}, [])
