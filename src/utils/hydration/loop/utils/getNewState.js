@@ -3,8 +3,8 @@ import { checkUniquenessOfKeys } from '../dev/checkUniquenessOfKeys'
 
 /**
  * create new loopState using current array value
- * @param {import('types/loop').LoopInfo} loopInfo
- * @returns {import('types/reconcile').ReconcileState}
+ * @param {LoopInfo} loopInfo
+ * @returns {ReconcileState}
  */
 export const getNewState = (loopInfo) => {
   const { _parentComp, _getArray, _getKeys } = loopInfo

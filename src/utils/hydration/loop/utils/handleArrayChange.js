@@ -8,10 +8,10 @@ import { targetProp } from '../../../state/slice'
 
 /**
  * update dom to reflect the array mutation
- * @param {import('types/loop').LoopInfo} loopInfo
+ * @param {LoopInfo} loopInfo
  * @param {number[]} dirtyIndexes
- * @param {import('types/loop').updatedSlices} updatedSlices
- * @param {import('types/reconcile').ReconcileState} oldState
+ * @param {UpdatedSlices} updatedSlices
+ * @param {ReconcileState} oldState
  */
 export const handleArrayChange = (loopInfo, dirtyIndexes, updatedSlices, oldState) => {
   const { _loopedCompInstances, _instanciated, _animation, _loopAttributes } = loopInfo

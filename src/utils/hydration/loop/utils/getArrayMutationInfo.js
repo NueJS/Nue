@@ -1,10 +1,10 @@
 
 /**
  * go through mutations and filter out info that is relevant for updating the looped components
- * @param {import('types/others').Mutation[]} mutations
+ * @param {Mutation[]} mutations
  * @param {string} arrayPathString
- * @param {import('types/others').StatePath} arrayPath
- * @returns {[number[], import('types/loop').updatedSlices]}
+ * @param {StatePath} arrayPath
+ * @returns {[number[], UpdatedSlices]}
  */
 
 export const getArrayMutationInfo = (mutations, arrayPathString, arrayPath) => {
@@ -16,7 +16,7 @@ export const getArrayMutationInfo = (mutations, arrayPathString, arrayPath) => {
 
   /**
    * object containing information about what parts of state has been mutated
-   * @type {import('types/loop').updatedSlices}
+   * @type {UpdatedSlices}
    * */
   const stateUpdates = {}
 

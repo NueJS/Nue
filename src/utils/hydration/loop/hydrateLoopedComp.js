@@ -11,14 +11,23 @@ import { batches } from 'enums.js'
 
 /**
  * hydrate looped comp
- * @param {import('types/dom').LoopedComp} loopedComp
- * @param {import('types/dom').Comp} parentComp
+ * @param {LoopedComp} loopedComp
+ * @param {Comp} parentComp
  */
 export const hydrateLoopedComp = (loopedComp, parentComp) => {
   const parsed = loopedComp._parsedInfo
-
   const loopAttributes = parsed._loopAttributes
   const { _itemArray, _itemIndex, _item, _key } = loopAttributes
+
+  const arrayPath = _itemArray._stateDeps[0]
+  const arrayPathString = arrayPath.join('.')
+  const anchor = createComment('loop/')
+
+  const oldState = {
+    _values: [],
+    _keys: [],
+    _keyHash: {}
+  }
 
   /** @type {getClosure} */
   const getClosure = (value, index) => {
@@ -39,13 +48,7 @@ export const hydrateLoopedComp = (loopedComp, parentComp) => {
 
   const getKeys = () => getArray().map(getKey)
 
-  const arrayPath = _itemArray._stateDeps[0]
-  const arrayPathString = arrayPath.join('.')
-  const anchor = createComment('loop/')
-
-  const oldState = { _values: [], _keys: [], _keyHash: {} }
-
-  /** @type {import('types/loop').LoopInfo} */
+  /** @type {LoopInfo} */
   const loopInfo = {
     _loopedCompInstances: [],
     _anchor: anchor,
@@ -72,16 +75,19 @@ export const hydrateLoopedComp = (loopedComp, parentComp) => {
     loopInfo._instanciated = true
   })
 
-  /** @type {import('types/subscription').SubCallBack} */
+  /** @type {SubCallBack} */
   const onDepsChange = (mutations) => {
     // if some mutation in batch assigned a new array
     const newArrayAssigned = mutations.some(batchInfo => arraysAreShallowEqual(batchInfo.path, arrayPath))
+
     if (newArrayAssigned) fullReconcile()
+
     else {
       // partial reconciliation
       const [dirtyIndexes, stateUpdatePaths] = getArrayMutationInfo(mutations, arrayPathString, arrayPath)
       handleArrayChange(loopInfo, dirtyIndexes, stateUpdatePaths, oldState)
     }
+
   }
 
   subscribe(parentComp, arrayPath, onDepsChange, batches._DOM)
