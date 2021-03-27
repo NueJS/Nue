@@ -1,4 +1,3 @@
-import { ITSELF } from '../../constants.js'
 import { data } from '../data'
 import { createElement } from '../node/dom.js'
 import { reactify } from '../reactivity/reactify.js'
@@ -30,7 +29,7 @@ export const defineCustomElement = (compFn) => {
   class NueComp extends HTMLElement {
     constructor () {
       super()
-      /** @type {import('types/dom').Comp} */
+      /** @type {Comp} */
       // @ts-expect-error
       const comp = this
 
@@ -40,10 +39,9 @@ export const defineCustomElement = (compFn) => {
       comp.refs = {}
 
       // subscription tree which contains the callbacks stored at various dependency paths
-      comp._subscriptions = { [ITSELF]: new Set() }
+      comp._subscriptions = { _itself: new Set() }
 
-      // @ts-expect-error
-      comp._batches = [new Set(), new Set()]
+      comp._batches = /** @type {[Set<Function>, Set<Function>]}*/([new Set(), new Set()])
 
       // Array of mutation info that happened in a batch
       comp._mutations = []
@@ -63,7 +61,7 @@ export const defineCustomElement = (compFn) => {
     }
 
     connectedCallback () {
-      /** @type {import('types/dom').Comp} */
+      /** @type {Comp} */
       // @ts-expect-error
       const comp = this
 
@@ -148,7 +146,7 @@ export const defineCustomElement = (compFn) => {
     }
 
     disconnectedCallback () {
-      /** @type {import('types/dom').Comp} */
+      /** @type {Comp} */
       // @ts-expect-error
       const comp = this
 

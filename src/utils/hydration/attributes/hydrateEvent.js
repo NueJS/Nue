@@ -3,9 +3,9 @@ import { addSubscriber } from '../../subscription/node.js'
 
 /**
  * add event on target target
- * @param {import('types/dom').Parsed_HTMLElement} target
- * @param {import('types/parsed').Attribute_ParseInfo} attribute
- * @param {import('types/dom').Comp} comp
+ * @param {Parsed_HTMLElement} target
+ * @param {Attribute_ParseInfo} attribute
+ * @param {Comp} comp
  */
 export const hydrateEvent = (target, attribute, comp) => {
   const fnName = /** @type {string}*/ (attribute._placeholder)

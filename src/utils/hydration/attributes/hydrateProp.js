@@ -1,18 +1,18 @@
-import { attributeTypes } from '../../../enums.js'
+import { placeholderTypes } from '../../../enums.js'
 import { errors } from '../../dev/errors.js'
 import { mutate } from '../../state/mutate.js'
 import { syncNode } from '../../subscription/node.js'
 
 /**
  * add prop on target
- * @param {import('types/dom').Parsed_HTMLElement} target
- * @param {import('types/parsed').Attribute_ParseInfo} attribute
- * @param {import('types/dom').Comp} comp
+ * @param {Parsed_HTMLElement} target
+ * @param {Attribute_ParseInfo} attribute
+ * @param {Comp} comp
  */
 export const hydrateProp = (target, attribute, comp) => {
   // [{ getValue, deps, type, content }, propName]
   const propName = attribute._name
-  const { _getValue, _type, _content, _stateDeps } = /** @type {import('types/placeholder').Placeholder} */(attribute._placeholder)
+  const { _getValue, _type, _content, _stateDeps } = /** @type {Placeholder} */(attribute._placeholder)
   const setProp = () => {
     // @ts-expect-error
     target[propName] = _getValue(comp)
@@ -20,7 +20,7 @@ export const hydrateProp = (target, attribute, comp) => {
 
   if (target.matches('input, textarea')) {
     // TODO: move this error to parsing phase
-    if (_DEV_ && _type === attributeTypes._functional) {
+    if (_DEV_ && _type === placeholderTypes._functional) {
       throw errors.INVALID_INPUT_BINDING(comp._compFnName, _content)
     }
 

@@ -4,13 +4,13 @@ import { hydrate } from '../hydration/hydrate.js'
 
 /**
  * hydrate templateElement and add it in shadowDOM of comp
- * @param {import('types/dom').Comp} comp
+ * @param {Comp} comp
  * @param {HTMLTemplateElement} templateElement
  */
 export const buildShadowDOM = (comp, templateElement) => {
   const fragment = getParsedClone(templateElement.content)
 
-  hydrate(comp, fragment)
+  hydrate(fragment, comp)
 
   flushArray(comp._deferredWork)
 

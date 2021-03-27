@@ -3,7 +3,7 @@ import { errors } from '../dev/errors.js'
 
 /**
  * add lifecycle hooks to comp
- * @param {import('types/dom').Comp} comp
+ * @param {Comp} comp
  */
 export const addHooks = (comp) => {
   comp._hookCbs = {

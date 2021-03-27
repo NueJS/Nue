@@ -2,11 +2,9 @@ import { joinTagArgs } from 'utils/string/joinTagArgs.js'
 import { modes } from '../reactivity/modes.js'
 import { dashifyComponentNames } from '../string/dashify.js'
 
-/** @typedef {(strings: string[], ...exprs: string[] ) => void} TaggedTemplate */
-
 /**
  * run compFn
- * @param {import('types/dom').Comp} comp
+ * @param {Comp} comp
  * @param {Function} compFn
  * @param {boolean} parsed
  * @returns {[string, string, Function[]]}

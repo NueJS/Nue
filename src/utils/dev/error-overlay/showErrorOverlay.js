@@ -4,7 +4,7 @@ import { errorOverlayHTML } from './errorOverlayHTML'
 
 /**
  * show error overlay
- * @param {{ message: string, fix: string, compName: string }} error
+ * @param {NueError} error
  */
 
 export const showErrorOverlay = (error) => {
@@ -28,9 +28,9 @@ export const showErrorOverlay = (error) => {
     }
   }
 
-  window.customElements.define('nuejs-error-overlay', errorOverlay)
+  window.customElements.define('nue-error-overlay', errorOverlay)
 
-  const overlay = /** @type {HTMLElement} */(createElement('nuejs-error-overlay'))
+  const overlay = /** @type {HTMLElement} */(createElement('nue-error-overlay'))
   document.body.append(overlay)
 
   const root = /** @type {ShadowRoot}*/ (overlay.shadowRoot)

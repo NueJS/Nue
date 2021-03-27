@@ -7,14 +7,12 @@ import { lower } from '../others'
  */
 const getNodeName = (node) => `<${lower(node.nodeName)}>`
 
-/** @typedef {{ message: string, fix: string, compName: string }} error */
-
 export const errors = {
 
   /**
    * @param {string} compName
    * @param {string} content
-   * @returns {error}
+   * @returns {NueError}
    */
   STATE_NOT_FOUND (compName, content) {
     return {
@@ -27,7 +25,7 @@ export const errors = {
   /**
    * @param {string} compName
    * @param {string[]} keys
-   * @returns {error}
+   * @returns {NueError}
    */
   KEYS_ARE_NOT_UNIQUE (compName, keys) {
     /**
@@ -61,7 +59,7 @@ export const errors = {
   /**
    * @param {string} compName
    * @param {Element} node
-   * @returns {error}
+   * @returns {NueError}
    */
   KEY_NOT_BRACKETED (compName, node) {
     const nodeName = getNodeName(node)
@@ -74,7 +72,7 @@ export const errors = {
 
   /**
    * @param {string} compName
-   * @returns {error}
+   * @returns {NueError}
    */
   MISSING_DEPENDENCIES_IN_ON_MUTATE (compName) {
     return {
@@ -87,7 +85,7 @@ export const errors = {
   /**
    * @param {string} compName
    * @param {Element} node
-   * @returns {error}
+   * @returns {NueError}
    */
   INVALID_FOR_ATTRIBUTE (compName, node) {
     const nodeName = getNodeName(node)
@@ -102,7 +100,7 @@ export const errors = {
    * @param {string} compName
    * @param {string} animationName
    * @param {string} loopedCompName
-   * @returns {error}
+   * @returns {NueError}
    */
   EXIT_ANIMATION_NOT_FOUND (compName, animationName, loopedCompName) {
     return {
@@ -115,7 +113,7 @@ export const errors = {
   /**
    * @param {string} parentCompName
    * @param {string} compName
-   * @returns {error}
+   * @returns {NueError}
    */
   MISSING_KEY_ATTRIBUTE (parentCompName, compName) {
     return {
@@ -128,7 +126,7 @@ export const errors = {
   /**
    * @param {string} compName
    * @param {string} fnName
-   * @returns {error}
+   * @returns {NueError}
    */
   METHOD_NOT_FOUND (compName, fnName) {
     return {
@@ -142,7 +140,7 @@ export const errors = {
    * @param {string} compName
    * @param {Element} node
    * @param {string} attributeName
-   * @returns {error}
+   * @returns {NueError}
    */
   RESERVED_ATTRIBUTE_USED_ON_NON_COMPONENT (compName, node, attributeName) {
     const nodeName = getNodeName(node)
@@ -164,7 +162,7 @@ const app = ({ components }) => {
    *
    * @param {string} compName
    * @param {string} collectedString
-   * @returns {error}
+   * @returns {NueError}
    */
   BRACKET_NOT_CLOSED (compName, collectedString) {
     const text = `"[${collectedString}"`
@@ -182,7 +180,7 @@ const app = ({ components }) => {
    *
    * @param {string} compName
    * @param {string} content
-   * @returns {error}
+   * @returns {NueError}
    */
   INVALID_INPUT_BINDING (compName, content) {
     return {

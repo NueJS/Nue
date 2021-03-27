@@ -7,12 +7,14 @@ import { dashify } from '../utils/string/dashify'
  * define the custom targetElement of given name
  * @param {Function} component
  * @param {HTMLElement} targetElement
- * @param {import('types/others').Config} [config]
+ * @param {Config} [config]
  */
+
 export const render = (component, targetElement, config) => {
+
   // attach error-overlay
   if (_DEV_) {
-    // @ts-ignore
+    // @ts-expect-error
     window.data = data
     window.onerror = (message, filename, lineno, colno, error) => {
       // @ts-ignore
