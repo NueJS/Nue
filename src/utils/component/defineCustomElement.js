@@ -56,8 +56,6 @@ export const defineCustomElement = (compFn) => {
       // nodes that are using the closure state
       comp._nodesUsingClosureState = new Set()
 
-      if (!comp._prop$) comp._prop$ = {}
-
       addHooks(comp)
     }
 
@@ -78,7 +76,7 @@ export const defineCustomElement = (compFn) => {
         comp.fn = parent ? Object.create(parent.fn) : {}
 
         // create $
-        comp.$ = reactify(comp, [])
+        comp.$ = reactify(comp, comp._prop$ || {}, [])
 
         // process attributes
         // do this only on looped components - right ?
