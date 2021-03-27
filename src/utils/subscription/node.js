@@ -1,64 +1,62 @@
-import devtools from '../../apis/devtools'
-import { DOM_BATCH, IS_SUBSCRIBED } from '../constants'
-import DEV from '../dev/DEV'
+import { batches } from 'enums'
+import { nodeUpdated } from 'utils/dev/nodeUpdated'
 import { subscribeMultiple } from './subscribe'
 
 /**
  * subscribe node to state
- * @param {import('../types').parsedNode} node
+ * @param {ParsedDOMElement} node
  */
 export const subscribeNode = (node) => {
-  if (!node.subscribers) return
-  node.unsubscribers = node.subscribers.map(s => s())
-  node[IS_SUBSCRIBED] = true
+  if (!node._subscribers) return
+  node._unsubscribers = node._subscribers.map(s => s())
+  node._isSubscribed = true
 }
 
 /**
  * unsubscribe node to state
- * @param {import('../types').parsedNode} node
+ * @param {ParsedDOMElement} node
  */
 export const unsubscribeNode = (node) => {
-  if (!node.unsubscribers) return
-  node.unsubscribers.forEach(dc => dc())
-  node[IS_SUBSCRIBED] = false
+  if (!node._unsubscribers) return
+  node._unsubscribers.forEach(dc => dc())
+  node._isSubscribed = false
 }
 
 /**
  * unsubscribe node to state
- * @param {import('../types').parsedNode} node
+ * @param {ParsedDOMElement} node
  * @param {Function} subscriber
  */
 export const addSubscriber = (node, subscriber) => {
-  if (!node.subscribers) node.subscribers = []
-  node.subscribers.push(subscriber)
+  if (!node._subscribers) node._subscribers = []
+  node._subscribers.push(subscriber)
 }
 
-// keep the dom node in sync with the state from compNode
-// by calling the update callback when deps change in state of compNode
+// keep the dom node in sync with the state from comp
+// by calling the update callback when deps change in state of comp
 /**
  *
- * @param {import('../types').compNode} compNode
- * @param {import('../types').parsedNode} node
- * @param {Array<import('../types').path>} deps
- * @param {import('../types').subscribeCallback} update
+ * @param {Comp} comp
+ * @param {ParsedDOMElement} node
+ * @param {StatePath[]} deps
+ * @param {SubCallBack} update
  */
-export const syncNode = (compNode, node, deps, update) => {
+export const syncNode = (comp, node, deps, update) => {
   // attach which node the update method is for so that when the update is called in batches
   // it can check whether to invoke it or not based on whether the node is subscribed or not
   // @ts-ignore @todo fix it
   update.node = node
 
   // when node is subscribed, call update so that node is up-to-date with state
-  // returns unsubscriber function which removes subscription from compNode subscriptions to prevent unnecessary dom updates
+  // returns unsubscriber function which removes subscription from comp subscriptions to prevent unnecessary dom updates
   const subscriber = () => {
-    // @ts-ignore
+    // @ts-expect-error
     update()
 
-    if (DEV) {
-      // @ts-ignore
-      devtools.nodeUpdated(node)
+    if (_DEV_) {
+      nodeUpdated(node)
     }
-    return subscribeMultiple(compNode, deps, update, DOM_BATCH)
+    return subscribeMultiple(comp, deps, update, batches._DOM)
   }
 
   addSubscriber(node, subscriber)

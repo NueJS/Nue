@@ -1,15 +1,18 @@
-import { TEXT } from '../constants'
-import errors from '../dev/errors'
-import processPlaceholder from './placeholder/processPlaceholder'
+import { errors } from '../dev/errors'
+import { processPlaceholder } from './placeholder/processPlaceholder'
 
 /**
  * take the string text and split it into placeholders and strings
- * @param {import('../types').compNode} compNode
+ * @param {Comp} comp
  * @param {string} text
- * @returns {import('../types').placeholder[]} parts
+ * @returns {SplitPart[]} parts
  */
-const split = (compNode, text) => {
+
+export const split = (comp, text) => {
+
+  /** @type {SplitPart[]} */
   const parts = []
+
   let collectingVar = false
   let collectedString = ''
   let i = -1
@@ -32,7 +35,7 @@ const split = (compNode, text) => {
 
     else if (char === '[') {
       // save current collected string (if any)
-      if (collectedString) parts.push({ content: collectedString, type: TEXT })
+      if (collectedString) parts.push(collectedString)
       reset(true)
     }
 
@@ -49,10 +52,11 @@ const split = (compNode, text) => {
 
   // add the remaining text
   if (collectedString) {
-    if (collectingVar) throw errors.BRACKET_NOT_CLOSED(compNode.name, collectedString)
-    parts.push({ content: collectedString, type: TEXT })
+    if (_DEV_ && collectingVar) {
+      throw errors.BRACKET_NOT_CLOSED(comp._compFnName, collectedString)
+    }
+
+    parts.push(collectedString)
   }
   return parts
 }
-
-export default split

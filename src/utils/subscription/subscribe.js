@@ -1,28 +1,29 @@
 import { batchify } from '../batch'
 import { origin } from '../closure.js'
-import { ITSELF, NODES_USING_CLOSURE, SUBSCRIPTIONS } from '../constants'
-import DEV from '../dev/DEV.js'
-import errors from '../dev/errors.js'
+import { ITSELF } from '../../constants'
+import { errors } from '../dev/errors.js'
 
 /**
  * subscribe to slice of state pointed by the path in baseNue
  * when that slice is updated, call the callback in "batchName" batch
  *
- * @param {import('../types').compNode} baseCompNode
- * @param {import('../types').path} path
- * @param {import('../types').subscribeCallback} cb
- * @param {number} batchName // @todo use enum instead
+ * @param {Comp} baseCompNode
+ * @param {StatePath} path
+ * @param {SubCallBack} cb
+ * @param {0 | 1} batchName // @todo use enum instead
  * @returns {Function}
  */
-const subscribe = (baseCompNode, path, cb, batchName) => {
+export const subscribe = (baseCompNode, path, cb, batchName) => {
   // get the originCompNode where the state referred by path is coming from
   const originCompNode = origin(baseCompNode, path)
 
   // throw if no origin is found
-  if (DEV && !originCompNode) throw errors.STATE_NOT_FOUND(baseCompNode.name, path.join('.'))
+  if (_DEV_ && !originCompNode) {
+    throw errors.STATE_NOT_FOUND(baseCompNode._compFnName, path.join('.'))
+  }
 
-  if (cb.node && originCompNode !== baseCompNode) {
-    baseCompNode[NODES_USING_CLOSURE].add(cb.node)
+  if (cb._node && originCompNode !== baseCompNode) {
+    baseCompNode._nodesUsingClosureState.add(cb._node)
   }
 
   // get the higher order cb that will only call the cb once every batch
@@ -30,7 +31,7 @@ const subscribe = (baseCompNode, path, cb, batchName) => {
   const batchCb = batchify(cb, originCompNode[batchName])
 
   // start from the root of subscriptions
-  let target = originCompNode[SUBSCRIPTIONS]
+  let target = originCompNode._subscriptions
 
   // add batchCb in path table at appropriate location
   // map is used to unsubscribe in constant time
@@ -38,27 +39,29 @@ const subscribe = (baseCompNode, path, cb, batchName) => {
   path.forEach((key, i) => {
     if (!target[key]) target[key] = { [ITSELF]: new Set() }
     target = target[key]
-    if (i === lastIndex) target[ITSELF].add(batchCb)
+    if (i === lastIndex) {
+      // @ts-expect-error
+      target[ITSELF].add(batchCb)
+    }
   })
 
   // return unsubscribe function to remove subscription
+  // @ts-expect-error
   return () => target[ITSELF].delete(batchCb)
 }
-
-export default subscribe
 
 /**
  * returns an array of removeDep functions
  *
- * @param {import('../types').compNode} compNode
- * @param {Array<import('../types').path>} paths
- * @param {import('../types').subscribeCallback} cb
- * @param {number} batchName
+ * @param {Comp} comp
+ * @param {StatePath[]} paths
+ * @param {SubCallBack} cb
+ * @param {0 | 1} batchName
  * @returns {Function}
  */
 
-export const subscribeMultiple = (compNode, paths, cb, batchName) => {
-  const unsubscribeFunctions = paths.map(path => subscribe(compNode, path, cb, batchName))
+export const subscribeMultiple = (comp, paths, cb, batchName) => {
+  const unsubscribeFunctions = paths.map(path => subscribe(comp, path, cb, batchName))
   // return unsubscribeMultiple
   return () => unsubscribeFunctions.forEach(c => c())
 }

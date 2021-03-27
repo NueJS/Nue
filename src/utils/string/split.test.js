@@ -1,31 +1,31 @@
-const { REACTIVE, TEXT } = require('../constants')
-const { default: split } = require('./split')
+const { placeholderTypes } = require('enums')
+const { split } = require('./split')
 
+// these tests will be outdated - no point in fixing these tests
+
+const { _reactive, _functional } = placeholderTypes
 /**
- * @type {import('../types').compNode}
+ * @type {Comp}
  */
 // @ts-expect-error
 const mockComp = {}
 
 it('can split the plain text only', () => {
   const parts = split(mockComp, 'this is just plain text')
-  expect(parts[0].content).toEqual('this is just plain text')
-  expect(parts[0].type).toBe(TEXT)
+  expect(parts).toEqual(['this is just plain text'])
 })
 
 it('can split the reactive placeholder only', () => {
-  const parts = split(mockComp, '[name]')
-  expect(parts[0].type).toEqual(REACTIVE)
-  expect(parts[0].deps).toEqual([['name']])
-  expect(parts[0].content).toBe('name')
+  const parts = /** @type {Placeholder[]}*/(split(mockComp, '[name]'))
+  expect(parts[0]._type).toEqual(_reactive)
+  expect(parts[0]._stateDeps).toEqual([['name']])
+  expect(parts[0]._content).toBe('name')
 })
 
 it('can split the plain text and simple reactive placeholder', () => {
   const parts = split(mockComp, 'my name is [name]')
-  expect(parts[0]).toEqual({
-    type: TEXT,
-    content: 'my name is '
-  })
+
+  expect(parts[0]).toBe('my name is ')
 
   expect(parts[1].type).toEqual(REACTIVE)
   expect(parts[1].deps).toEqual([['name']])
