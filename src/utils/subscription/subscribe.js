@@ -9,7 +9,7 @@ import { errors } from '../dev/errors.js'
  *
  * @param {Comp} baseCompNode
  * @param {StatePath} path
- * @param {SubCallBack} cb
+ * @param {SubCallBack | Function} cb
  * @param {0 | 1} batchName // @todo use enum instead
  * @returns {Function}
  */
@@ -22,8 +22,8 @@ export const subscribe = (baseCompNode, path, cb, batchName) => {
     throw errors.STATE_NOT_FOUND(baseCompNode._compFnName, path.join('.'))
   }
 
-  if (cb._node && originCompNode !== baseCompNode) {
-    baseCompNode._nodesUsingClosureState.add(cb._node)
+  if (/** @type {SubCallBack}*/(cb)._node && originCompNode !== baseCompNode) {
+    baseCompNode._nodesUsingClosureState.add(/** @type {SubCallBack}*/(cb)._node)
   }
 
   // get the higher order cb that will only call the cb once every batch
@@ -55,7 +55,7 @@ export const subscribe = (baseCompNode, path, cb, batchName) => {
  *
  * @param {Comp} comp
  * @param {StatePath[]} paths
- * @param {SubCallBack} cb
+ * @param {SubCallBack | Function} cb
  * @param {0 | 1} batchName
  * @returns {Function}
  */

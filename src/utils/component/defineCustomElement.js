@@ -9,6 +9,7 @@ import { addHooks } from './hooks.js'
 import { buildShadowDOM } from './buildShadowDOM.js'
 import { hydrate } from '../hydration/hydrate.js'
 import { parse } from 'utils/parse/parseNode.js'
+import { ITSELF } from '../../constants'
 // import processAttributes from '../process/attributes/processAttributes.js'
 
 /**
@@ -39,9 +40,9 @@ export const defineCustomElement = (compFn) => {
       comp.refs = {}
 
       // subscription tree which contains the callbacks stored at various dependency paths
-      comp._subscriptions = { _itself: new Set() }
+      comp._subscriptions = { [ITSELF]: new Set() }
 
-      comp._batches = /** @type {[Set<Function>, Set<Function>]}*/([new Set(), new Set()])
+      comp._batches = /** @type {[Set<SubCallBack>, Set<SubCallBack>]}*/([new Set(), new Set()])
 
       // Array of mutation info that happened in a batch
       comp._mutations = []
