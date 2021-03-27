@@ -9,10 +9,6 @@
     "noEmit": true,
     "strict": true,
     "downlevelIteration": true,
-    "baseUrl": "./src",
-    "paths": {
-      "types/*": [ "types/*"],
-    }
   },
   "include": ["src/**/*.js", "src/**/*.d.ts"],
   "exclude": ["node_modules"]
