@@ -1,1 +1,1 @@
-export { default as render } from './apis/render'
+export { render } from './apis/render'
