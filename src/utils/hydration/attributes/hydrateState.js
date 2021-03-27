@@ -12,16 +12,15 @@ export const hydrateState = (target, attribute, comp) => {
   const { _placeholder, _name } = attribute
   const { _getValue, _stateDeps } = /** @type {Placeholder}*/(_placeholder)
 
-  // @TODO: shorten this
   const update = () => {
-    if (target === comp) {
-      target.$[_name] = _getValue(comp)
-    } else {
-      if (!target._prop$) target._prop$ = {}
-      target._prop$[_name] = _getValue(comp)
-    }
+    target.$[_name] = _getValue(comp)
   }
 
-  update()
+  if (target === comp) update()
+  else {
+    if (!target._prop$) target._prop$ = {}
+    target._prop$[_name] = _getValue(comp)
+  }
+
   subscribeMultiple(comp, _stateDeps, update, batches._beforeDOM)
 }
