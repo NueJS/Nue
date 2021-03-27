@@ -10,6 +10,6 @@ import { syncNode } from '../../subscription/node.js'
 
 export const hydrateNormalAttribute = (target, attribute, comp) => {
   const placeholder = /** @type {Placeholder} */(attribute._placeholder)
-  const update = () => setAttr(target, attribute._name, placeholder._getValue(comp.$, comp._compFnName))
+  const update = () => setAttr(target, attribute._name, placeholder._getValue(comp))
   syncNode(comp, target, placeholder._stateDeps, update)
 }

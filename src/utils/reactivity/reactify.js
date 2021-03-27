@@ -116,7 +116,7 @@ export const reactify = (comp, obj, _statePath = []) => {
         const fullPath = [...statePath, prop]
         // @ts-ignore
         if (statePath.length !== 0) accessed.paths[accessed.paths.length - 1] = fullPath
-        else accessed.paths.push(fullPath)
+        else accessed._paths.push(fullPath)
       }
 
       // closure state API

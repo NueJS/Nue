@@ -11,7 +11,7 @@ export const hydrateConditionalAttribute = (element, attribute, comp) => {
   const placeholder = /** @type {Placeholder} */(attribute._placeholder)
   const name = attribute._name
 
-  const update = () => placeholder._getValue(comp.$, comp._compFnName)
+  const update = () => placeholder._getValue(comp)
     ? setAttr(comp, name, '')
     : removeAttr(element, name)
 

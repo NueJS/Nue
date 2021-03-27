@@ -15,10 +15,10 @@ export const hydrateState = (target, attribute, comp) => {
   // @TODO: shorten this
   const update = () => {
     if (target === comp) {
-      target.$[_name] = _getValue(comp.$, comp._compFnName)
+      target.$[_name] = _getValue(comp)
     } else {
       if (!target._prop$) target._prop$ = {}
-      target._prop$[_name] = _getValue(comp.$, comp._compFnName)
+      target._prop$[_name] = _getValue(comp)
     }
   }
 

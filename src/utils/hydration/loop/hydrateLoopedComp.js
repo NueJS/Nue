@@ -40,11 +40,18 @@ export const hydrateLoopedComp = (loopedComp, parentComp) => {
   }
 
   /** @returns {Array<any>} */
-  const getArray = () => _itemArray._getValue(loopedComp.$, loopedComp._compFnName)
+  const getArray = () => _itemArray._getValue(loopedComp)
 
   // @todo current key can only be from closure, add support for state too
   /** @type {getKey} */
-  const getKey = (value, index) => _key._getValue(getClosure(value, index), loopedComp._compFnName)
+  const getKey = (value, index) => {
+    const pseudoComp = {
+      $: getClosure(value, index),
+      _compFnName: loopedComp._compFnName
+    }
+    // @ts-expect-error
+    return _key._getValue(pseudoComp)
+  }
 
   const getKeys = () => getArray().map(getKey)
 
