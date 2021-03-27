@@ -110,13 +110,17 @@ export const reactify = (comp, obj, _statePath = []) => {
     get (target, prop) {
       if (prop === IS_REACTIVE) return true
       if (prop === TARGET) return target
+
       if (modes._detective) {
+
         /** @type {StatePath} */
-        // @ts-ignore
-        const fullPath = [...statePath, prop]
-        // @ts-ignore
-        if (statePath.length !== 0) accessed.paths[accessed.paths.length - 1] = fullPath
-        else accessed._paths.push(fullPath)
+        const fullPath = [...statePath, /** @type {string}*/(prop)]
+
+        if (statePath.length !== 0) {
+          accessed._paths[accessed._paths.length - 1] = fullPath
+        } else {
+          accessed._paths.push(fullPath)
+        }
       }
 
       // closure state API
