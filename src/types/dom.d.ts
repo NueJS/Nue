@@ -110,4 +110,4 @@ interface ElseIfComp extends Comp {
 type ConditionalComp = IfComp | ElseComp | ElseIfComp
 
 
-type ParsedDOMElement = Parsed_Text | Parsed_HTMLElement | Comp
+type ParsedDOMElement = Parsed_Text | Parsed_HTMLElement | Comp | IfComp | ElseComp | ElseIfComp

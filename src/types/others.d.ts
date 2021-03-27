@@ -31,3 +31,7 @@ type NueError = {
   fix: string,
   compName: string
 }
+
+type TaggedTemplate = (strings: string[], ...exprs: string[] ) => void
+
+type State = Record<string, any>
