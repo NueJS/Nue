@@ -5,5 +5,5 @@
  */
 
 export const hydrateStaticState = (target, attribute) => {
-  target.$[attribute._name] = /** @type {string}*/(attribute._placeholder)
+  target._prop$[attribute._name] = /** @type {string}*/(attribute._placeholder)
 }
