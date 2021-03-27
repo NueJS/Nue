@@ -1,7 +1,7 @@
 
 interface Placeholder {
   _type: 0 | 1,
-  _getValue: ($: Record<string, any>, compName: string) => any,
+  _getValue: (comp: Comp) => any,
   _stateDeps: StatePath[],
   _content: string
 }

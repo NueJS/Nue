@@ -1,6 +1,8 @@
+// commented out stuff is actually being used, but I can't import ITSELF symbol in this file
+// because then these types will be be globally available - this sucks !
 interface Subscriptions {
-  _itself: Set<Function>,
-  [key: string]: Subscriptions | Set<Function>
+  // [ITSELF]: Set<Function>,
+  [key: string]: Subscriptions
 }
 
 interface SubCallBack  {
