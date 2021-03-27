@@ -27,8 +27,8 @@ export const subscribe = (baseCompNode, path, cb, batchName) => {
   }
 
   // get the higher order cb that will only call the cb once every batch
-  // @ts-ignore @todo use .batches
-  const batchCb = batchify(cb, originCompNode[batchName])
+
+  const batchCb = batchify(cb, originCompNode._batches[batchName])
 
   // start from the root of subscriptions
   let target = originCompNode._subscriptions

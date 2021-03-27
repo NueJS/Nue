@@ -1,4 +1,4 @@
- type Batch = Set<SubCallBack>
+ type Batch = Set<SubCallBack|Function>
 
 /** collection of props that a parsed HTMLElement or parsed Text should have in order to receive notifications from the state updates */
  interface ConnectionProps {
