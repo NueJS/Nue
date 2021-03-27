@@ -4,7 +4,7 @@ import { createLoopedCompInstance } from '../utils/createLoopedCompInstance'
 /**
  * create component instances using the give reconcileInfo
  * @param {[number, any]} reconcileInfo
- * @param {import('types/loop').LoopInfo} loopInfo
+ * @param {LoopInfo} loopInfo
  */
 export const executeCreate = (reconcileInfo, loopInfo) => {
   const [index, value] = reconcileInfo

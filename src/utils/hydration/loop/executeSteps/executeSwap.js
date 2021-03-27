@@ -16,9 +16,11 @@ import { createElement } from '../../../node/dom'
 
 /**
  * swap component a and b
- * @param {import('types/dom').LoopedComp} a
- * @param {import('types/dom').LoopedComp} b
+ * @param {LoopedComp} a
+ * @param {LoopedComp} b
  */
+
+// @TODO: shorten this
 const swapLoopedComps = (a, b) => {
   a._moving = true
   b._moving = true
@@ -46,7 +48,7 @@ const swapLoopedComps = (a, b) => {
 /**
  * swap ith and jth compNodes
  * @param {[number, number,]} step
- * @param {import('types/dom').LoopedComp[]} loopedCompInstances
+ * @param {LoopedComp[]} loopedCompInstances
  */
 export const executeSwap = (step, loopedCompInstances) => {
   const [i, j] = step

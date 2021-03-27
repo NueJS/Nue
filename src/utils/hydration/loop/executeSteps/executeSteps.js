@@ -4,8 +4,8 @@ import { executeSwap } from './executeSwap.js'
 
 /**
  * get the steps from reconcile and perform them in DOM
- * @param {import('types/reconcile').ReconcileSteps} steps
- * @param {import('types/loop').LoopInfo} loopInfo
+ * @param {ReconcileSteps} steps
+ * @param {LoopInfo} loopInfo
  */
 export const executeSteps = (steps, loopInfo) => {
   const { _remove, _add, _swap } = steps
