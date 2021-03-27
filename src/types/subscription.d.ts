@@ -1,13 +1,9 @@
-import { Parsed_Text, Parsed_HTMLElement, Comp } from './dom.d';
-import { Mutation } from './others.d';
-import { ITSELF } from '../constants'
-
-export interface Subscriptions {
-  [ITSELF]: Set<Function>,
-  [key: string]: Subscriptions
+interface Subscriptions {
+  _itself: Set<Function>,
+  [key: string]: Subscriptions | Set<Function>
 }
 
-export interface SubCallBack  {
+interface SubCallBack  {
   (Mutations: Mutation[]) : void,
   _node?: Parsed_Text | Parsed_HTMLElement | Comp
 }

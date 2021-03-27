@@ -1,25 +1,22 @@
-import { ConnectionProps, Mutation, Offset } from './others.d';
-import { Comp_ParseInfo, LoopedComp_ParseInfo, IfComp_ParseInfo, ElseComp_ParseInfo, ElseIfComp_ParseInfo, HTMLElement_ParseInfo, Text_ParseInfo } from './parsed.d';
-import { Subscriptions } from './subscription.d';
+type LifeCycleHook = (cb: Function) => void
 
-// node, element types
+type NodeSet = Set<Parsed_Text | Parsed_HTMLElement>
+
 
 /** Text node that has been parsed */
-export interface Parsed_Text extends Text, ConnectionProps {
+interface Parsed_Text extends Text, ConnectionProps {
   _parsedInfo: Text_ParseInfo
 }
 
 /** HTMLElement that has been parsed */
-export interface Parsed_HTMLElement extends HTMLElement, ConnectionProps {
+interface Parsed_HTMLElement extends HTMLElement, ConnectionProps {
   _parsedInfo: HTMLElement_ParseInfo
 }
 
 // component types
 
-type LifeCycleHook = (cb: Function) => void
-type NodeSet = Set<Parsed_Text | Parsed_HTMLElement>
 
-export interface Comp extends HTMLElement, ConnectionProps {
+interface Comp extends HTMLElement, ConnectionProps {
   disconnectedCallback: Function,
 
   /** stores elements having *ref='ref-name' attribute with "ref-name" as key and element itself as the value */
@@ -91,24 +88,26 @@ export interface Comp extends HTMLElement, ConnectionProps {
 }
 
 
-export interface LoopedComp extends Comp {
+interface LoopedComp extends Comp {
   _parsedInfo: LoopedComp_ParseInfo,
   /** records the previous offset, this is set when a loopedComponent is given a move transition */
   _prevOffset?: Offset
 }
 
-export interface IfComp extends Comp {
+interface IfComp extends Comp {
   _parsedInfo: IfComp_ParseInfo
 }
 
-export interface ElseComp extends Comp {
+interface ElseComp extends Comp {
   _parsedInfo: ElseComp_ParseInfo
 }
 
-export interface ElseIfComp extends Comp {
+interface ElseIfComp extends Comp {
   _parsedInfo: ElseIfComp_ParseInfo
 }
 
-export type ConditionalComp = IfComp | ElseComp | ElseIfComp
 
-export type ParsedDOMElement = Parsed_Text | Parsed_HTMLElement | Comp
+type ConditionalComp = IfComp | ElseComp | ElseIfComp
+
+
+type ParsedDOMElement = Parsed_Text | Parsed_HTMLElement | Comp

@@ -1,27 +1,33 @@
-export type Batch = Set<Function>
+ type Batch = Set<Function>
 
 /** collection of props that a parsed HTMLElement or parsed Text should have in order to receive notifications from the state updates */
-export interface ConnectionProps {
+ interface ConnectionProps {
   _subscribers: Function[],
   _unsubscribers: Function[],
   _isSubscribed: boolean,
   _isProcessed: boolean,
 }
 
-export type Mutation = {
+ type Mutation = {
   oldValue: any,
   newValue: any,
   path: string[],
   livePath: () => string[]
 }
 
-export type StatePath = string[]
+ type StatePath = string[]
 
-export type Config = {
+ type Config = {
   defaultStyle?: string,
 }
 
-export type Offset = {
+ type Offset = {
   _left: number,
   _top: number
+}
+
+type NueError = {
+  message: string,
+  fix: string,
+  compName: string
 }
