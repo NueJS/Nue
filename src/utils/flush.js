@@ -1,43 +1,38 @@
 import { flushBatch } from './batch'
-import { runEvent } from './component/lifecycle.js'
-import { AFTER_UPDATE_CBS, BATCH_INFO, BEFORE_DOM_BATCH, BEFORE_UPDATE_CBS, DOM_BATCH, FLUSH_SCHEDULED } from './constants'
 
 /**
  * flush events and batched callbacks to outside world
- * @param {import('./types').compNode} compNode
- * @param {import('./types').batchInfoArray} batchInfoArray
+ * @param {Comp} comp
+ * @param {Mutation[]} mutations
  */
-const flush = (compNode, batchInfoArray) => {
-  // run before update event
-  runEvent(compNode, BEFORE_UPDATE_CBS, batchInfoArray)
+export const flush = (comp, mutations) => {
+
+  comp._hookCbs._beforeUpdate.forEach(cb => cb(mutations))
 
   // run and clear batches
-  flushBatch(compNode[BEFORE_DOM_BATCH], batchInfoArray)
-  flushBatch(compNode[DOM_BATCH], batchInfoArray)
+  comp._batches.forEach(batch => flushBatch(batch, mutations))
 
-  // run after update event
-  runEvent(compNode, AFTER_UPDATE_CBS, batchInfoArray)
+  comp._hookCbs._afterUpdate.forEach(cb => cb(mutations))
+
 }
 
 /**
  * schedule the flush
- * @param {import('./types').compNode} compNode
+ * @param {Comp} comp
  */
-export const scheduleFlush = (compNode) => {
+export const scheduleFlush = (comp) => {
   // schedule flush
   setTimeout(() => {
-    // do a shallow clone because compNode.batchInfo will be cleared out
-    const batchInfoArray = [...compNode[BATCH_INFO]]
+    // do a shallow clone because comp.batchInfo will be cleared out
+    const mutations = [...comp._mutations]
 
-    flush(compNode, batchInfoArray)
+    flush(comp, mutations)
     // clear batch info
-    compNode[BATCH_INFO].length = 0
+    comp._mutations.length = 0
     // reset flag
-    compNode[FLUSH_SCHEDULED] = false
+    comp._flush_scheduled = false
   }, 0)
 
   // start batching
-  compNode[FLUSH_SCHEDULED] = true
+  comp._flush_scheduled = true
 }
-
-export default flush

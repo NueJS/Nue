@@ -1,12 +1,10 @@
-const data = {
+export const data = {
   /** @type Record<string, Function> */
-  __components: {},
-  __errorThrown: false,
-  __config: {
+  _components: {},
+  _errorThrown: false,
+  _config: {
     defaultStyle: ':host{display:block;}'
   },
   /** @type {Function | undefined} */
-  __onNodeUpdate: undefined
+  _onNodeUpdate: undefined
 }
-
-export default data

@@ -68,7 +68,7 @@ interface Comp extends HTMLElement, ConnectionProps {
   _flush_scheduled: boolean,
 
   /** array of batches, first one is flushed first, second one is flushed after. second batch is for callbacks that update DOM */
-  _batches: [Set<Function>, Set<Function>],
+  _batches: [Set<SubCallBack>, Set<SubCallBack>],
 
   /** callbacks that are registered to be called on certain lifecycles */
   _hookCbs: {
