@@ -1,17 +1,16 @@
-import { FN } from '../../constants.js'
+import { placeholderTypes } from 'enums.js'
 import { targetProp } from '../../state/slice.js'
-import DEV from '../../dev/DEV'
 
 /**
  * process fn placeholder
- * @param {string} content
- * @returns {import('../../types.js').placeholder}
+ * @param {string} _content
+ * @returns {Placeholder}
  */
-const processFnPlaceholder = (content) => {
+export const processFnPlaceholder = (_content) => {
   // 'foo(bar.baz, fizz, buzz)'
 
   // 'foo(bar.baz, fizz, buzz'
-  const closeParenRemoved = content.slice(0, -1)
+  const closeParenRemoved = _content.slice(0, -1)
 
   // [ 'foo', 'bar.baz, fizz, buzz' ]
   const [fnName, argsStr] = closeParenRemoved.split('(')
@@ -20,34 +19,32 @@ const processFnPlaceholder = (content) => {
   const args = argsStr.split(',')
 
   // [ ['bar', 'baz'], ['fizz'], ['buzz'] ]
-  const deps = args.map(a => a.split('.'))
+  const _stateDeps = args.map(a => a.split('.'))
 
   /**
    * get the value of function placeholder
-   * @param {import('../../types').compNode} compNode
+   * @param {Comp} comp
    * @returns {any}
    */
-  const getValue = (compNode) => {
-    const fn = compNode.fn[fnName]
+  const _getValue = (comp) => {
+    const fn = comp.fn[fnName]
     // @todo move this to errors
-    if (DEV && !fn) {
+    if (_DEV_ && !fn) {
       throw {
-        compName: compNode.name,
-        message: `invalid method "${fnName}" used in [${content}] placeholder in template`,
-        fix: `make sure "${fnName}" method exists in the 'fn' object of <${compNode.name}/> or its closure`
+        compName: comp._compFnName,
+        message: `invalid method "${fnName}" used in [${_content}] placeholder in template`,
+        fix: `make sure "${fnName}" method exists in the 'fn' object of <${comp._compFnName}/> or its closure`
       }
     }
-    const tps = deps.map(path => targetProp(compNode.$, path))
+    const tps = _stateDeps.map(path => targetProp(comp.$, path))
     const values = tps.map(([t, p]) => t[p])
     return fn(...values)
   }
 
   return {
-    type: FN,
-    deps,
-    getValue,
-    content
+    _type: placeholderTypes._functional,
+    _stateDeps,
+    _getValue,
+    _content
   }
 }
-
-export default processFnPlaceholder

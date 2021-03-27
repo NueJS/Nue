@@ -1,44 +1,44 @@
-import { REACTIVE } from '../../constants.js'
-import DEV from '../../dev/DEV.js'
-import errors from '../../dev/errors.js'
+
+import { placeholderTypes } from 'enums.js'
+import { errors } from '../../dev/errors.js'
 import { isDefined } from '../../others.js'
 import { targetProp } from '../../state/slice.js'
 
 /**
  * process reactive placeholder
- * @param {string} content
- * @returns {import('../../types.js').placeholder}
+ * @param {string} _content
+ * @returns {Placeholder}
  */
-const processReactivePlaceholder = (content) => {
-  const path = content.split('.')
+
+export const processReactivePlaceholder = (_content) => {
+  const statePath = _content.split('.')
 
   /**
-   * return the value of placeholder in given component
-   * @param {import('../../types').compNode} compNode
-   * @returns any
+   * @param {Comp} comp
    */
-  const getValue = (compNode) => {
-    if (DEV) {
+  const _getValue = (comp) => {
+    if (_DEV_) {
       try {
-        const [target, prop] = targetProp(compNode.$, path)
+        const [target, prop] = targetProp(comp.$, statePath)
         const value = target[prop]
         if (!isDefined(value)) throw value
         else return value
       } catch (e) {
-        throw errors.STATE_NOT_FOUND(compNode.name, content)
+        throw errors.STATE_NOT_FOUND(comp._compFnName, _content)
       }
-    } else {
-      const [target, prop] = targetProp(compNode.$, path)
+    }
+
+    // prod
+    else {
+      const [target, prop] = targetProp(comp.$, statePath)
       return target[prop]
     }
   }
 
   return {
-    type: REACTIVE,
-    getValue,
-    deps: [path],
-    content
+    _type: placeholderTypes._reactive,
+    _getValue,
+    _stateDeps: [statePath],
+    _content
   }
 }
-
-export default processReactivePlaceholder
