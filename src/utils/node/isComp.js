@@ -1,6 +1,6 @@
 
 /**
- * @param {import('types/dom').ParsedDOMElement} target
+ * @param {ParsedDOMElement} target
  */
 export const isComp = target =>
   target._parsedInfo &&

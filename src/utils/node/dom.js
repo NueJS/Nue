@@ -1,4 +1,4 @@
-import { ENTER_ATTRIBUTE, EXIT_ATTRIBUTE, MOVE_ATTRIBUTE } from '../../constants'
+import { animationAttributes } from '../../constants'
 
 /**
  * get name attribute from element
@@ -64,7 +64,7 @@ export const createComment = (data) => document.createComment(data)
 
 /**
  * call disconnectedCallback and then play remove animation
- * @param {import('types/dom').Comp} comp
+ * @param {Comp} comp
  * @param {string} animation
  */
 export const animatedRemove = (comp, animation) => {
@@ -91,11 +91,12 @@ export const animateAll = (elements, cssAnimation, onLastAnimationEnd) => {
 /**
  * return object containing enter and exit animation info
  * @param {HTMLElement} element
+ * @returns {AnimationAttributes_ParseInfo}
  */
 export const getAnimationAttributes = (element) => ({
-  _enter: getAttr(element, ENTER_ATTRIBUTE),
-  _exit: getAttr(element, EXIT_ATTRIBUTE),
-  _move: getAttr(element, MOVE_ATTRIBUTE)
+  _enter: getAttr(element, animationAttributes._enter),
+  _exit: getAttr(element, animationAttributes._exit),
+  _move: getAttr(element, animationAttributes._move)
 })
 
 const node = /*#__PURE__*/ document.createElement('div')
