@@ -2,8 +2,8 @@ import { getOffset } from './offset'
 
 /**
  * transit comp from one prevOffset to currentOffset with cssTransition
- * @param {import('types/dom').LoopedComp} comp
- * @param {import('types/others').Offset} prevOffset
+ * @param {LoopedComp} comp
+ * @param {Offset} prevOffset
  * @param {string} cssTransition
  */
 export const transit = (comp, prevOffset, cssTransition) => {

@@ -1,8 +1,8 @@
 
 /**
  * get the left and top offset
- * @param {import('types/dom').LoopedComp} comp
- * @returns {import('types/others').Offset}
+ * @param {LoopedComp} comp
+ * @returns {Offset}
  */
 export const getOffset = (comp) => ({
   _left: comp.offsetLeft,
@@ -11,7 +11,7 @@ export const getOffset = (comp) => ({
 
 /**
  * save offset on looped comp
- * @param {import('types/dom').LoopedComp} comp
+ * @param {LoopedComp} comp
  */
 export const saveOffset = (comp) => {
   comp._prevOffset = getOffset(comp)
@@ -20,7 +20,7 @@ export const saveOffset = (comp) => {
 /**
  * save offsets for all loopedComponents
  * @param {number[]} indexes
- * @param {import('types/dom').LoopedComp[]} loopedComponents
+ * @param {LoopedComp[]} loopedComponents
  */
 export const saveOffsets = (indexes, loopedComponents) => {
   for (const index of indexes) {

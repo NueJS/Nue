@@ -2,7 +2,7 @@ import { transit } from './transit'
 
 /**
  * animateMove comps at indexes
- * @param {import('types/loop').LoopInfo} loopInfo
+ * @param {LoopInfo} loopInfo
  * @param {Array<number>} indexes
  */
 
@@ -16,7 +16,7 @@ export const animateMove = (loopInfo, indexes) => {
 
     transit(
       comp,
-      /** @type {import('types/others').Offset}  */(comp._prevOffset),
+      /** @type {Offset}  */(comp._prevOffset),
       /** @type {string}*/(moveAnimation)
     )
   }
