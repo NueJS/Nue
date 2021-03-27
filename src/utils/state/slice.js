@@ -1,7 +1,7 @@
 /**
  * return [target, prop] for given path in object
  * @param {Record<string, any>} obj
- * @param {import("../types").path} path
+ * @param {StatePath} path
  * @returns {[Record<string, any>, any]}
  */
 

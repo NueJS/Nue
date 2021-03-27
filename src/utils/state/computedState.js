@@ -1,6 +1,6 @@
+import { batches } from 'enums'
 import { subscribeMultiple } from '../subscription/subscribe'
-import detectStateUsage from './detectStateUsage.js'
-import { BEFORE_DOM_BATCH } from '../constants.js'
+import { detectStateUsage } from './detectStateUsage.js'
 
 // when initializing the state, if a function is given
 // call that function, detect the state keys it depends on, get the initial value
@@ -8,23 +8,21 @@ import { BEFORE_DOM_BATCH } from '../constants.js'
 
 /**
  *
- * @param {import('../types').compNode} compNode
+ * @param {Comp} comp
  * @param {Function} fn
  * @param {string} prop
  * @returns
  */
-const computedState = (compNode, fn, prop) => {
+export const computedState = (comp, fn, prop) => {
   const [initValue, paths] = detectStateUsage(fn)
 
-  /** @type {import('../types').subscribeCallback} */
+  /** @type {SubCallBack} */
   const compute = () => {
     const value = fn()
-    compNode.$[prop] = value
+    comp.$[prop] = value
   }
 
   const deps = paths.map(path => path.length === 1 ? path : path.slice(0, -1))
-  subscribeMultiple(compNode, deps, compute, BEFORE_DOM_BATCH)
+  subscribeMultiple(comp, deps, compute, batches._beforeDOM)
   return initValue
 }
-
-export default computedState
