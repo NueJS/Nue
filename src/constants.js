@@ -1,13 +1,22 @@
 // reserved attribute names
-export const IF_ATTRIBUTE = '*if'
-export const ELSE_IF_ATTRIBUTE = '*else-if'
-export const ELSE_ATTRIBUTE = '*else'
-export const FOR_ATTRIBUTE = '*for'
-export const KEY_ATTRIBUTE = '*key'
-export const REF_ATTRIBUTE = '*ref'
-export const ENTER_ATTRIBUTE = '*enter'
-export const EXIT_ATTRIBUTE = '*exit'
-export const MOVE_ATTRIBUTE = '*move'
+
+export const conditionAttributes = {
+  _if: '*if',
+  _else: '*else',
+  _elseIf: '*else-if'
+}
+
+export const loopAttributes = {
+  _for: '*for',
+  _key: '*key',
+  _ref: '*ref'
+}
+
+export const animationAttributes = {
+  _enter: '*enter',
+  _exit: '*exit',
+  _move: '*move'
+}
 
 // symbols
 export const TARGET = /*#__PURE__*/ Symbol()
