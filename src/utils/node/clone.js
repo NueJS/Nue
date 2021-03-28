@@ -2,11 +2,12 @@ import { copyParsed } from './copyParsed'
 
 /**
  * clone the node and add the parsed prop
- * @param {ParsedDOMElement} node
- * @returns {ParsedDOMElement}
+ * @template {ParsedDOMElement} T
+ * @param {T} node
+ * @returns {T}
  */
 export const getParsedClone = (node) => {
-  const clone = /** @type {ParsedDOMElement}*/(node.cloneNode(true))
+  const clone = /** @type {T}*/(node.cloneNode(true))
   copyParsed(node, clone)
   return clone
 }

@@ -17,7 +17,9 @@ export const hydrateIfComp = (ifComp, parentComp) => {
 
   if (parsed._conditionGroup) {
     parsed._conditionGroup.forEach(node => {
-      group.push(getParsedClone(node))
+      group.push(
+        getParsedClone(node)
+      )
     })
   }
 

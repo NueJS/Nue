@@ -9,6 +9,7 @@ import { hydrate } from '../hydration/hydrate.js'
  */
 export const buildShadowDOM = (comp, templateElement) => {
 
+  // @ts-expect-error
   const fragment = getParsedClone(templateElement.content)
 
   hydrate(fragment, comp)

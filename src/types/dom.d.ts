@@ -15,4 +15,4 @@ interface LoopedComp extends Comp {
 }
 
 
-type ParsedDOMElement = Parsed_Text | Parsed_HTMLElement | Comp | IfComp | ElseComp | ElseIfComp
+type ParsedDOMElement = Parsed_Text | Parsed_HTMLElement | Comp | ConditionalComp

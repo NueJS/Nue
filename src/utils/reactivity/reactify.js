@@ -58,7 +58,9 @@ export const reactify = (comp, obj, _statePath = []) => {
         // ignore set
         if (propInTarget) return true
 
-        if (typeof value === 'function') value = computedState(comp, value, prop)
+        if (typeof value === 'function') {
+          value = computedState(comp, value, /** @type {string}*/(prop))
+        }
       }
 
       // if the prop is not in target but is in it's closure state
