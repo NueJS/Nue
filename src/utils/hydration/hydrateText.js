@@ -7,9 +7,9 @@ import { syncNode } from '../subscription/node'
  */
 export const hydrateText = (textNode, comp) => {
   const parsed = textNode._parsedInfo
-  const { _getValue, _stateDeps } = parsed._placeholder
+  const { _getValue, _statePaths } = parsed._placeholder
   const update = () => {
     textNode.textContent = _getValue(comp)
   }
-  syncNode(comp, textNode, _stateDeps, update)
+  syncNode(comp, textNode, _statePaths, update)
 }

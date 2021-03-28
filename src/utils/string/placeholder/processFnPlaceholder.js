@@ -19,7 +19,7 @@ export const processFnPlaceholder = (_content) => {
   const args = argsStr.split(',')
 
   // [ ['bar', 'baz'], ['fizz'], ['buzz'] ]
-  const _stateDeps = args.map(a => a.split('.'))
+  const _statePaths = args.map(a => a.split('.'))
 
   /**
    * get the value of function placeholder
@@ -36,14 +36,14 @@ export const processFnPlaceholder = (_content) => {
         fix: `make sure "${fnName}" method exists in the 'fn' object of <${comp._compFnName}/> or its closure`
       }
     }
-    const tps = _stateDeps.map(path => targetProp(comp.$, path))
+    const tps = _statePaths.map(path => targetProp(comp.$, path))
     const values = tps.map(([t, p]) => t[p])
     return fn(...values)
   }
 
   return {
     _type: placeholderTypes._functional,
-    _stateDeps,
+    _statePaths,
     _getValue,
     _content
   }

@@ -15,5 +15,5 @@ export const hydrateConditionalAttribute = (element, attribute, comp) => {
     ? setAttr(comp, name, '')
     : removeAttr(element, name)
 
-  syncNode(comp, element, placeholder._stateDeps, update)
+  syncNode(comp, element, placeholder._statePaths, update)
 }

@@ -4,39 +4,39 @@ import { ITSELF } from '../../constants'
 import { errors } from '../dev/errors.js'
 
 /**
- * subscribe to slice of state pointed by the path in baseNue
- * when that slice is updated, call the callback in "batchName" batch
+ * subscribe to slice of state pointed by the statePath in baseNue
+ * when that slice is updated, call the callback in "batch" batch
  *
- * @param {Comp} baseCompNode
- * @param {StatePath} path
- * @param {SubCallBack | Function} cb
- * @param {0 | 1} batchName // @todo use enum instead
+ * @param {Comp} baseComp
+ * @param {StatePath} statePath
+ * @param {SubCallBack | Function} updateCb
+ * @param {0 | 1} batch
  * @returns {Function}
  */
-export const subscribe = (baseCompNode, path, cb, batchName) => {
-  // get the originCompNode where the state referred by path is coming from
-  const originCompNode = origin(baseCompNode, path)
+export const subscribe = (baseComp, statePath, updateCb, batch) => {
+  // get the originCompNode where the state referred by statePath is coming from
+  const originCompNode = origin(baseComp, statePath)
 
   // throw if no origin is found
   if (_DEV_ && !originCompNode) {
-    throw errors.STATE_NOT_FOUND(baseCompNode._compFnName, path.join('.'))
+    throw errors.STATE_NOT_FOUND(baseComp._compFnName, statePath.join('.'))
   }
 
-  if (/** @type {SubCallBack}*/(cb)._node && originCompNode !== baseCompNode) {
-    baseCompNode._nodesUsingClosureState.add(/** @type {SubCallBack}*/(cb)._node)
+  if (/** @type {SubCallBack}*/(updateCb)._node && originCompNode !== baseComp) {
+    baseComp._nodesUsingClosureState.add(/** @type {SubCallBack}*/(updateCb)._node)
   }
 
-  // get the higher order cb that will only call the cb once every batch
+  // get the higher order updateCb that will only call the updateCb once every batch
 
-  const batchCb = batchify(cb, originCompNode._batches[batchName])
+  const batchCb = batchify(updateCb, originCompNode._batches[batch])
 
   // start from the root of subscriptions
   let target = originCompNode._subscriptions
 
-  // add batchCb in path table at appropriate location
+  // add batchCb in statePath table at appropriate location
   // map is used to unsubscribe in constant time
-  const lastIndex = path.length - 1
-  path.forEach((key, i) => {
+  const lastIndex = statePath.length - 1
+  statePath.forEach((key, i) => {
     if (!target[key]) target[key] = { [ITSELF]: new Set() }
     target = target[key]
     if (i === lastIndex) {
@@ -54,14 +54,16 @@ export const subscribe = (baseCompNode, path, cb, batchName) => {
  * returns an array of removeDep functions
  *
  * @param {Comp} comp
- * @param {StatePath[]} paths
- * @param {SubCallBack | Function} cb
- * @param {0 | 1} batchName
+ * @param {StatePath[]} statePaths
+ * @param {SubCallBack | Function} updateCb
+ * @param {0 | 1} batch
  * @returns {Function}
  */
 
-export const subscribeMultiple = (comp, paths, cb, batchName) => {
-  const unsubscribeFunctions = paths.map(path => subscribe(comp, path, cb, batchName))
+export const subscribeMultiple = (comp, statePaths, updateCb, batch) => {
+  const unsubscribeFunctions = statePaths.map(
+    statePath => subscribe(comp, statePath, updateCb, batch)
+  )
   // return unsubscribeMultiple
   return () => unsubscribeFunctions.forEach(c => c())
 }

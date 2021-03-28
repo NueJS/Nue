@@ -20,10 +20,14 @@ export const parseIfComp = (ifComp) => {
     // get the conditionType of the node
 
     // @ts-expect-error
-    const type = node && node._parsedInfo && node._parsedInfo._conditionType
+    const conditionType = node && node._parsedInfo && node._parsedInfo._conditionType
 
-    // if the node is not a condition node or is a separate condition, break the loop
-    if (!type || (type === conditionAttributes._if)) break
+    // if the node is not a condition comp or is a part of separate condition,
+    // break the loop
+    if (
+      !conditionType ||
+      (conditionType === conditionAttributes._if)
+    ) break
 
     conditionGroup.push(/** @type {ConditionalComp } */(node))
 
@@ -38,13 +42,14 @@ export const parseIfComp = (ifComp) => {
   // remove other nodes from template
   conditionGroup.forEach(n => n.remove())
 
-  const conditionGroupStateDeps = [ifComp._parsedInfo._conditionAttribute._stateDeps]
+  let conditionGroupStateDeps = [...ifComp._parsedInfo._conditionAttribute._statePaths]
+
   conditionGroup.forEach(node => {
     if (node._parsedInfo._conditionType !== conditionAttributes._else) {
-      conditionGroupStateDeps.push(
-        /** @type {IfComp | ElseIfComp }*/
-        (node)._parsedInfo._conditionAttribute._stateDeps
-      )
+
+      const deps = /** @type {IfComp | ElseIfComp }*/(node)._parsedInfo._conditionAttribute._statePaths
+
+      conditionGroupStateDeps = [...conditionGroupStateDeps, ...deps]
     }
   })
 

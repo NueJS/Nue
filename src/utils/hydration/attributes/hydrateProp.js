@@ -12,7 +12,7 @@ import { syncNode } from '../../subscription/node.js'
 export const hydrateProp = (target, attribute, comp) => {
   // [{ getValue, deps, type, content }, propName]
   const propName = attribute._name
-  const { _getValue, _type, _content, _stateDeps } = /** @type {Placeholder} */(attribute._placeholder)
+  const { _getValue, _type, _content, _statePaths } = /** @type {Placeholder} */(attribute._placeholder)
   const setProp = () => {
     // @ts-expect-error
     target[propName] = _getValue(comp)
@@ -31,11 +31,11 @@ export const hydrateProp = (target, attribute, comp) => {
       // @ts-expect-error
       let value = target[propName]
       value = isNumber ? Number(value) : value
-      mutate(comp.$, _stateDeps[0], value)
+      mutate(comp.$, _statePaths[0], value)
     }
 
     target.addEventListener('input', handler)
   }
 
-  syncNode(comp, target, _stateDeps, setProp)
+  syncNode(comp, target, _statePaths, setProp)
 }

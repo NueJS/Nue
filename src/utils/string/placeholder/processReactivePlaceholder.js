@@ -38,7 +38,7 @@ export const processReactivePlaceholder = (_content) => {
   return {
     _type: placeholderTypes._reactive,
     _getValue,
-    _stateDeps: [statePath],
+    _statePaths: [statePath],
     _content
   }
 }

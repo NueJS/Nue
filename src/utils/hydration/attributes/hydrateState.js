@@ -10,7 +10,7 @@ import { subscribeMultiple } from '../../subscription/subscribe'
 
 export const hydrateState = (target, attribute, comp) => {
   const { _placeholder, _name } = attribute
-  const { _getValue, _stateDeps } = /** @type {Placeholder}*/(_placeholder)
+  const { _getValue, _statePaths } = /** @type {Placeholder}*/(_placeholder)
 
   const update = () => {
     target.$[_name] = _getValue(comp)
@@ -22,5 +22,5 @@ export const hydrateState = (target, attribute, comp) => {
     target._prop$[_name] = _getValue(comp)
   }
 
-  subscribeMultiple(comp, _stateDeps, update, batches._beforeDOM)
+  subscribeMultiple(comp, _statePaths, update, batches._beforeDOM)
 }

@@ -19,7 +19,7 @@ export const hydrateLoopedComp = (loopedComp, parentComp) => {
   const loopAttributes = parsed._loopAttributes
   const { _itemArray, _itemIndex, _item, _key } = loopAttributes
 
-  const arrayPath = _itemArray._stateDeps[0]
+  const arrayPath = _itemArray._statePaths[0]
   const arrayPathString = arrayPath.join('.')
   const anchor = createComment('loop/')
 
