@@ -25,20 +25,18 @@ const swapLoopedComps = (a, b) => {
   a._moving = true
   b._moving = true
 
-  const aParent = a.parentNode
-  const bParent = b.parentNode
+  const aParent = /** @type {HTMLElement}*/(a.parentNode)
+  const bParent = /** @type {HTMLElement}*/(b.parentNode)
 
   const aHolder = createElement('div')
   const bHolder = createElement('div')
 
-  // @ts-ignore
   aParent.replaceChild(aHolder, a)
-  // @ts-ignore
+
   bParent.replaceChild(bHolder, b)
 
-  // @ts-ignore
   aParent.replaceChild(b, aHolder)
-  // @ts-ignore
+
   bParent.replaceChild(a, bHolder)
 
   a._moving = false

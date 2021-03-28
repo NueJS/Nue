@@ -339,7 +339,6 @@ const origin = (baseComp, statePath) => {
   let target, prop;
   [target, prop] = targetProp(baseComp.$, statePath);
 
-  // @ts-ignore
   if (!target[IS_REACTIVE]) {
     [target, prop] = targetProp(baseComp.$, statePath.slice(0, -1));
   }
@@ -773,7 +772,7 @@ const reactify = (comp, obj, _statePath = []) => {
 
     set (target, prop, newValue) {
       // short circuit if the set is redundant
-      // @ts-ignore
+
       if (target[prop] === newValue) return true
 
       // change the reactive object's statePath, because it has been moved to a different key
@@ -792,8 +791,10 @@ const reactify = (comp, obj, _statePath = []) => {
       if (modes._noOverride) {
         // ignore set
         if (propInTarget) return true
-        // @ts-ignore
-        if (typeof value === 'function') value = computedState(comp, value, prop);
+
+        if (typeof value === 'function') {
+          value = computedState(comp, value, prop);
+        }
       }
 
       // if the prop is not in target but is in it's closure state
@@ -804,11 +805,16 @@ const reactify = (comp, obj, _statePath = []) => {
 
       if (isObject(value)) {
         // if value is not reactive, make it reactive
-        // @ts-ignore
-        if (!value[IS_REACTIVE]) value = reactify(comp, value, [...statePath, prop]);
+
+        if (!value[IS_REACTIVE]) {
+          value = reactify(comp, value, [...statePath, prop]);
+        }
+
         // when a reactive value is set on some index(prop) in target array
         // we have to update that reactive object's statePath - because we are changing the index it was created at
-        else if (Array.isArray(target)) value[UPDATE_INDEX] = prop;
+        else if (Array.isArray(target)) {
+          value[UPDATE_INDEX] = prop;
+        }
       }
 
       // -----------------------------

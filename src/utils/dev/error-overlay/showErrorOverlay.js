@@ -18,10 +18,9 @@ export const showErrorOverlay = (error) => {
     }
 
     connectedCallback () {
-      const shadowRoot = this.shadowRoot
-      /** @type {Element} */
-      // @ts-ignore
-      const closeButton = shadowRoot.querySelector('.parsed-error__close-icon')
+      const shadowRoot = /** @type {ShadowRoot}*/(this.shadowRoot)
+
+      const closeButton = /** @type {Element} */(shadowRoot.querySelector('.parsed-error__close-icon'))
       closeButton.addEventListener('click', () => {
         this.remove()
       })

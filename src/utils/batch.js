@@ -15,8 +15,8 @@ export const batchify = (cb, batch) => () => batch.add(cb)
  */
 export const flushBatch = (batch, mutations) => {
   batch.forEach(cb => {
-    // @ts-ignore // @todo fix this
-    const { _node } = cb
+
+    const { _node } = /** @type {SubCallBack}*/(cb)
     // if cb is for updating a node, only call cb if node is subscribed
     if ((_node && _node._isSubscribed) || !_node) {
       cb(mutations)

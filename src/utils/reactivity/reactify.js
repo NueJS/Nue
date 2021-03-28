@@ -38,8 +38,8 @@ export const reactify = (comp, obj, _statePath = []) => {
 
     set (target, prop, newValue) {
       // short circuit if the set is redundant
-      // @ts-ignore
-      if (target[prop] === newValue) return true
+
+      if (target[/** @type {string}*/(prop)] === newValue) return true
 
       // change the reactive object's statePath, because it has been moved to a different key
       if (prop === UPDATE_INDEX) {
@@ -57,7 +57,7 @@ export const reactify = (comp, obj, _statePath = []) => {
       if (modes._noOverride) {
         // ignore set
         if (propInTarget) return true
-        // @ts-ignore
+
         if (typeof value === 'function') value = computedState(comp, value, prop)
       }
 
@@ -69,8 +69,10 @@ export const reactify = (comp, obj, _statePath = []) => {
 
       if (isObject(value)) {
         // if value is not reactive, make it reactive
-        // @ts-ignore
-        if (!value[IS_REACTIVE]) value = reactify(comp, value, [...statePath, prop])
+
+        if (!value[IS_REACTIVE]) {
+          value = reactify(comp, value, [...statePath, /** @type {string}*/(prop)])
+        }
         // when a reactive value is set on some index(prop) in target array
         // we have to update that reactive object's statePath - because we are changing the index it was created at
         else if (Array.isArray(target)) value[UPDATE_INDEX] = prop
@@ -81,17 +83,18 @@ export const reactify = (comp, obj, _statePath = []) => {
 
       if (modes._reactive) {
         // push to BATCH_INFO and call onMutate
-        // @ts-ignore
-        const oldValue = target[prop]
+
+        const oldValue = target[/** @type {string}*/(prop)]
         const newValue = value
         const success = set()
         if (oldValue !== newValue) {
-          const getPath = () => [...statePath, prop]
-          const mutatedPath = getPath()
+          const livePath = () => [...statePath, /** @type {string}*/(prop)]
+
+          const mutatedPath = /** @type {StatePath}*/(livePath())
           // statePath may have changed of reactive object, so add a getPath property to fetch the fresh statePath
-          // @ts-ignore
-          comp._mutations.push({ oldValue, newValue, statePath: mutatedPath, getPath })
-          // @ts-ignore
+
+          comp._mutations.push({ oldValue, newValue, path: mutatedPath, livePath })
+
           onMutate(comp, mutatedPath)
         }
 
@@ -102,8 +105,7 @@ export const reactify = (comp, obj, _statePath = []) => {
     },
 
     deleteProperty (target, prop) {
-      // @ts-ignore
-      if (modes._reactive) onMutate(comp, [...statePath, prop])
+      if (modes._reactive) onMutate(comp, [...statePath, /** @type {string}*/(prop)])
       return Reflect.deleteProperty(target, prop)
     },
 

@@ -6,6 +6,7 @@ import { subscribeMultiple } from './subscribe'
  * subscribe node to state
  * @param {ParsedDOMElement} node
  */
+
 export const subscribeNode = (node) => {
   if (!node._subscribers) return
   node._unsubscribers = node._subscribers.map(s => s())
@@ -16,6 +17,7 @@ export const subscribeNode = (node) => {
  * unsubscribe node to state
  * @param {ParsedDOMElement} node
  */
+
 export const unsubscribeNode = (node) => {
   if (!node._unsubscribers) return
   node._unsubscribers.forEach(dc => dc())
@@ -27,6 +29,7 @@ export const unsubscribeNode = (node) => {
  * @param {ParsedDOMElement} node
  * @param {Function} subscriber
  */
+
 export const addSubscriber = (node, subscriber) => {
   if (!node._subscribers) node._subscribers = []
   node._subscribers.push(subscriber)
@@ -41,6 +44,7 @@ export const addSubscriber = (node, subscriber) => {
  * @param {StatePath[]} deps
  * @param {SubCallBack} update
  */
+
 export const syncNode = (comp, node, deps, update) => {
   // attach which node the update method is for so that when the update is called in batches
   // it can check whether to invoke it or not based on whether the node is subscribed or not
@@ -52,9 +56,8 @@ export const syncNode = (comp, node, deps, update) => {
     // @ts-expect-error
     update()
 
-    if (_DEV_) {
-      nodeUpdated(node)
-    }
+    if (_DEV_) nodeUpdated(node)
+
     return subscribeMultiple(comp, deps, update, batches._DOM)
   }
 
