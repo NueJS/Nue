@@ -19,14 +19,14 @@ export const addHooks = (comp) => {
     beforeUpdate: (cb) => comp._hookCbs._beforeUpdate.push(cb),
     afterUpdate: (cb) => comp._hookCbs._afterUpdate.push(cb),
 
-    onMutate: (cb, ...slices) => {
+    onMutate: (cb, slices) => {
       if (_DEV_ && !slices.length) {
         throw errors.MISSING_DEPENDENCIES_IN_ON_MUTATE(comp._compFnName)
       }
 
       comp._hookCbs._onMount.push(() => {
         const stateDeps = slices.map(slice => slice.split('.'))
-        subscribeMultiple(comp, stateDeps, cb, 0)
+        return subscribeMultiple(comp, stateDeps, cb, 0)
       })
     }
   }

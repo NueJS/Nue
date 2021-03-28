@@ -24,7 +24,7 @@ interface Comp extends HTMLElement, ConnectionProps {
     onDestroy: LifeCycleHook,
     beforeUpdate: LifeCycleHook,
     afterUpdate: LifeCycleHook
-    onMutate: (cb: Function, ...paths: string[]) => void,
+    onMutate: (cb: Function, paths: string[]) => void,
   },
 
   /** name of the component function */
