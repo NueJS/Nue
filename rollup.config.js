@@ -41,8 +41,8 @@ const umdDev = {
 
 const es = {
   file: './dist/nue.es.js',
-  format: 'es'
-  // plugins: minifier
+  format: 'es',
+  plugins: minifier
 }
 
 const outputs = {
@@ -59,7 +59,6 @@ export default info => {
   }
 
   if (info.bundle === 'es') {
-    console.log('yes ******')
     replaceValues = {
       _DEV_: "process.env.NODE_ENV !== 'production'"
     }

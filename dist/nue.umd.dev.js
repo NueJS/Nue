@@ -797,7 +797,9 @@ const app = ({ components }) => {
           // ignore set
           if (propInTarget) return true
 
-          if (typeof value === 'function') value = computedState(comp, value, prop);
+          if (typeof value === 'function') {
+            value = computedState(comp, value, /** @type {string}*/(prop));
+          }
         }
 
         // if the prop is not in target but is in it's closure state
@@ -1068,15 +1070,14 @@ const app = ({ components }) => {
 
   /**
    * clone the node and add the parsed prop
-   * @template {ParsedDOMElement | Node} T
+   * @template {ParsedDOMElement} T
    * @param {T} node
    * @returns {T}
    */
   const getParsedClone = (node) => {
-    const clone = node.cloneNode(true);
-    // @ts-expect-error
+    const clone = /** @type {T}*/(node.cloneNode(true));
     copyParsed(node, clone);
-    return /** @type {T} */(clone)
+    return clone
   };
 
   /**
@@ -1312,7 +1313,9 @@ const app = ({ components }) => {
 
     if (parsed._conditionGroup) {
       parsed._conditionGroup.forEach(node => {
-        group.push(getParsedClone(node));
+        group.push(
+          getParsedClone(node)
+        );
       });
     }
 
@@ -1904,8 +1907,11 @@ const app = ({ components }) => {
         $: getClosure(value, index),
         _compFnName: loopedComp._compFnName
       };
-      // @ts-expect-error
-      return _key._getValue(pseudoComp)
+
+      return _key._getValue(
+        // @ts-expect-error
+        pseudoComp
+      )
     };
 
     const getKeys = () => getArray().map(getKey);
@@ -1956,17 +1962,16 @@ const app = ({ components }) => {
   };
 
   /**
-   * @param {ParsedDOMElement} target
+   * @param {Node} target
    */
   const isComp = target =>
-    target._parsedInfo &&
-    // @ts-expect-error
-    target._parsedInfo._isComp;
+    /** @type {ParsedDOMElement}*/(target)._parsedInfo &&
+    /** @type {Comp}*/(target)._parsedInfo._isComp;
 
   // hydration
 
   /**
-   * hydrate the target dom element using it's own _parsedInfo in context of given comp
+   * hydrate target element using _parsedInfo in context of given comp
    * @param {ParsedDOMElement | HTMLElement | Node } target
    * @param {Comp} comp
    * @returns
@@ -1981,11 +1986,7 @@ const app = ({ components }) => {
       // if target is a comp
       if (/** @type {Comp_ParseInfo} */(_parsedInfo)._isComp) {
 
-        /**
-         * save parent prop
-         * @type {Comp}
-         * */
-        (target).parent = comp;
+        /** @type {Comp}*/(target).parent = comp;
 
         // if target is looped comp
         if (/** @type {LoopedComp_ParseInfo}*/(_parsedInfo)._loopAttributes) {
@@ -2015,7 +2016,6 @@ const app = ({ components }) => {
     }
 
     // if target is a component, do not hydrate it's childNodes
-    // @ts-expect-error
     if (isComp(target)) return
 
     // else if it has childNodes hydrate all childNodes
@@ -2032,15 +2032,16 @@ const app = ({ components }) => {
    * @param {HTMLTemplateElement} templateElement
    */
   const buildShadowDOM = (comp, templateElement) => {
+
+    // @ts-expect-error
     const fragment = getParsedClone(templateElement.content);
 
     hydrate(fragment, comp);
 
     flushArray(comp._deferredWork);
 
-    const shadowRoot = comp.attachShadow({ mode: 'open' });
+    comp.attachShadow({ mode: 'open' }).append(fragment);
 
-    shadowRoot.append(fragment);
   };
 
   /**
