@@ -1,6 +1,6 @@
 {
     "name": "@nuejs/nue",
-    "version": "0.14.0",
+    "version": "0.15.0",
     "description": "Next Generation Reactive JavaScript Framework",
     "main": "dist/nue.cjs.js",
     "module": "src/index.js",
