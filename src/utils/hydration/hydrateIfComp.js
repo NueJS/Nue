@@ -85,7 +85,6 @@ export const hydrateIfComp = (ifComp, parentComp) => {
   }
 
   // since this modifies the DOM, it should be done in dom batches
-  console.log({ _conditionGroupStateDeps })
   subscribeMultiple(
     parentComp,
     _conditionGroupStateDeps,

@@ -23,7 +23,6 @@ export const subscribe = (baseComp, statePath, updateCb, batch) => {
   }
 
   if (/** @type {SubCallBack}*/(updateCb)._node && originComp !== baseComp) {
-    console.log('using closure :', baseComp)
     baseComp._nodesUsingClosureState.add(/** @type {SubCallBack}*/(updateCb)._node)
   }
 
