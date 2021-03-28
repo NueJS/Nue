@@ -44,8 +44,7 @@ export const addSubscriber = (node, subscriber) => {
 export const syncNode = (comp, node, deps, update) => {
   // attach which node the update method is for so that when the update is called in batches
   // it can check whether to invoke it or not based on whether the node is subscribed or not
-  // @ts-ignore @todo fix it
-  update.node = node
+  update._node = node
 
   // when node is subscribed, call update so that node is up-to-date with state
   // returns unsubscriber function which removes subscription from comp subscriptions to prevent unnecessary dom updates
