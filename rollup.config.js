@@ -41,7 +41,8 @@ const umdDev = {
 
 const es = {
   file: './dist/nue.es.js',
-  format: 'es'
+  format: 'es',
+  plugins: minifier
 }
 
 const outputs = {
@@ -53,14 +54,22 @@ const outputs = {
 }
 
 export default info => {
+  let replaceValues = {
+    _DEV_: Boolean(info.dev)
+  }
+
+  if (info.bundle === 'es') {
+    console.log('yes ******')
+    replaceValues = {
+      _DEV_: "process.env.NODE_ENV !== 'production'"
+    }
+  }
   return {
     input: './src/index.js',
     output: outputs[info.bundle],
     plugins: [
       replace({
-        values: {
-          _DEV_: Boolean(info.dev)
-        }
+        values: replaceValues
       })
     ]
   }
