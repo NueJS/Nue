@@ -3,7 +3,7 @@
     "version": "0.15.0",
     "description": "Next Generation Reactive JavaScript Framework",
     "main": "dist/nue.cjs.js",
-    "module": "src/index.js",
+    "module": "dist/nue.es.js",
     "unpkg": "dist/nue.umd.prod.js",
     "jsdelivr": "dist/nue.umd.prod.js",
     "scripts": {
