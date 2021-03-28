@@ -15,7 +15,7 @@
         "bundle:es": "rollup -c --bundle es --dev",
         "bundle:cjs": "npm run bundle:cjsProd && npm run bundle:cjsDev",
         "bundle:umd": "npm run bundle:umdProd && npm run bundle:umdDev",
-        "bundle": "npm run bundle:cjs && npm run bundle:umd"
+        "bundle": "npm run bundle:cjs && npm run bundle:umd && npm run bundle:es"
     },
     "keywords": [
         "nuejs",

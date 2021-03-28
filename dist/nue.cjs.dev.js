@@ -179,8 +179,8 @@ const batchify = (cb, batch) => () => batch.add(cb);
  */
 const flushBatch = (batch, mutations) => {
   batch.forEach(cb => {
-    // @ts-ignore // @todo fix this
-    const { _node } = cb;
+
+    const { _node } = /** @type {SubCallBack}*/(cb);
     // if cb is for updating a node, only call cb if node is subscribed
     if ((_node && _node._isSubscribed) || !_node) {
       cb(mutations);
@@ -339,6 +339,7 @@ const origin = (baseComp, statePath) => {
   let target, prop;
   [target, prop] = targetProp(baseComp.$, statePath);
 
+  // @ts-ignore
   if (!target[IS_REACTIVE]) {
     [target, prop] = targetProp(baseComp.$, statePath.slice(0, -1));
   }
@@ -624,39 +625,39 @@ const app = ({ components }) => {
 };
 
 /**
- * subscribe to slice of state pointed by the path in baseNue
- * when that slice is updated, call the callback in "batchName" batch
+ * subscribe to slice of state pointed by the statePath in baseNue
+ * when that slice is updated, call the callback in "batch" batch
  *
- * @param {Comp} baseCompNode
- * @param {StatePath} path
- * @param {SubCallBack | Function} cb
- * @param {0 | 1} batchName // @todo use enum instead
+ * @param {Comp} baseComp
+ * @param {StatePath} statePath
+ * @param {SubCallBack | Function} updateCb
+ * @param {0 | 1} batch
  * @returns {Function}
  */
-const subscribe = (baseCompNode, path, cb, batchName) => {
-  // get the originCompNode where the state referred by path is coming from
-  const originCompNode = origin(baseCompNode, path);
+const subscribe = (baseComp, statePath, updateCb, batch) => {
+  // get the originComp where the state referred by statePath is coming from
+  const originComp = origin(baseComp, statePath);
 
   // throw if no origin is found
-  if (!originCompNode) {
-    throw errors.STATE_NOT_FOUND(baseCompNode._compFnName, path.join('.'))
+  if (!originComp) {
+    throw errors.STATE_NOT_FOUND(baseComp._compFnName, statePath.join('.'))
   }
 
-  if (/** @type {SubCallBack}*/(cb)._node && originCompNode !== baseCompNode) {
-    baseCompNode._nodesUsingClosureState.add(/** @type {SubCallBack}*/(cb)._node);
+  if (/** @type {SubCallBack}*/(updateCb)._node && originComp !== baseComp) {
+    baseComp._nodesUsingClosureState.add(/** @type {SubCallBack}*/(updateCb)._node);
   }
 
-  // get the higher order cb that will only call the cb once every batch
+  // get the higher order updateCb that will only call the updateCb once every batch
 
-  const batchCb = batchify(cb, originCompNode._batches[batchName]);
+  const batchCb = batchify(updateCb, originComp._batches[batch]);
 
   // start from the root of subscriptions
-  let target = originCompNode._subscriptions;
+  let target = originComp._subscriptions;
 
-  // add batchCb in path table at appropriate location
+  // add batchCb in statePath table at appropriate location
   // map is used to unsubscribe in constant time
-  const lastIndex = path.length - 1;
-  path.forEach((key, i) => {
+  const lastIndex = statePath.length - 1;
+  statePath.forEach((key, i) => {
     if (!target[key]) target[key] = { [ITSELF]: new Set() };
     target = target[key];
     if (i === lastIndex) {
@@ -674,14 +675,16 @@ const subscribe = (baseCompNode, path, cb, batchName) => {
  * returns an array of removeDep functions
  *
  * @param {Comp} comp
- * @param {StatePath[]} paths
- * @param {SubCallBack | Function} cb
- * @param {0 | 1} batchName
+ * @param {StatePath[]} statePaths
+ * @param {SubCallBack | Function} updateCb
+ * @param {0 | 1} batch
  * @returns {Function}
  */
 
-const subscribeMultiple = (comp, paths, cb, batchName) => {
-  const unsubscribeFunctions = paths.map(path => subscribe(comp, path, cb, batchName));
+const subscribeMultiple = (comp, statePaths, updateCb, batch) => {
+  const unsubscribeFunctions = statePaths.map(
+    statePath => subscribe(comp, statePath, updateCb, batch)
+  );
   // return unsubscribeMultiple
   return () => unsubscribeFunctions.forEach(c => c())
 };
@@ -773,7 +776,7 @@ const reactify = (comp, obj, _statePath = []) => {
     set (target, prop, newValue) {
       // short circuit if the set is redundant
 
-      if (target[prop] === newValue) return true
+      if (target[/** @type {string}*/(prop)] === newValue) return true
 
       // change the reactive object's statePath, because it has been moved to a different key
       if (prop === UPDATE_INDEX) {
@@ -792,9 +795,7 @@ const reactify = (comp, obj, _statePath = []) => {
         // ignore set
         if (propInTarget) return true
 
-        if (typeof value === 'function') {
-          value = computedState(comp, value, prop);
-        }
+        if (typeof value === 'function') value = computedState(comp, value, prop);
       }
 
       // if the prop is not in target but is in it's closure state
@@ -807,14 +808,11 @@ const reactify = (comp, obj, _statePath = []) => {
         // if value is not reactive, make it reactive
 
         if (!value[IS_REACTIVE]) {
-          value = reactify(comp, value, [...statePath, prop]);
+          value = reactify(comp, value, [...statePath, /** @type {string}*/(prop)]);
         }
-
         // when a reactive value is set on some index(prop) in target array
         // we have to update that reactive object's statePath - because we are changing the index it was created at
-        else if (Array.isArray(target)) {
-          value[UPDATE_INDEX] = prop;
-        }
+        else if (Array.isArray(target)) value[UPDATE_INDEX] = prop;
       }
 
       // -----------------------------
@@ -822,17 +820,18 @@ const reactify = (comp, obj, _statePath = []) => {
 
       if (modes._reactive) {
         // push to BATCH_INFO and call onMutate
-        // @ts-ignore
-        const oldValue = target[prop];
+
+        const oldValue = target[/** @type {string}*/(prop)];
         const newValue = value;
         const success = set();
         if (oldValue !== newValue) {
-          const getPath = () => [...statePath, prop];
-          const mutatedPath = getPath();
+          const livePath = () => [...statePath, /** @type {string}*/(prop)];
+
+          const mutatedPath = /** @type {StatePath}*/(livePath());
           // statePath may have changed of reactive object, so add a getPath property to fetch the fresh statePath
-          // @ts-ignore
-          comp._mutations.push({ oldValue, newValue, statePath: mutatedPath, getPath });
-          // @ts-ignore
+
+          comp._mutations.push({ oldValue, newValue, path: mutatedPath, livePath });
+
           onMutate(comp, mutatedPath);
         }
 
@@ -843,8 +842,7 @@ const reactify = (comp, obj, _statePath = []) => {
     },
 
     deleteProperty (target, prop) {
-      // @ts-ignore
-      if (modes._reactive) onMutate(comp, [...statePath, prop]);
+      if (modes._reactive) onMutate(comp, [...statePath, /** @type {string}*/(prop)]);
       return Reflect.deleteProperty(target, prop)
     },
 
@@ -881,6 +879,7 @@ const reactify = (comp, obj, _statePath = []) => {
  * subscribe node to state
  * @param {ParsedDOMElement} node
  */
+
 const subscribeNode = (node) => {
   if (!node._subscribers) return
   node._unsubscribers = node._subscribers.map(s => s());
@@ -891,6 +890,7 @@ const subscribeNode = (node) => {
  * unsubscribe node to state
  * @param {ParsedDOMElement} node
  */
+
 const unsubscribeNode = (node) => {
   if (!node._unsubscribers) return
   node._unsubscribers.forEach(dc => dc());
@@ -902,6 +902,7 @@ const unsubscribeNode = (node) => {
  * @param {ParsedDOMElement} node
  * @param {Function} subscriber
  */
+
 const addSubscriber = (node, subscriber) => {
   if (!node._subscribers) node._subscribers = [];
   node._subscribers.push(subscriber);
@@ -916,11 +917,11 @@ const addSubscriber = (node, subscriber) => {
  * @param {StatePath[]} deps
  * @param {SubCallBack} update
  */
+
 const syncNode = (comp, node, deps, update) => {
   // attach which node the update method is for so that when the update is called in batches
   // it can check whether to invoke it or not based on whether the node is subscribed or not
-  // @ts-ignore @todo fix it
-  update.node = node;
+  update._node = node;
 
   // when node is subscribed, call update so that node is up-to-date with state
   // returns unsubscriber function which removes subscription from comp subscriptions to prevent unnecessary dom updates
@@ -928,9 +929,8 @@ const syncNode = (comp, node, deps, update) => {
     // @ts-expect-error
     update();
 
-    {
-      nodeUpdated(node);
-    }
+    nodeUpdated(node);
+
     return subscribeMultiple(comp, deps, update, batches._DOM)
   };
 
@@ -1084,11 +1084,11 @@ const getParsedClone = (node) => {
  */
 const hydrateText = (textNode, comp) => {
   const parsed = textNode._parsedInfo;
-  const { _getValue, _stateDeps } = parsed._placeholder;
+  const { _getValue, _statePaths } = parsed._placeholder;
   const update = () => {
     textNode.textContent = _getValue(comp);
   };
-  syncNode(comp, textNode, _stateDeps, update);
+  syncNode(comp, textNode, _statePaths, update);
 };
 
 /**
@@ -1112,7 +1112,7 @@ const mutate = (obj, path, newValue) => {
 const hydrateProp = (target, attribute, comp) => {
   // [{ getValue, deps, type, content }, propName]
   const propName = attribute._name;
-  const { _getValue, _type, _content, _stateDeps } = /** @type {Placeholder} */(attribute._placeholder);
+  const { _getValue, _type, _content, _statePaths } = /** @type {Placeholder} */(attribute._placeholder);
   const setProp = () => {
     // @ts-expect-error
     target[propName] = _getValue(comp);
@@ -1131,13 +1131,13 @@ const hydrateProp = (target, attribute, comp) => {
       // @ts-expect-error
       let value = target[propName];
       value = isNumber ? Number(value) : value;
-      mutate(comp.$, _stateDeps[0], value);
+      mutate(comp.$, _statePaths[0], value);
     };
 
     target.addEventListener('input', handler);
   }
 
-  syncNode(comp, target, _stateDeps, setProp);
+  syncNode(comp, target, _statePaths, setProp);
 };
 
 /**
@@ -1150,7 +1150,7 @@ const hydrateProp = (target, attribute, comp) => {
 const hydrateNormalAttribute = (target, attribute, comp) => {
   const placeholder = /** @type {Placeholder} */(attribute._placeholder);
   const update = () => setAttr(target, attribute._name, placeholder._getValue(comp));
-  syncNode(comp, target, placeholder._stateDeps, update);
+  syncNode(comp, target, placeholder._statePaths, update);
 };
 
 /**
@@ -1199,7 +1199,7 @@ const hydrateRef = (element, attribute, comp) => {
 
 const hydrateState = (target, attribute, comp) => {
   const { _placeholder, _name } = attribute;
-  const { _getValue, _stateDeps } = /** @type {Placeholder}*/(_placeholder);
+  const { _getValue, _statePaths } = /** @type {Placeholder}*/(_placeholder);
 
   const update = () => {
     target.$[_name] = _getValue(comp);
@@ -1211,7 +1211,7 @@ const hydrateState = (target, attribute, comp) => {
     target._prop$[_name] = _getValue(comp);
   }
 
-  subscribeMultiple(comp, _stateDeps, update, batches._beforeDOM);
+  subscribeMultiple(comp, _statePaths, update, batches._beforeDOM);
 };
 
 /**
@@ -1251,7 +1251,7 @@ const hydrateConditionalAttribute = (element, attribute, comp) => {
     ? setAttr(comp, name, '')
     : removeAttr(element, name);
 
-  syncNode(comp, element, placeholder._stateDeps, update);
+  syncNode(comp, element, placeholder._statePaths, update);
 };
 
 const {
@@ -1334,14 +1334,13 @@ const hydrateIfComp = (ifComp, parentComp) => {
     group.forEach(conditionNode => {
       const { _isProcessed, isConnected } = conditionNode;
       const {
-        // @ts-expect-error - it will not be directly used
         _conditionAttribute,
         _animationAttributes
-      } = conditionNode._parsedInfo;
+      } = /** @type {IfComp | ElseIfComp}*/(conditionNode)._parsedInfo;
 
       const { _enter, _exit } = _animationAttributes;
 
-      const satisfied = _conditionAttribute ? _conditionAttribute.getValue(parentComp) : true;
+      const satisfied = _conditionAttribute ? _conditionAttribute._getValue(parentComp) : true;
 
       // if this component should be mounted
       if (!foundSatisfied && satisfied) {
@@ -1351,7 +1350,7 @@ const hydrateIfComp = (ifComp, parentComp) => {
         if (!isConnected) {
           // if this node is not processed
           if (!_isProcessed) {
-            hydrate(parentComp, conditionNode);
+            hydrate(conditionNode, parentComp);
             conditionNode._isProcessed = true;
           }
 
@@ -1379,8 +1378,11 @@ const hydrateIfComp = (ifComp, parentComp) => {
   };
 
   // since this modifies the DOM, it should be done in dom batches
-  // @ts-ignore
-  subscribeMultiple(parentComp, _conditionGroupStateDeps, onGroupDepChange, batches._beforeDOM);
+  subscribeMultiple(
+    parentComp,
+    _conditionGroupStateDeps,
+    onGroupDepChange, batches._beforeDOM
+  );
 
   parentComp._deferredWork.push(() => {
     ifComp.remove();
@@ -1573,20 +1575,18 @@ const swapLoopedComps = (a, b) => {
   a._moving = true;
   b._moving = true;
 
-  const aParent = a.parentNode;
-  const bParent = b.parentNode;
+  const aParent = /** @type {HTMLElement}*/(a.parentNode);
+  const bParent = /** @type {HTMLElement}*/(b.parentNode);
 
   const aHolder = createElement('div');
   const bHolder = createElement('div');
 
-  // @ts-ignore
   aParent.replaceChild(aHolder, a);
-  // @ts-ignore
+
   bParent.replaceChild(bHolder, b);
 
-  // @ts-ignore
   aParent.replaceChild(b, aHolder);
-  // @ts-ignore
+
   bParent.replaceChild(a, bHolder);
 
   a._moving = false;
@@ -1872,7 +1872,7 @@ const hydrateLoopedComp = (loopedComp, parentComp) => {
   const loopAttributes = parsed._loopAttributes;
   const { _itemArray, _itemIndex, _item, _key } = loopAttributes;
 
-  const arrayPath = _itemArray._stateDeps[0];
+  const arrayPath = _itemArray._statePaths[0];
   const arrayPathString = arrayPath.join('.');
   const anchor = createComment('loop/');
 
@@ -1992,7 +1992,7 @@ const hydrate = (target, comp) => {
 
       // if target is condition comp
       // else if used because a looped comp can not be conditional comp too
-      else if (/** @type {ConditionalComp_ParseInfo}*/(_parsedInfo)._conditionType) {
+      else if (/** @type {ConditionalComp_ParseInfo}*/(_parsedInfo)._conditionType === conditionAttributes._if) {
         hydrateIfComp(/** @type {IfComp} */(target), comp);
       }
     }
@@ -2073,7 +2073,7 @@ const processFnPlaceholder = (_content) => {
   const args = argsStr.split(',');
 
   // [ ['bar', 'baz'], ['fizz'], ['buzz'] ]
-  const _stateDeps = args.map(a => a.split('.'));
+  const _statePaths = args.map(a => a.split('.'));
 
   /**
    * get the value of function placeholder
@@ -2090,14 +2090,14 @@ const processFnPlaceholder = (_content) => {
         fix: `make sure "${fnName}" method exists in the 'fn' object of <${comp._compFnName}/> or its closure`
       }
     }
-    const tps = _stateDeps.map(path => targetProp(comp.$, path));
+    const tps = _statePaths.map(path => targetProp(comp.$, path));
     const values = tps.map(([t, p]) => t[p]);
     return fn(...values)
   };
 
   return {
     _type: placeholderTypes._functional,
-    _stateDeps,
+    _statePaths,
     _getValue,
     _content
   }
@@ -2131,7 +2131,7 @@ const processReactivePlaceholder = (_content) => {
   return {
     _type: placeholderTypes._reactive,
     _getValue,
-    _stateDeps: [statePath],
+    _statePaths: [statePath],
     _content
   }
 };
@@ -2413,10 +2413,14 @@ const parseIfComp = (ifComp) => {
     // get the conditionType of the node
 
     // @ts-expect-error
-    const type = node && node._parsedInfo && node._parsedInfo._conditionType;
+    const conditionType = node && node._parsedInfo && node._parsedInfo._conditionType;
 
-    // if the node is not a condition node or is a separate condition, break the loop
-    if (!type || (type === conditionAttributes._if)) break
+    // if the node is not a condition comp or is a part of separate condition,
+    // break the loop
+    if (
+      !conditionType ||
+      (conditionType === conditionAttributes._if)
+    ) break
 
     conditionGroup.push(/** @type {ConditionalComp } */(node));
 
@@ -2431,13 +2435,14 @@ const parseIfComp = (ifComp) => {
   // remove other nodes from template
   conditionGroup.forEach(n => n.remove());
 
-  const conditionGroupStateDeps = [ifComp._parsedInfo._conditionAttribute._stateDeps];
+  let conditionGroupStateDeps = [...ifComp._parsedInfo._conditionAttribute._statePaths];
+
   conditionGroup.forEach(node => {
     if (node._parsedInfo._conditionType !== conditionAttributes._else) {
-      conditionGroupStateDeps.push(
-        /** @type {IfComp | ElseIfComp }*/
-        (node)._parsedInfo._conditionAttribute._stateDeps
-      );
+
+      const deps = /** @type {IfComp | ElseIfComp }*/(node)._parsedInfo._conditionAttribute._statePaths;
+
+      conditionGroupStateDeps = [...conditionGroupStateDeps, ...deps];
     }
   });
 
@@ -2862,10 +2867,9 @@ const showErrorOverlay = (error) => {
     }
 
     connectedCallback () {
-      const shadowRoot = this.shadowRoot;
-      /** @type {Element} */
-      // @ts-ignore
-      const closeButton = shadowRoot.querySelector('.parsed-error__close-icon');
+      const shadowRoot = /** @type {ShadowRoot}*/(this.shadowRoot);
+
+      const closeButton = /** @type {Element} */(shadowRoot.querySelector('.parsed-error__close-icon'));
       closeButton.addEventListener('click', () => {
         this.remove();
       });
