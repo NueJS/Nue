@@ -14,24 +14,25 @@ import { errors } from '../dev/errors.js'
  * @returns {Function}
  */
 export const subscribe = (baseComp, statePath, updateCb, batch) => {
-  // get the originCompNode where the state referred by statePath is coming from
-  const originCompNode = origin(baseComp, statePath)
+  // get the originComp where the state referred by statePath is coming from
+  const originComp = origin(baseComp, statePath)
 
   // throw if no origin is found
-  if (_DEV_ && !originCompNode) {
+  if (_DEV_ && !originComp) {
     throw errors.STATE_NOT_FOUND(baseComp._compFnName, statePath.join('.'))
   }
 
-  if (/** @type {SubCallBack}*/(updateCb)._node && originCompNode !== baseComp) {
+  if (/** @type {SubCallBack}*/(updateCb)._node && originComp !== baseComp) {
+    console.log('using closure :', baseComp)
     baseComp._nodesUsingClosureState.add(/** @type {SubCallBack}*/(updateCb)._node)
   }
 
   // get the higher order updateCb that will only call the updateCb once every batch
 
-  const batchCb = batchify(updateCb, originCompNode._batches[batch])
+  const batchCb = batchify(updateCb, originComp._batches[batch])
 
   // start from the root of subscriptions
-  let target = originCompNode._subscriptions
+  let target = originComp._subscriptions
 
   // add batchCb in statePath table at appropriate location
   // map is used to unsubscribe in constant time
