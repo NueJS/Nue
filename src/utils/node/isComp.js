@@ -1,8 +1,7 @@
 
 /**
- * @param {ParsedDOMElement} target
+ * @param {Node} target
  */
 export const isComp = target =>
-  target._parsedInfo &&
-  // @ts-expect-error
-  target._parsedInfo._isComp
+  /** @type {ParsedDOMElement}*/(target)._parsedInfo &&
+  /** @type {Comp}*/(target)._parsedInfo._isComp

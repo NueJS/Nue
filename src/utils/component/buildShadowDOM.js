@@ -8,13 +8,13 @@ import { hydrate } from '../hydration/hydrate.js'
  * @param {HTMLTemplateElement} templateElement
  */
 export const buildShadowDOM = (comp, templateElement) => {
+
   const fragment = getParsedClone(templateElement.content)
 
   hydrate(fragment, comp)
 
   flushArray(comp._deferredWork)
 
-  const shadowRoot = comp.attachShadow({ mode: 'open' })
+  comp.attachShadow({ mode: 'open' }).append(fragment)
 
-  shadowRoot.append(fragment)
 }

@@ -49,8 +49,11 @@ export const hydrateLoopedComp = (loopedComp, parentComp) => {
       $: getClosure(value, index),
       _compFnName: loopedComp._compFnName
     }
-    // @ts-expect-error
-    return _key._getValue(pseudoComp)
+
+    return _key._getValue(
+      // @ts-expect-error
+      pseudoComp
+    )
   }
 
   const getKeys = () => getArray().map(getKey)

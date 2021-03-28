@@ -9,7 +9,7 @@ import { isComp } from '../node/isComp.js'
 import { conditionAttributes } from '../../constants.js'
 
 /**
- * hydrate the target dom element using it's own _parsedInfo in context of given comp
+ * hydrate target element using _parsedInfo in context of given comp
  * @param {ParsedDOMElement | HTMLElement | Node } target
  * @param {Comp} comp
  * @returns
@@ -24,11 +24,7 @@ export const hydrate = (target, comp) => {
     // if target is a comp
     if (/** @type {Comp_ParseInfo} */(_parsedInfo)._isComp) {
 
-      /**
-       * save parent prop
-       * @type {Comp}
-       * */
-      (target).parent = comp
+      /** @type {Comp}*/(target).parent = comp
 
       // if target is looped comp
       if (/** @type {LoopedComp_ParseInfo}*/(_parsedInfo)._loopAttributes) {
@@ -58,7 +54,6 @@ export const hydrate = (target, comp) => {
   }
 
   // if target is a component, do not hydrate it's childNodes
-  // @ts-expect-error
   if (isComp(target)) return
 
   // else if it has childNodes hydrate all childNodes
