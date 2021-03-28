@@ -1,14 +1,12 @@
 import { ITSELF } from '../../constants'
-import { isObject } from '../others'
-
 /**
  * notify all the callbacks that are in given subscriptions
- * @param {Subscriptions} subscriptions
+ * @param {Subscriptions} subtree
  */
-const notifyAll = (subscriptions) => {
+const notifySubTree = (subtree) => {
   // @ts-expect-error
-  subscriptions[ITSELF].forEach(cb => cb())
-  for (const k in subscriptions) notifyAll(subscriptions[k])
+  subtree[ITSELF].forEach(cb => cb())
+  for (const k in subtree) notifySubTree(subtree[k])
 }
 
 /**
@@ -19,18 +17,12 @@ const notifyAll = (subscriptions) => {
  */
 export const notify = (subscriptions, path) => {
   let tree = subscriptions
-  const leafIndex = path.length - 1
-  path.forEach((edge, i) => {
-    // if primitive, return
-    if (!isObject(tree)) return
-    // for non-leaf node, notify parent path subscribers
-    if (i !== leafIndex) {
-      // @ts-expect-error
-      tree[ITSELF].forEach(cb => cb())
-    }
-    // notify child path subscribers
-    notifyAll(tree)
+  const lastEdgeIndex = path.length - 1
 
+  path.forEach((edge, edgeIndex) => {
+    // @ts-expect-error
+    tree[ITSELF].forEach(cb => cb())
     tree = tree[edge]
+    if (edgeIndex === lastEdgeIndex) notifySubTree(tree)
   })
 }
