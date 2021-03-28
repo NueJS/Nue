@@ -4,7 +4,7 @@ import { processPlaceholder } from '../string/placeholder/processPlaceholder.js'
 import { getAttr, removeAttr, dashCaseToCamelCase } from '../node/dom.js'
 import { errors } from '../dev/errors.js'
 import { attributeTypes } from '../../enums'
-import { conditionAttributes, loopAttributes } from '../../constants'
+import { conditionAttributes, loopAttributes, otherAttributes } from '../../constants'
 
 /**
  * parse attributes on element if any
@@ -17,8 +17,8 @@ export const parseAttributes = (element, compName, comp) => {
   if (_DEV_ && !compName) {
     // DEV ONLy
     const { _if, _else, _elseIf } = conditionAttributes
-    const { _for, _ref } = loopAttributes
-    const compOnlyAttributes = [_if, _else, _elseIf, _ref, _for]
+    const { _for, _key } = loopAttributes
+    const compOnlyAttributes = [_if, _else, _elseIf, _key, _for]
 
     compOnlyAttributes.forEach(attrName => {
       if (getAttr(element, attrName)) {
@@ -42,7 +42,7 @@ export const parseAttributes = (element, compName, comp) => {
     let value
     const firstChar = attributeName[0]
 
-    if (attributeName === loopAttributes._ref) {
+    if (attributeName === otherAttributes._ref) {
       type = attributeTypes._ref
       value = attributeValue
     }

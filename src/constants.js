@@ -8,14 +8,17 @@ export const conditionAttributes = {
 
 export const loopAttributes = {
   _for: '*for',
-  _key: '*key',
-  _ref: '*ref'
+  _key: '*key'
 }
 
 export const animationAttributes = {
   _enter: '*enter',
   _exit: '*exit',
   _move: '*move'
+}
+
+export const otherAttributes = {
+  _ref: '*ref'
 }
 
 // symbols
