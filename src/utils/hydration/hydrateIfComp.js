@@ -41,14 +41,13 @@ export const hydrateIfComp = (ifComp, parentComp) => {
     group.forEach(conditionNode => {
       const { _isProcessed, isConnected } = conditionNode
       const {
-        // @ts-expect-error - it will not be directly used
         _conditionAttribute,
         _animationAttributes
-      } = conditionNode._parsedInfo
+      } = /** @type {IfComp | ElseIfComp}*/(conditionNode)._parsedInfo
 
       const { _enter, _exit } = _animationAttributes
 
-      const satisfied = _conditionAttribute ? _conditionAttribute.getValue(parentComp) : true
+      const satisfied = _conditionAttribute ? _conditionAttribute._getValue(parentComp) : true
 
       // if this component should be mounted
       if (!foundSatisfied && satisfied) {
@@ -58,7 +57,7 @@ export const hydrateIfComp = (ifComp, parentComp) => {
         if (!isConnected) {
           // if this node is not processed
           if (!_isProcessed) {
-            hydrate(parentComp, conditionNode)
+            hydrate(conditionNode, parentComp)
             conditionNode._isProcessed = true
           }
 
@@ -86,8 +85,11 @@ export const hydrateIfComp = (ifComp, parentComp) => {
   }
 
   // since this modifies the DOM, it should be done in dom batches
-  // @ts-ignore
-  subscribeMultiple(parentComp, _conditionGroupStateDeps, onGroupDepChange, batches._beforeDOM)
+  subscribeMultiple(
+    parentComp,
+    _conditionGroupStateDeps,
+    onGroupDepChange, batches._beforeDOM
+  )
 
   parentComp._deferredWork.push(() => {
     ifComp.remove()

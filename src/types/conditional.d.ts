@@ -8,7 +8,7 @@ interface ConditionalComp_ParseInfo extends Comp_ParseInfo {
 interface IfComp_ParseInfo extends ConditionalComp_ParseInfo {
   _conditionAttribute: Placeholder,
   _conditionGroup: (IfComp | ElseComp | ElseIfComp)[],
-  _conditionGroupStateDeps: StatePath[][],
+  _conditionGroupStateDeps: StatePath[],
   _conditionGroupAnchor: Comment
 }
 

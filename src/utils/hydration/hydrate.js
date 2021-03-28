@@ -6,6 +6,7 @@ import { hydrateLoopedComp } from './loop/hydrateLoopedComp.js'
 
 // others
 import { isComp } from '../node/isComp.js'
+import { conditionAttributes } from '../../constants.js'
 
 /**
  * hydrate the target dom element using it's own _parsedInfo in context of given comp
@@ -36,7 +37,7 @@ export const hydrate = (target, comp) => {
 
       // if target is condition comp
       // else if used because a looped comp can not be conditional comp too
-      else if (/** @type {ConditionalComp_ParseInfo}*/(_parsedInfo)._conditionType) {
+      else if (/** @type {ConditionalComp_ParseInfo}*/(_parsedInfo)._conditionType === conditionAttributes._if) {
         hydrateIfComp(/** @type {IfComp} */(target), comp)
       }
     }
