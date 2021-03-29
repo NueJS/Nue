@@ -1,16 +1,18 @@
 
 import { placeholderTypes } from '../../../enums'
-import { errors } from '../../dev/errors.js'
+import { data } from '../../data'
+import { errors } from '../../dev/errors'
 import { isDefined } from '../../others.js'
 import { targetProp } from '../../state/slice.js'
 
 /**
  * process reactive placeholder
  * @param {string} _content
+ * @param {string} _text
  * @returns {Placeholder}
  */
 
-export const processReactivePlaceholder = (_content) => {
+export const processReactivePlaceholder = (_content, _text) => {
   const statePath = _content.split('.')
 
   /**
@@ -24,7 +26,7 @@ export const processReactivePlaceholder = (_content) => {
         if (!isDefined(value)) throw value
         else return value
       } catch (e) {
-        throw errors.STATE_NOT_FOUND(comp._compFnName, _content)
+        if (!data._errorThrown) throw errors.invalid_state_placeholder(comp, _content)
       }
     }
 
@@ -39,6 +41,7 @@ export const processReactivePlaceholder = (_content) => {
     _type: placeholderTypes._reactive,
     _getValue,
     _statePaths: [statePath],
-    _content
+    _content,
+    _text
   }
 }

@@ -15,7 +15,7 @@ export const processPlaceholder = (text, noBrackets = false) => {
   const content = bracketsRemoved.replace(/ /g, '')
 
   if (content.includes('(')) {
-    return processFnPlaceholder(content)
+    return processFnPlaceholder(content, text)
   }
-  return processReactivePlaceholder(content)
+  return processReactivePlaceholder(content, text)
 }

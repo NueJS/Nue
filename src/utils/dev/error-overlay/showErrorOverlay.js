@@ -5,9 +5,10 @@ import { errorOverlayHTML } from './errorOverlayHTML'
 /**
  * show error overlay
  * @param {NueError} error
+ * @param {{ filename: string, lineno: string, colno: string }} location
  */
 
-export const showErrorOverlay = (error) => {
+export const showErrorOverlay = (error, location) => {
   // if already showing error, return
   if (data._errorThrown) return
   class errorOverlay extends HTMLElement {
@@ -34,17 +35,20 @@ export const showErrorOverlay = (error) => {
 
   const root = /** @type {ShadowRoot}*/ (overlay.shadowRoot)
   const message = /** @type {HTMLElement}*/(root.querySelector('.message'))
+  const code = /** @type {HTMLElement}*/(root.querySelector('.code'))
   const title = /** @type {HTMLElement}*/(root.querySelector('.title'))
+  const fileLink = /** @type {HTMLElement}*/(root.querySelector('.file'))
 
-  if (error.compName) {
-    title.textContent = `error in ${error.compName}`
-    const errorMessage = `${error.message}\n\n${error.fix || ''}`
-    message.textContent = errorMessage
+  if (error.issue) {
+    title.textContent = error.name
+    message.textContent = `${error.issue}\n\n${error.fix}`
+    code.textContent = error.code
   }
 
   else {
     title.textContent = error.constructor.name
     message.textContent = error.message
+    code.textContent = error.stack
   }
 
   data._errorThrown = true

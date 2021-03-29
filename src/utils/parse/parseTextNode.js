@@ -29,7 +29,8 @@ export const parseTextNode = (node, deferred, comp) => {
     if (typeof part === 'string') {
       textNode = document.createTextNode(part)
     } else {
-      textNode = document.createTextNode(part._content);
+      const temp = `[${part._content}]`
+      textNode = document.createTextNode(temp);
       /** @type {Parsed_Text} */(textNode)._parsedInfo = {
         _placeholder: part
       }

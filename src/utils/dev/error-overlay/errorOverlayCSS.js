@@ -1,39 +1,80 @@
-const cardBg = '#111827'
-const overlay = 'rgba(17,24,39, 0.8)'
-const fontColor = '#E5E7EB'
-const fontColor2 = '#6B7280'
+const cardBg = '#222831'
+const codeBg = '#333C49'
+const overlay = 'rgba(51, 60, 73, 0.5)'
+const fontColor = '#dddddd'
+const fontColor2 = '#f05454'
 
 export const errorOverlayCSS = /* css */`
+
+.panel {
+  background: ${overlay};
+  backdrop-filter: blur(5px);
+  min-height: 100vh;
+  margin: 0;
+  box-sizing: border-box;
+}
+
 :host {
   position: fixed;
   top: 0;
   left: 0;
-  font-family: 'MonoLisa', consolas, monospace;
+  font-family: monospace;
   width: 100vw;
   height: 100vh;
   color: rgba(209, 213, 219);
 }
 
-.parsed-error__card {
+:host * {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.code {
+  background: ${codeBg};
+  padding: 20px;
+  color: ${fontColor};
+  font-size: 16px;
+  border-radius: 5px;
+  line-height: 1.5;
+  overflow-x: auto;
+}
+
+.card {
   background: ${cardBg};
   border-radius: 5px;
   padding: 30px;
-  max-width: 800px;
+  max-width: 850px;
+  width: calc(100% - 40px);
+  max-height: calc(100vh - 80px);
+  overflow-y: auto;
+  overflow-x: hidden;
   margin: 0 auto;
   animation: fade-in 300ms ease;
   position: relative;
   box-shadow: 2px 2px 20px rgba(0,0,0,0.1);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 
-
-@keyframes pop-out {
-  to {
-    opacity: 0;
-    transform: scale(0.8);
-  }
+/* width */
+.card::-webkit-scrollbar {
+  width: 5px;
 }
 
-.parsed-error__close-icon {
+/* Track */
+.card::-webkit-scrollbar-track {
+  background: ${cardBg};
+}
+
+/* Handle */
+.card::-webkit-scrollbar-thumb {
+  background: ${codeBg};
+}
+
+.close-icon {
   background: none;
   border: none;
   border-radius: 50%;
@@ -48,44 +89,45 @@ export const errorOverlayCSS = /* css */`
   cursor: pointer;
 }
 
-.parsed-error__close-icon svg {
+.close-icon svg {
   fill: ${fontColor2};
 }
 
-.parsed-error__panel {
-  background: ${overlay};
-  padding: 50px 20px;
-  min-height: 100vh;
-  margin: 0;
-  box-sizing: border-box;
+.code-container {
+  position: relative;
+}
+
+.code-switcher {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  padding: 10px 15px;
+  font-size: 14px;
+  color: ${fontColor};
+  background: ${cardBg};
+  border: none;
+  border-radius: 5px;
 }
 
 .title {
-  font-size: 30px;
+  font-size: 24px;
   margin-bottom: 20px;
   color: ${fontColor2};
 }
 
-.subtitle {
+.console {
   color: ${fontColor2};
+  font-size: 16px;
+  margin-top: 20px;
 }
 
 .message {
-  line-height: 1.6;
+  line-height: 1.5;
   font-size: 16px;
   border-radius: 5px;
   white-space: pre-wrap;
-  margin: 20px 0 30px 0;
-  color: ${fontColor}
+  color: ${fontColor};
+  margin: 20px 0;
 }
 
-.minimize {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  border: none;
-  z-index: 100;
-  padding: 5px 10px;
-  border-radius: 4px;
-}
 `

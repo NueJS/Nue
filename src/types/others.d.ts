@@ -26,10 +26,10 @@ type Offset = {
   _top: number
 }
 
-type NueError = {
-  message: string,
+interface NueError extends Error {
+  issue: string,
   fix: string,
-  compName: string
+  code: string,
 }
 
 type TaggedTemplate = (strings: string[], ...exprs: string[] ) => void

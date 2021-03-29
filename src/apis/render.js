@@ -17,9 +17,17 @@ export const render = (component, targetElement, config) => {
     // @ts-expect-error
     window.data = data
     window.onerror = (message, filename, lineno, colno, error) => {
+
+      const location = {
+        filename,
+        lineno,
+        colno
+      }
+
       // @ts-ignore
-      showErrorOverlay(error)
+      showErrorOverlay(error, location)
     }
+
   }
 
   // override config with default config

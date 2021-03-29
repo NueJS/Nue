@@ -1,12 +1,14 @@
 import { placeholderTypes } from '../../../enums'
+import { errors } from '../../dev/errors'
 import { targetProp } from '../../state/slice.js'
 
 /**
  * process fn placeholder
  * @param {string} _content
+ * @param {string} _text
  * @returns {Placeholder}
  */
-export const processFnPlaceholder = (_content) => {
+export const processFnPlaceholder = (_content, _text) => {
   // 'foo(bar.baz, fizz, buzz)'
 
   // 'foo(bar.baz, fizz, buzz'
@@ -30,11 +32,7 @@ export const processFnPlaceholder = (_content) => {
     const fn = comp.fn[fnName]
     // @todo move this to errors
     if (_DEV_ && !fn) {
-      throw {
-        compName: comp._compFnName,
-        message: `invalid method "${fnName}" used in [${_content}] placeholder in template`,
-        fix: `make sure "${fnName}" method exists in the 'fn' object of <${comp._compFnName}/> or its closure`
-      }
+      throw errors.function_not_found(comp, fnName)
     }
     const tps = _statePaths.map(path => targetProp(comp.$, path))
     const values = tps.map(([t, p]) => t[p])
@@ -45,6 +43,7 @@ export const processFnPlaceholder = (_content) => {
     _type: placeholderTypes._functional,
     _statePaths,
     _getValue,
-    _content
+    _content,
+    _text
   }
 }

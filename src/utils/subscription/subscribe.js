@@ -1,7 +1,8 @@
 import { batchify } from '../batch'
 import { origin } from '../closure.js'
 import { ITSELF } from '../../constants'
-import { errors } from '../dev/errors.js'
+import { errors } from '../dev/errors'
+import { data } from '../data'
 
 /**
  * subscribe to slice of state pointed by the statePath in baseNue
@@ -19,7 +20,7 @@ export const subscribe = (baseComp, statePath, updateCb, batch) => {
 
   // throw if no origin is found
   if (_DEV_ && !originComp) {
-    throw errors.STATE_NOT_FOUND(baseComp._compFnName, statePath.join('.'))
+    if (!data._errorThrown) throw errors.invalid_state_placeholder(baseComp, statePath.join('.'))
   }
 
   if (/** @type {SubCallBack}*/(updateCb)._node && originComp !== baseComp) {

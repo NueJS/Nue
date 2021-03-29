@@ -53,7 +53,7 @@ export const split = (comp, text) => {
   // add the remaining text
   if (collectedString) {
     if (_DEV_ && collectingVar) {
-      throw errors.BRACKET_NOT_CLOSED(comp._compFnName, collectedString)
+      throw errors.placeholder_not_closed(comp, collectedString)
     }
 
     parts.push(collectedString)

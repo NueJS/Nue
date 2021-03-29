@@ -1,5 +1,5 @@
 import { placeholderTypes } from '../../../enums.js'
-import { errors } from '../../dev/errors.js'
+import { errors } from '../../dev/errors/index.js'
 import { mutate } from '../../state/mutate.js'
 import { syncNode } from '../../subscription/node.js'
 
@@ -12,7 +12,7 @@ import { syncNode } from '../../subscription/node.js'
 export const hydrateProp = (target, attribute, comp) => {
   // [{ getValue, deps, type, content }, propName]
   const propName = attribute._name
-  const { _getValue, _type, _content, _statePaths } = /** @type {Placeholder} */(attribute._placeholder)
+  const { _getValue, _type, _content, _statePaths, _text } = /** @type {Placeholder} */(attribute._placeholder)
   const setProp = () => {
     // @ts-expect-error
     target[propName] = _getValue(comp)
@@ -20,9 +20,7 @@ export const hydrateProp = (target, attribute, comp) => {
 
   if (target.matches('input, textarea')) {
     // TODO: move this error to parsing phase
-    if (_DEV_ && _type === placeholderTypes._functional) {
-      throw errors.INVALID_INPUT_BINDING(comp._compFnName, _content)
-    }
+    if (_DEV_ && _type === placeholderTypes._functional) throw errors.function_placeholder_used_in_input_binding(comp, _content, _text)
 
     // @ts-expect-error
     const isNumber = target.type === 'number' || target.type === 'range'

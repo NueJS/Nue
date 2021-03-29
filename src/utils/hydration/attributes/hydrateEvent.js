@@ -1,4 +1,4 @@
-import { errors } from '../../dev/errors.js'
+import { errors } from '../../dev/errors/index.js'
 import { addSubscriber } from '../../subscription/node.js'
 
 /**
@@ -12,9 +12,7 @@ export const hydrateEvent = (target, attribute, comp) => {
   const eventName = attribute._name
   const fn = comp.fn[fnName]
 
-  if (_DEV_ && !fn) {
-    throw errors.METHOD_NOT_FOUND(comp._compFnName, fnName)
-  }
+  if (_DEV_ && !fn) throw errors.function_not_found(comp, fnName)
 
   /** @type {EventListener} */
   const handleEvent = (e) => fn(e, comp.$)

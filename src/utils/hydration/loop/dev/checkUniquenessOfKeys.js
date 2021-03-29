@@ -7,6 +7,6 @@ import { errors } from '../../../dev/errors'
  */
 export const checkUniquenessOfKeys = (keys, comp) => {
   if (new Set(keys).size !== keys.length) {
-    throw errors.KEYS_ARE_NOT_UNIQUE(comp._compFnName, keys)
+    throw errors.keys_not_unique(comp, keys)
   }
 }
