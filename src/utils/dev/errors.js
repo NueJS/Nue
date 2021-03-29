@@ -71,6 +71,23 @@ export const errors = {
   },
 
   /**
+   * @param {Comp} comp
+   * @param {string} parentCompName
+   * @returns {Error}
+   */
+  KEY_ATTRIBUTE_IS_MISSING (comp, parentCompName) {
+    console.log('error in :', comp)
+
+    const message = `"*key" attribute is missing on <${comp._parsedInfo._compName}> in <${parentCompName}>`
+    const fix = '*key attribute is required on a looped component for efficient and correct updates'
+
+    const fullMessage = message + '\n\n' + fix + '\n'
+    const error = new Error(fullMessage)
+    error.name = 'nue.js Error'
+    return error
+  },
+
+  /**
    * @param {string} compName
    * @returns {NueError}
    */

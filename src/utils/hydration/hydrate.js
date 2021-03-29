@@ -24,7 +24,8 @@ export const hydrate = (target, comp) => {
     // if target is a comp
     if (/** @type {Comp_ParseInfo} */(_parsedInfo)._isComp) {
 
-      /** @type {Comp}*/(target).parent = comp
+      /** @type {Comp}*/(target).parent = comp;
+      /** @type {Comp}*/(target)._prop$ = {}
 
       // if target is looped comp
       if (/** @type {LoopedComp_ParseInfo}*/(_parsedInfo)._loopAttributes) {

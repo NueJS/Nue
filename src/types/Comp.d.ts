@@ -51,6 +51,8 @@ interface Comp extends HTMLElement, ConnectionProps {
   /** state that component is given from parent component */
   _prop$: Record<string, any>,
 
+  _isLooped: boolean,
+
   /** indicates whether or not a "flush" is scheduled or not - a flush is process of clearing batches by invoking all the callbacks  */
   _flush_scheduled: boolean,
 

@@ -7,10 +7,10 @@ import { parseComp } from './parseComp'
  * @param {Node} target
  * @param {Record<string, string>} childCompNodeNames
  * @param {Function[]} deferred
- * @param {Comp} comp
+ * @param {Comp} parentComp
  */
 
-export const parse = (target, childCompNodeNames, deferred, comp) => {
+export const parse = (target, childCompNodeNames, deferred, parentComp) => {
 
   // if target is component, get it's name else it will be undefined
   const compName = childCompNodeNames[target.nodeName]
@@ -20,7 +20,7 @@ export const parse = (target, childCompNodeNames, deferred, comp) => {
     return parseTextNode(
       /** @type {Text}*/(target),
       deferred,
-      comp
+      parentComp
     )
   }
 
@@ -29,6 +29,7 @@ export const parse = (target, childCompNodeNames, deferred, comp) => {
     parseComp(
       /** @type {Comp}*/(target),
       compName,
+      parentComp,
       deferred
     )
   }
@@ -36,13 +37,13 @@ export const parse = (target, childCompNodeNames, deferred, comp) => {
   // attributes on component or simple target
   // @ts-expect-error
   if (target.hasAttribute) {
-    parseAttributes(/** @type {Parsed_HTMLElement}*/(target), compName, comp)
+    parseAttributes(/** @type {Parsed_HTMLElement}*/(target), compName, parentComp)
   }
 
   // child nodes of component or simple target
   if (target.hasChildNodes()) {
     target.childNodes.forEach(
-      childNode => parse(childNode, childCompNodeNames, deferred, comp)
+      childNode => parse(childNode, childCompNodeNames, deferred, parentComp)
     )
   }
 }

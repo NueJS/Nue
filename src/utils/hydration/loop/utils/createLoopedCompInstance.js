@@ -11,10 +11,11 @@ import { getParsedClone } from '../../../node/clone'
 export const createLoopedCompInstance = (loopInfo, value, index) => {
   const { _loopedComp, _parentComp, _getClosure } = loopInfo
 
-  const newComp = /** @type {LoopedComp} */(getParsedClone(_loopedComp))
+  const loopedCompInstance = getParsedClone(_loopedComp)
 
-  newComp.parent = _parentComp
-  newComp._prop$ = _getClosure(value, index)
+  loopedCompInstance._isLooped = true
+  loopedCompInstance.parent = _parentComp
+  loopedCompInstance._prop$ = _getClosure(value, index)
 
-  return newComp
+  return loopedCompInstance
 }

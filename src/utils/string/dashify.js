@@ -1,9 +1,11 @@
+import { lower } from '../others'
+
 /**
  * add dash at the end of string
  * @param {string} str
  * @returns {string}
  */
-export const dashify = str => str + '-'
+export const dashify = str => lower(str) + '-'
 
 /**
  * replace component names in html with dashed names

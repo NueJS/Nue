@@ -40,7 +40,7 @@ export const hydrateLoopedComp = (loopedComp, parentComp) => {
   }
 
   /** @returns {Array<any>} */
-  const getArray = () => _itemArray._getValue(loopedComp)
+  const getArray = () => _itemArray._getValue(parentComp)
 
   // @todo current key can only be from closure, add support for state too
   /** @type {getKey} */

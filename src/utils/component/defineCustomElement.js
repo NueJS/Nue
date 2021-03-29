@@ -3,13 +3,14 @@ import { createElement } from '../node/dom.js'
 import { reactify } from '../reactivity/reactify.js'
 import { subscribeNode, unsubscribeNode } from '../subscription/node.js'
 import { dashify } from '../string/dashify.js'
-import { flushArray, upper } from '../others.js'
+import { flushArray, lower, upper } from '../others.js'
 import { runComponent } from './runComponent.js'
 import { addHooks } from './hooks.js'
 import { buildShadowDOM } from './buildShadowDOM.js'
 import { hydrate } from '../hydration/hydrate.js'
 import { parse } from '../parse/parseNode'
 import { ITSELF } from '../../constants'
+import { hydrateAttributes } from '../hydration/hydrateAttributes'
 // import processAttributes from '../process/attributes/processAttributes.js'
 
 /**
@@ -56,7 +57,9 @@ export const defineCustomElement = (compFn) => {
       // nodes that are using the closure state
       comp._nodesUsingClosureState = new Set()
 
-      if (!comp.fn) comp.fn = {}
+      comp.fn = comp.parent ? Object.create(comp.parent.fn) : {}
+
+      if (!comp._prop$) comp._prop$ = {}
 
       addHooks(comp)
     }
@@ -76,12 +79,10 @@ export const defineCustomElement = (compFn) => {
         // create $
         comp.$ = reactify(comp, comp._prop$ || {}, [])
 
-        // process attributes
-        // do this only on looped components - right ?
-        // if (comp._parsedInfo) {
-        //   const { _attributes } = comp._parsedInfo
-        //   if (_attributes) processAttributes(comp, comp, _attributes)
-        // }
+        if (comp._isLooped) {
+          // debugger
+          hydrateAttributes(comp, comp._parsedInfo._attributes, comp)
+        }
 
         const [templateString, cssString, childComponents] = runComponent(comp, compFn, !!componentTemplateElement)
 
@@ -99,7 +100,7 @@ export const defineCustomElement = (compFn) => {
                */
               (acc, child) => {
                 const { name } = child
-                acc[dashify(upper(name))] = name
+                acc[upper(dashify(name))] = name
                 return acc
               }, {})
           }
