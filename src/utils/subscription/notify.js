@@ -23,6 +23,8 @@ export const notify = (subscriptions, path) => {
     // @ts-expect-error
     tree[ITSELF].forEach(cb => cb())
     tree = tree[edge]
+    // no subscription exists for the given edge, return
+    if (!tree) return
     if (edgeIndex === lastEdgeIndex) notifySubTree(tree)
   })
 }
