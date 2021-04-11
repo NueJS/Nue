@@ -3,15 +3,17 @@ import { data } from '../../data'
 import { errorOverlayHTML } from './errorOverlayHTML'
 
 /**
- * show error overlay
+ * show error overlay by creating a custom overlay element
  * @param {NueError} error
  * @param {{ filename: string, lineno: string, colno: string }} location
  */
 
 export const showErrorOverlay = (error, location) => {
+
   // if already showing error, return
   if (data._errorThrown) return
-  class errorOverlay extends HTMLElement {
+
+  window.customElements.define('nue-error-overlay', class extends HTMLElement {
     constructor () {
       super()
       const shadowRoot = this.attachShadow({ mode: 'open' })
@@ -26,9 +28,7 @@ export const showErrorOverlay = (error, location) => {
         this.remove()
       })
     }
-  }
-
-  window.customElements.define('nue-error-overlay', errorOverlay)
+  })
 
   const overlay = /** @type {HTMLElement} */(createElement('nue-error-overlay'))
   document.body.append(overlay)
@@ -37,7 +37,6 @@ export const showErrorOverlay = (error, location) => {
   const message = /** @type {HTMLElement}*/(root.querySelector('.message'))
   const code = /** @type {HTMLElement}*/(root.querySelector('.code'))
   const title = /** @type {HTMLElement}*/(root.querySelector('.title'))
-  const fileLink = /** @type {HTMLElement}*/(root.querySelector('.file'))
 
   if (error.issue) {
     title.textContent = error.name
@@ -48,7 +47,7 @@ export const showErrorOverlay = (error, location) => {
   else {
     title.textContent = error.constructor.name
     message.textContent = error.message
-    code.textContent = error.stack
+    code.textContent = /** @type {string}*/(error.stack)
   }
 
   data._errorThrown = true

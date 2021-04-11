@@ -1,6 +1,8 @@
 import { joinTagArgs } from '../string/joinTagArgs'
 import { modes } from '../reactivity/modes.js'
 import { dashifyComponentNames } from '../string/dashify.js'
+import { errors } from '../dev/errors'
+import { data } from '../data'
 
 /**
  * run compFn
@@ -30,6 +32,17 @@ export const runComponent = (comp, compFn, parsed) => {
 
   /** @param {Function[]} _childComponents */
   const components = _childComponents => {
+
+    if (_DEV_ && !data._errorThrown) {
+      const throwError = () => {
+        throw errors.invalid_args_given_to_components_method(comp)
+      }
+      const notArray = !Array.isArray(_childComponents)
+      if (notArray) throwError()
+      const notArrayOfFunctions = !_childComponents.every(item => typeof item === 'function')
+      if (notArrayOfFunctions) throwError()
+    }
+
     if (parsed) return
     childComponents = _childComponents
   }

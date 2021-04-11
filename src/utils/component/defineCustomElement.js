@@ -11,6 +11,7 @@ import { hydrate } from '../hydration/hydrate.js'
 import { parse } from '../parse/parseNode'
 import { ITSELF } from '../../constants'
 import { hydrateAttributes } from '../hydration/hydrateAttributes'
+import { errors } from '../dev/errors'
 // import processAttributes from '../process/attributes/processAttributes.js'
 
 /**
@@ -18,6 +19,11 @@ import { hydrateAttributes } from '../hydration/hydrateAttributes'
  * @param {Function} compFn
  */
 export const defineCustomElement = (compFn) => {
+
+  if (_DEV_ && typeof compFn !== 'function') {
+    throw errors.component_is_not_a_function(compFn)
+  }
+
   const { _components, _config } = data
   const compFnName = compFn.name
 

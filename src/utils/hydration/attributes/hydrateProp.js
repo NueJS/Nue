@@ -20,7 +20,7 @@ export const hydrateProp = (target, attribute, comp) => {
 
   if (target.matches('input, textarea')) {
     // TODO: move this error to parsing phase
-    if (_DEV_ && _type === placeholderTypes._functional) throw errors.function_placeholder_used_in_input_binding(comp, _content, _text)
+    if (_DEV_ && _type === placeholderTypes._functional) throw errors.function_placeholder_used_in_input_binding(comp, _text)
 
     // @ts-expect-error
     const isNumber = target.type === 'number' || target.type === 'range'

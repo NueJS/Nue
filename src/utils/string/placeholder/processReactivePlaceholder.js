@@ -16,6 +16,7 @@ export const processReactivePlaceholder = (_content, _text) => {
   const statePath = _content.split('.')
 
   /**
+   * return the value of state placeholder in context of given component
    * @param {Comp} comp
    */
   const _getValue = (comp) => {

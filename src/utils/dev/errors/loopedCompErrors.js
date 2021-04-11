@@ -1,18 +1,14 @@
-import { createError } from '../createError'
-import { compName } from '../name'
+import { createError } from '../utils/createError'
+import { angularCompName } from '../utils/angularName'
+import { toJSON } from '../utils/toJSON'
+import { getCodeWithError } from '../utils/code'
 
 /**
- * convert to json
- * @param {any} v
- * @returns {string}
+ * called when looped components are given non-unique key attribute
+ * @param {Comp} comp
+ * @param {string[]} keys
+ * @returns {Error}
  */
-const toJSON = v => JSON.stringify(v)
-
-/**
-   * @param {Comp} comp
-   * @param {string[]} keys
-   * @returns {Error}
-   */
 
 export const keys_not_unique = (comp, keys) => {
 
@@ -25,7 +21,7 @@ export const keys_not_unique = (comp, keys) => {
   const _s = nonUniqueKeys.length > 1 ? 's' : ''
 
   const issue = `\
-non-unique key${_s} used in ${compName(comp)}
+non-unique key${_s} used in ${angularCompName(comp)}
 
 keys used: \n${_keys}
 
@@ -36,9 +32,10 @@ non-unique key${_s}: ${nonUniqueKeysJoin}`
   console.log('keys: ', keys)
   console.log('non unique Keys: ', nonUniqueKeys)
 
-  const type = 'keys_not_unique'
+  const errorCode = getCodeWithError(comp, /\*key=/)
 
-  return createError(type, issue, fix, comp)
+  // @TODO improve the regex
+  return createError(issue, fix, comp, errorCode, keys_not_unique.name)
 }
 
 /**
@@ -48,7 +45,7 @@ non-unique key${_s}: ${nonUniqueKeysJoin}`
  */
 export const hardcoded_keys = (comp, parentComp) => {
 
-  const issue = `"*key" attribute on ${compName(comp)} in ${compName(parentComp)} is hard-coded`
+  const issue = `"*key" attribute on ${angularCompName(comp)} in ${angularCompName(parentComp)} is hard-coded`
 
   const fix = `\
 make sure you are using a placeholder on "*key" attribute's value.
@@ -58,33 +55,36 @@ Example:
 ✔ *key='[foo]'
 ✖ *key='foo'`
 
-  const type = 'hardcoded_keys'
-  return createError(type, issue, fix, comp)
+  const errorCode = getCodeWithError(comp, /\*key=/)
+  return createError(issue, fix, comp, errorCode, hardcoded_keys.name)
 }
 
 /**
+ * called when key attribute is not specified on looped component
  * @param {Comp} comp
  * @param {Comp} parentComp
  * @returns {Error}
  */
 export const missing_key_attribute = (comp, parentComp) => {
 
-  const issue = `"*key" attribute is missing on ${compName(comp)} in ${compName(parentComp)}`
+  const issue = `"*key" attribute is missing on looped component ${angularCompName(comp)} in ${angularCompName(parentComp)}`
 
   const fix = '*key attribute is required on a looped component for efficient and correct updates'
 
-  const type = 'missing_key_attribute'
-  return createError(type, issue, fix, comp)
+  const errorCode = getCodeWithError(parentComp, new RegExp(`<${comp._compFnName}`))
+
+  return createError(issue, fix, comp, errorCode, missing_key_attribute.name)
 }
 
 /**
+ * called when looping attribute *for is given invalid value
  * @param {Comp} comp
  * @param {Comp} parentComp
  * @returns {Error}
  */
 export const invalid_for_attribute = (comp, parentComp) => {
 
-  const issue = `Invalid for attribute value on ${compName(comp)} in ${compName(parentComp)}`
+  const issue = `Invalid for attribute value on ${angularCompName(comp)} in ${angularCompName(parentComp)}`
 
   const fix = `\
 make sure you are following this pattern:
@@ -92,6 +92,7 @@ make sure you are following this pattern:
 or
 *for='item in items'`
 
-  const type = 'invalid_for_attribute'
-  return createError(type, issue, fix, comp)
+  const errorCode = getCodeWithError(parentComp, /\*for=/)
+
+  return createError(issue, fix, comp, errorCode, invalid_for_attribute.name)
 }
