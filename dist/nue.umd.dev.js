@@ -256,6 +256,8 @@
       // @ts-expect-error
       tree[ITSELF].forEach(cb => cb());
       tree = tree[edge];
+      // no subscription exists for the given edge, return
+      if (!tree) return
       if (edgeIndex === lastEdgeIndex) notifySubTree(tree);
     });
   };
@@ -354,6 +356,124 @@
   };
 
   /**
+   * create an error object that to be shown in error-overlay and in console
+   * @param {string} issue
+   * @param {string} fix
+   * @param {Comp | null} comp
+   * @param {string} errorCode
+   * @param {string} errorName
+   * @returns {NueError}
+   */
+  const createError = (issue, fix, comp, errorCode, errorName) => {
+
+    // get the component function
+    if (comp) {
+      const compFn = data._components[comp._compFnName];
+
+      console.error(compFn);
+      console.error(comp);
+    }
+
+    console.log(' ');
+
+    const error = /** @type {NueError}*/(new Error(`${errorCode ? `\n\n${errorCode}\n\n` : ''}${issue}\n\n${fix}\n`));
+    error.code = errorCode;
+    error.fix = fix;
+    error.issue = issue;
+    error.name = `nue.js error : ${errorName}`;
+
+    return error
+  };
+
+  /**
+   * return array of lines of codes of given component's function
+   * @param {Comp} comp
+   * @return {string[]}
+   */
+
+  const getCompFnLines = (comp) => {
+    // get the component function
+    const compFn = data._components[comp._compFnName];
+    // return array of lines of that function's code
+    return compFn.toString().split('\n')
+  };
+
+  /**
+   * return the index of line which is having the error
+   * line which is having the error will have a match for given regex
+   * @param {string[]} codeLines
+   * @param {RegExp} errorRegex
+   * @returns {number}
+   */
+  const getErrorLineIndex = (codeLines, errorRegex) => codeLines.findIndex((codeLine) => {
+    const match = codeLine.match(errorRegex);
+    return match !== null
+  });
+
+  /**
+   * highlight word in code of given component
+   * and return the portion of code surrounding code of that word
+   * @param {Comp} comp
+   * @param {RegExp} errorRegex
+   * @returns {string}
+   */
+
+  const getCodeWithError = (comp, errorRegex) => {
+    // get the error line index using the comp's fn
+    let allCodeLines = getCompFnLines(comp);
+    let matchLineIndex = getErrorLineIndex(allCodeLines, errorRegex);
+
+    // if not found there, error might be in the slot or on attributes of that comp
+    // in that case, error code will be in the parent of the comp
+    if (matchLineIndex === -1 && comp.parent) {
+      allCodeLines = getCompFnLines(comp.parent);
+      matchLineIndex = getErrorLineIndex(allCodeLines, errorRegex);
+    }
+
+    // if still can't find it - we need a better errorRegex
+    if (matchLineIndex === -1) return ''
+
+    const codeLines = [];
+
+    let startIndex = matchLineIndex - 3;
+    let endIndex = matchLineIndex + 4;
+    startIndex = startIndex < 1 ? 1 : startIndex;
+    endIndex = endIndex > allCodeLines.length - 1 ? allCodeLines.length - 1 : endIndex;
+
+    let matchLineIndexInPartialCode = 0;
+
+    /** @type {RegExpMatchArray}*/
+    let regexMatch;
+
+    for (let i = startIndex; i < endIndex; i++) {
+      const line = allCodeLines[i];
+      codeLines.push(line);
+
+      if (i === matchLineIndex) {
+        matchLineIndexInPartialCode = codeLines.length;
+        regexMatch = /** @type {RegExpMatchArray}*/(line.match(errorRegex));
+
+        let dashLine = '';
+        for (let i = 0; i < /** @type {number}*/(regexMatch.index); i++) dashLine += ' ';
+        for (let i = matchLineIndex; i < matchLineIndex + regexMatch[0].length; i++) dashLine += '─';
+
+        codeLines.push(dashLine);
+      }
+    }
+
+    return codeLines.map((line, lineIndex) => {
+      let num;
+      if (matchLineIndexInPartialCode === lineIndex) num = '──';
+      else if (lineIndex === matchLineIndexInPartialCode - 1) num = 'x';
+      else if (lineIndex > matchLineIndexInPartialCode) num = lineIndex - matchLineIndexInPartialCode;
+      else num = lineIndex - matchLineIndexInPartialCode + 1;
+
+      const lineNumber = String(num);
+      return lineNumber.padStart(3) + ' | ' + line
+    }).join('\n')
+  };
+
+  /**
    * swap items at indexes i and j in array arr
    * @param {any[]} arr
    * @param {number} i
@@ -435,195 +555,298 @@
   const isObject = x => typeof x === 'object' && x !== null;
 
   /**
-   * return the "<x>" for xNode
+   * returns the component name surrounded by angular brackets eg. <compName>
+   * @param {Comp} comp
+   * @returns {string}
+   */
+  const angularCompName = comp => `<${comp._compFnName}>`;
+
+  /**
+   * returns the node name surrounded by angular brackets eg. <h1>
    * @param {Element} node
    * @returns {string}
    */
-  const getNodeName = (node) => `<${lower(node.nodeName)}>`;
+  const angularNodeName = (node) => `<${lower(node.nodeName)}>`;
 
-  const errors = {
+  /**
+   * called when a component specific attribute is added on a non-component element
+   * @param {Element} node
+   * @param {string} attributeName
+   * @param {Comp} comp
+   * @returns {Error}
+   */
 
-    /**
-     * @param {string} compName
-     * @param {string} content
-     * @returns {NueError}
-     */
-    STATE_NOT_FOUND (compName, content) {
-      return {
-        message: `Could not find value of [${content}]`,
-        fix: `Make sure [${content}] is available in state or it's closure`,
-        compName
-      }
-    },
+  const component_attribute_used_on_non_component = (node, attributeName, comp) => {
 
-    /**
-     * @param {string} compName
-     * @param {string[]} keys
-     * @returns {NueError}
-     */
-    KEYS_ARE_NOT_UNIQUE (compName, keys) {
-      /**
-       * convert to json
-       * @param {any} v
-       * @returns {string}
-       */
-      const toJSON = v => JSON.stringify(v);
+    const nodeName = angularNodeName(node);
 
-      const nonUniqueKeys = keys.filter((key, i) => {
-        return keys.indexOf(key, i) !== keys.lastIndexOf(key)
-      });
+    const issue = `\
+'${attributeName}' attribute can only be used on a component,
+but it is used on a non-component element ${nodeName}`;
 
-      const _keys = keys.map(toJSON).join(', ');
-      const _nonUniqueKeys = nonUniqueKeys.map(toJSON).join(', ');
-      const _s = nonUniqueKeys.length > 1 ? 's' : '';
+    const fix = `\
+Remove this attribute if ${nodeName} is not a component
 
-      const message = `non-unique key${_s} used in <${compName}>` +
-      '\n\n' +
-      `keys used: \n${_keys} ` +
-      '\n\n' +
-      `non-unique key${_s}: ${_nonUniqueKeys}`;
+If ${nodeName} is actually a component, make sure to declare it in the components() method
+`;
 
-      return {
-        message,
-        compName,
-        fix: 'make sure that all keys are unique'
-      }
-    },
+    const errorCode = getCodeWithError(comp, new RegExp(`/${attributeName}=`));
 
-    /**
-     * @param {string} compName
-     * @param {Element} node
-     * @returns {NueError}
-     */
-    KEY_NOT_BRACKETED (compName, node) {
-      const nodeName = getNodeName(node);
-      return {
-        message: `"Key" attribute on ${nodeName} is hard-coded`,
-        fix: 'make sure you are using a bracket [] on "key" attribute\'s value so that it is not hard-coded value but a placeholder',
-        compName
-      }
-    },
+    return createError(issue, fix, comp, errorCode, component_attribute_used_on_non_component.name)
 
-    /**
-     * @param {string} compName
-     * @returns {NueError}
-     */
-    MISSING_DEPENDENCIES_IN_ON_MUTATE (compName) {
-      return {
-        message: 'Missing dependencies in onMutate()',
-        fix: 'onMutate expects one or more dependencies.\nExample: onMutate(countChanged, \'count\')',
-        compName
-      }
-    },
+  };
 
-    /**
-     * @param {string} compName
-     * @param {Element} node
-     * @returns {NueError}
-     */
-    INVALID_FOR_ATTRIBUTE (compName, node) {
-      const nodeName = getNodeName(node);
-      return {
-        message: `Invalid for attribute value on ${nodeName}`,
-        fix: 'make sure you are following the pattern:\nfor=\'(item, index) in items\'\nor\nfor=\'item in items\'',
-        compName
-      }
-    },
+  /**
+   * called when a function placeholder is used in input attribute binding
+   * @param {Comp} comp
+   * @param {string} text
+   * @returns {Error}
+   */
+  const function_placeholder_used_in_input_binding = (comp, text) => {
+    const issue = 'function placeholder used on input binding';
 
-    /**
-     * @param {string} compName
-     * @param {string} animationName
-     * @param {string} loopedCompName
-     * @returns {NueError}
-     */
-    EXIT_ANIMATION_NOT_FOUND (compName, animationName, loopedCompName) {
-      return {
-        message: `exit animation: "${animationName}" used on <${loopedCompName}> but not defined in CSS. \nThis will result in component never being removed, as nue.js keeps waiting for the animation to end which does not exist`,
-        fix: `To fix this: define animation "${animationName}" in CSS using @keyframes`,
-        compName
-      }
-    },
-
-    /**
-     * @param {string} parentCompName
-     * @param {string} compName
-     * @returns {NueError}
-     */
-    MISSING_KEY_ATTRIBUTE (parentCompName, compName) {
-      return {
-        message: `Missing "key" attribute on <${compName}>`,
-        fix: `<${compName}> is looped and needs a key attribute for efficient reconciliation`,
-        compName: parentCompName
-      }
-    },
-
-    /**
-     * @param {string} compName
-     * @param {string} fnName
-     * @returns {NueError}
-     */
-    METHOD_NOT_FOUND (compName, fnName) {
-      return {
-        message: `invalid method "${fnName}" used`,
-        fix: `Make sure that "${fnName}" is defined in the fn or it's parent fn`,
-        compName
-      }
-    },
-
-    /**
-     * @param {string} compName
-     * @param {Element} node
-     * @param {string} attributeName
-     * @returns {NueError}
-     */
-    RESERVED_ATTRIBUTE_USED_ON_NON_COMPONENT (compName, node, attributeName) {
-      const nodeName = getNodeName(node);
-      return {
-        message: `conditional rendering attribute "${attributeName}" can only be used on a component element, \nbut it is used on a non-component element ${nodeName}`,
-        fix: `Remove this attribute if ${nodeName} is not a component. \nIf ${nodeName} is actually a component, make sure to declare it in components([ ]) array.
+    const fix = `\
+input binding must be a state placeholder.
 
 EXAMPLE:
+✔ :input=[foo]
+✖ :input=[someFn(bar)]`;
 
-const app = ({ components }) => {
-  components([ comp1, comp2 ... ])
-  ...
-}`,
-        compName
-      }
-    },
+    const code = getCodeWithError(comp, new RegExp(text));
 
-    /**
-     *
-     * @param {string} compName
-     * @param {string} collectedString
-     * @returns {NueError}
-     */
-    BRACKET_NOT_CLOSED (compName, collectedString) {
-      const text = `"[${collectedString}"`;
-      const trimmed = `"${collectedString.trim()}"`;
-      const ifNotPlaceholder = `if ${trimmed} is not a state placeholder: \nprefix the bracket with "!" \n${text} => "![${collectedString}" `;
-      const ifPlaceholder = `if ${trimmed} is a placeholder: \nInsert closing bracket after ${text}\n${text} => "[${collectedString}]"`;
-      return {
-        message: `Bracket started but not closed \n"[${collectedString}"`,
-        fix: `${ifNotPlaceholder}\n\n${ifPlaceholder}`,
-        compName
-      }
-    },
+    return createError(issue, fix, comp, code, function_placeholder_used_in_input_binding.name)
+  };
 
-    /**
-     *
-     * @param {string} compName
-     * @param {string} content
-     * @returns {NueError}
-     */
-    INVALID_INPUT_BINDING (compName, content) {
-      return {
-        compName,
-        message: `functional placeholder used on input binding: \n:input=[${content}]`,
-        fix: 'Input binding must be a state placeholder. \nEXAMPLE \n✔ :input=[foo] \n✖ :input=[someFn(bar)] '
-      }
-    }
+  var attributeErrors = /*#__PURE__*/Object.freeze({
+    __proto__: null,
+    component_attribute_used_on_non_component: component_attribute_used_on_non_component,
+    function_placeholder_used_in_input_binding: function_placeholder_used_in_input_binding
+  });
 
+  /**
+   * called when onMutate is called without a second argument of dependency array
+   * @param {Comp} comp
+   * @returns {Error}
+   */
+
+  const missing_dependency_array_in_onMutate = (comp) => {
+    const issue = `Missing dependencies in onMutate() in ${angularCompName(comp)}`;
+
+    const fix = `\
+onMutate hook expects a dependency array as second argument.
+
+Example:
+onMutate(callbackFn, [ 'foo', 'bar.baz'])`;
+
+    const errorCode = getCodeWithError(comp, /onMutate(\\w*)/);
+
+    return createError(issue, fix, comp, errorCode, missing_dependency_array_in_onMutate.name)
+  };
+
+  var hookErrors = /*#__PURE__*/Object.freeze({
+    __proto__: null,
+    missing_dependency_array_in_onMutate: missing_dependency_array_in_onMutate
+  });
+
+  /**
+   * convert to json
+   * @param {any} v
+   * @returns {string}
+   */
+  const toJSON = v => JSON.stringify(v, null, 2);
+
+  /**
+   * called when looped components are given non-unique key attribute
+   * @param {Comp} comp
+   * @param {string[]} keys
+   * @returns {Error}
+   */
+
+  const keys_not_unique = (comp, keys) => {
+
+    const nonUniqueKeys = keys.filter((key, i) => {
+      return keys.indexOf(key, i) !== keys.lastIndexOf(key)
+    });
+
+    const _keys = keys.map(toJSON).join(', ');
+    const nonUniqueKeysJoin = nonUniqueKeys.map(toJSON).join(', ');
+    const _s = nonUniqueKeys.length > 1 ? 's' : '';
+
+    const issue = `\
+non-unique key${_s} used in ${angularCompName(comp)}
+
+keys used: \n${_keys}
+
+non-unique key${_s}: ${nonUniqueKeysJoin}`;
+
+    const fix = 'make sure that all keys are unique';
+
+    console.log('keys: ', keys);
+    console.log('non unique Keys: ', nonUniqueKeys);
+
+    const errorCode = getCodeWithError(comp, /\*key=/);
+
+    // @TODO improve the regex
+    return createError(issue, fix, comp, errorCode, keys_not_unique.name)
+  };
+
+  /**
+   * called when a key attribute is not a placeholder on a looped component
+   * @param {Comp} comp
+   * @param {Comp} parentComp
+   * @returns {Error}
+   */
+  const hardcoded_keys = (comp, parentComp) => {
+
+    const issue = `"*key" attribute on ${angularCompName(comp)} in ${angularCompName(parentComp)} is hard-coded`;
+
+    const fix = `\
+make sure you are using a placeholder on "*key" attribute's value.
+
+Example:
+
+✔ *key='[foo]'
+✖ *key='foo'`;
+
+    const errorCode = getCodeWithError(comp, /\*key=/);
+    return createError(issue, fix, comp, errorCode, hardcoded_keys.name)
+  };
+
+  /**
+   * called when key attribute is not specified on looped component
+   * @param {Comp} comp
+   * @param {Comp} parentComp
+   * @returns {Error}
+   */
+  const missing_key_attribute = (comp, parentComp) => {
+
+    const issue = `"*key" attribute is missing on looped component ${angularCompName(comp)} in ${angularCompName(parentComp)}`;
+
+    const fix = '*key attribute is required on a looped component for efficient and correct updates';
+
+    const errorCode = getCodeWithError(parentComp, new RegExp(`<${comp._compFnName}`));
+
+    return createError(issue, fix, comp, errorCode, missing_key_attribute.name)
+  };
+
+  /**
+   * called when looping attribute *for is given invalid value
+   * @param {Comp} comp
+   * @param {Comp} parentComp
+   * @returns {Error}
+   */
+  const invalid_for_attribute = (comp, parentComp) => {
+
+    const issue = `Invalid for attribute value on ${angularCompName(comp)} in ${angularCompName(parentComp)}`;
+
+    const fix = `\
+make sure you are following this pattern:
+*for='(item, index) in items'
+or
+*for='item in items'`;
+
+    const errorCode = getCodeWithError(parentComp, /\*for=/);
+
+    return createError(issue, fix, comp, errorCode, invalid_for_attribute.name)
+  };
+
+  var loopedCompErrors = /*#__PURE__*/Object.freeze({
+    __proto__: null,
+    keys_not_unique: keys_not_unique,
+    hardcoded_keys: hardcoded_keys,
+    missing_key_attribute: missing_key_attribute,
+    invalid_for_attribute: invalid_for_attribute
+  });
+
+  /**
+   * called when state placeholder is either a invalid path or a path which points to an undefined value in state
+   * @param {Comp} comp
+   * @param {string} content
+   * @returns {Error}
+   */
+  const invalid_state_placeholder = (comp, content) => {
+    const issue = `invalid state placeholder: [${content}] used in ${angularCompName(comp)}`;
+    const fix = `Make sure that "${content}" is available in state of ${angularCompName(comp)} or it's closure`;
+    const regex = content.split('').join('\\s*');
+    const errorCode = getCodeWithError(comp, new RegExp(`\\[\\w*${regex}\\w*\\]`));
+    return createError(issue, fix, comp, errorCode, invalid_state_placeholder.name)
+  };
+
+  /**
+   * called when function used in template is not defined
+   * @param {Comp} comp
+   * @param {string} fnName
+   * @returns {Error}
+   */
+  const function_not_found = (comp, fnName) => {
+    const issue = `invalid function "${fnName}" used in ${angularCompName(comp)}`;
+    const fix = `Make sure that "${fnName}" is defined in the fn or it's parent fn`;
+    const errorCode = getCodeWithError(comp, new RegExp(`=.*${fnName}`));
+    return createError(issue, fix, comp, errorCode, function_not_found.name)
+  };
+
+  /**
+   * called when a placeholder is opened but not closed
+   * @param {Comp} comp
+   * @param {string} collectedString
+   * @returns {Error}
+   */
+  const placeholder_not_closed = (comp, collectedString) => {
+
+    const trimmed = `"${collectedString.trim()}"`;
+    const ifNotPlaceholder = `if ${trimmed} is not a state placeholder: \nprefix the bracket with "!" -> "![${collectedString}" `;
+    const ifPlaceholder = `if ${trimmed} is a placeholder: \nInsert closing -> "[${collectedString}]"`;
+
+    const issue = `\
+found unclosed placeholder in ${angularCompName(comp)} -> "[${collectedString}"`;
+
+    const fix = `${ifNotPlaceholder}\n\n${ifPlaceholder}`;
+    const errorCode = getCodeWithError(comp, new RegExp(`[${collectedString}`));
+
+    return createError(issue, fix, comp, errorCode, placeholder_not_closed.name)
+  };
+
+  var placeholderErrors = /*#__PURE__*/Object.freeze({
+    __proto__: null,
+    invalid_state_placeholder: invalid_state_placeholder,
+    function_not_found: function_not_found,
+    placeholder_not_closed: placeholder_not_closed
+  });
+
+  /**
+   * called when invalid argument is given to the components method in component
+   * @param {Comp} comp
+   * @return {NueError}
+   */
+  const invalid_args_given_to_components_method = (comp) => {
+    const issue = 'components() method expects an array of components, but got this instead:';
+    const errorCode = getCodeWithError(comp, /components\(.*\)/);
+    return createError(issue, '', comp, errorCode, invalid_args_given_to_components_method.name)
+  };
+
+  /**
+   * called when component is not a function
+   * @param {any} compFn
+   * @returns
+   */
+  const component_is_not_a_function = (compFn) => {
+    const issue = `components must be functions, not ${typeof compFn}`;
+    const fix = 'change this to a valid component function:';
+    return createError(issue, fix, null, toJSON(compFn), component_is_not_a_function.name)
+  };
+
+  var otherErrors = /*#__PURE__*/Object.freeze({
+    __proto__: null,
+    invalid_args_given_to_components_method: invalid_args_given_to_components_method,
+    component_is_not_a_function: component_is_not_a_function
+  });
+
+  const errors = {
+    ...attributeErrors,
+    ...hookErrors,
+    ...loopedCompErrors,
+    ...placeholderErrors,
+    ...otherErrors
   };
 
   /**
@@ -642,7 +865,7 @@ const app = ({ components }) => {
 
     // throw if no origin is found
     if (!originComp) {
-      throw errors.STATE_NOT_FOUND(baseComp._compFnName, statePath.join('.'))
+      if (!data._errorThrown) throw errors.invalid_state_placeholder(baseComp, statePath.join('.'))
     }
 
     if (/** @type {SubCallBack}*/(updateCb)._node && originComp !== baseComp) {
@@ -946,7 +1169,7 @@ const app = ({ components }) => {
    * @param {string} str
    * @returns {string}
    */
-  const dashify = str => str + '-';
+  const dashify = str => lower(str) + '-';
 
   /**
    * replace component names in html with dashed names
@@ -997,6 +1220,17 @@ const app = ({ components }) => {
 
     /** @param {Function[]} _childComponents */
     const components = _childComponents => {
+
+      if (!data._errorThrown) {
+        const throwError = () => {
+          throw errors.invalid_args_given_to_components_method(comp)
+        };
+        const notArray = !Array.isArray(_childComponents);
+        if (notArray) throwError();
+        const notArrayOfFunctions = !_childComponents.every(item => typeof item === 'function');
+        if (notArrayOfFunctions) throwError();
+      }
+
       if (parsed) return
       childComponents = _childComponents;
     };
@@ -1036,9 +1270,7 @@ const app = ({ components }) => {
       afterUpdate: (cb) => comp._hookCbs._afterUpdate.push(cb),
 
       onMutate: (cb, slices) => {
-        if (!slices.length) {
-          throw errors.MISSING_DEPENDENCIES_IN_ON_MUTATE(comp._compFnName)
-        }
+        if (!slices.length) throw errors.missing_dependency_array_in_onMutate(comp)
 
         comp._hookCbs._onMount.push(() => {
           const stateDeps = slices.map(slice => slice.split('.'));
@@ -1115,7 +1347,7 @@ const app = ({ components }) => {
   const hydrateProp = (target, attribute, comp) => {
     // [{ getValue, deps, type, content }, propName]
     const propName = attribute._name;
-    const { _getValue, _type, _content, _statePaths } = /** @type {Placeholder} */(attribute._placeholder);
+    const { _getValue, _type, _content, _statePaths, _text } = /** @type {Placeholder} */(attribute._placeholder);
     const setProp = () => {
       // @ts-expect-error
       target[propName] = _getValue(comp);
@@ -1123,9 +1355,7 @@ const app = ({ components }) => {
 
     if (target.matches('input, textarea')) {
       // TODO: move this error to parsing phase
-      if (_type === placeholderTypes._functional) {
-        throw errors.INVALID_INPUT_BINDING(comp._compFnName, _content)
-      }
+      if (_type === placeholderTypes._functional) throw errors.function_placeholder_used_in_input_binding(comp, _text)
 
       // @ts-expect-error
       const isNumber = target.type === 'number' || target.type === 'range';
@@ -1167,9 +1397,7 @@ const app = ({ components }) => {
     const eventName = attribute._name;
     const fn = comp.fn[fnName];
 
-    if (!fn) {
-      throw errors.METHOD_NOT_FOUND(comp._compFnName, fnName)
-    }
+    if (!fn) throw errors.function_not_found(comp, fnName)
 
     /** @type {EventListener} */
     const handleEvent = (e) => fn(e, comp.$);
@@ -1236,7 +1464,7 @@ const app = ({ components }) => {
   const hydrateFnProp = (target, attribute, comp) => {
     const propName = attribute._name;
     const sourceFnName = /** @type {string}*/(attribute._placeholder);
-    if (!target.fn) target.fn = Object.create(comp.fn);
+    // if (!target.fn) target.fn = Object.create(comp.fn)
     target.fn[propName] = comp.fn[sourceFnName];
   };
 
@@ -1516,12 +1744,13 @@ const app = ({ components }) => {
   const createLoopedCompInstance = (loopInfo, value, index) => {
     const { _loopedComp, _parentComp, _getClosure } = loopInfo;
 
-    const newComp = /** @type {LoopedComp} */(getParsedClone(_loopedComp));
+    const loopedCompInstance = getParsedClone(_loopedComp);
 
-    newComp.parent = _parentComp;
-    newComp._prop$ = _getClosure(value, index);
+    loopedCompInstance._isLooped = true;
+    loopedCompInstance.parent = _parentComp;
+    loopedCompInstance._prop$ = _getClosure(value, index);
 
-    return newComp
+    return loopedCompInstance
   };
 
   /**
@@ -1629,7 +1858,7 @@ const app = ({ components }) => {
    */
   const checkUniquenessOfKeys = (keys, comp) => {
     if (new Set(keys).size !== keys.length) {
-      throw errors.KEYS_ARE_NOT_UNIQUE(comp._compFnName, keys)
+      throw errors.keys_not_unique(comp, keys)
     }
   };
 
@@ -1898,7 +2127,7 @@ const app = ({ components }) => {
     };
 
     /** @returns {Array<any>} */
-    const getArray = () => _itemArray._getValue(loopedComp);
+    const getArray = () => _itemArray._getValue(parentComp);
 
     // @todo current key can only be from closure, add support for state too
     /** @type {getKey} */
@@ -1987,6 +2216,7 @@ const app = ({ components }) => {
       if (/** @type {Comp_ParseInfo} */(_parsedInfo)._isComp) {
 
         /** @type {Comp}*/(target).parent = comp;
+        /** @type {Comp}*/(target)._prop$ = {};
 
         // if target is looped comp
         if (/** @type {LoopedComp_ParseInfo}*/(_parsedInfo)._loopAttributes) {
@@ -2061,9 +2291,10 @@ const app = ({ components }) => {
   /**
    * process fn placeholder
    * @param {string} _content
+   * @param {string} _text
    * @returns {Placeholder}
    */
-  const processFnPlaceholder = (_content) => {
+  const processFnPlaceholder = (_content, _text) => {
     // 'foo(bar.baz, fizz, buzz)'
 
     // 'foo(bar.baz, fizz, buzz'
@@ -2087,11 +2318,7 @@ const app = ({ components }) => {
       const fn = comp.fn[fnName];
       // @todo move this to errors
       if (!fn) {
-        throw {
-          compName: comp._compFnName,
-          message: `invalid method "${fnName}" used in [${_content}] placeholder in template`,
-          fix: `make sure "${fnName}" method exists in the 'fn' object of <${comp._compFnName}/> or its closure`
-        }
+        throw errors.function_not_found(comp, fnName)
       }
       const tps = _statePaths.map(path => targetProp(comp.$, path));
       const values = tps.map(([t, p]) => t[p]);
@@ -2102,20 +2329,23 @@ const app = ({ components }) => {
       _type: placeholderTypes._functional,
       _statePaths,
       _getValue,
-      _content
+      _content,
+      _text
     }
   };
 
   /**
    * process reactive placeholder
    * @param {string} _content
+   * @param {string} _text
    * @returns {Placeholder}
    */
 
-  const processReactivePlaceholder = (_content) => {
+  const processReactivePlaceholder = (_content, _text) => {
     const statePath = _content.split('.');
 
     /**
+     * return the value of state placeholder in context of given component
      * @param {Comp} comp
      */
     const _getValue = (comp) => {
@@ -2126,7 +2356,7 @@ const app = ({ components }) => {
           if (!isDefined(value)) throw value
           else return value
         } catch (e) {
-          throw errors.STATE_NOT_FOUND(comp._compFnName, _content)
+          if (!data._errorThrown) throw errors.invalid_state_placeholder(comp, _content)
         }
       }
     };
@@ -2135,7 +2365,8 @@ const app = ({ components }) => {
       _type: placeholderTypes._reactive,
       _getValue,
       _statePaths: [statePath],
-      _content
+      _content,
+      _text
     }
   };
 
@@ -2152,9 +2383,9 @@ const app = ({ components }) => {
     const content = bracketsRemoved.replace(/ /g, '');
 
     if (content.includes('(')) {
-      return processFnPlaceholder(content)
+      return processFnPlaceholder(content, text)
     }
-    return processReactivePlaceholder(content)
+    return processReactivePlaceholder(content, text)
   };
 
   /**
@@ -2173,7 +2404,7 @@ const app = ({ components }) => {
 
       compOnlyAttributes.forEach(attrName => {
         if (getAttr(element, attrName)) {
-          throw errors.RESERVED_ATTRIBUTE_USED_ON_NON_COMPONENT(comp._compFnName, element, attrName)
+          throw errors.component_attribute_used_on_non_component(element, attrName, comp)
         }
       });
     }
@@ -2321,7 +2552,7 @@ const app = ({ components }) => {
     // add the remaining text
     if (collectedString) {
       if (collectingVar) {
-        throw errors.BRACKET_NOT_CLOSED(comp._compFnName, collectedString)
+        throw errors.placeholder_not_closed(comp, collectedString)
       }
 
       parts.push(collectedString);
@@ -2358,7 +2589,8 @@ const app = ({ components }) => {
       if (typeof part === 'string') {
         textNode = document.createTextNode(part);
       } else {
-        textNode = document.createTextNode(part._content);
+        const temp = `[${part._content}]`;
+        textNode = document.createTextNode(temp);
         /** @type {Parsed_Text} */(textNode)._parsedInfo = {
           _placeholder: part
         };
@@ -2469,22 +2701,33 @@ const app = ({ components }) => {
    * parse looped component
    * @param {LoopedComp} comp
    * @param {string} forAttribute
+   * @param {Comp} parentComp
    */
 
-  const parseLoopedComp = (comp, forAttribute) => {
-    // replace ' in ', '(' ')' ',' with space, split with space, and remove empty strings
-    const [a, b, c] = forAttribute.replace(/\(|\)|,|(\sin\s)/g, ' ').split(/\s+/).filter(t => t);
+  const parseLoopedComp = (comp, forAttribute, parentComp) => {
+
+    const [a, b, c] =
+    forAttribute.replace(/\(|\)|,|(\sin\s)/g, ' ') // replace ' in ', '(', ')', ',' with space character
+      .split(/\s+/) // split with space character,
+      .filter(t => t); // remove empty strings
 
     // ['item', 'index', 'arr'] or
     // ['item', 'arr']
     const indexUsed = isDefined(c);
+    const keyAttribute = getAttr(comp, _key);
+
+    if (!keyAttribute) {
+      throw errors.missing_key_attribute(comp, parentComp)
+    }
 
     comp._parsedInfo._loopAttributes = {
       _itemArray: processPlaceholder(indexUsed ? c : b, true),
       _item: a,
       _itemIndex: indexUsed ? b : undefined,
-      _key: processPlaceholder(/** @type {string}*/(getAttr(comp, _key)))
+      _key: processPlaceholder(/** @type {string}*/(keyAttribute))
     };
+
+    comp._parsedInfo._animationAttributes = getAnimationAttributes(comp);
 
     attributesToRemove.forEach(name => removeAttr(comp, name));
   };
@@ -2495,9 +2738,10 @@ const app = ({ components }) => {
    * parse component node
    * @param {Comp} comp
    * @param {string} compName
+   * @param {Comp} parentComp
    * @param {Function[]} deferred
    */
-  const parseComp = (comp, compName, deferred) => {
+  const parseComp = (comp, compName, parentComp, deferred) => {
 
     comp._parsedInfo = {
       _isComp: true,
@@ -2511,7 +2755,8 @@ const app = ({ components }) => {
     if (forAttribute) {
       parseLoopedComp(
         /** @type {LoopedComp} */(comp),
-        forAttribute
+        forAttribute,
+        parentComp
       );
     }
 
@@ -2554,10 +2799,10 @@ const app = ({ components }) => {
    * @param {Node} target
    * @param {Record<string, string>} childCompNodeNames
    * @param {Function[]} deferred
-   * @param {Comp} comp
+   * @param {Comp} parentComp
    */
 
-  const parse = (target, childCompNodeNames, deferred, comp) => {
+  const parse = (target, childCompNodeNames, deferred, parentComp) => {
 
     // if target is component, get it's name else it will be undefined
     const compName = childCompNodeNames[target.nodeName];
@@ -2567,7 +2812,7 @@ const app = ({ components }) => {
       return parseTextNode(
         /** @type {Text}*/(target),
         deferred,
-        comp
+        parentComp
       )
     }
 
@@ -2576,6 +2821,7 @@ const app = ({ components }) => {
       parseComp(
         /** @type {Comp}*/(target),
         compName,
+        parentComp,
         deferred
       );
     }
@@ -2583,13 +2829,13 @@ const app = ({ components }) => {
     // attributes on component or simple target
     // @ts-expect-error
     if (target.hasAttribute) {
-      parseAttributes(/** @type {Parsed_HTMLElement}*/(target), compName, comp);
+      parseAttributes(/** @type {Parsed_HTMLElement}*/(target), compName, parentComp);
     }
 
     // child nodes of component or simple target
     if (target.hasChildNodes()) {
       target.childNodes.forEach(
-        childNode => parse(childNode, childCompNodeNames, deferred, comp)
+        childNode => parse(childNode, childCompNodeNames, deferred, parentComp)
       );
     }
   };
@@ -2601,6 +2847,11 @@ const app = ({ components }) => {
    * @param {Function} compFn
    */
   const defineCustomElement = (compFn) => {
+
+    if (typeof compFn !== 'function') {
+      throw errors.component_is_not_a_function(compFn)
+    }
+
     const { _components, _config } = data;
     const compFnName = compFn.name;
 
@@ -2640,7 +2891,9 @@ const app = ({ components }) => {
         // nodes that are using the closure state
         comp._nodesUsingClosureState = new Set();
 
-        if (!comp.fn) comp.fn = {};
+        comp.fn = comp.parent ? Object.create(comp.parent.fn) : {};
+
+        if (!comp._prop$) comp._prop$ = {};
 
         addHooks(comp);
       }
@@ -2660,12 +2913,10 @@ const app = ({ components }) => {
           // create $
           comp.$ = reactify(comp, comp._prop$ || {}, []);
 
-          // process attributes
-          // do this only on looped components - right ?
-          // if (comp._parsedInfo) {
-          //   const { _attributes } = comp._parsedInfo
-          //   if (_attributes) processAttributes(comp, comp, _attributes)
-          // }
+          if (comp._isLooped) {
+            // debugger
+            hydrateAttributes(comp, comp._parsedInfo._attributes, comp);
+          }
 
           const [templateString, cssString, childComponents] = runComponent(comp, compFn, !!componentTemplateElement);
 
@@ -2683,7 +2934,7 @@ const app = ({ components }) => {
                  */
                 (acc, child) => {
                   const { name } = child;
-                  acc[dashify(upper(name))] = name;
+                  acc[upper(dashify(name))] = name;
                   return acc
                 }, {});
             }
@@ -2747,42 +2998,83 @@ const app = ({ components }) => {
     customElements.define(dashify(compFnName), NueComp);
   };
 
-  const cardBg = '#111827';
-  const overlay = 'rgba(17,24,39, 0.8)';
-  const fontColor = '#E5E7EB';
-  const fontColor2 = '#6B7280';
+  const cardBg = '#222831';
+  const codeBg = '#333C49';
+  const overlay = 'rgba(51, 60, 73, 0.5)';
+  const fontColor = '#dddddd';
+  const fontColor2 = '#f05454';
 
   const errorOverlayCSS = /* css */`
+
+.panel {
+  background: ${overlay};
+  backdrop-filter: blur(5px);
+  min-height: 100vh;
+  margin: 0;
+  box-sizing: border-box;
+}
+
 :host {
   position: fixed;
   top: 0;
   left: 0;
-  font-family: 'MonoLisa', consolas, monospace;
+  font-family: monospace;
   width: 100vw;
   height: 100vh;
   color: rgba(209, 213, 219);
 }
 
-.parsed-error__card {
+:host * {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.code {
+  background: ${codeBg};
+  padding: 20px;
+  color: ${fontColor};
+  font-size: 16px;
+  border-radius: 5px;
+  line-height: 1.5;
+  overflow-x: auto;
+}
+
+.card {
   background: ${cardBg};
   border-radius: 5px;
   padding: 30px;
-  max-width: 800px;
+  max-width: 850px;
+  width: calc(100% - 40px);
+  max-height: calc(100vh - 80px);
+  overflow-y: auto;
+  overflow-x: hidden;
   margin: 0 auto;
   animation: fade-in 300ms ease;
   position: relative;
   box-shadow: 2px 2px 20px rgba(0,0,0,0.1);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 
-
-@keyframes pop-out {
-  to {
-    opacity: 0;
-    transform: scale(0.8);
-  }
+/* width */
+.card::-webkit-scrollbar {
+  width: 5px;
 }
 
-.parsed-error__close-icon {
+/* Track */
+.card::-webkit-scrollbar-track {
+  background: ${cardBg};
+}
+
+/* Handle */
+.card::-webkit-scrollbar-thumb {
+  background: ${codeBg};
+}
+
+.close-icon {
   background: none;
   border: none;
   border-radius: 50%;
@@ -2797,57 +3089,62 @@ const app = ({ components }) => {
   cursor: pointer;
 }
 
-.parsed-error__close-icon svg {
+.close-icon svg {
   fill: ${fontColor2};
 }
 
-.parsed-error__panel {
-  background: ${overlay};
-  padding: 50px 20px;
-  min-height: 100vh;
-  margin: 0;
-  box-sizing: border-box;
+.code-container {
+  position: relative;
+}
+
+.code-switcher {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  padding: 10px 15px;
+  font-size: 14px;
+  color: ${fontColor};
+  background: ${cardBg};
+  border: none;
+  border-radius: 5px;
 }
 
 .title {
-  font-size: 30px;
+  font-size: 24px;
   margin-bottom: 20px;
   color: ${fontColor2};
 }
 
-.subtitle {
+.console {
   color: ${fontColor2};
+  font-size: 16px;
+  margin-top: 20px;
 }
 
 .message {
-  line-height: 1.6;
+  line-height: 1.5;
   font-size: 16px;
   border-radius: 5px;
   white-space: pre-wrap;
-  margin: 20px 0 30px 0;
-  color: ${fontColor}
+  color: ${fontColor};
+  margin: 20px 0;
 }
 
-.minimize {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  border: none;
-  z-index: 100;
-  padding: 5px 10px;
-  border-radius: 4px;
-}
 `;
 
-  const closeIcon = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>';
+  const closeIcon = /* html */`
+<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
+  <path d="M0 0h24v24H0z" fill="none"/><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+</svg>`;
 
   const errorOverlayHTML = /* html */`
-<div class='parsed-error__panel'>
-  <div class='parsed-error__card'>
-    <button class='parsed-error__close-icon'> ${closeIcon} </button>
+<div class='panel'>
+  <div class='card'>
+    <button class='close-icon'> ${closeIcon} </button>
     <div class='title'> ERROR </div>
     <pre class='message'>  </pre>
-    <div class='subtitle'> open console to see stack trace </div>
+    <pre class='code'>  </pre>
+    <div class='console'> open console to see stack trace </div>
   </div>
 </div>
 
@@ -2855,14 +3152,17 @@ const app = ({ components }) => {
 `;
 
   /**
-   * show error overlay
+   * show error overlay by creating a custom overlay element
    * @param {NueError} error
+   * @param {{ filename: string, lineno: string, colno: string }} location
    */
 
-  const showErrorOverlay = (error) => {
+  const showErrorOverlay = (error, location) => {
+
     // if already showing error, return
     if (data._errorThrown) return
-    class errorOverlay extends HTMLElement {
+
+    window.customElements.define('nue-error-overlay', class extends HTMLElement {
       constructor () {
         super();
         const shadowRoot = this.attachShadow({ mode: 'open' });
@@ -2872,31 +3172,31 @@ const app = ({ components }) => {
       connectedCallback () {
         const shadowRoot = /** @type {ShadowRoot}*/(this.shadowRoot);
 
-        const closeButton = /** @type {Element} */(shadowRoot.querySelector('.parsed-error__close-icon'));
+        const closeButton = /** @type {Element} */(shadowRoot.querySelector('.close-icon'));
         closeButton.addEventListener('click', () => {
           this.remove();
         });
       }
-    }
-
-    window.customElements.define('nue-error-overlay', errorOverlay);
+    });
 
     const overlay = /** @type {HTMLElement} */(createElement('nue-error-overlay'));
     document.body.append(overlay);
 
     const root = /** @type {ShadowRoot}*/ (overlay.shadowRoot);
     const message = /** @type {HTMLElement}*/(root.querySelector('.message'));
+    const code = /** @type {HTMLElement}*/(root.querySelector('.code'));
     const title = /** @type {HTMLElement}*/(root.querySelector('.title'));
 
-    if (error.compName) {
-      title.textContent = `error in ${error.compName}`;
-      const errorMessage = `${error.message}\n\n${error.fix || ''}`;
-      message.textContent = errorMessage;
+    if (error.issue) {
+      title.textContent = error.name;
+      message.textContent = `${error.issue}\n\n${error.fix}`;
+      code.textContent = error.code;
     }
 
     else {
       title.textContent = error.constructor.name;
       message.textContent = error.message;
+      code.textContent = /** @type {string}*/(error.stack);
     }
 
     data._errorThrown = true;
@@ -2916,9 +3216,11 @@ const app = ({ components }) => {
       // @ts-expect-error
       window.data = data;
       window.onerror = (message, filename, lineno, colno, error) => {
+
         // @ts-ignore
         showErrorOverlay(error);
       };
+
     }
 
     // override config with default config
