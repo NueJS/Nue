@@ -2,7 +2,7 @@
 import { isBracketed } from '../string/bracket.js'
 import { processPlaceholder } from '../string/placeholder/processPlaceholder.js'
 import { getAttr, removeAttr, dashCaseToCamelCase } from '../node/dom.js'
-import { errors } from '../dev/errors'
+import { errors } from '../dev/errors/index.js'
 import { attributeTypes } from '../../enums'
 import { conditionAttributes, loopAttributes, otherAttributes } from '../../constants'
 
@@ -22,7 +22,7 @@ export const parseAttributes = (element, compName, comp) => {
 
     compOnlyAttributes.forEach(attrName => {
       if (getAttr(element, attrName)) {
-        throw errors.component_attribute_used_on_non_component_error(element, attrName, comp)
+        throw errors.component_attribute_used_on_non_component(element, attrName, comp)
       }
     })
   }

@@ -1,4 +1,4 @@
-import { errors } from '../../../dev/errors'
+import { errors } from '../../../dev/errors/index.js'
 
 /**
  * DEV ONLY: check if all the keys are unique, else throw error

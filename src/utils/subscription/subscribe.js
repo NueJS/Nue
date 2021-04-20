@@ -1,7 +1,7 @@
 import { batchify } from '../batch'
 import { origin } from '../closure.js'
 import { ITSELF } from '../../constants'
-import { errors } from '../dev/errors'
+import { errors } from '../dev/errors/index.js'
 import { data } from '../data'
 
 /**

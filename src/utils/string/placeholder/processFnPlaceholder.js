@@ -1,5 +1,5 @@
 import { placeholderTypes } from '../../../enums'
-import { errors } from '../../dev/errors'
+import { errors } from '../../dev/errors/index.js'
 import { targetProp } from '../../state/slice.js'
 
 /**

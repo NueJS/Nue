@@ -1,7 +1,7 @@
 import { joinTagArgs } from '../string/joinTagArgs'
 import { modes } from '../reactivity/modes.js'
 import { dashifyComponentNames } from '../string/dashify.js'
-import { errors } from '../dev/errors'
+import { errors } from '../dev/errors/index.js'
 import { data } from '../data'
 
 /**

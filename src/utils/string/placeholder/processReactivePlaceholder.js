@@ -1,7 +1,7 @@
 
 import { placeholderTypes } from '../../../enums'
 import { data } from '../../data'
-import { errors } from '../../dev/errors'
+import { errors } from '../../dev/errors/index.js'
 import { isDefined } from '../../others.js'
 import { targetProp } from '../../state/slice.js'
 

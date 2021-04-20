@@ -1,5 +1,5 @@
 import { animationAttributes, loopAttributes } from '../../constants'
-import { errors } from '../dev/errors'
+import { errors } from '../dev/errors/index.js'
 import { getAnimationAttributes, getAttr, removeAttr } from '../node/dom'
 import { isDefined } from '../others'
 import { processPlaceholder } from '../string/placeholder/processPlaceholder'
