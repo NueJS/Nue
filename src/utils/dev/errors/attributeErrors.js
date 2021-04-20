@@ -24,7 +24,7 @@ Remove this attribute if ${nodeName} is not a component
 If ${nodeName} is actually a component, make sure to declare it in the components() method
 `
 
-  const errorCode = getCodeWithError(comp, new RegExp(attributeName))
+  const errorCode = getCodeWithError(comp, new RegExp(`/${attributeName}=`))
 
   return createError(issue, fix, comp, errorCode, component_attribute_used_on_non_component.name)
 

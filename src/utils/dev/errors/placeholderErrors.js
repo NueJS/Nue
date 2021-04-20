@@ -30,7 +30,7 @@ export const function_not_found = (comp, fnName) => {
 }
 
 /**
- *  called when a placeholder is opened but not closed
+ * called when a placeholder is opened but not closed
  * @param {Comp} comp
  * @param {string} collectedString
  * @returns {Error}

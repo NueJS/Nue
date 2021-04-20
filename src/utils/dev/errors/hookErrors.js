@@ -15,7 +15,7 @@ export const missing_dependency_array_in_onMutate = (comp) => {
 onMutate hook expects a dependency array as second argument.
 
 Example:
-onMutate(() => { ... }, [ 'foo', 'bar.baz'])`
+onMutate(callbackFn, [ 'foo', 'bar.baz'])`
 
   const errorCode = getCodeWithError(comp, /onMutate(\\w*)/)
 

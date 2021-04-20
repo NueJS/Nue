@@ -39,6 +39,7 @@ non-unique key${_s}: ${nonUniqueKeysJoin}`
 }
 
 /**
+ * called when a key attribute is not a placeholder on a looped component
  * @param {Comp} comp
  * @param {Comp} parentComp
  * @returns {Error}
