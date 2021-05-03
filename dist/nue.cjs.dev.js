@@ -3205,6 +3205,7 @@ const showErrorOverlay = (error, location) => {
  * @param {Function} component
  * @param {HTMLElement} targetElement
  * @param {Config} [config]
+ * @returns {Comp}
  */
 
 const render = (component, targetElement, config) => {
@@ -3227,8 +3228,10 @@ const render = (component, targetElement, config) => {
   defineCustomElement(component);
 
   // replace the targetElement with customElement
-  const customElement = document.createElement(dashify(component.name));
+  const customElement = /** @type {Comp}*/(document.createElement(dashify(component.name)));
   targetElement.replaceWith(customElement);
+
+  return customElement
 };
 
 exports.render = render;
