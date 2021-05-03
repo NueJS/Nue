@@ -5,10 +5,9 @@ import { errorOverlayHTML } from './errorOverlayHTML'
 /**
  * show error overlay by creating a custom overlay element
  * @param {NueError} error
- * @param {{ filename: string, lineno: string, colno: string }} location
  */
 
-export const showErrorOverlay = (error, location) => {
+export const showErrorOverlay = (error) => {
 
   // if already showing error, return
   if (data._errorThrown) return
