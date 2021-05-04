@@ -7,12 +7,16 @@ import { flushBatch } from './batch'
  */
 export const flush = (comp, mutations) => {
 
-  comp._hookCbs._beforeUpdate.forEach(cb => cb(mutations))
+  const { _beforeUpdate, _afterUpdate } = comp._hookCbs
 
-  // run and clear batches
+  // before updates
+  _beforeUpdate.forEach(cb => cb(mutations))
+
+  // updates
   comp._batches.forEach(batch => flushBatch(batch, mutations))
 
-  comp._hookCbs._afterUpdate.forEach(cb => cb(mutations))
+  // after updates
+  _afterUpdate.forEach(cb => cb(mutations))
 
 }
 
