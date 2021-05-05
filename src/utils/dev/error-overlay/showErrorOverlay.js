@@ -37,6 +37,11 @@ export const showErrorOverlay = (error) => {
   const code = /** @type {HTMLElement}*/(root.querySelector('.code'))
   const title = /** @type {HTMLElement}*/(root.querySelector('.title'))
 
+  // hide the .code if the no code is to be shown
+  if (!error.code) {
+    code.hidden = true
+  }
+
   if (error.issue) {
     title.textContent = error.name
     message.textContent = `${error.issue}\n\n${error.fix}`
