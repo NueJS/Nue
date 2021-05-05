@@ -12,7 +12,6 @@ import { parse } from '../parse/parseNode'
 import { ITSELF } from '../../constants'
 import { hydrateAttributes } from '../hydration/hydrateAttributes'
 import { errors } from '../dev/errors/index.js'
-// import processAttributes from '../process/attributes/processAttributes.js'
 
 /**
  * defines a custom element using the compFn function
@@ -34,9 +33,11 @@ export const defineCustomElement = (compFn) => {
   /** @type {HTMLTemplateElement}*/
   let componentTemplateElement
 
-  class NueComp extends HTMLElement {
+  // define current compFn and then it's children
+  customElements.define(dashify(compFnName), class extends HTMLElement {
     constructor () {
       super()
+
       /** @type {Comp} */
       // @ts-expect-error
       const comp = this
@@ -51,16 +52,13 @@ export const defineCustomElement = (compFn) => {
 
       comp._batches = /** @type {[Set<SubCallBack>, Set<SubCallBack>]}*/([new Set(), new Set()])
 
-      // Array of mutation info that happened in a batch
+      // Array of mutation info that happened in a flush
       comp._mutations = []
 
       // array of callbacks that should be run after some process is done
       comp._deferredWork = []
 
-      // nodes that are using the state
       comp._nodesUsingLocalState = new Set()
-
-      // nodes that are using the closure state
       comp._nodesUsingClosureState = new Set()
 
       comp.fn = comp.parent ? Object.create(comp.parent.fn) : {}
@@ -164,8 +162,5 @@ export const defineCustomElement = (compFn) => {
 
       // unsubscribeNode(comp) (not needed ?)
     }
-  }
-
-  // define current compFn and then it's children
-  customElements.define(dashify(compFnName), NueComp)
+  })
 }
