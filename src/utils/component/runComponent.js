@@ -7,7 +7,7 @@ import { data } from '../data'
 /**
  * run compFn
  * @param {Comp} comp
- * @param {Function} compFn
+ * @param {CompFn} compFn
  * @param {boolean} parsed
  * @returns {[string, string, Function[]]}
  */
@@ -51,7 +51,8 @@ export const runComponent = (comp, compFn, parsed) => {
   modes._noOverride = true
 
   const { $, refs, fn, hooks } = comp
-  compFn({ $, refs, fn, ...hooks, hooks, html, components, css })
+
+  compFn({ $, refs, fn, hooks, html, components, css })
 
   modes._reactive = true
   modes._noOverride = false
