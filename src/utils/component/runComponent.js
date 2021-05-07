@@ -9,10 +9,10 @@ import { data } from '../data'
  * @param {Comp} comp
  * @param {CompFn} compFn
  * @param {boolean} parsed
- * @returns {[string, string, Function[]]}
+ * @returns {[string, string, CompFn[]]}
  */
 export const runComponent = (comp, compFn, parsed) => {
-  /** @type {Function[]} */
+  /** @type {CompFn[]} */
   let childComponents = []
 
   let htmlString = ''
@@ -30,7 +30,7 @@ export const runComponent = (comp, compFn, parsed) => {
     cssString = joinTagArgs(strings, exprs)
   }
 
-  /** @param {Function[]} _childComponents */
+  /** @param {CompFn[]} _childComponents */
   const components = _childComponents => {
 
     if (_DEV_ && !data._errorThrown) {

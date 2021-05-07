@@ -15,7 +15,7 @@ import { errors } from '../dev/errors/index.js'
 
 /**
  * defines a custom element using the compFn function
- * @param {Function} compFn
+ * @param {CompFn} compFn
  */
 export const defineCustomElement = (compFn) => {
 
@@ -61,7 +61,8 @@ export const defineCustomElement = (compFn) => {
       comp._nodesUsingLocalState = new Set()
       comp._nodesUsingClosureState = new Set()
 
-      comp.fn = comp.parent ? Object.create(comp.parent.fn) : {}
+      // if comp.fn is not already added
+      if (!comp.fn) comp.fn = comp.parent ? Object.create(comp.parent.fn) : {}
 
       if (!comp._prop$) comp._prop$ = {}
 
