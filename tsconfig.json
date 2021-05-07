@@ -10,7 +10,7 @@
     "strict": true,
     "downlevelIteration": true,
   },
-  "include": ["src/**/*.js", "src/**/*.d.ts"],
+  "include": ["src/**/*.js", "src/**/*.d.ts", "__test__/**/*.js"],
   "exclude": ["node_modules"]
 }
 
