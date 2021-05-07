@@ -5,8 +5,15 @@
  * @param {Comp} comp
  */
 export const hydrateFnProp = (target, attribute, comp) => {
-  const propName = attribute._name
-  const sourceFnName = /** @type {string}*/(attribute._placeholder)
-  // if (!target.fn) target.fn = Object.create(comp.fn)
-  target.fn[propName] = comp.fn[sourceFnName]
+
+  // create target.fn if not already
+  if (!target.fn) target.fn = Object.create(target.parent.fn)
+
+  // add the function in target.fn
+  target.fn[attribute._name] = comp.fn[/** @type {string}*/(attribute._placeholder)]
+
+  // @Example
+  // <comp fn.foo='bar'>
+  // attribute._name === 'foo'
+  // attribute._placeholder === 'bar'
 }
