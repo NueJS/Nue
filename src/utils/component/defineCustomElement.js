@@ -98,9 +98,7 @@ export const defineCustomElement = (compFn) => {
       if (_manuallyDisconnected || _moving) return
 
       _nodesUsingClosureState.forEach(unsubscribeNode)
-
       _hookCbs._onDestroy.forEach(cb => cb())
-
     }
   })
 }

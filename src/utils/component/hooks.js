@@ -13,16 +13,20 @@ export const addHooks = (comp) => {
     _afterUpdate: []
   }
 
+  const { _onMount, _onDestroy, _beforeUpdate, _afterUpdate } = comp._hookCbs
+
   comp.hooks = {
-    onMount: (cb) => comp._hookCbs._onMount.push(cb),
-    onDestroy: (cb) => comp._hookCbs._onDestroy.push(cb),
-    beforeUpdate: (cb) => comp._hookCbs._beforeUpdate.push(cb),
-    afterUpdate: (cb) => comp._hookCbs._afterUpdate.push(cb),
+    onMount: (cb) => _onMount.push(cb),
+    onDestroy: (cb) => _onDestroy.push(cb),
+    beforeUpdate: (cb) => _beforeUpdate.push(cb),
+    afterUpdate: (cb) => _afterUpdate.push(cb),
 
     onMutate: (cb, slices) => {
-      if (_DEV_ && !slices.length) throw errors.missing_dependency_array_in_onMutate(comp)
+      if (_DEV_ && !slices.length) {
+        throw errors.missing_dependency_array_in_onMutate(comp)
+      }
 
-      comp._hookCbs._onMount.push(() => {
+      _onMount.push(() => {
         const stateDeps = slices.map(slice => slice.split('.'))
         return subscribeMultiple(comp, stateDeps, cb, 0)
       })
