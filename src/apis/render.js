@@ -6,27 +6,29 @@ import { dashify } from '../utils/string/dashify'
 
 /**
  * render component in place of targetElement with optional config
- * @param {Function} component
+ * @param {CompFn} compFn
  * @param {Config} [config]
  * @returns {Comp}
  */
 
-export const render = (component, config) => {
+export const render = (compFn, config) => {
 
   if (_DEV_) attachErrorOverlay()
 
   // override config with default config
   if (config) data._config = { ...data._config, ...config }
 
-  defineCustomElement(component)
+  defineCustomElement(compFn)
 
   // replace the <component> with <component->
-  const targetElement = /** @type {Element}*/(document.querySelector(component.name))
+  const compFnName = compFn.name
+  const targetElement = /** @type {Element}*/(document.querySelector(compFnName))
 
   if (_DEV_ && !targetElement) {
-    throw errors.root_not_found_in_html(component.name)
+    throw errors.root_not_found_in_html(compFnName)
   }
-  const customElement = /** @type {Comp}*/(document.createElement(dashify(component.name)))
+
+  const customElement = /** @type {Comp}*/(document.createElement(dashify(compFnName)))
   targetElement.replaceWith(customElement)
 
   return customElement
