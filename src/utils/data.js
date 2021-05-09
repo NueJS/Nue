@@ -1,6 +1,6 @@
 export const data = {
   /** @type Record<string, Function> */
-  _components: {},
+  _definedComponents: {},
   _errorThrown: false,
   _config: {
     defaultStyle: ':host{display:block;}'

@@ -40,9 +40,7 @@ export const parseComp = (comp, compName, parentComp, deferred) => {
       parseConditionComp(/** @type {ConditionalComp}*/(comp), type, value)
 
       if (type === _if) {
-        deferred.push(
-          () => parseIfComp(/** @type {IfComp} */(comp))
-        )
+        deferred.push(() => parseIfComp(/** @type {IfComp} */(comp)))
       }
     }
   }

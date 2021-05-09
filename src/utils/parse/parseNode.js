@@ -3,23 +3,24 @@ import { parseTextNode } from './parseTextNode'
 import { parseComp } from './parseComp'
 
 /**
- * parse all types of nodes
+ * parse all types of nodes in context of parentComp
+ * and dump the work delayed work to deferredParsingWork array
  * @param {Node} target
- * @param {Record<string, string>} childCompNodeNames
- * @param {Function[]} deferred
+ * @param {Record<string, string>} childrenCompNames
+ * @param {Function[]} deferredParsingWork
  * @param {Comp} parentComp
  */
 
-export const parse = (target, childCompNodeNames, deferred, parentComp) => {
+export const parse = (target, childrenCompNames, deferredParsingWork, parentComp) => {
 
   // if target is component, get it's name else it will be undefined
-  const compName = childCompNodeNames[target.nodeName]
+  const compName = childrenCompNames[target.nodeName]
 
   // #text
   if (target.nodeType === target.TEXT_NODE) {
     return parseTextNode(
       /** @type {Text}*/(target),
-      deferred,
+      deferredParsingWork,
       parentComp
     )
   }
@@ -30,7 +31,7 @@ export const parse = (target, childCompNodeNames, deferred, parentComp) => {
       /** @type {Comp}*/(target),
       compName,
       parentComp,
-      deferred
+      deferredParsingWork
     )
   }
 
@@ -43,7 +44,12 @@ export const parse = (target, childCompNodeNames, deferred, parentComp) => {
   // child nodes of component or simple target
   if (target.hasChildNodes()) {
     target.childNodes.forEach(
-      childNode => parse(childNode, childCompNodeNames, deferred, parentComp)
+      childNode => parse(
+        childNode,
+        childrenCompNames,
+        deferredParsingWork,
+        parentComp
+      )
     )
   }
 }

@@ -1,17 +1,11 @@
 import { data } from '../data'
-import { createElement } from '../node/dom.js'
-import { reactify } from '../reactivity/reactify.js'
 import { subscribeNode, unsubscribeNode } from '../subscription/node.js'
 import { dashify } from '../string/dashify.js'
-import { flushArray, upper } from '../others.js'
-import { runComponent } from './runComponent.js'
 import { addHooks } from './hooks.js'
-import { buildShadowDOM } from './buildShadowDOM.js'
-import { hydrate } from '../hydration/hydrate.js'
-import { parse } from '../parse/parseNode'
 import { ITSELF } from '../../constants'
-import { hydrateAttributes } from '../hydration/hydrateAttributes'
 import { errors } from '../dev/errors/index.js'
+import { onFirstConnect } from './connectedCallback/onFirstConnect'
+import { createElement } from '../node/dom'
 
 /**
  * defines a custom element using the compFn function
@@ -23,17 +17,24 @@ export const defineCustomElement = (compFn) => {
     throw errors.component_is_not_a_function(compFn)
   }
 
-  const { _components, _config } = data
+  const { _definedComponents, _config } = data
+
+  // get the name of compFn
   const compFnName = compFn.name
 
-  // return if already defined
-  if (compFnName in _components) return
-  _components[compFnName] = compFn
+  // do nothing if a component by this name is already defined
+  if (compFnName in _definedComponents) return
 
-  /** @type {HTMLTemplateElement}*/
-  let componentTemplateElement
+  // else, mark this as defined
+  _definedComponents[compFnName] = compFn
 
-  // define current compFn and then it's children
+  /** @type {CompData} */
+  const compData = {
+    _parsed: false,
+    _template: /** @type {HTMLTemplateElement}*/(createElement('template'))
+  }
+
+  // create a custom element
   customElements.define(dashify(compFnName), class extends HTMLElement {
     constructor () {
       super()
@@ -43,27 +44,15 @@ export const defineCustomElement = (compFn) => {
       const comp = this
 
       comp._compFnName = compFnName
-
-      // refs of child nodes with *ref='ref-name' attribute
       comp.refs = {}
-
-      // subscription tree which contains the callbacks stored at various dependency paths
       comp._subscriptions = { [ITSELF]: new Set() }
-
       comp._batches = /** @type {[Set<SubCallBack>, Set<SubCallBack>]}*/([new Set(), new Set()])
-
-      // Array of mutation info that happened in a flush
       comp._mutations = []
-
-      // array of callbacks that should be run after some process is done
       comp._deferredWork = []
-
       comp._nodesUsingLocalState = new Set()
       comp._nodesUsingClosureState = new Set()
 
-      // if comp.fn is not already added
       if (!comp.fn) comp.fn = comp.parent ? Object.create(comp.parent.fn) : {}
-
       if (!comp._prop$) comp._prop$ = {}
 
       addHooks(comp)
@@ -74,78 +63,29 @@ export const defineCustomElement = (compFn) => {
       // @ts-expect-error
       const comp = this
 
+      // do nothing if component is just moving
       if (comp._moving) return
 
       comp._manuallyDisconnected = false
 
-      // when compFn is being connected for the first time
-      if (!comp.shadowRoot) {
+      const { _nodesUsingLocalState, _nodesUsingClosureState, _hookCbs, shadowRoot } = comp
 
-        // create $
-        comp.$ = reactify(comp, comp._prop$ || {}, [])
-
-        if (comp._isLooped) {
-          // debugger
-          hydrateAttributes(comp, comp._parsedInfo._attributes, comp)
-        }
-
-        const [templateString, cssString, childComponents] = runComponent(comp, compFn, !!componentTemplateElement)
-
-        // do this only once per compFn ------------------
-        if (!componentTemplateElement) {
-          /** @type {Record<string, string>} */
-          let childCompNodeNames = {}
-          if (childComponents) {
-            childCompNodeNames = childComponents.reduce(
-              /**
-               * use the upper case dashed name of child function as key and save the original name
-               * @param {Record<string, string>} acc
-               * @param {Function} child
-               * @returns {Record<string, string>}
-               */
-              (acc, child) => {
-                const { name } = child
-                acc[upper(dashify(name))] = name
-                return acc
-              }, {})
-          }
-
-          // create componentTemplateElement using template, style, and defaultStyle
-          componentTemplateElement = /** @type {HTMLTemplateElement}*/(createElement('template'))
-          componentTemplateElement.innerHTML =
-          templateString +
-          `<style default> ${_config.defaultStyle} </style>` +
-          '<style scoped >' + cssString + '</style>'
-
-          // parse the template and create componentTemplateElement which has all the parsed info
-
-          /** @type {Function[]} */
-          const deferred = []
-          parse(componentTemplateElement.content, childCompNodeNames, deferred, comp)
-          flushArray(deferred)
-
-          // define all child components
-          childComponents.forEach(defineCustomElement)
-        }
-
-        // hydrate DOM and shadow DOM
-        // TODO: process should be able to take the fragment node
-        comp.childNodes.forEach(node => hydrate(node, comp))
-        buildShadowDOM(comp, componentTemplateElement)
+      // when comp is being connected for the first time
+      if (!shadowRoot) {
+        onFirstConnect(comp, compFn, compData, _config.defaultStyle)
 
         // connect all nodes using local state
-        comp._nodesUsingLocalState.forEach(subscribeNode)
-
-        // subscribe node, so that it's attributes are in sync
-        subscribeNode(comp)
+        _nodesUsingLocalState.forEach(subscribeNode)
       }
 
-      // only connect nodes that were previously disconnected (nodes using closure state)
+      // only connect nodes that were previously disconnected
+      // connect all nodes using closure state
       else {
-        comp._nodesUsingClosureState.forEach(subscribeNode)
+        _nodesUsingClosureState.forEach(subscribeNode)
       }
 
-      comp._hookCbs._onMount.forEach(cb => cb())
+      // after all the connections are done, run the onMount callbacks
+      _hookCbs._onMount.forEach(cb => cb())
     }
 
     disconnectedCallback () {
@@ -153,15 +93,14 @@ export const defineCustomElement = (compFn) => {
       // @ts-expect-error
       const comp = this
 
-      if (comp._manuallyDisconnected) return
-      if (comp._moving) return
+      const { _hookCbs, _nodesUsingClosureState, _manuallyDisconnected, _moving } = comp
 
-      comp._hookCbs._onDestroy.forEach(cb => cb())
+      if (_manuallyDisconnected || _moving) return
 
-      // only disconnect nodes that are using closure, no need to disconnect nodes that use local state only
-      comp._nodesUsingClosureState.forEach(unsubscribeNode)
+      _nodesUsingClosureState.forEach(unsubscribeNode)
 
-      // unsubscribeNode(comp) (not needed ?)
+      _hookCbs._onDestroy.forEach(cb => cb())
+
     }
   })
 }

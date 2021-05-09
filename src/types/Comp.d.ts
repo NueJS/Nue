@@ -75,3 +75,9 @@ interface Comp extends HTMLElement, ConnectionProps {
    * this is set when we want to perform an animated exit  */
   _manuallyDisconnected?: boolean,
 }
+
+
+type CompData = {
+  _template: HTMLTemplateElement,
+  _parsed: boolean
+}

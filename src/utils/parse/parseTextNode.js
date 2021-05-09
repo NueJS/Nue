@@ -3,16 +3,16 @@ import { split } from '../string/split.js'
 /**
  * parse text node
  * @param {Text} node
- * @param {Function[]} deferred
+ * @param {Function[]} deferredParsingWork
  * @param {Comp} comp
  */
-export const parseTextNode = (node, deferred, comp) => {
+export const parseTextNode = (node, deferredParsingWork, comp) => {
   const text = node.textContent || ''
   const trimmedText = text.trim()
 
   // if the node is only empty string, it will be normalized by DOM, so remove it
   if (!trimmedText) {
-    deferred.push(() => node.remove())
+    deferredParsingWork.push(() => node.remove())
     return
   }
 
@@ -41,7 +41,7 @@ export const parseTextNode = (node, deferred, comp) => {
   })
 
   // replace the original node with new textNodes
-  deferred.push(() => {
+  deferredParsingWork.push(() => {
     textNodes.forEach(textNode => node.before(textNode))
     node.remove()
   })

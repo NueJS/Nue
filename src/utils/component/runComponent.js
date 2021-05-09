@@ -8,10 +8,10 @@ import { data } from '../data'
  * run compFn
  * @param {Comp} comp
  * @param {CompFn} compFn
- * @param {boolean} parsed
+ * @param {boolean} isTemplateParsed
  * @returns {[string, string, CompFn[]]}
  */
-export const runComponent = (comp, compFn, parsed) => {
+export const runComponent = (comp, compFn, isTemplateParsed) => {
   /** @type {CompFn[]} */
   let childComponents = []
 
@@ -20,13 +20,13 @@ export const runComponent = (comp, compFn, parsed) => {
 
   /** @type {TaggedTemplate} */
   const html = (strings, ...exprs) => {
-    if (parsed) return
+    if (isTemplateParsed) return
     htmlString = joinTagArgs(strings, exprs)
   }
 
   /** @type {TaggedTemplate} */
   const css = (strings, ...exprs) => {
-    if (parsed) return
+    if (isTemplateParsed) return
     cssString = joinTagArgs(strings, exprs)
   }
 
@@ -43,7 +43,7 @@ export const runComponent = (comp, compFn, parsed) => {
       if (notArrayOfFunctions) throwError()
     }
 
-    if (parsed) return
+    if (isTemplateParsed) return
     childComponents = _childComponents
   }
 

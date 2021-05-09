@@ -1,4 +1,4 @@
-import { lower } from '../others'
+import { lower, upper } from '../others'
 
 /**
  * add dash at the end of string
@@ -6,6 +6,12 @@ import { lower } from '../others'
  * @returns {string}
  */
 export const dashify = str => lower(str) + '-'
+
+/**
+ * returns the nodeName of given compFnName
+ * @param {string} str
+ */
+export const nodeName = str => upper(str) + '-'
 
 /**
  * replace component names in html with dashed names
