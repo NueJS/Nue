@@ -6,22 +6,22 @@ import { dashify } from '../utils/string/dashify'
 
 /**
  * render component in place of targetElement with optional config
- * @param {CompFn} compFn
+ * @param {NueComp} compClass
  * @param {Config} [config]
  * @returns {Comp}
  */
 
-export const render = (compFn, config) => {
+export const render = (compClass, config) => {
 
   if (_DEV_) attachErrorOverlay()
 
   // override config with default config
   if (config) data._config = { ...data._config, ...config }
 
-  defineCustomElement(compFn)
+  defineCustomElement(compClass)
 
   // replace the <component> with <component->
-  const compFnName = compFn.name
+  const compFnName = compClass.name
   const targetElement = /** @type {Element}*/(document.querySelector(compFnName))
 
   if (_DEV_ && !targetElement) {
