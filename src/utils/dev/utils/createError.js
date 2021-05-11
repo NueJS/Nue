@@ -13,7 +13,7 @@ export const createError = (issue, fix, comp, errorCode, errorName) => {
 
   // get the component function
   if (comp) {
-    const compFn = data._components[comp._compFnName]
+    const compFn = data._definedComponents[comp._compFnName]
 
     console.error(compFn)
     console.error(comp)

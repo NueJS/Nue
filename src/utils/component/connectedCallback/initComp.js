@@ -1,25 +1,28 @@
 import { flushArray } from '../../others'
 import { parse } from '../../parse/parseNode'
-import { nodeName } from '../../string/dashify'
-import { defineCustomElement } from '../defineCustomElement'
+import { dashifyComponentNames, nodeName } from '../../string/dashify'
 
 /**
  * initialize the components template, parse the template and define the child components
- * @param {CompFn[]} childCompFns
- * @param {string} htmlString
- * @param {string} defaultStyle
- * @param {string} cssString
+ * @param {CompFn} compFn
  * @param {Comp} comp
  * @param {CompData} compData
+ * @param {string} defaultStyle
  */
 
-export const initComp = (childCompFns, htmlString, defaultStyle, cssString, comp, compData) => {
-  const childrenCompNames = getChildrenCompNames(childCompFns)
+export const initComp = (compInstance, comp, compData, defaultStyle) => {
 
   const { _template } = compData
 
+  const childrenCompNames = compInstance.uses ? getChildrenCompNames(compInstance.uses) : {}
+
+  const html = compInstance.uses ? dashifyComponentNames(compInstance.html, compInstance.uses) : compInstance.html
+
   // fill template
-  _template.innerHTML = htmlString + style(defaultStyle, 'default') + style(cssString, 'scoped')
+  _template.innerHTML =
+  html +
+  style(defaultStyle, 'default') +
+  style(compInstance.css, 'scoped')
 
   /** @type {Function[]} */
   const deferredParsingWork = []
@@ -35,9 +38,6 @@ export const initComp = (childCompFns, htmlString, defaultStyle, cssString, comp
   compData._parsed = true
 
   flushArray(deferredParsingWork)
-
-  // define childCompFns
-  childCompFns.forEach(defineCustomElement)
 
 }
 

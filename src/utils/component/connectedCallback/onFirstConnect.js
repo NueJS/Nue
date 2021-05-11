@@ -3,19 +3,20 @@ import { hydrateAttributes } from '../../hydration/hydrateAttributes'
 import { reactify } from '../../reactivity/reactify'
 import { subscribeNode } from '../../subscription/node'
 import { buildShadowDOM } from '../buildShadowDOM'
-import { runComponent } from '../runComponent'
+import { defineCustomElement } from '../defineCustomElement'
+import { invokeCompFn } from '../runComponent'
 import { initComp } from './initComp'
 
 /**
  * this function is called when comp is connected to DOM for the first time
  * @param {Comp} comp
- * @param {CompFn} compFn
+ * @param {NueComp} CompClass
  * @param {CompData} compData
  * @param {string} defaultStyle
  */
 
-export function onFirstConnect (comp, compFn, compData, defaultStyle) {
-  // create $
+export function onFirstConnect (comp, CompClass, compData, defaultStyle) {
+
   comp.$ = reactify(comp, comp._prop$ || {}, [])
 
   // if the component is looped, hydrate attributes
@@ -23,18 +24,18 @@ export function onFirstConnect (comp, compFn, compData, defaultStyle) {
     hydrateAttributes(comp, comp._parsedInfo._attributes, comp)
   }
 
-  // run the component and get the html, css and childCompFns data
-  const [htmlString, cssString, childCompFns] = runComponent(comp, compFn, compData._parsed)
+  const compInstance = new CompClass()
+  if (compInstance.js) invokeCompFn(compInstance, comp)
 
   // do this only once per component - not for all instances
   if (!compData._parsed) {
-    initComp(childCompFns, htmlString, defaultStyle, cssString, comp, compData)
+    initComp(compInstance, comp, compData, defaultStyle)
+    if (compInstance.uses) compInstance.uses.forEach(defineCustomElement)
   }
 
-  // hydrate DOM and shadow DOM
-  // TODO: process should be able to take the fragment node
+  // hydrate DOM
   comp.childNodes.forEach(node => hydrate(node, comp))
-
+  // create shadowDOM
   buildShadowDOM(comp, /** @type {HTMLTemplateElement}*/(compData._template))
 
   // subscribe node, so that it's attributes are in sync

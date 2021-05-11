@@ -1,5 +1,5 @@
 export const data = {
-  /** @type Record<string, Function> */
+  /** @type Record<string, NueComp> */
   _definedComponents: {},
   _errorThrown: false,
   _config: {

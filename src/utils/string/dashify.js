@@ -16,11 +16,11 @@ export const nodeName = str => upper(str) + '-'
 /**
  * replace component names in html with dashed names
  * @param {string} html
- * @param {Function[]} components
+ * @param {Function[]} compFns
  * @returns {string}
  */
-export const dashifyComponentNames = (html, components) =>
-  components.reduce(
-    (acc, comp) => acc.replace(new RegExp(`<${comp.name}|</${comp.name}`, 'g'), dashify),
+export const dashifyComponentNames = (html, compFns) =>
+  compFns.reduce(
+    (acc, compFn) => acc.replace(new RegExp(`<${compFn.name}|</${compFn.name}`, 'g'), dashify),
     html
   )

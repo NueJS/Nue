@@ -19,7 +19,7 @@ interface Comp extends HTMLElement, ConnectionProps {
   parent: Comp, // root component will not have any parent
 
   /** object containing lifecycles hooks  */
-  hooks: {
+  events: {
     onMount: LifeCycleHook,
     onDestroy: LifeCycleHook,
     beforeUpdate: LifeCycleHook,
@@ -60,7 +60,7 @@ interface Comp extends HTMLElement, ConnectionProps {
   _batches: [Set<SubCallBack>, Set<SubCallBack>],
 
   /** callbacks that are registered to be called on certain lifecycles */
-  _hookCbs: {
+  _eventCbs: {
     _onMount: Function[],
     _onDestroy: Function[],
     _beforeUpdate: Function[],

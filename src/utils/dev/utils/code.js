@@ -8,7 +8,7 @@ import { data } from '../../data'
 
 export const getCompFnLines = (comp) => {
   // get the component function
-  const compFn = data._components[comp._compFnName]
+  const compFn = data._definedComponents[comp._compFnName]
   // return array of lines of that function's code
   return compFn.toString().split('\n')
 }

@@ -7,7 +7,7 @@ import { flushBatch } from './batch'
  */
 export const flush = (comp, mutations) => {
 
-  const { _beforeUpdate, _afterUpdate } = comp._hookCbs
+  const { _beforeUpdate, _afterUpdate } = comp._eventCbs
 
   // before updates
   _beforeUpdate.forEach(cb => cb(mutations))

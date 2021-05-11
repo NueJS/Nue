@@ -6,16 +6,16 @@ import { errors } from '../dev/errors/index.js'
  * @param {Comp} comp
  */
 export const addHooks = (comp) => {
-  comp._hookCbs = {
+  comp._eventCbs = {
     _onMount: [],
     _onDestroy: [],
     _beforeUpdate: [],
     _afterUpdate: []
   }
 
-  const { _onMount, _onDestroy, _beforeUpdate, _afterUpdate } = comp._hookCbs
+  const { _onMount, _onDestroy, _beforeUpdate, _afterUpdate } = comp._eventCbs
 
-  comp.hooks = {
+  comp.events = {
     onMount: (cb) => _onMount.push(cb),
     onDestroy: (cb) => _onDestroy.push(cb),
     beforeUpdate: (cb) => _beforeUpdate.push(cb),
