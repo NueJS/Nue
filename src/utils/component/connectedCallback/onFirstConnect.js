@@ -4,7 +4,7 @@ import { reactify } from '../../reactivity/reactify'
 import { subscribeNode } from '../../subscription/node'
 import { buildShadowDOM } from '../buildShadowDOM'
 import { defineCustomElement } from '../defineCustomElement'
-import { invokeCompFn } from '../runComponent'
+import { invokeCompJs } from '../invokeCompJs'
 import { initComp } from './initComp'
 
 /**
@@ -25,7 +25,7 @@ export function onFirstConnect (comp, CompClass, compData, defaultStyle) {
   }
 
   const compInstance = new CompClass()
-  if (compInstance.js) invokeCompFn(compInstance, comp)
+  if (compInstance.js) invokeCompJs(compInstance.js, comp)
 
   // do this only once per component - not for all instances
   if (!compData._parsed) {

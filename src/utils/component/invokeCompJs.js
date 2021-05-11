@@ -2,15 +2,16 @@ import { modes } from '../reactivity/modes.js'
 
 /**
  * invoke compFn with comp instance
- * @param {CompFn} compFn
+ * @param {NueCompInstance['js']} compJs
  * @param {Comp} comp
  */
-export const invokeCompFn = (compInstance, comp) => {
+export const invokeCompJs = (compJs, comp) => {
 
   modes._reactive = false
   modes._noOverride = true
 
-  compInstance.js(comp)
+  // @ts-expect-error
+  compJs(comp)
 
   modes._reactive = true
   modes._noOverride = false
