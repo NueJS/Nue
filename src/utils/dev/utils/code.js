@@ -2,15 +2,16 @@ import { data } from '../../data'
 
 /**
  * return array of lines of codes of given component's function
- * @param {Comp} comp
+ * @param {string} compName
  * @return {string[]}
  */
 
-export const getCompFnLines = (comp) => {
+export const getCompClassCode = (compName) => {
   // get the component function
-  const compFn = data._definedComponents[comp._compFnName]
+  const compClass = data._definedComponents[compName]
+  debugger
   // return array of lines of that function's code
-  return compFn.toString().split('\n')
+  return compClass.toString().split('\n')
 }
 
 /**
@@ -28,22 +29,22 @@ const getErrorLineIndex = (codeLines, errorRegex) => codeLines.findIndex((codeLi
 /**
  * highlight word in code of given component
  * and return the portion of code surrounding code of that word
- * @param {Comp} comp
+ * @param {string} compName
  * @param {RegExp} errorRegex
  * @returns {string}
  */
 
-export const getCodeWithError = (comp, errorRegex) => {
+export const getCodeWithError = (compName, errorRegex) => {
   // get the error line index using the comp's fn
-  let allCodeLines = getCompFnLines(comp)
-  let matchLineIndex = getErrorLineIndex(allCodeLines, errorRegex)
+  const allCodeLines = getCompClassCode(compName)
+  const matchLineIndex = getErrorLineIndex(allCodeLines, errorRegex)
 
   // if not found there, error might be in the slot or on attributes of that comp
   // in that case, error code will be in the parent of the comp
-  if (matchLineIndex === -1 && comp.parent) {
-    allCodeLines = getCompFnLines(comp.parent)
-    matchLineIndex = getErrorLineIndex(allCodeLines, errorRegex)
-  }
+  // if (matchLineIndex === -1 && comp.parent) {
+  //   allCodeLines = getCompClassCode(comp.parent._compName)
+  //   matchLineIndex = getErrorLineIndex(allCodeLines, errorRegex)
+  // }
 
   // if still can't find it - we need a better errorRegex
   if (matchLineIndex === -1) return ''

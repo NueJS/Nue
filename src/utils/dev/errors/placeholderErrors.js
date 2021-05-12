@@ -25,27 +25,28 @@ export const invalid_state_placeholder = (comp, content) => {
 export const function_not_found = (comp, fnName) => {
   const issue = `invalid function "${fnName}" used in ${angularCompName(comp)}`
   const fix = `Make sure that "${fnName}" is defined in the fn or it's parent fn`
-  const errorCode = getCodeWithError(comp, new RegExp(`=.*${fnName}`))
+  const errorCode = getCodeWithError(comp._compName, new RegExp(`=.*${fnName}`))
   return createError(issue, fix, comp, errorCode, function_not_found.name)
 }
 
 /**
  * called when a placeholder is opened but not closed
- * @param {Comp} comp
+ * @param {CompDef} compDef
  * @param {string} collectedString
  * @returns {Error}
  */
-export const placeholder_not_closed = (comp, collectedString) => {
+export const placeholder_not_closed = (compDef, collectedString) => {
 
   const trimmed = `"${collectedString.trim()}"`
   const ifNotPlaceholder = `if ${trimmed} is not a state placeholder: \nprefix the bracket with "!" -> "![${collectedString}" `
   const ifPlaceholder = `if ${trimmed} is a placeholder: \nInsert closing -> "[${collectedString}]"`
+  const nodeName = `<${compDef._compName}>`
 
   const issue = `\
-found unclosed placeholder in ${angularCompName(comp)} -> "[${collectedString}"`
+found unclosed placeholder in ${nodeName} -> "[${collectedString}"`
 
   const fix = `${ifNotPlaceholder}\n\n${ifPlaceholder}`
-  const errorCode = getCodeWithError(comp, new RegExp(`[${collectedString}`))
+  const errorCode = getCodeWithError(compDef._compName, new RegExp(`[${collectedString}`))
 
   return createError(issue, fix, comp, errorCode, placeholder_not_closed.name)
 }

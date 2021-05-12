@@ -16,10 +16,10 @@ const attributesToRemove = [
  * parse looped component
  * @param {LoopedComp} comp
  * @param {string} forAttribute
- * @param {Comp} parentComp
+ * @param {CompDef} compDef
  */
 
-export const parseLoopedComp = (comp, forAttribute, parentComp) => {
+export const parseLoopedComp = (comp, forAttribute, compDef) => {
 
   const [a, b, c] =
   forAttribute.replace(/\(|\)|,|(\sin\s)/g, ' ') // replace ' in ', '(', ')', ',' with space character
@@ -32,7 +32,7 @@ export const parseLoopedComp = (comp, forAttribute, parentComp) => {
   const keyAttribute = getAttr(comp, _key)
 
   if (_DEV_ && !keyAttribute) {
-    throw errors.missing_key_attribute(comp, parentComp)
+    throw errors.missing_key_attribute(comp, compDef)
   }
 
   comp._parsedInfo._loopAttributes = {

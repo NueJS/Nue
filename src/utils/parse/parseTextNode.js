@@ -4,9 +4,9 @@ import { split } from '../string/split.js'
  * parse text node
  * @param {Text} node
  * @param {Function[]} deferredParsingWork
- * @param {Comp} comp
+ * @param {CompDef} compDef
  */
-export const parseTextNode = (node, deferredParsingWork, comp) => {
+export const parseTextNode = (node, deferredParsingWork, compDef) => {
   const text = node.textContent || ''
   const trimmedText = text.trim()
 
@@ -16,7 +16,7 @@ export const parseTextNode = (node, deferredParsingWork, comp) => {
     return
   }
 
-  const parts = split(comp, text)
+  const parts = split(text)
 
   /** @type {Parsed_Text[]} */
   const textNodes = []

@@ -28,7 +28,7 @@ interface Comp extends HTMLElement, ConnectionProps {
   },
 
   /** name of the component function */
-  _compFnName: string,
+  _compName: string,
 
   /** information gotten by parsing the component element */
   _parsedInfo: Comp_ParseInfo,

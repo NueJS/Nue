@@ -10,9 +10,8 @@ import { conditionAttributes, loopAttributes, otherAttributes } from '../../cons
  * parse attributes on element if any
  * @param {Parsed_HTMLElement} element
  * @param {string} compName
- * @param {Comp} comp
  */
-export const parseAttributes = (element, compName, comp) => {
+export const parseAttributes = (element, compName) => {
   // if component specific attributes are used on non-component elements
   if (_DEV_ && !compName) {
     // DEV ONLy
@@ -22,7 +21,7 @@ export const parseAttributes = (element, compName, comp) => {
 
     compOnlyAttributes.forEach(attrName => {
       if (getAttr(element, attrName)) {
-        throw errors.component_attribute_used_on_non_component(element, attrName, comp)
+        throw errors.component_attribute_used_on_non_component(element, attrName, compName)
       }
     })
   }

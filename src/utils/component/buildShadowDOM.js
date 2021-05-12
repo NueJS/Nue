@@ -3,14 +3,14 @@ import { flushArray } from '../others.js'
 import { hydrate } from '../hydration/hydrate.js'
 
 /**
- * hydrate templateElement and add it in shadowDOM of comp
+ * hydrate template and add it in shadowDOM of comp
  * @param {Comp} comp
- * @param {HTMLTemplateElement} templateElement
+ * @param {HTMLTemplateElement} template
  */
-export const buildShadowDOM = (comp, templateElement) => {
+export const buildShadowDOM = (comp, template) => {
 
   // @ts-expect-error
-  const fragment = getParsedClone(templateElement.content)
+  const fragment = getParsedClone(template.content)
 
   hydrate(fragment, comp)
 

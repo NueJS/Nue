@@ -6,11 +6,11 @@ import { angularNodeName } from '../utils/angularName'
  * called when a component specific attribute is added on a non-component element
  * @param {Element} node
  * @param {string} attributeName
- * @param {Comp} comp
+ * @param {string} compName
  * @returns {Error}
  */
 
-export const component_attribute_used_on_non_component = (node, attributeName, comp) => {
+export const component_attribute_used_on_non_component = (node, attributeName, compName) => {
 
   const nodeName = angularNodeName(node)
 
@@ -24,9 +24,9 @@ Remove this attribute if ${nodeName} is not a component
 If ${nodeName} is actually a component, make sure to declare it in the components() method
 `
 
-  const errorCode = getCodeWithError(comp, new RegExp(`/${attributeName}=`))
+  const errorCode = getCodeWithError(compName, new RegExp(`/${attributeName}=`))
 
-  return createError(issue, fix, comp, errorCode, component_attribute_used_on_non_component.name)
+  return createError(issue, fix, null, errorCode, component_attribute_used_on_non_component.name)
 
 }
 
@@ -46,7 +46,7 @@ EXAMPLE:
 ✔ :input=[foo]
 ✖ :input=[someFn(bar)]`
 
-  const code = getCodeWithError(comp, new RegExp(text))
+  const code = getCodeWithError(comp._compName, new RegExp(text))
 
   return createError(issue, fix, comp, code, function_placeholder_used_in_input_binding.name)
 }

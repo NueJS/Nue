@@ -2,10 +2,10 @@ import { lower } from '../../others'
 
 /**
  * returns the component name surrounded by angular brackets eg. <compName>
- * @param {Comp} comp
+ * @param {CompDef} compDef
  * @returns {string}
  */
-export const angularCompName = comp => `<${comp._compFnName}>`
+export const angularCompName = compDef => `<${compDef._compName}>`
 
 /**
  * returns the node name surrounded by angular brackets eg. <h1>

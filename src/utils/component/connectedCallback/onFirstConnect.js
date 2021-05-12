@@ -3,42 +3,34 @@ import { hydrateAttributes } from '../../hydration/hydrateAttributes'
 import { reactify } from '../../reactivity/reactify'
 import { subscribeNode } from '../../subscription/node'
 import { buildShadowDOM } from '../buildShadowDOM'
-import { defineCustomElement } from '../defineCustomElement'
 import { invokeCompJs } from '../invokeCompJs'
-import { initComp } from './initComp'
 
 /**
  * this function is called when comp is connected to DOM for the first time
  * @param {Comp} comp
- * @param {NueComp} CompClass
- * @param {CompData} compData
- * @param {string} defaultStyle
+ * @param {CompDef} compDef
  */
 
-export function onFirstConnect (comp, CompClass, compData, defaultStyle) {
+export function onFirstConnect (comp, compDef) {
 
+  // create state
   comp.$ = reactify(comp, comp._prop$ || {}, [])
 
-  // if the component is looped, hydrate attributes
+  // manually created looped component requires hydration
   if (comp._isLooped) {
     hydrateAttributes(comp, comp._parsedInfo._attributes, comp)
   }
 
-  const compInstance = new CompClass()
-  if (compInstance.js) invokeCompJs(compInstance.js, comp)
-
-  // do this only once per component - not for all instances
-  if (!compData._parsed) {
-    initComp(compInstance, comp, compData, defaultStyle)
-    if (compInstance.uses) compInstance.uses.forEach(defineCustomElement)
-  }
-
-  // hydrate DOM
+  // hydrate DOM (for slots)
   comp.childNodes.forEach(node => hydrate(node, comp))
-  // create shadowDOM
-  buildShadowDOM(comp, /** @type {HTMLTemplateElement}*/(compData._template))
 
-  // subscribe node, so that it's attributes are in sync
+  // create shadowDOM
+  buildShadowDOM(comp, compDef._template)
+
+  // keep the attributes of comp element in sync
   subscribeNode(comp)
+
+  // after everything is set up, invoke js
+  if (compDef.js) invokeCompJs(compDef.js, comp)
 
 }

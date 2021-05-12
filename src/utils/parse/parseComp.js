@@ -10,10 +10,10 @@ const { _else, _if, _elseIf } = conditionAttributes
  * parse component node
  * @param {Comp} comp
  * @param {string} compName
- * @param {Comp} parentComp
- * @param {Function[]} deferred
+ * @param {CompDef} compDef
+ * @param {Function[]} deferredParsingWork
  */
-export const parseComp = (comp, compName, parentComp, deferred) => {
+export const parseComp = (comp, compName, compDef, deferredParsingWork) => {
 
   comp._parsedInfo = {
     _isComp: true,
@@ -28,7 +28,7 @@ export const parseComp = (comp, compName, parentComp, deferred) => {
     parseLoopedComp(
       /** @type {LoopedComp} */(comp),
       forAttribute,
-      parentComp
+      compDef
     )
   }
 
@@ -40,7 +40,7 @@ export const parseComp = (comp, compName, parentComp, deferred) => {
       parseConditionComp(/** @type {ConditionalComp}*/(comp), type, value)
 
       if (type === _if) {
-        deferred.push(() => parseIfComp(/** @type {IfComp} */(comp)))
+        deferredParsingWork.push(() => parseIfComp(/** @type {IfComp} */(comp)))
       }
     }
   }
