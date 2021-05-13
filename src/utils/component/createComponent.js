@@ -1,11 +1,9 @@
 import { data } from '../data'
-import { dashify } from '../string/dashify.js'
-import { createElement } from '../node/dom'
+import { createCompDef } from './createCompDef'
 import { createCompTemplate } from './connectedCallback/createCompTemplate'
-import { getChildren } from './getChildren'
+import { construct } from './onCreate'
 import { onConnect } from './onConnect'
 import { onDisconnect } from './onDisconnect'
-import { construct } from './onCreate'
 
 /**
  * defines a custom element using the CompClass function
@@ -31,19 +29,19 @@ export const createComponent = CompClass => {
   // create a custom element for this component
 
   class NueComp extends HTMLElement {
+    /** @this {Comp} */
     constructor () {
       super()
-      // @ts-expect-error
       construct(this, compName)
     }
 
+    /** @this {Comp} */
     connectedCallback () {
-      // @ts-expect-error
       onConnect(this, compDef)
     }
 
+    /** @this {Comp} */
     disconnectedCallback () {
-      // @ts-expect-error
       onDisconnect(this)
     }
   }
@@ -52,21 +50,4 @@ export const createComponent = CompClass => {
   customElements.define(compDef._elName, NueComp)
 
   if (compDef.uses) compDef.uses.forEach(createComponent)
-}
-
-/**
- *
- * @param {NueComp} CompClass
- * @param {string} compName
- */
-const createCompDef = (CompClass, compName) => {
-  const compDef = new CompClass()
-
-  compDef._class = CompClass
-  compDef._compName = compName
-  compDef._elName = dashify(compName)
-  compDef._template = /** @type {HTMLTemplateElement}*/ (createElement('template'))
-  compDef._children = compDef.uses ? getChildren(compDef.uses) : {}
-
-  return compDef
 }

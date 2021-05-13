@@ -9,26 +9,18 @@ import { conditionAttributes, loopAttributes, otherAttributes } from '../../cons
 /**
  * parse attributes on element if any
  * @param {Parsed_HTMLElement} element
- * @param {string} compName
+ * @param {string} targetCompName
  */
-export const parseAttributes = (element, compName) => {
-  // if component specific attributes are used on non-component elements
-  if (_DEV_ && !compName) {
-    // DEV ONLy
-    const { _if, _else, _elseIf } = conditionAttributes
-    const { _for, _key } = loopAttributes
-    const compOnlyAttributes = [_if, _else, _elseIf, _key, _for]
+export const parseAttributes = (element, targetCompName) => {
 
-    compOnlyAttributes.forEach(attrName => {
-      if (getAttr(element, attrName)) {
-        throw errors.component_attribute_used_on_non_component(element, attrName, compName)
-      }
-    })
+  // throw error if component specific attributes are used on non-component elements
+  if (_DEV_ && !targetCompName) {
+    testForCompAttributesUsage(element, targetCompName)
   }
 
   /** @type {Attribute_ParseInfo[] } */
   const attributes = []
-  const elementIsComp = !!compName
+  const elementIsComp = !!targetCompName
 
   for (const attributeName of element.getAttributeNames()) {
     const attributeValue = /** @type {string} */ (element.getAttribute(attributeName))
@@ -115,4 +107,21 @@ export const parseAttributes = (element, compName) => {
     }
     element._parsedInfo._attributes = attributes
   }
+}
+
+/**
+ * parse attributes on element if any
+ * @param {Parsed_HTMLElement} element
+ * @param {string} targetCompName
+ */
+const testForCompAttributesUsage = (element, targetCompName) => {
+  const { _if, _else, _elseIf } = conditionAttributes
+  const { _for, _key } = loopAttributes
+  const compOnlyAttributes = [_if, _else, _elseIf, _key, _for]
+
+  compOnlyAttributes.forEach(attrName => {
+    if (getAttr(element, attrName)) {
+      throw errors.component_attribute_used_on_non_component(element, attrName, targetCompName)
+    }
+  })
 }

@@ -18,7 +18,7 @@ export const parse = (target, compDef, deferredParsingWork) => {
 
   // #text
   if (target.nodeType === target.TEXT_NODE) {
-    return parseTextNode(/** @type {Text}*/(target), deferredParsingWork, compDef._compName)
+    return parseTextNode(/** @type {Text}*/(target), deferredParsingWork, parentCompName)
   }
 
   // component

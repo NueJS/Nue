@@ -12,11 +12,12 @@ export const createCompTemplate = (compDef) => {
 
   const { uses, html, css, _template } = compDef
 
+  // replace compName with elName in html
   const dashHtml = uses
     ? dashifyComponentNames(html, uses)
     : html
 
-  // fill template
+  // fill template innerHTML with html and css
   _template.innerHTML = dashHtml + style(data._config.defaultStyle, 'default') + style(css || '', 'scoped')
 
   /** @type {Function[]} */
