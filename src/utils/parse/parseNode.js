@@ -13,22 +13,23 @@ import { parseComp } from './parseComp'
 export const parse = (target, compDef, deferredParsingWork) => {
 
   // if target is component, get it's name else it will be undefined
-  const compName = compDef._children[target.nodeName]
+  const targetCompName = compDef._children[target.nodeName]
+  const parentCompName = compDef._compName
 
   // #text
   if (target.nodeType === target.TEXT_NODE) {
-    return parseTextNode(/** @type {Text}*/(target), deferredParsingWork, compDef)
+    return parseTextNode(/** @type {Text}*/(target), deferredParsingWork, compDef._compName)
   }
 
   // component
-  if (compName) {
-    parseComp(/** @type {Comp}*/(target), compName, compDef, deferredParsingWork)
+  if (targetCompName) {
+    parseComp(/** @type {Comp}*/(target), targetCompName, parentCompName, deferredParsingWork)
   }
 
   // attributes on component or simple target
   // @ts-expect-error
   if (target.hasAttribute) {
-    parseAttributes(/** @type {Parsed_HTMLElement}*/(target), compName)
+    parseAttributes(/** @type {Parsed_HTMLElement}*/(target), targetCompName)
   }
 
   // child nodes of component or simple target
