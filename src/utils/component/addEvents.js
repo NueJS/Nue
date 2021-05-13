@@ -5,7 +5,7 @@ import { errors } from '../dev/errors/index.js'
  * add lifecycle hooks to comp
  * @param {Comp} comp
  */
-export const addHooks = (comp) => {
+export const addEvents = (comp) => {
   comp._eventCbs = {
     _onMount: [],
     _onDestroy: [],

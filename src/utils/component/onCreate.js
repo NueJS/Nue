@@ -1,5 +1,5 @@
 import { ITSELF } from '../../constants'
-import { addHooks } from './hooks'
+import { addEvents } from './addEvents'
 
 /**
  *
@@ -21,5 +21,5 @@ export const construct = (comp, compName) => {
   if (!comp._prop$) comp._prop$ = {}
   if (!comp.fn) comp.fn = comp.parent ? Object.create(comp.parent.fn) : {}
 
-  addHooks(comp)
+  addEvents(comp)
 }
