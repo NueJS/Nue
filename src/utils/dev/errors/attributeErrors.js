@@ -1,7 +1,5 @@
 import { createError } from '../utils/createError'
 import { getCodeWithError } from '../utils/code'
-import { angularNodeName } from '../utils/angularName'
-
 /**
  * called when a component specific attribute is added on a non-component element
  * @param {Element} node
@@ -12,7 +10,7 @@ import { angularNodeName } from '../utils/angularName'
 
 export const component_attribute_used_on_non_component = (node, attributeName, compName) => {
 
-  const nodeName = angularNodeName(node)
+  const nodeName = node.nodeName
 
   const issue = `\
 '${attributeName}' attribute can only be used on a component,
@@ -32,11 +30,11 @@ If ${nodeName} is actually a component, make sure to declare it in the component
 
 /**
  * called when a function placeholder is used in input attribute binding
- * @param {Comp} comp
+ * @param {string} compName
  * @param {string} text
  * @returns {Error}
  */
-export const function_placeholder_used_in_input_binding = (comp, text) => {
+export const function_placeholder_used_in_input_binding = (compName, text) => {
   const issue = 'function placeholder used on input binding'
 
   const fix = `\
@@ -46,7 +44,7 @@ EXAMPLE:
 ✔ :input=[foo]
 ✖ :input=[someFn(bar)]`
 
-  const code = getCodeWithError(comp._compName, new RegExp(text))
+  const code = getCodeWithError(compName, new RegExp(text))
 
-  return createError(issue, fix, comp, code, function_placeholder_used_in_input_binding.name)
+  return createError(issue, fix, null, code, function_placeholder_used_in_input_binding.name)
 }

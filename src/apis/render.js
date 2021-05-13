@@ -1,4 +1,4 @@
-import { defineCustomElement } from '../utils/component/defineCustomElement'
+import { createComponent } from '../utils/component/createComponent'
 import { data } from '../utils/data'
 import { attachErrorOverlay } from '../utils/dev/error-overlay/attachErrorOverlay'
 import { errors } from '../utils/dev/errors'
@@ -18,7 +18,7 @@ export const render = (compClass, config) => {
   // override config with default config
   if (config) data._config = { ...data._config, ...config }
 
-  defineCustomElement(compClass)
+  createComponent(compClass)
 
   // replace the <component> with <component->
   const compFnName = compClass.name

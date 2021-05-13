@@ -4,11 +4,11 @@ import { parse } from '../../parse/parseNode'
 import { dashifyComponentNames } from '../../string/dashify'
 
 /**
- * initialize the components template, parse the template and define the child components
+ * create template and parse it
  * @param {CompDef} compDef
  */
 
-export const initComp = (compDef) => {
+export const createCompTemplate = (compDef) => {
 
   const { uses, html, css, _template } = compDef
 

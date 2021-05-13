@@ -4,11 +4,11 @@ import { processPlaceholder } from './placeholder/processPlaceholder'
 /**
  * take the string text and split it into placeholders and strings
  * @param {string} text
- * @param {CompDef} compDef
+ * @param {string} compName
  * @returns {SplitPart[]} parts
  */
 
-export const split = (text, compDef) => {
+export const split = (text, compName) => {
 
   /** @type {SplitPart[]} */
   const parts = []
@@ -53,7 +53,7 @@ export const split = (text, compDef) => {
   // add the remaining text
   if (collectedString) {
     if (_DEV_ && collectingVar) {
-      throw errors.placeholder_not_closed(compDef, collectedString)
+      throw errors.placeholder_not_closed(compName, collectedString)
     }
 
     parts.push(collectedString)

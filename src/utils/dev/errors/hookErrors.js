@@ -1,5 +1,4 @@
 import { createError } from '../utils/createError'
-import { angularCompName } from '../utils/angularName'
 import { getCodeWithError } from '../utils/code'
 
 /**
@@ -9,15 +8,16 @@ import { getCodeWithError } from '../utils/code'
  */
 
 export const missing_dependency_array_in_onMutate = (comp) => {
-  const issue = `Missing dependencies in onMutate() in ${angularCompName(comp)}`
+  const compName = `<${comp._compName}>`
+  const issue = `Missing dependencies in onMutate() in ${compName}`
 
   const fix = `\
 onMutate hook expects a dependency array as second argument.
 
 Example:
-onMutate(callbackFn, [ 'foo', 'bar.baz'])`
+onMutate(callbackFn, [ 'foo', 'bar.baz' ])`
 
-  const errorCode = getCodeWithError(comp, /onMutate(\\w*)/)
+  const errorCode = getCodeWithError(comp._compName, /onMutate(\\w*)/)
 
   return createError(issue, fix, comp, errorCode, missing_dependency_array_in_onMutate.name)
 }

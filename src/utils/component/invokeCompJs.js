@@ -1,8 +1,8 @@
 import { modes } from '../reactivity/modes.js'
 
 /**
- * invoke compFn with comp instance
- * @param {NueCompInstance['js']} compJs
+ * invoke compJs with comp instance
+ * @param {CompDef['js']} compJs
  * @param {Comp} comp
  */
 export const invokeCompJs = (compJs, comp) => {

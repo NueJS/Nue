@@ -13,9 +13,9 @@ export const createError = (issue, fix, comp, errorCode, errorName) => {
 
   // get the component function
   if (comp) {
-    const compFn = data._definedComponents[comp._compFnName]
+    const compClass = data._definedComponents[comp._compName]
 
-    console.error(compFn)
+    console.error(compClass)
     console.error(comp)
   }
 
