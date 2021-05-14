@@ -45,7 +45,7 @@ export const showErrorOverlay = (error) => {
   if (error.issue) {
     title.textContent = error.name
     message.textContent = `${error.issue}\n\n${error.fix}`
-    code.textContent = error.code
+    code.innerHTML = error.code.innerHTML
   }
 
   else {

@@ -1,8 +1,9 @@
 
 import { subscribeNode } from '../subscription/node'
-import { onFirstConnect } from './connectedCallback/onFirstConnect'
+import { onFirstConnect } from './onFirstConnect'
+
 /**
- *
+ * called when comp is connected to DOM
  * @param {Comp} comp
  * @param {CompDef} compDef
  * @returns

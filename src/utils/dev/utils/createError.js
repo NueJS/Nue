@@ -4,28 +4,27 @@ import { data } from '../../data'
  * create an error object that to be shown in error-overlay and in console
  * @param {string} issue
  * @param {string} fix
- * @param {Comp | null} comp
- * @param {string} errorCode
- * @param {string} errorName
+ * @param {HTMLElement} [code]
+ * @param {string} [compName]
  * @returns {NueError}
  */
-export const createError = (issue, fix, comp, errorCode, errorName) => {
+export const createError = (issue, fix, code, compName) => {
 
   // get the component function
-  if (comp) {
-    const compClass = data._definedComponents[comp._compName]
+  if (compName) {
+    const compClass = data._definedComponents[compName]
 
     console.error(compClass)
-    console.error(comp)
   }
 
   console.log(' ')
 
-  const error = /** @type {NueError}*/(new Error(`${errorCode ? `\n\n${errorCode}\n\n` : ''}${issue}\n\n${fix}\n`))
-  error.code = errorCode
+  const error = /** @type {NueError}*/(new Error(`\n${issue}\n\n${fix}\n`))
+
+  if (code) error.code = code
   error.fix = fix
   error.issue = issue
-  error.name = `nue.js error : ${errorName}`
+  error.name = compName ? `nue.error in ${compName}` : 'nue.error'
 
   return error
 }

@@ -1,9 +1,9 @@
-import { hydrate } from '../../hydration/hydrate'
-import { hydrateAttributes } from '../../hydration/hydrateAttributes'
-import { reactify } from '../../reactivity/reactify'
-import { subscribeNode } from '../../subscription/node'
-import { buildShadowDOM } from '../buildShadowDOM'
-import { invokeCompJs } from '../invokeCompJs'
+import { hydrate } from '../hydration/hydrate'
+import { hydrateAttributes } from '../hydration/hydrateAttributes'
+import { reactify } from '../reactivity/reactify'
+import { subscribeNode } from '../subscription/node'
+import { buildShadowDOM } from './buildShadowDOM'
+import { invokeCompJs } from './invokeCompJs'
 
 /**
  * this function is called when comp is connected to DOM for the first time

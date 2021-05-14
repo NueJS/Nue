@@ -9,9 +9,7 @@ import { data } from '../../data'
 export const getCompClassCode = (compName) => {
   // get the component function
   const compClass = data._definedComponents[compName]
-  debugger
-  // return array of lines of that function's code
-  return compClass.toString().split('\n')
+  return compClass.toString().split('\n').map(line => line.trim())
 }
 
 /**
@@ -31,11 +29,12 @@ const getErrorLineIndex = (codeLines, errorRegex) => codeLines.findIndex((codeLi
  * and return the portion of code surrounding code of that word
  * @param {string} compName
  * @param {RegExp} errorRegex
- * @returns {string}
+ * @returns {HTMLElement | undefined}
  */
 
 export const getCodeWithError = (compName, errorRegex) => {
   // get the error line index using the comp's fn
+  console.log({ errorRegex })
   const allCodeLines = getCompClassCode(compName)
   const matchLineIndex = getErrorLineIndex(allCodeLines, errorRegex)
 
@@ -47,44 +46,60 @@ export const getCodeWithError = (compName, errorRegex) => {
   // }
 
   // if still can't find it - we need a better errorRegex
-  if (matchLineIndex === -1) return ''
+  if (matchLineIndex === -1) return undefined
 
-  const codeLines = []
+  const code = document.createElement('code')
 
-  let startIndex = matchLineIndex - 3
-  let endIndex = matchLineIndex + 4
+  // show a total of 9 lines
+  const lineCount = 10
+  let startIndex = matchLineIndex - Math.floor(lineCount / 2)
+  let endIndex = matchLineIndex + Math.floor(lineCount / 2)
+
   startIndex = startIndex < 1 ? 1 : startIndex
   endIndex = endIndex > allCodeLines.length - 1 ? allCodeLines.length - 1 : endIndex
-
-  let matchLineIndexInPartialCode = 0
 
   /** @type {RegExpMatchArray}*/
   let regexMatch
 
-  for (let i = startIndex; i < endIndex; i++) {
-    const line = allCodeLines[i]
-    codeLines.push(line)
+  for (let lineIndex = startIndex; lineIndex < endIndex; lineIndex++) {
+    const line = allCodeLines[lineIndex]
 
-    if (i === matchLineIndex) {
-      matchLineIndexInPartialCode = codeLines.length
+    const errorLine = ['', '', '']
+    let hasError = false
+
+    if (lineIndex === matchLineIndex) {
+      hasError = true
+
       regexMatch = /** @type {RegExpMatchArray}*/(line.match(errorRegex))
 
-      let dashLine = ''
-      for (let i = 0; i < /** @type {number}*/(regexMatch.index); i++) dashLine += ' '
-      for (let i = matchLineIndex; i < matchLineIndex + regexMatch[0].length; i++) dashLine += '─'
+      const startIndex = /** @type {number}*/(regexMatch.index)
+      const endIndex = startIndex + regexMatch[0].length - 1
 
-      codeLines.push(dashLine)
+      for (let i = 0; i < line.length; i++) {
+        if (i < startIndex) errorLine[0] += line[i]
+        else if (i > endIndex) errorLine[2] += line[i]
+        else errorLine[1] += line[i]
+      }
+
+    }
+
+    const lineEl = document.createElement('div')
+    code.append(lineEl)
+    if (!hasError) lineEl.textContent = line
+    else {
+      const beforeText = document.createTextNode(errorLine[0])
+      const afterText = document.createTextNode(errorLine[2])
+      const errorText = document.createElement('span')
+      errorText.className = 'error'
+      errorText.textContent = errorLine[1]
+
+      lineEl.append(beforeText)
+      lineEl.append(errorText)
+      lineEl.append(afterText)
+
+      lineEl.className = 'has-error'
     }
   }
 
-  return codeLines.map((line, lineIndex) => {
-    let num
-    if (matchLineIndexInPartialCode === lineIndex) num = '──'
-    else if (lineIndex === matchLineIndexInPartialCode - 1) num = 'x'
-    else if (lineIndex > matchLineIndexInPartialCode) num = lineIndex - matchLineIndexInPartialCode
-    else num = lineIndex - matchLineIndexInPartialCode + 1
-
-    const lineNumber = String(num)
-    return lineNumber.padStart(3) + ' | ' + line
-  }).join('\n')
+  return code
 }

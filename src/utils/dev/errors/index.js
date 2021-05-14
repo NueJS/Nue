@@ -1,15 +1,13 @@
 import * as attributeErrors from './attributeErrors'
-import * as hookErrors from './hookErrors'
+import * as eventErrors from './eventErrors'
 import * as loopedCompErrors from './loopedCompErrors'
 import * as placeholderErrors from './placeholderErrors'
-import * as otherErrors from './otherErrors'
 import * as DOMErrors from './DOMErrors'
 
 export const errors = {
   ...attributeErrors,
-  ...hookErrors,
+  ...eventErrors,
   ...loopedCompErrors,
   ...placeholderErrors,
-  ...otherErrors,
   ...DOMErrors
 }

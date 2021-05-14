@@ -1,7 +1,7 @@
-import { data } from '../../data'
-import { flushArray } from '../../others'
-import { parse } from '../../parse/parseNode'
-import { dashifyComponentNames } from '../../string/dashify'
+import { data } from '../data'
+import { flushArray } from '../others'
+import { parse } from '../parse/parseNode'
+import { dashifyComponentNames } from '../string/dashify'
 
 /**
  * create template and parse it

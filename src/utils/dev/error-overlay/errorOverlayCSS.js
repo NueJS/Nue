@@ -40,6 +40,28 @@ export const errorOverlayCSS = /* css */`
   overflow-x: auto;
 }
 
+.code span.error {
+  color: ${fontColor2};
+  display: inline-block;
+  background: ${cardBg};
+  padding: 0.1em 0.3em;
+  border-radius: 5px;
+  margin: 0 0.2em;
+}
+
+.code div {
+  border-radius: 5px;
+  padding: 0.2em 0.5em;
+}
+
+.code div:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.code div.has-error {
+  background: rgba(255, 255, 255, 0.1);
+}
+
 .card {
   background: ${cardBg};
   border-radius: 5px;

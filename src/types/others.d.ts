@@ -29,7 +29,7 @@ type Offset = {
 interface NueError extends Error {
   issue: string,
   fix: string,
-  code: string,
+  code: HTMLElement,
 }
 
 type TaggedTemplate = (strings: string[], ...exprs: string[] ) => void

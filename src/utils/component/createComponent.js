@@ -1,6 +1,6 @@
 import { data } from '../data'
 import { createCompDef } from './createCompDef'
-import { createCompTemplate } from './connectedCallback/createCompTemplate'
+import { createCompTemplate } from './createCompTemplate'
 import { construct } from './onCreate'
 import { onConnect } from './onConnect'
 import { onDisconnect } from './onDisconnect'

@@ -10,6 +10,7 @@ export const onDisconnect = (comp) => {
   if (_manuallyDisconnected || _moving) return
 
   _nodesUsingClosureState.forEach(unsubscribeNode)
+
   _eventCbs._onDestroy.forEach(cb => cb())
 
 }

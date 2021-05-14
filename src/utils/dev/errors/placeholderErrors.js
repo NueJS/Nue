@@ -12,22 +12,23 @@ export const invalid_state_placeholder = (comp, content) => {
   const issue = `invalid state placeholder: [${content}] used in ${compNodeName}`
   const fix = `Make sure that "${content}" is available in state of ${compNodeName} or it's closure`
   const regex = content.split('').join('\\s*')
-  const errorCode = getCodeWithError(comp._compName, new RegExp(`\\[\\w*${regex}\\w*\\]`))
-  return createError(issue, fix, comp, errorCode, invalid_state_placeholder.name)
+  console.log({ regex })
+  const code = getCodeWithError(comp._compName, new RegExp(`\\[\\w*${regex}\\w*\\]`))
+  return createError(issue, fix, code)
 }
 
 /**
  * called when function used in template is not defined
- * @param {Comp} comp
+ * @param {string} compName
  * @param {string} fnName
  * @returns {Error}
  */
-export const function_not_found = (comp, fnName) => {
-  const compNodeName = `<${comp._compName}>`
+export const function_not_found = (compName, fnName) => {
+  const compNodeName = `<${compName}>`
   const issue = `invalid function "${fnName}" used in ${compNodeName}`
   const fix = `Make sure that "${fnName}" is defined in the fn or it's parent fn`
-  const errorCode = getCodeWithError(comp._compName, new RegExp(`=.*${fnName}`))
-  return createError(issue, fix, comp, errorCode, function_not_found.name)
+  const code = getCodeWithError(compName, new RegExp(fnName))
+  return createError(issue, fix, code, compName)
 }
 
 /**
@@ -39,15 +40,14 @@ export const function_not_found = (comp, fnName) => {
 export const placeholder_not_closed = (compName, collectedString) => {
 
   const trimmed = `"${collectedString.trim()}"`
-  const ifNotPlaceholder = `if ${trimmed} is not a state placeholder: \nprefix the bracket with "!" -> "![${collectedString}" `
-  const ifPlaceholder = `if ${trimmed} is a placeholder: \nInsert closing -> "[${collectedString}]"`
+  const ifNotPlaceholder = `if ${trimmed} is not a state placeholder: \nprefix the bracket with "!" : "![${collectedString}" `
+  const ifPlaceholder = `if ${trimmed} is a placeholder: \nInsert closing : "[${collectedString}]"`
   const nodeName = `<${compName}>`
 
-  const issue = `\
-found unclosed placeholder in ${nodeName} -> "[${collectedString}"`
+  const issue = `found unclosed placeholder in ${nodeName} : "[${collectedString}"`
 
   const fix = `${ifNotPlaceholder}\n\n${ifPlaceholder}`
-  const errorCode = getCodeWithError(compName, new RegExp(`[${collectedString}`))
+  const code = getCodeWithError(compName, new RegExp(`\\[${collectedString}`))
 
-  return createError(issue, fix, null, errorCode, placeholder_not_closed.name)
+  return createError(issue, fix, code)
 }

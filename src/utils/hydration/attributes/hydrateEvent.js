@@ -12,7 +12,7 @@ export const hydrateEvent = (target, attribute, comp) => {
   const eventName = attribute._name
   const fn = comp.fn[fnName]
 
-  if (_DEV_ && !fn) throw errors.function_not_found(comp, fnName)
+  if (_DEV_ && !fn) throw errors.function_not_found(comp._compName, fnName)
 
   /** @type {EventListener} */
   const handleEvent = (e) => fn(e, comp.$)

@@ -1,5 +1,6 @@
 import { placeholderTypes } from '../../../enums'
 import { errors } from '../../dev/errors/index.js'
+import { isDefined } from '../../others'
 import { targetProp } from '../../state/slice.js'
 
 /**
@@ -32,10 +33,17 @@ export const processFnPlaceholder = (_content, _text) => {
     const fn = comp.fn[fnName]
     // @todo move this to errors
     if (_DEV_ && !fn) {
-      throw errors.function_not_found(comp, fnName)
+      throw errors.function_not_found(comp._compName, fnName)
     }
     const tps = _statePaths.map(path => targetProp(comp.$, path))
     const values = tps.map(([t, p]) => t[p])
+
+    if (_DEV_) {
+      values.forEach((value) => {
+        if (!isDefined(value)) throw errors.invalid_state_placeholder(comp, _content)
+      })
+    }
+
     return fn(...values)
   }
 

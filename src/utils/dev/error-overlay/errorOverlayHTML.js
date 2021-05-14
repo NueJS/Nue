@@ -12,7 +12,6 @@ export const errorOverlayHTML = /* html */`
     <div class='title'> ERROR </div>
     <pre class='message'>  </pre>
     <pre class='code'>  </pre>
-    <div class='console'> open console to see stack trace </div>
   </div>
 </div>
 
