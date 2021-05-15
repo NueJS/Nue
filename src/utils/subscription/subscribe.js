@@ -20,7 +20,7 @@ export const subscribe = (baseComp, statePath, updateCb, batch) => {
 
   // throw if no origin is found
   if (_DEV_ && !originComp) {
-    if (!data._errorThrown) throw errors.invalid_state_placeholder(baseComp, statePath.join('.'))
+    if (!data._errorThrown) throw errors.invalid_state_placeholder(baseComp._compName, statePath.join('.'))
   }
 
   if (/** @type {SubCallBack}*/(updateCb)._node && originComp !== baseComp) {

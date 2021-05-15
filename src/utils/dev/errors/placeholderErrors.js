@@ -3,33 +3,33 @@ import { getCodeWithError } from '../utils/code'
 
 /**
  * called when state placeholder is either a invalid path or a path which points to an undefined value in state
- * @param {Comp} comp
+ * @param {string} compName
  * @param {string} content
  * @returns {Error}
  */
-export const invalid_state_placeholder = (comp, content) => {
-  const compNodeName = `<${comp._compName}>`
+export const invalid_state_placeholder = (compName, content) => {
+  const compNodeName = `<${compName}>`
   const issue = `invalid state placeholder: [${content}] used in ${compNodeName}`
   const fix = `Make sure that "${content}" is available in state of ${compNodeName} or it's closure`
   const regex = content.split('').join('\\s*').replace(')', '\\)').replace('(', '\\(')
-  const code = getCodeWithError(comp._compName, new RegExp(`\\[\\w*${regex}\\w*\\]`))
-  return createError(issue, fix, code)
+  const code = getCodeWithError(compName, new RegExp(`\\[\\w*${regex}\\w*\\]`))
+  return createError(issue, fix, code, compName)
 }
 
 /**
  * called when state placeholder is either a invalid path or a path which points to an undefined value in state
- * @param {Comp} comp
+ * @param {string} compName
  * @param {string} invalidState
  * @param {string} content
  * @returns {Error}
  */
-export const invalid_fn_placeholder = (comp, invalidState, content) => {
-  const compNodeName = `<${comp._compName}>`
+export const invalid_fn_placeholder = (compName, invalidState, content) => {
+  const compNodeName = `<${compName}>`
   const issue = `invalid state "${invalidState}" used in fn placeholder [ ${content} ] in ${compNodeName}`
   const fix = `Make sure that "${invalidState}" is available in state of ${compNodeName} or it's closure`
   const regex = invalidState.split('').join('\\s*')
-  const code = getCodeWithError(comp._compName, new RegExp(`\\[.*${regex}.*\\]`))
-  return createError(issue, fix, code)
+  const code = getCodeWithError(compName, new RegExp(`\\[.*${regex}.*\\]`))
+  return createError(issue, fix, code, compName)
 }
 
 /**
@@ -64,5 +64,5 @@ export const placeholder_not_closed = (compName, collectedString) => {
   const fix = `${ifNotPlaceholder}\n\n${ifPlaceholder}`
   const code = getCodeWithError(compName, new RegExp(`\\[${collectedString}`))
 
-  return createError(issue, fix, code)
+  return createError(issue, fix, code, compName)
 }

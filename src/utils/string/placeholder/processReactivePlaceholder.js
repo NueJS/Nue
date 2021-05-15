@@ -27,7 +27,7 @@ export const processReactivePlaceholder = (_content, _text) => {
         if (!isDefined(value)) throw value
         else return value
       } catch (e) {
-        if (!data._errorThrown) throw errors.invalid_state_placeholder(comp, _content)
+        if (!data._errorThrown) throw errors.invalid_state_placeholder(comp._compName, _content)
       }
     }
 

@@ -14,7 +14,7 @@ export const processPlaceholder = (text, noBrackets = false) => {
   // remove all spaces
   const content = bracketsRemoved.replace(/ /g, '')
 
-  if (content.includes('(')) {
+  if (content.includes('(') && content.includes(')')) {
     return processFnPlaceholder(content, text)
   }
   return processReactivePlaceholder(content, text)

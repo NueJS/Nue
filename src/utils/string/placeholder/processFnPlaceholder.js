@@ -40,7 +40,7 @@ export const processFnPlaceholder = (_content, _text) => {
 
     if (_DEV_) {
       values.forEach((value, i) => {
-        if (!isDefined(value)) throw errors.invalid_fn_placeholder(comp, args[i], _content)
+        if (!isDefined(value)) throw errors.invalid_fn_placeholder(comp._compName, args[i], _content)
       })
     }
 
