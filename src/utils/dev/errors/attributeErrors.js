@@ -27,24 +27,3 @@ If ${nodeName} is actually a component, make sure to declare it in the component
   return createError(issue, fix, code, compName)
 
 }
-
-/**
- * called when a function placeholder is used in input attribute binding
- * @param {string} compName
- * @param {string} text
- * @returns {Error}
- */
-export const function_placeholder_used_in_input_binding = (compName, text) => {
-  const issue = 'function placeholder used on input binding'
-
-  const fix = `\
-input binding must be a state placeholder.
-
-EXAMPLE:
-✔ :input=[foo]
-✖ :input=[someFn(bar)]`
-
-  const code = getCodeWithError(compName, new RegExp(text))
-
-  return createError(issue, fix, code, compName)
-}

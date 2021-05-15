@@ -6,6 +6,8 @@ import { errors } from '../dev/errors/index.js'
 import { attributeTypes } from '../../enums'
 import { conditionAttributes, loopAttributes, otherAttributes } from '../../constants'
 
+const { _normal, _ref, _bindProp, _conditional, _prop, _functional, _state, _staticState, _event } = attributeTypes
+
 /**
  * parse attributes on element if any
  * @param {Parsed_HTMLElement} element
@@ -29,19 +31,19 @@ export const parseAttributes = (element, targetCompName) => {
     let name = attributeName
 
     /**  @type {AttributeType} */
-    let type = attributeTypes._normal
+    let type = _normal
     let value
     const firstChar = attributeName[0]
 
     if (attributeName === otherAttributes._ref) {
-      type = attributeTypes._ref
+      type = _ref
       value = attributeValue
     }
 
     // SETTING FN OF COMPONENT
     else if (attributeName.startsWith('fn.')) {
       if (!elementIsComp) continue
-      type = attributeTypes._functional
+      type = _functional
       name = attributeName.slice(3)
       value = attributeValue
     }
@@ -52,17 +54,17 @@ export const parseAttributes = (element, targetCompName) => {
       name = attributeName.slice(2)
 
       if (variableValue) {
-        type = attributeTypes._state
+        type = _state
         value = processPlaceholder(attributeValue)
       } else {
-        type = attributeTypes._staticState
+        type = _staticState
         value = attributeValue
       }
     }
 
     // ATTACHING EVENT OR ACTION
     else if (firstChar === '@') {
-      type = attributeTypes._event
+      type = _event
       name = attributeName.slice(1)
       value = attributeValue
     }
@@ -71,13 +73,19 @@ export const parseAttributes = (element, targetCompName) => {
     else if (variableValue) {
       // conditionally setting attribute
       if (attributeName.endsWith(':if')) {
-        type = attributeTypes._conditional
+        type = _conditional
         name = attributeName.slice(0, -3)
       }
 
       // binding property
+      else if (attributeName.startsWith('bind:')) {
+        type = _bindProp
+        name = attributeName.slice(5)
+      }
+
+      // property
       else if (firstChar === ':') {
-        type = attributeTypes._prop
+        type = _prop
         name = attributeName.slice(1)
       }
 

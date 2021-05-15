@@ -1,5 +1,4 @@
-import { placeholderTypes } from '../../../enums.js'
-import { errors } from '../../dev/errors/index.js'
+import { attributeTypes } from '../../../enums.js'
 import { mutate } from '../../state/mutate.js'
 import { syncNode } from '../../subscription/node.js'
 
@@ -10,30 +9,31 @@ import { syncNode } from '../../subscription/node.js'
  * @param {Comp} comp
  */
 export const hydrateProp = (target, attribute, comp) => {
-  // [{ getValue, deps, type, content }, propName]
+
   const propName = attribute._name
-  const { _getValue, _type, _statePaths, _text } = /** @type {Placeholder} */(attribute._placeholder)
+
+  const { _getValue, _statePaths } = /** @type {Placeholder} */(attribute._placeholder)
+
   const setProp = () => {
     // @ts-expect-error
     target[propName] = _getValue(comp)
   }
 
-  if (target.matches('input, textarea')) {
-    // TODO: move this error to parsing phase
-    if (_DEV_ && _type === placeholderTypes._functional) throw errors.function_placeholder_used_in_input_binding(comp._compName, _text)
+  syncNode(comp, target, _statePaths, setProp)
 
+  // bind:prop
+  if (attribute._type === attributeTypes._bindProp) {
     // @ts-expect-error
     const isNumber = target.type === 'number' || target.type === 'range'
 
     const handler = () => {
-      // @ts-expect-error
+    // @ts-expect-error
       let value = target[propName]
       value = isNumber ? Number(value) : value
+      // as this is not a functional placeholder - it will only have one state dependency - so use the first one
       mutate(comp.$, _statePaths[0], value)
     }
 
     target.addEventListener('input', handler)
   }
-
-  syncNode(comp, target, _statePaths, setProp)
 }

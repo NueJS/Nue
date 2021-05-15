@@ -3,10 +3,11 @@ export const attributeTypes = {
   _event: /** @type {1}*/ (1),
   _state: /** @type {2}*/ (2),
   _prop: /** @type {3}*/ (3),
-  _conditional: /** @type {4}*/ (4),
-  _staticState: /** @type {5}*/ (5),
-  _functional: /** @type {6}*/ (6),
-  _ref: /** @type {7}*/ (7)
+  _bindProp: /** @type {3}*/ (4),
+  _conditional: /** @type {4}*/ (5),
+  _staticState: /** @type {5}*/ (6),
+  _functional: /** @type {6}*/ (7),
+  _ref: /** @type {7}*/ (8)
 }
 
 export const placeholderTypes = {

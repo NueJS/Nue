@@ -16,12 +16,14 @@ const {
   _functional,
   _state,
   _staticState,
-  _ref
+  _ref,
+  _bindProp
 } = attributeTypes
 
 const typeToFn = {
   [_event]: hydrateEvent,
   [_prop]: hydrateProp,
+  [_bindProp]: hydrateProp,
   [_normal]: hydrateNormalAttribute,
   [_conditional]: hydrateConditionalAttribute,
   [_functional]: hydrateFnProp,
