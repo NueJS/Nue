@@ -14,7 +14,7 @@ export const createCompDef = (CompClass, compName) => {
   compDef._compName = compName
   compDef._elName = dashify(compName)
   compDef._template = /** @type {HTMLTemplateElement}*/ (createElement('template'))
-  compDef._children = compDef.uses ? getChildren(compDef.uses) : {}
+  compDef._children = compDef.components ? getChildren(compDef.components) : {}
 
   return compDef
 }

@@ -2,7 +2,7 @@ interface CompDef {
   html: string,
   css?: string,
   js?: (comp: Comp) => void,
-  uses?: NueComp[],
+  components?: NueComp[],
   _compName: string,
   _elName: string,
   _template: HTMLTemplateElement,

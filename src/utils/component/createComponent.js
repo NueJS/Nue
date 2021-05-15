@@ -49,5 +49,5 @@ export const createComponent = CompClass => {
   // define component and then it's used child components
   customElements.define(compDef._elName, NueComp)
 
-  if (compDef.uses) compDef.uses.forEach(createComponent)
+  if (compDef.components) compDef.components.forEach(createComponent)
 }

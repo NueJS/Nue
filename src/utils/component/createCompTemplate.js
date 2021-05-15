@@ -10,11 +10,11 @@ import { dashifyComponentNames } from '../string/dashify'
 
 export const createCompTemplate = (compDef) => {
 
-  const { uses, html, css, _template } = compDef
+  const { components, html, css, _template } = compDef
 
   // replace compName with elName in html
-  const dashHtml = uses
-    ? dashifyComponentNames(html, uses)
+  const dashHtml = components
+    ? dashifyComponentNames(html, components)
     : html
 
   // fill template innerHTML with html and css
