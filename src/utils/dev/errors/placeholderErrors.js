@@ -47,6 +47,20 @@ export const function_not_found = (compName, fnName) => {
 }
 
 /**
+ * called when function used in template is not defined
+ * @param {string} compName
+ * @param {string} fnName
+ * @returns {Error}
+ */
+export const event_handler_not_found = (compName, fnName) => {
+  const compNodeName = `<${compName}>`
+  const issue = `could not find event handler "${fnName}" used in ${compNodeName}`
+  const fix = `Make sure that "${fnName}" is defined in the ${compNodeName}.fn or it's closure`
+  const code = getCodeWithError(compName, new RegExp(`=.*${fnName}`))
+  return createError(issue, fix, code, compName)
+}
+
+/**
  * called when a placeholder is opened but not closed
  * @param {string} compName
  * @param {string} collectedString
