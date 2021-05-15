@@ -1,8 +1,9 @@
-import { createComponent } from '../utils/component/createComponent'
-import { data } from '../utils/data'
-import { attachErrorOverlay } from '../utils/dev/error-overlay/attachErrorOverlay'
-import { errors } from '../utils/dev/errors'
-import { dashify } from '../utils/string/dashify'
+import { createComponent } from '../component/createComponent'
+import { data } from '../data'
+import { attachErrorOverlay } from '../dev/error-overlay/attachErrorOverlay'
+import { errors } from '../dev/errors'
+import { createElement } from '../dom/create'
+import { dashify } from '../string/dashify'
 
 /**
  * render component in place of targetElement with optional config
@@ -21,14 +22,14 @@ export const render = (compClass, config) => {
   createComponent(compClass)
 
   // replace the <component> with <component->
-  const compFnName = compClass.name
-  const targetElement = /** @type {Element}*/(document.querySelector(compFnName))
+  const compName = compClass.name
+  const targetElement = /** @type {Element}*/(document.querySelector(compName))
 
   if (_DEV_ && !targetElement) {
-    throw errors.root_not_found_in_html(compFnName)
+    throw errors.root_not_found_in_html(compName)
   }
 
-  const customElement = /** @type {Comp}*/(document.createElement(dashify(compFnName)))
+  const customElement = /** @type {Comp}*/(createElement(dashify(compName)))
   targetElement.replaceWith(customElement)
 
   return customElement
