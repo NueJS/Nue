@@ -4,12 +4,12 @@ import { getCodeWithError } from '../utils/code'
 
 /**
  * called when looped components are given non-unique key attribute
- * @param {Comp} comp
+ * @param {string} compName
  * @param {string[]} keys
  * @returns {Error}
  */
 
-export const keys_not_unique = (comp, keys) => {
+export const keys_not_unique = (compName, keys) => {
 
   const nonUniqueKeys = keys.filter((key, i) => {
     return keys.indexOf(key, i) !== keys.lastIndexOf(key)
@@ -20,7 +20,7 @@ export const keys_not_unique = (comp, keys) => {
   const _s = nonUniqueKeys.length > 1 ? 's' : ''
 
   const issue = `\
-non-unique key${_s} used in <${comp._compName}>
+non-unique key${_s} used in <${compName}>
 
 keys used: \n${_keys}
 
@@ -31,21 +31,22 @@ non-unique key${_s}: ${nonUniqueKeysJoin}`
   console.log('keys: ', keys)
   console.log('non unique Keys: ', nonUniqueKeys)
 
-  const errorCode = getCodeWithError(comp._compName, /\*key=/)
+  const code = getCodeWithError(compName, /\*key=/)
 
   // @TODO improve the regex
-  return createError(issue, fix, comp, errorCode, keys_not_unique.name)
+  return createError(issue, fix, code, compName)
 }
 
+// TODO: needs better regex
 /**
  * called when a key attribute is not a placeholder on a looped component
- * @param {Comp} comp
- * @param {Comp} compDef
+ * @param {string} loopedCompName
+ * @param {string} parentCompName
  * @returns {Error}
  */
-export const hardcoded_keys = (comp, compDef) => {
+export const hardcoded_keys = (loopedCompName, parentCompName) => {
 
-  const issue = `"*key" attribute on <${comp._compName}> in <${compDef._compName}> is hard-coded`
+  const issue = `"*key" attribute on <${loopedCompName}> in <${parentCompName}> is hard-coded`
 
   const fix = `\
 make sure you are using a placeholder on "*key" attribute's value.
@@ -55,8 +56,8 @@ Example:
 ✔ *key='[foo]'
 ✖ *key='foo'`
 
-  const errorCode = getCodeWithError(comp._compName, /\*key=/)
-  return createError(issue, fix, comp, errorCode, hardcoded_keys.name)
+  const code = getCodeWithError(parentCompName, /\*key=/)
+  return createError(issue, fix, code, parentCompName)
 }
 
 /**
@@ -71,9 +72,9 @@ export const missing_key_attribute = (loopedCompName, parentCompName) => {
 
   const fix = '*key attribute is required on a looped component for efficient and correct updates'
 
-  const errorCode = getCodeWithError(loopedCompName, new RegExp(`<${loopedCompName}`))
+  const code = getCodeWithError(loopedCompName, new RegExp(`<${loopedCompName}`))
 
-  return createError(issue, fix, null, errorCode, missing_key_attribute.name)
+  return createError(issue, fix, code, parentCompName)
 }
 
 /**

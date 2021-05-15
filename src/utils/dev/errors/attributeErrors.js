@@ -22,9 +22,9 @@ Remove this attribute if ${nodeName} is not a component
 If ${nodeName} is actually a component, make sure to declare it in the components() method
 `
 
-  const errorCode = getCodeWithError(compName, new RegExp(`/${attributeName}=`))
+  const code = getCodeWithError(compName, new RegExp(`/${attributeName}=`))
 
-  return createError(issue, fix, null, errorCode, component_attribute_used_on_non_component.name)
+  return createError(issue, fix, code, compName)
 
 }
 
@@ -46,5 +46,5 @@ EXAMPLE:
 
   const code = getCodeWithError(compName, new RegExp(text))
 
-  return createError(issue, fix, null, code, function_placeholder_used_in_input_binding.name)
+  return createError(issue, fix, code, compName)
 }

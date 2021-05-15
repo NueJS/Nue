@@ -23,7 +23,7 @@ export const addEvents = (comp) => {
 
     onMutate: (cb, slices) => {
       if (_DEV_ && !slices.length) {
-        throw errors.missing_dependency_array_in_onMutate(comp)
+        throw errors.missing_dependency_array_in_onMutate(comp._compName)
       }
 
       _onMount.push(() => {

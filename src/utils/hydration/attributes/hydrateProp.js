@@ -12,7 +12,7 @@ import { syncNode } from '../../subscription/node.js'
 export const hydrateProp = (target, attribute, comp) => {
   // [{ getValue, deps, type, content }, propName]
   const propName = attribute._name
-  const { _getValue, _type, _content, _statePaths, _text } = /** @type {Placeholder} */(attribute._placeholder)
+  const { _getValue, _type, _statePaths, _text } = /** @type {Placeholder} */(attribute._placeholder)
   const setProp = () => {
     // @ts-expect-error
     target[propName] = _getValue(comp)
@@ -20,7 +20,7 @@ export const hydrateProp = (target, attribute, comp) => {
 
   if (target.matches('input, textarea')) {
     // TODO: move this error to parsing phase
-    if (_DEV_ && _type === placeholderTypes._functional) throw errors.function_placeholder_used_in_input_binding(comp, _text)
+    if (_DEV_ && _type === placeholderTypes._functional) throw errors.function_placeholder_used_in_input_binding(comp._compName, _text)
 
     // @ts-expect-error
     const isNumber = target.type === 'number' || target.type === 'range'

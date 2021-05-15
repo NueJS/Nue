@@ -34,29 +34,13 @@ const getErrorLineIndex = (codeLines, errorRegex) => codeLines.findIndex((codeLi
 
 export const getCodeWithError = (compName, errorRegex) => {
   // get the error line index using the comp's fn
-  console.log({ errorRegex })
   const allCodeLines = getCompClassCode(compName)
   const matchLineIndex = getErrorLineIndex(allCodeLines, errorRegex)
-
-  // if not found there, error might be in the slot or on attributes of that comp
-  // in that case, error code will be in the parent of the comp
-  // if (matchLineIndex === -1 && comp.parent) {
-  //   allCodeLines = getCompClassCode(comp.parent._compName)
-  //   matchLineIndex = getErrorLineIndex(allCodeLines, errorRegex)
-  // }
 
   // if still can't find it - we need a better errorRegex
   if (matchLineIndex === -1) return undefined
 
   const code = document.createElement('code')
-
-  // show a total of 9 lines
-  const lineCount = 10
-  // let startIndex = matchLineIndex - Math.floor(lineCount / 2)
-  // let endIndex = matchLineIndex + Math.floor(lineCount / 2)
-
-  // startIndex = startIndex < 1 ? 1 : startIndex
-  // endIndex = endIndex > allCodeLines.length - 1 ? allCodeLines.length - 1 : endIndex
 
   /** @type {RegExpMatchArray}*/
   let regexMatch

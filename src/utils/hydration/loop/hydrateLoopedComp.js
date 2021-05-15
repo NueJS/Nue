@@ -47,7 +47,7 @@ export const hydrateLoopedComp = (loopedComp, parentComp) => {
   const getKey = (value, index) => {
     const pseudoComp = {
       $: getClosure(value, index),
-      _compFnName: loopedComp._compFnName
+      _compName: loopedComp._compName
     }
 
     return _key._getValue(

@@ -7,6 +7,6 @@ import { errors } from '../../../dev/errors/index.js'
  */
 export const checkUniquenessOfKeys = (keys, comp) => {
   if (new Set(keys).size !== keys.length) {
-    throw errors.keys_not_unique(comp, keys)
+    throw errors.keys_not_unique(comp._compName, keys)
   }
 }
