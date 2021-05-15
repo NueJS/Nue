@@ -9,7 +9,7 @@ import { data } from '../../data'
 export const getCompClassCode = (compName) => {
   // get the component function
   const compClass = data._definedComponents[compName]
-  return compClass.toString().split('\n').map(line => line.trim())
+  return compClass.toString().split('\n')
 }
 
 /**
@@ -52,16 +52,16 @@ export const getCodeWithError = (compName, errorRegex) => {
 
   // show a total of 9 lines
   const lineCount = 10
-  let startIndex = matchLineIndex - Math.floor(lineCount / 2)
-  let endIndex = matchLineIndex + Math.floor(lineCount / 2)
+  // let startIndex = matchLineIndex - Math.floor(lineCount / 2)
+  // let endIndex = matchLineIndex + Math.floor(lineCount / 2)
 
-  startIndex = startIndex < 1 ? 1 : startIndex
-  endIndex = endIndex > allCodeLines.length - 1 ? allCodeLines.length - 1 : endIndex
+  // startIndex = startIndex < 1 ? 1 : startIndex
+  // endIndex = endIndex > allCodeLines.length - 1 ? allCodeLines.length - 1 : endIndex
 
   /** @type {RegExpMatchArray}*/
   let regexMatch
 
-  for (let lineIndex = startIndex; lineIndex < endIndex; lineIndex++) {
+  for (let lineIndex = 0; lineIndex < allCodeLines.length; lineIndex++) {
     const line = allCodeLines[lineIndex]
 
     const errorLine = ['', '', '']

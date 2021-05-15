@@ -1,14 +1,19 @@
-const cardBg = '#222831'
-const codeBg = '#333C49'
-const overlay = 'rgba(51, 60, 73, 0.5)'
-const fontColor = '#dddddd'
-const fontColor2 = '#f05454'
-
 export const errorOverlayCSS = /* css */`
 
+:host {
+    /* colors */
+  --cardBg: hsl(215deg, 15%, 22%);
+  --codeBg: hsl(215deg, 15%, 28%);
+  --highlight: hsl(215deg, 15%, 38%);
+  --highlightWord: #738397;
+  --hoverHighlight: #4d5968;
+  --overlay: hsla(0deg, 0%, 90%, 50%);
+  --primaryColor: #d2dae2;
+  --secondColor: #d2dae2;
+}
+
 .panel {
-  background: ${overlay};
-  backdrop-filter: blur(5px);
+  background: var(--overlay);
   min-height: 100vh;
   margin: 0;
   box-sizing: border-box;
@@ -31,39 +36,44 @@ export const errorOverlayCSS = /* css */`
 }
 
 .code {
-  background: ${codeBg};
+  background: var(--codeBg);
   padding: 20px;
-  color: ${fontColor};
+  color: var(--primaryColor);
   font-size: 16px;
   border-radius: 5px;
   line-height: 1.5;
   overflow-x: auto;
+  max-height: 40vh;
 }
 
 .code span.error {
-  color: ${fontColor2};
+  color: white;
   display: inline-block;
-  background: ${cardBg};
+  background: var(--highlightWord);
   padding: 0.1em 0.3em;
   border-radius: 5px;
   margin: 0 0.2em;
 }
 
+.code span.error:focus {
+  outline: none;
+}
+
 .code div {
   border-radius: 5px;
-  padding: 0.2em 0.5em;
+  margin-bottom: 0.2em;
 }
 
 .code div:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--hoverHighlight);
 }
 
 .code div.has-error {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--highlight);
 }
 
 .card {
-  background: ${cardBg};
+  background: var(--cardBg);
   border-radius: 5px;
   padding: 30px;
   max-width: 850px;
@@ -74,7 +84,7 @@ export const errorOverlayCSS = /* css */`
   margin: 0 auto;
   animation: fade-in 300ms ease;
   position: relative;
-  box-shadow: 2px 2px 20px rgba(0,0,0,0.1);
+  box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
   position: absolute;
   left: 50%;
   top: 50%;
@@ -88,12 +98,28 @@ export const errorOverlayCSS = /* css */`
 
 /* Track */
 .card::-webkit-scrollbar-track {
-  background: ${cardBg};
+  background: var(--cardBg);
 }
 
 /* Handle */
 .card::-webkit-scrollbar-thumb {
-  background: ${codeBg};
+  background: var(--codeBg);
+}
+
+/* width */
+.code::-webkit-scrollbar {
+  width: 5px;
+}
+
+/* Track */
+.code::-webkit-scrollbar-track {
+  background: var(--codeBg);
+}
+
+/* Handle */
+.code::-webkit-scrollbar-thumb {
+  background: var(--highlight);
+  border-radius: 5px;
 }
 
 .close-icon {
@@ -112,7 +138,7 @@ export const errorOverlayCSS = /* css */`
 }
 
 .close-icon svg {
-  fill: ${fontColor2};
+  fill: var(--secondColor);
 }
 
 .code-container {
@@ -125,8 +151,8 @@ export const errorOverlayCSS = /* css */`
   right: 20px;
   padding: 10px 15px;
   font-size: 14px;
-  color: ${fontColor};
-  background: ${cardBg};
+  color: var(--primaryColor);
+  background: var(--cardBg);
   border: none;
   border-radius: 5px;
 }
@@ -134,11 +160,12 @@ export const errorOverlayCSS = /* css */`
 .title {
   font-size: 24px;
   margin-bottom: 20px;
-  color: ${fontColor2};
+  font-weight: 700;
+  color: var(--secondColor);
 }
 
 .console {
-  color: ${fontColor2};
+  color: var(--secondColor);
   font-size: 16px;
   margin-top: 20px;
 }
@@ -148,8 +175,13 @@ export const errorOverlayCSS = /* css */`
   font-size: 16px;
   border-radius: 5px;
   white-space: pre-wrap;
-  color: ${fontColor};
+  color: var(--primaryColor);
   margin: 20px 0;
+}
+
+::selection {
+  background: var(--highlightWord);
+  color: white;
 }
 
 `

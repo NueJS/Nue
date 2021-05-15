@@ -11,9 +11,24 @@ export const invalid_state_placeholder = (comp, content) => {
   const compNodeName = `<${comp._compName}>`
   const issue = `invalid state placeholder: [${content}] used in ${compNodeName}`
   const fix = `Make sure that "${content}" is available in state of ${compNodeName} or it's closure`
-  const regex = content.split('').join('\\s*')
-  console.log({ regex })
+  const regex = content.split('').join('\\s*').replace(')', '\\)').replace('(', '\\(')
   const code = getCodeWithError(comp._compName, new RegExp(`\\[\\w*${regex}\\w*\\]`))
+  return createError(issue, fix, code)
+}
+
+/**
+ * called when state placeholder is either a invalid path or a path which points to an undefined value in state
+ * @param {Comp} comp
+ * @param {string} invalidState
+ * @param {string} content
+ * @returns {Error}
+ */
+export const invalid_fn_placeholder = (comp, invalidState, content) => {
+  const compNodeName = `<${comp._compName}>`
+  const issue = `invalid state "${invalidState}" used in fn placeholder [ ${content} ] in ${compNodeName}`
+  const fix = `Make sure that "${invalidState}" is available in state of ${compNodeName} or it's closure`
+  const regex = invalidState.split('').join('\\s*')
+  const code = getCodeWithError(comp._compName, new RegExp(`\\[.*${regex}.*\\]`))
   return createError(issue, fix, code)
 }
 

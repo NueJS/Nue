@@ -39,8 +39,8 @@ export const processFnPlaceholder = (_content, _text) => {
     const values = tps.map(([t, p]) => t[p])
 
     if (_DEV_) {
-      values.forEach((value) => {
-        if (!isDefined(value)) throw errors.invalid_state_placeholder(comp, _content)
+      values.forEach((value, i) => {
+        if (!isDefined(value)) throw errors.invalid_fn_placeholder(comp, args[i], _content)
       })
     }
 

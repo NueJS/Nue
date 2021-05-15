@@ -44,8 +44,12 @@ export const showErrorOverlay = (error) => {
 
   if (error.issue) {
     title.textContent = error.name
-    message.textContent = `${error.issue}\n\n${error.fix}`
+    message.textContent = `${error.issue}\n${error.fix}`
     code.innerHTML = error.code.innerHTML
+
+    const codeError = /** @type {HTMLElement} */(code.querySelector('.error'))
+    codeError.tabIndex = 0
+    codeError.focus()
   }
 
   else {
