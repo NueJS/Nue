@@ -3,15 +3,29 @@
 Object.defineProperty(exports, '__esModule', { value: true });
 
 const data = {
-  /** @type Record<string, Function> */
-  _components: {},
+  /** @type Record<string, NueComp> */
+  _definedComponents: {},
   _errorThrown: false,
   _config: {
-    defaultStyle: ':host{display:block;}'
+    defaultStyle: ''
   },
   /** @type {Function | undefined} */
   _onNodeUpdate: undefined
 };
+
+/**
+ * returns newly created element of given tag name
+ * @param {string} tagName
+ * @returns {Element}
+ */
+const createElement = (tagName) => document.createElement(tagName);
+
+/**
+ * returns a comment node with given text
+ * @param {string} data
+ * @returns {Comment}
+ */
+const createComment = (data) => document.createComment(data);
 
 // reserved attribute names
 
@@ -50,85 +64,21 @@ const ITSELF = /*#__PURE__*/ Symbol();
 const getAttr = (element, name) => element.getAttribute(name);
 
 /**
- * remove name attribute from element
- * @param {HTMLElement} element
- * @param {string} name
- */
+  * remove name attribute from element
+  * @param {HTMLElement} element
+  * @param {string} name
+  */
 const removeAttr = (element, name) => element.removeAttribute(name);
 
 /**
- * remove name attribute from element
- * @param {HTMLElement} element
- * @param {string} name
- * @param {string} value
- */
+  * remove name attribute from element
+  * @param {HTMLElement} element
+  * @param {string} name
+  * @param {string} value
+  */
 const setAttr = (element, name, value) => element.setAttribute(name, value);
 
-/**
- * remove name attribute from element
- * @param {HTMLElement} element
- * @param {string} name
- * @param {boolean} [clearAnimation]
- * @param {Function} [cb]
- */
-const animate = (element, name, clearAnimation = false, cb) => {
-  element.style.animation = name;
-  if (clearAnimation) {
-    onAnimationEnd(element, () => {
-      element.style.animation = '';
-      if (cb) cb();
-    });
-  }
-};
-
-/**
- * when animation ends on element run callback
- * @param {HTMLElement} element
- * @param {() => any} cb
- */
-const onAnimationEnd = (element, cb) => {
-  element.addEventListener('animationend', cb, { once: true });
-};
-
-/**
- * returns newly created element of given tag name
- * @param {string} tagName
- * @returns {Element}
- */
-const createElement = (tagName) => document.createElement(tagName);
-
-/**
- * returns a comment node with given text
- * @param {string} data
- * @returns {Comment}
- */
-const createComment = (data) => document.createComment(data);
-
-/**
- * call disconnectedCallback and then play remove animation
- * @param {Comp} comp
- * @param {string} animation
- */
-const animatedRemove = (comp, animation) => {
-  comp.disconnectedCallback();
-  comp._manuallyDisconnected = true;
-  animate(comp, animation, true, () => comp.remove());
-};
-
-/**
- * run animation on all elements, and call onAnimationEnd when last animation is completed
- * @param {HTMLElement[]} elements
- * @param {string} cssAnimation
- * @param {Function} onLastAnimationEnd
- */
-const animateAll = (elements, cssAnimation, onLastAnimationEnd) => {
-  const lastIndex = elements.length - 1;
-  elements.forEach((comp, i) => {
-    animate(comp, cssAnimation, true, () => {
-      if (i === lastIndex) onLastAnimationEnd();
-    });
-  });
-};
+const { _enter: _enter$2, _exit: _exit$2, _move: _move$1 } = animationAttributes;
 
 /**
  * return object containing enter and exit animation info
@@ -136,10 +86,23 @@ const animateAll = (elements, cssAnimation, onLastAnimationEnd) => {
  * @returns {AnimationAttributes_ParseInfo}
  */
 const getAnimationAttributes = (element) => ({
-  _enter: getAttr(element, animationAttributes._enter),
-  _exit: getAttr(element, animationAttributes._exit),
-  _move: getAttr(element, animationAttributes._move)
+  _enter: getAttr(element, _enter$2),
+  _exit: getAttr(element, _exit$2),
+  _move: getAttr(element, _move$1)
 });
+
+/**
+ * return lowercase string
+ * @param {string} str
+ * @returns {string}
+ */
+const lower = str => str.toLowerCase();
+
+/**
+ * convert string to upperCase
+ * @param {string} str
+ */
+const upper = str => str.toUpperCase();
 
 const node = /*#__PURE__*/ document.createElement('div');
 
@@ -157,318 +120,66 @@ const dashCaseToCamelCase = (name) => {
 };
 
 /**
- * call this function to show that given node is updated
- * @param {ParsedDOMElement} node
- */
-const nodeUpdated = (node) => {
-  if (data._onNodeUpdate) data._onNodeUpdate(node);
-};
-
-/**
- * return function which when called adds the cb to given batch
- * @param {SubCallBack | Function} cb
- * @param {Batch} batch
- */
-const batchify = (cb, batch) => () => batch.add(cb);
-
-// @todo reduce the amount of functions in this file - they all are very similar
-/**
- *
- * @param {Batch} batch
- * @param {Mutation[]} mutations
- */
-const flushBatch = (batch, mutations) => {
-  batch.forEach(cb => {
-
-    const { _node } = /** @type {SubCallBack}*/(cb);
-    // if cb is for updating a node, only call cb if node is subscribed
-    if ((_node && _node._isSubscribed) || !_node) {
-      cb(mutations);
-      if (_node) {
-        nodeUpdated(_node);
-      }
-    }
-  });
-  // once all callbacks are run clear the batch
-  batch.clear();
-};
-
-/**
- * flush events and batched callbacks to outside world
- * @param {Comp} comp
- * @param {Mutation[]} mutations
- */
-const flush = (comp, mutations) => {
-
-  comp._hookCbs._beforeUpdate.forEach(cb => cb(mutations));
-
-  // run and clear batches
-  comp._batches.forEach(batch => flushBatch(batch, mutations));
-
-  comp._hookCbs._afterUpdate.forEach(cb => cb(mutations));
-
-};
-
-/**
- * schedule the flush
- * @param {Comp} comp
- */
-const scheduleFlush = (comp) => {
-  // schedule flush
-  setTimeout(() => {
-    // do a shallow clone because comp.batchInfo will be cleared out
-    const mutations = [...comp._mutations];
-
-    flush(comp, mutations);
-    // clear batch info
-    comp._mutations.length = 0;
-    // reset flag
-    comp._flush_scheduled = false;
-  }, 0);
-
-  // start batching
-  comp._flush_scheduled = true;
-};
-
-/**
- * notify all the callbacks that are in given subscriptions
- * @param {Subscriptions} subtree
- */
-const notifySubTree = (subtree) => {
-  // @ts-expect-error
-  subtree[ITSELF].forEach(cb => cb());
-  for (const k in subtree) notifySubTree(subtree[k]);
-};
-
-/**
- * notify callbacks that are subscribed to given path that it is mutated
- * navigate inside subscriptions using the path and notify entire subtree
- * @param {Subscriptions} subscriptions
- * @param {StatePath} path
- */
-const notify = (subscriptions, path) => {
-  let tree = subscriptions;
-  const lastEdgeIndex = path.length - 1;
-
-  path.forEach((edge, edgeIndex) => {
-    // @ts-expect-error
-    tree[ITSELF].forEach(cb => cb());
-    tree = tree[edge];
-    // no subscription exists for the given edge, return
-    if (!tree) return
-    if (edgeIndex === lastEdgeIndex) notifySubTree(tree);
-  });
-};
-
-/**
- * when state is mutated, add the cb in batch
- * schedule flush if not already scheduled
- * @param {Comp} comp
- * @param {StatePath} path
- */
-const onMutate = (comp, path) => {
-  notify(comp._subscriptions, path);
-  if (!comp._flush_scheduled) scheduleFlush(comp);
-};
-
-const modes = {
-  /** when detection mode is true,
-   * all key accessed in state is recorded in an array called "keyAccesses"
-   */
-  _detective: false,
-
-  /** when reactive is true
-   * state mutation does not invoke onMutate function
-   */
-  _reactive: false,
-
-  /** when noOverride is true,
-   * setting a key in state which already exists does nothing
-   * this is used so that default value of state does not override the state set by the parent component
-   * via state attribute
-   */
-  _noOverride: false,
-
-  /** when origin mode is true,
-   * it returns the comp where the piece of state is coming from rather it's value
-   */
-  _returnComp: false
-};
-
-const attributeTypes = {
-  _normal: /** @type {0}*/ (0),
-  _event: /** @type {1}*/ (1),
-  _state: /** @type {2}*/ (2),
-  _prop: /** @type {3}*/ (3),
-  _conditional: /** @type {4}*/ (4),
-  _staticState: /** @type {5}*/ (5),
-  _functional: /** @type {6}*/ (6),
-  _ref: /** @type {7}*/ (7)
-};
-
-const placeholderTypes = {
-  _reactive: /** @type {0}*/ (0),
-  _functional: /** @type {1}*/ (1)
-};
-
-const batches = {
-  _beforeDOM: /** @type {0}*/ (0),
-  _DOM: /** @type {1}*/ (1)
-};
-
-/**
- * return [target, prop] for given path in object
- * @param {Record<string, any>} obj
- * @param {StatePath} path
- * @returns {[Record<string, any>, any]}
- */
-
-const targetProp = (obj, path) => {
-  const target = path.slice(0, -1).reduce((target, key) => target[key], obj);
-  const prop = path[path.length - 1];
-  return [target, prop]
-};
-
-/**
- * get the origin component where the value of the state is coming from
- * @param {Comp} baseComp
- * @param {StatePath} statePath
- * @returns {Comp}
- */
-const origin = (baseComp, statePath) => {
-  if (statePath.length === 0) return baseComp
-
-  let target, prop;
-  [target, prop] = targetProp(baseComp.$, statePath);
-
-  // @ts-ignore
-  if (!target[IS_REACTIVE]) {
-    [target, prop] = targetProp(baseComp.$, statePath.slice(0, -1));
-  }
-
-  modes._returnComp = true;
-  const originCompNode = target[prop];
-  modes._returnComp = false;
-
-  return originCompNode
-};
-
-/**
- * create an error object that to be shown in error-overlay and in console
- * @param {string} issue
- * @param {string} fix
- * @param {Comp | null} comp
- * @param {string} errorCode
- * @param {string} errorName
- * @returns {NueError}
- */
-const createError = (issue, fix, comp, errorCode, errorName) => {
-
-  // get the component function
-  if (comp) {
-    const compFn = data._components[comp._compFnName];
-
-    console.error(compFn);
-    console.error(comp);
-  }
-
-  console.log(' ');
-
-  const error = /** @type {NueError}*/(new Error(`${errorCode ? `\n\n${errorCode}\n\n` : ''}${issue}\n\n${fix}\n`));
-  error.code = errorCode;
-  error.fix = fix;
-  error.issue = issue;
-  error.name = `nue.js error : ${errorName}`;
-
-  return error
-};
-
-/**
- * return array of lines of codes of given component's function
- * @param {Comp} comp
- * @return {string[]}
- */
-
-const getCompFnLines = (comp) => {
-  // get the component function
-  const compFn = data._components[comp._compFnName];
-  // return array of lines of that function's code
-  return compFn.toString().split('\n')
-};
-
-/**
- * return the index of line which is having the error
- * line which is having the error will have a match for given regex
- * @param {string[]} codeLines
- * @param {RegExp} errorRegex
- * @returns {number}
- */
-const getErrorLineIndex = (codeLines, errorRegex) => codeLines.findIndex((codeLine) => {
-  const match = codeLine.match(errorRegex);
-  return match !== null
-});
-
-/**
- * highlight word in code of given component
- * and return the portion of code surrounding code of that word
- * @param {Comp} comp
- * @param {RegExp} errorRegex
+ * add dash at the end of string
+ * @param {string} str
  * @returns {string}
  */
+const dashify = str => lower(str) + '-';
 
-const getCodeWithError = (comp, errorRegex) => {
-  // get the error line index using the comp's fn
-  let allCodeLines = getCompFnLines(comp);
-  let matchLineIndex = getErrorLineIndex(allCodeLines, errorRegex);
+/**
+ * returns the nodeName of given compFnName
+ * @param {string} str
+ */
+const nodeName = str => upper(str) + '-';
 
-  // if not found there, error might be in the slot or on attributes of that comp
-  // in that case, error code will be in the parent of the comp
-  if (matchLineIndex === -1 && comp.parent) {
-    allCodeLines = getCompFnLines(comp.parent);
-    matchLineIndex = getErrorLineIndex(allCodeLines, errorRegex);
-  }
+/**
+ * replace component names in html with dashed names
+ * @param {string} html
+ * @param {Function[]} compFns
+ * @returns {string}
+ */
+const dashifyComponentNames = (html, compFns) =>
+  compFns.reduce(
+    (acc, compFn) => acc.replace(new RegExp(`<${compFn.name}|</${compFn.name}`, 'g'), dashify),
+    html
+  );
 
-  // if still can't find it - we need a better errorRegex
-  if (matchLineIndex === -1) return ''
+/**
+ * returns the map object which contains the name of child components
+ * where the key is the nodeName of the child component and
+ * value is the compFn name of the child component
+ *
+ * @param {NueComp[]} compClasses
+ */
+const getChildren = (compClasses) => compClasses.reduce(
+  /**
+   * @param {Record<string, string>} acc
+   * @param {NueComp} compClass
+   * @returns {Record<string, string>}
+   */
+  (acc, compClass) => {
+    const { name } = compClass;
+    acc[nodeName(name)] = name;
+    return acc
+  },
+  {}
+);
 
-  const codeLines = [];
+/**
+ * create component definition using the CompClass
+ * @param {NueComp} CompClass
+ */
+const createCompDef = (CompClass) => {
+  const compDef = new CompClass();
+  const compName = CompClass.name;
 
-  let startIndex = matchLineIndex - 3;
-  let endIndex = matchLineIndex + 4;
-  startIndex = startIndex < 1 ? 1 : startIndex;
-  endIndex = endIndex > allCodeLines.length - 1 ? allCodeLines.length - 1 : endIndex;
+  compDef._class = CompClass;
+  compDef._compName = compName;
+  compDef._elName = dashify(compName);
+  compDef._template = /** @type {HTMLTemplateElement}*/ (createElement('template'));
+  compDef._children = compDef.components ? getChildren(compDef.components) : {};
 
-  let matchLineIndexInPartialCode = 0;
-
-  /** @type {RegExpMatchArray}*/
-  let regexMatch;
-
-  for (let i = startIndex; i < endIndex; i++) {
-    const line = allCodeLines[i];
-    codeLines.push(line);
-
-    if (i === matchLineIndex) {
-      matchLineIndexInPartialCode = codeLines.length;
-      regexMatch = /** @type {RegExpMatchArray}*/(line.match(errorRegex));
-
-      let dashLine = '';
-      for (let i = 0; i < /** @type {number}*/(regexMatch.index); i++) dashLine += ' ';
-      for (let i = matchLineIndex; i < matchLineIndex + regexMatch[0].length; i++) dashLine += '─';
-
-      codeLines.push(dashLine);
-    }
-  }
-
-  return codeLines.map((line, lineIndex) => {
-    let num;
-    if (matchLineIndexInPartialCode === lineIndex) num = '──';
-    else if (lineIndex === matchLineIndexInPartialCode - 1) num = 'x';
-    else if (lineIndex > matchLineIndexInPartialCode) num = lineIndex - matchLineIndexInPartialCode;
-    else num = lineIndex - matchLineIndexInPartialCode + 1;
-
-    const lineNumber = String(num);
-    return lineNumber.padStart(3) + ' | ' + line
-  }).join('\n')
+  return compDef
 };
 
 /**
@@ -512,20 +223,6 @@ const arrayToHash = (arr) => {
 const isDefined = x => x !== undefined;
 
 /**
- * return lowercase string
- * @param {string} str
- * @returns {string}
- */
-const lower = (str) => str.toLowerCase();
-
-/**
- * convert string to upperCase
- * @param {string} str
- * @returns {string}
- */
-const upper = (str) => str.toUpperCase();
-
-/**
  * execute all functions in array and clear array
  * @param {Function[]} arr
  */
@@ -553,30 +250,133 @@ const arraysAreShallowEqual = (arr1, arr2) => {
 const isObject = x => typeof x === 'object' && x !== null;
 
 /**
- * returns the component name surrounded by angular brackets eg. <compName>
- * @param {Comp} comp
- * @returns {string}
+ * create an error object that to be shown in error-overlay and in console
+ * @param {string} issue
+ * @param {string} fix
+ * @param {HTMLElement} [code]
+ * @param {string} [compName]
+ * @returns {NueError}
  */
-const angularCompName = comp => `<${comp._compFnName}>`;
+const createError = (issue, fix, code, compName) => {
+
+  // get the component function
+  if (compName) {
+    const compClass = data._definedComponents[compName];
+
+    console.error(compClass);
+  }
+
+  console.log(' ');
+
+  const error = /** @type {NueError}*/(new Error(`\n${issue}\n\n${fix}\n`));
+
+  if (code) error.code = code;
+  error.fix = fix;
+  error.issue = issue;
+  error.name = compName ? `nue.error in ${compName}` : 'nue.error';
+
+  return error
+};
 
 /**
- * returns the node name surrounded by angular brackets eg. <h1>
- * @param {Element} node
- * @returns {string}
+ * return array of lines of codes of given component's function
+ * @param {string} compName
+ * @return {string[]}
  */
-const angularNodeName = (node) => `<${lower(node.nodeName)}>`;
+
+const getCompClassCode = (compName) => {
+  // get the component function
+  const compClass = data._definedComponents[compName];
+  return compClass.toString().split('\n')
+};
+
+/**
+ * return the index of line which is having the error
+ * line which is having the error will have a match for given regex
+ * @param {string[]} codeLines
+ * @param {RegExp} errorRegex
+ * @returns {number}
+ */
+const getErrorLineIndex = (codeLines, errorRegex) => codeLines.findIndex((codeLine) => {
+  const match = codeLine.match(errorRegex);
+  return match !== null
+});
+
+/**
+ * highlight word in code of given component
+ * and return the portion of code surrounding code of that word
+ * @param {string} compName
+ * @param {RegExp} errorRegex
+ * @returns {HTMLElement | undefined}
+ */
+
+const getCodeWithError = (compName, errorRegex) => {
+  // get the error line index using the comp's fn
+  const allCodeLines = getCompClassCode(compName);
+  const matchLineIndex = getErrorLineIndex(allCodeLines, errorRegex);
+
+  // if still can't find it - we need a better errorRegex
+  if (matchLineIndex === -1) return undefined
+
+  const code = document.createElement('code');
+
+  /** @type {RegExpMatchArray}*/
+  let regexMatch;
+
+  for (let lineIndex = 0; lineIndex < allCodeLines.length; lineIndex++) {
+    const line = allCodeLines[lineIndex];
+
+    const errorLine = ['', '', ''];
+    let hasError = false;
+
+    if (lineIndex === matchLineIndex) {
+      hasError = true;
+
+      regexMatch = /** @type {RegExpMatchArray}*/(line.match(errorRegex));
+
+      const startIndex = /** @type {number}*/(regexMatch.index);
+      const endIndex = startIndex + regexMatch[0].length - 1;
+
+      for (let i = 0; i < line.length; i++) {
+        if (i < startIndex) errorLine[0] += line[i];
+        else if (i > endIndex) errorLine[2] += line[i];
+        else errorLine[1] += line[i];
+      }
+
+    }
+
+    const lineEl = document.createElement('div');
+    code.append(lineEl);
+    if (!hasError) lineEl.textContent = line;
+    else {
+      const beforeText = document.createTextNode(errorLine[0]);
+      const afterText = document.createTextNode(errorLine[2]);
+      const errorText = document.createElement('span');
+      errorText.className = 'error';
+      errorText.textContent = errorLine[1];
+
+      lineEl.append(beforeText);
+      lineEl.append(errorText);
+      lineEl.append(afterText);
+
+      lineEl.className = 'has-error';
+    }
+  }
+
+  return code
+};
 
 /**
  * called when a component specific attribute is added on a non-component element
  * @param {Element} node
  * @param {string} attributeName
- * @param {Comp} comp
+ * @param {string} compName
  * @returns {Error}
  */
 
-const component_attribute_used_on_non_component = (node, attributeName, comp) => {
+const component_attribute_used_on_non_component = (node, attributeName, compName) => {
 
-  const nodeName = angularNodeName(node);
+  const nodeName = node.nodeName;
 
   const issue = `\
 '${attributeName}' attribute can only be used on a component,
@@ -588,60 +388,38 @@ Remove this attribute if ${nodeName} is not a component
 If ${nodeName} is actually a component, make sure to declare it in the components() method
 `;
 
-  const errorCode = getCodeWithError(comp, new RegExp(`/${attributeName}=`));
+  const code = getCodeWithError(compName, new RegExp(`/${attributeName}=`));
 
-  return createError(issue, fix, comp, errorCode, component_attribute_used_on_non_component.name)
+  return createError(issue, fix, code, compName)
 
-};
-
-/**
- * called when a function placeholder is used in input attribute binding
- * @param {Comp} comp
- * @param {string} text
- * @returns {Error}
- */
-const function_placeholder_used_in_input_binding = (comp, text) => {
-  const issue = 'function placeholder used on input binding';
-
-  const fix = `\
-input binding must be a state placeholder.
-
-EXAMPLE:
-✔ :input=[foo]
-✖ :input=[someFn(bar)]`;
-
-  const code = getCodeWithError(comp, new RegExp(text));
-
-  return createError(issue, fix, comp, code, function_placeholder_used_in_input_binding.name)
 };
 
 var attributeErrors = /*#__PURE__*/Object.freeze({
   __proto__: null,
-  component_attribute_used_on_non_component: component_attribute_used_on_non_component,
-  function_placeholder_used_in_input_binding: function_placeholder_used_in_input_binding
+  component_attribute_used_on_non_component: component_attribute_used_on_non_component
 });
 
 /**
  * called when onMutate is called without a second argument of dependency array
- * @param {Comp} comp
- * @returns {Error}
+ * @param {string} compName
  */
 
-const missing_dependency_array_in_onMutate = (comp) => {
-  const issue = `Missing dependencies in onMutate() in ${angularCompName(comp)}`;
+const missing_dependency_array_in_onMutate = (compName) => {
+
+  const issue = `Missing dependencies in onMutate() in ${compName}`;
 
   const fix = `\
 onMutate hook expects a dependency array as second argument.
 
 Example:
-onMutate(callbackFn, [ 'foo', 'bar.baz'])`;
+onMutate(callbackFn, [ 'foo', 'bar.baz' ])`;
 
-  const errorCode = getCodeWithError(comp, /onMutate(\\w*)/);
+  const code = getCodeWithError(compName, /onMutate(\\w*)/);
 
-  return createError(issue, fix, comp, errorCode, missing_dependency_array_in_onMutate.name)
+  return createError(issue, fix, code, compName)
 };
 
-var hookErrors = /*#__PURE__*/Object.freeze({
+var eventErrors = /*#__PURE__*/Object.freeze({
   __proto__: null,
   missing_dependency_array_in_onMutate: missing_dependency_array_in_onMutate
 });
@@ -655,12 +433,12 @@ const toJSON = v => JSON.stringify(v, null, 2);
 
 /**
  * called when looped components are given non-unique key attribute
- * @param {Comp} comp
+ * @param {string} compName
  * @param {string[]} keys
  * @returns {Error}
  */
 
-const keys_not_unique = (comp, keys) => {
+const keys_not_unique = (compName, keys) => {
 
   const nonUniqueKeys = keys.filter((key, i) => {
     return keys.indexOf(key, i) !== keys.lastIndexOf(key)
@@ -671,7 +449,7 @@ const keys_not_unique = (comp, keys) => {
   const _s = nonUniqueKeys.length > 1 ? 's' : '';
 
   const issue = `\
-non-unique key${_s} used in ${angularCompName(comp)}
+non-unique key${_s} used in <${compName}>
 
 keys used: \n${_keys}
 
@@ -682,21 +460,22 @@ non-unique key${_s}: ${nonUniqueKeysJoin}`;
   console.log('keys: ', keys);
   console.log('non unique Keys: ', nonUniqueKeys);
 
-  const errorCode = getCodeWithError(comp, /\*key=/);
+  const code = getCodeWithError(compName, /\*key=/);
 
   // @TODO improve the regex
-  return createError(issue, fix, comp, errorCode, keys_not_unique.name)
+  return createError(issue, fix, code, compName)
 };
 
+// TODO: needs better regex
 /**
  * called when a key attribute is not a placeholder on a looped component
- * @param {Comp} comp
- * @param {Comp} parentComp
+ * @param {string} loopedCompName
+ * @param {string} parentCompName
  * @returns {Error}
  */
-const hardcoded_keys = (comp, parentComp) => {
+const hardcoded_keys = (loopedCompName, parentCompName) => {
 
-  const issue = `"*key" attribute on ${angularCompName(comp)} in ${angularCompName(parentComp)} is hard-coded`;
+  const issue = `"*key" attribute on <${loopedCompName}> in <${parentCompName}> is hard-coded`;
 
   const fix = `\
 make sure you are using a placeholder on "*key" attribute's value.
@@ -706,146 +485,857 @@ Example:
 ✔ *key='[foo]'
 ✖ *key='foo'`;
 
-  const errorCode = getCodeWithError(comp, /\*key=/);
-  return createError(issue, fix, comp, errorCode, hardcoded_keys.name)
+  const code = getCodeWithError(parentCompName, /\*key=/);
+  return createError(issue, fix, code, parentCompName)
 };
 
 /**
  * called when key attribute is not specified on looped component
- * @param {Comp} comp
- * @param {Comp} parentComp
+ * @param {string} loopedCompName
+ * @param {string} parentCompName
  * @returns {Error}
  */
-const missing_key_attribute = (comp, parentComp) => {
+const missing_key_attribute = (loopedCompName, parentCompName) => {
 
-  const issue = `"*key" attribute is missing on looped component ${angularCompName(comp)} in ${angularCompName(parentComp)}`;
+  const issue = `"*key" attribute is missing on looped component <${loopedCompName}> in <${parentCompName}>`;
 
   const fix = '*key attribute is required on a looped component for efficient and correct updates';
 
-  const errorCode = getCodeWithError(parentComp, new RegExp(`<${comp._compFnName}`));
+  const code = getCodeWithError(loopedCompName, new RegExp(`<${loopedCompName}`));
 
-  return createError(issue, fix, comp, errorCode, missing_key_attribute.name)
-};
-
-/**
- * called when looping attribute *for is given invalid value
- * @param {Comp} comp
- * @param {Comp} parentComp
- * @returns {Error}
- */
-const invalid_for_attribute = (comp, parentComp) => {
-
-  const issue = `Invalid for attribute value on ${angularCompName(comp)} in ${angularCompName(parentComp)}`;
-
-  const fix = `\
-make sure you are following this pattern:
-*for='(item, index) in items'
-or
-*for='item in items'`;
-
-  const errorCode = getCodeWithError(parentComp, /\*for=/);
-
-  return createError(issue, fix, comp, errorCode, invalid_for_attribute.name)
+  return createError(issue, fix, code, parentCompName)
 };
 
 var loopedCompErrors = /*#__PURE__*/Object.freeze({
   __proto__: null,
   keys_not_unique: keys_not_unique,
   hardcoded_keys: hardcoded_keys,
-  missing_key_attribute: missing_key_attribute,
-  invalid_for_attribute: invalid_for_attribute
+  missing_key_attribute: missing_key_attribute
 });
 
 /**
  * called when state placeholder is either a invalid path or a path which points to an undefined value in state
- * @param {Comp} comp
+ * @param {string} compName
  * @param {string} content
  * @returns {Error}
  */
-const invalid_state_placeholder = (comp, content) => {
-  const issue = `invalid state placeholder: [${content}] used in ${angularCompName(comp)}`;
-  const fix = `Make sure that "${content}" is available in state of ${angularCompName(comp)} or it's closure`;
-  const regex = content.split('').join('\\s*');
-  const errorCode = getCodeWithError(comp, new RegExp(`\\[\\w*${regex}\\w*\\]`));
-  return createError(issue, fix, comp, errorCode, invalid_state_placeholder.name)
+const invalid_state_placeholder = (compName, content) => {
+  const compNodeName = `<${compName}>`;
+  const issue = `invalid state placeholder: [${content}] used in ${compNodeName}`;
+  const fix = `Make sure that "${content}" is available in state of ${compNodeName} or it's closure`;
+  const regex = content.split('').join('\\s*').replace(')', '\\)').replace('(', '\\(');
+  const code = getCodeWithError(compName, new RegExp(`\\[\\w*${regex}\\w*\\]`));
+  return createError(issue, fix, code, compName)
+};
+
+/**
+ * called when state placeholder is either a invalid path or a path which points to an undefined value in state
+ * @param {string} compName
+ * @param {string} invalidState
+ * @param {string} content
+ * @returns {Error}
+ */
+const invalid_fn_placeholder = (compName, invalidState, content) => {
+  const compNodeName = `<${compName}>`;
+  const issue = `invalid state "${invalidState}" used in fn placeholder [ ${content} ] in ${compNodeName}`;
+  const fix = `Make sure that "${invalidState}" is available in state of ${compNodeName} or it's closure`;
+  const regex = invalidState.split('').join('\\s*');
+  const code = getCodeWithError(compName, new RegExp(`\\[.*${regex}.*\\]`));
+  return createError(issue, fix, code, compName)
 };
 
 /**
  * called when function used in template is not defined
- * @param {Comp} comp
+ * @param {string} compName
  * @param {string} fnName
  * @returns {Error}
  */
-const function_not_found = (comp, fnName) => {
-  const issue = `invalid function "${fnName}" used in ${angularCompName(comp)}`;
+const function_not_found = (compName, fnName) => {
+  const compNodeName = `<${compName}>`;
+  const issue = `invalid function "${fnName}" used in ${compNodeName}`;
   const fix = `Make sure that "${fnName}" is defined in the fn or it's parent fn`;
-  const errorCode = getCodeWithError(comp, new RegExp(`=.*${fnName}`));
-  return createError(issue, fix, comp, errorCode, function_not_found.name)
+  const code = getCodeWithError(compName, new RegExp(fnName));
+  return createError(issue, fix, code, compName)
+};
+
+/**
+ * called when function used in template is not defined
+ * @param {string} compName
+ * @param {string} fnName
+ * @returns {Error}
+ */
+const event_handler_not_found = (compName, fnName) => {
+  const compNodeName = `<${compName}>`;
+  const issue = `could not find event handler "${fnName}" used in ${compNodeName}`;
+  const fix = `Make sure that "${fnName}" is defined in the ${compNodeName}.fn or it's closure`;
+  const code = getCodeWithError(compName, new RegExp(`=.*${fnName}`));
+  return createError(issue, fix, code, compName)
 };
 
 /**
  * called when a placeholder is opened but not closed
- * @param {Comp} comp
+ * @param {string} compName
  * @param {string} collectedString
  * @returns {Error}
  */
-const placeholder_not_closed = (comp, collectedString) => {
+const placeholder_not_closed = (compName, collectedString) => {
 
   const trimmed = `"${collectedString.trim()}"`;
-  const ifNotPlaceholder = `if ${trimmed} is not a state placeholder: \nprefix the bracket with "!" -> "![${collectedString}" `;
-  const ifPlaceholder = `if ${trimmed} is a placeholder: \nInsert closing -> "[${collectedString}]"`;
+  const ifNotPlaceholder = `if ${trimmed} is not a state placeholder: \nprefix the bracket with "!" : "![${collectedString}" `;
+  const ifPlaceholder = `if ${trimmed} is a placeholder: \nInsert closing : "[${collectedString}]"`;
+  const nodeName = `<${compName}>`;
 
-  const issue = `\
-found unclosed placeholder in ${angularCompName(comp)} -> "[${collectedString}"`;
+  const issue = `found unclosed placeholder in ${nodeName} : "[${collectedString}"`;
 
   const fix = `${ifNotPlaceholder}\n\n${ifPlaceholder}`;
-  const errorCode = getCodeWithError(comp, new RegExp(`[${collectedString}`));
+  const code = getCodeWithError(compName, new RegExp(`\\[${collectedString}`));
 
-  return createError(issue, fix, comp, errorCode, placeholder_not_closed.name)
+  return createError(issue, fix, code, compName)
 };
 
 var placeholderErrors = /*#__PURE__*/Object.freeze({
   __proto__: null,
   invalid_state_placeholder: invalid_state_placeholder,
+  invalid_fn_placeholder: invalid_fn_placeholder,
   function_not_found: function_not_found,
+  event_handler_not_found: event_handler_not_found,
   placeholder_not_closed: placeholder_not_closed
 });
 
 /**
- * called when invalid argument is given to the components method in component
- * @param {Comp} comp
- * @return {NueError}
+ * called when root element is not added in html
+ * @param {string} elName
+ * @returns {Error}
  */
-const invalid_args_given_to_components_method = (comp) => {
-  const issue = 'components() method expects an array of components, but got this instead:';
-  const errorCode = getCodeWithError(comp, /components\(.*\)/);
-  return createError(issue, '', comp, errorCode, invalid_args_given_to_components_method.name)
+
+const root_not_found_in_html = (elName) => {
+  const element = `<${elName}> </${elName}>`;
+  const issue = `Could not find ${element} in html to render ${elName}`;
+  const fix = `Add ${element} in HTML to render the ${elName}`;
+  return createError(issue, fix)
 };
 
-/**
- * called when component is not a function
- * @param {any} compFn
- * @returns
- */
-const component_is_not_a_function = (compFn) => {
-  const issue = `components must be functions, not ${typeof compFn}`;
-  const fix = 'change this to a valid component function:';
-  return createError(issue, fix, null, toJSON(compFn), component_is_not_a_function.name)
-};
-
-var otherErrors = /*#__PURE__*/Object.freeze({
+var DOMErrors = /*#__PURE__*/Object.freeze({
   __proto__: null,
-  invalid_args_given_to_components_method: invalid_args_given_to_components_method,
-  component_is_not_a_function: component_is_not_a_function
+  root_not_found_in_html: root_not_found_in_html
 });
 
 const errors = {
   ...attributeErrors,
-  ...hookErrors,
+  ...eventErrors,
   ...loopedCompErrors,
   ...placeholderErrors,
-  ...otherErrors
+  ...DOMErrors
 };
+
+const attributeTypes = {
+  _normal: /** @type {0}*/ (0),
+  _event: /** @type {1}*/ (1),
+  _state: /** @type {2}*/ (2),
+  _prop: /** @type {3}*/ (3),
+  _bindProp: /** @type {3}*/ (4),
+  _conditional: /** @type {4}*/ (5),
+  _staticState: /** @type {5}*/ (6),
+  _functional: /** @type {6}*/ (7),
+  _ref: /** @type {7}*/ (8)
+};
+
+const placeholderTypes = {
+  _reactive: /** @type {0}*/ (0),
+  _functional: /** @type {1}*/ (1)
+};
+
+const batches = {
+  _beforeDOM: /** @type {0}*/ (0),
+  _DOM: /** @type {1}*/ (1)
+};
+
+/**
+ * remove first and last character
+ * @param {string} str
+ * @returns {string}
+ */
+const unBracket = str => str.slice(1, -1);
+
+/**
+ * check if the string has brackets at the ends
+ * @param {string} str
+ * @returns {boolean}
+ */
+const isBracketed = str => str[0] === '[' && str.endsWith(']');
+
+/**
+ * return [target, prop] for given path in object
+ * @param {Record<string, any>} obj
+ * @param {StatePath} path
+ * @returns {[Record<string, any>, any]}
+ */
+
+const getTargetProp = (obj, path) => {
+  const target = path.slice(0, -1).reduce((target, key) => target[key], obj);
+  const prop = path[path.length - 1];
+  return [target, prop]
+};
+
+/**
+ * process fn placeholder
+ * @param {string} _content
+ * @param {string} _text
+ * @returns {Placeholder}
+ */
+const processFnPlaceholder = (_content, _text) => {
+  // 'foo(bar.baz, fizz, buzz)'
+
+  // 'foo(bar.baz, fizz, buzz'
+  const closeParenRemoved = _content.slice(0, -1);
+
+  // [ 'foo', 'bar.baz, fizz, buzz' ]
+  const [fnName, argsStr] = closeParenRemoved.split('(');
+
+  // [ 'bar.baz', 'fizz', 'buzz' ]
+  const args = argsStr.split(',');
+
+  // [ ['bar', 'baz'], ['fizz'], ['buzz'] ]
+  const _statePaths = args.map(a => a.split('.'));
+
+  /**
+   * get the value of function placeholder
+   * @param {Comp} comp
+   * @returns {any}
+   */
+  const _getValue = (comp) => {
+    const fn = comp.fn[fnName];
+    // @todo move this to errors
+    if (!fn) {
+      throw errors.function_not_found(comp._compName, fnName)
+    }
+    const tps = _statePaths.map(path => getTargetProp(comp.$, path));
+    const values = tps.map(([t, p]) => t[p]);
+
+    {
+      values.forEach((value, i) => {
+        if (!isDefined(value)) throw errors.invalid_fn_placeholder(comp._compName, args[i], _content)
+      });
+    }
+
+    return fn(...values)
+  };
+
+  return {
+    _type: placeholderTypes._functional,
+    _statePaths,
+    _getValue,
+    _content,
+    _text
+  }
+};
+
+/**
+ * process reactive placeholder
+ * @param {string} _content
+ * @param {string} _text
+ * @returns {Placeholder}
+ */
+
+const processReactivePlaceholder = (_content, _text) => {
+  const statePath = _content.split('.');
+
+  /**
+   * return the value of state placeholder in context of given component
+   * @param {Comp} comp
+   */
+  const _getValue = (comp) => {
+    {
+      try {
+        const [target, prop] = getTargetProp(comp.$, statePath);
+        const value = target[prop];
+        if (!isDefined(value)) throw value
+        else return value
+      } catch (e) {
+        if (!data._errorThrown) throw errors.invalid_state_placeholder(comp._compName, _content)
+      }
+    }
+  };
+
+  return {
+    _type: placeholderTypes._reactive,
+    _getValue,
+    _statePaths: [statePath],
+    _content,
+    _text
+  }
+};
+
+/**
+ * if functional placeholder's function name is not valid, make it not a placeholder
+ * @param {string} text
+ * @param {boolean} [noBrackets]
+ * @returns {Placeholder}
+ */
+const processPlaceholder = (text, noBrackets = false) => {
+  // if the text has bracket, remove it
+  const bracketsRemoved = noBrackets ? text : unBracket(text);
+  // remove all spaces
+  const content = bracketsRemoved.replace(/ /g, '');
+
+  if (content.includes('(') && content.includes(')')) {
+    return processFnPlaceholder(content, text)
+  }
+  return processReactivePlaceholder(content, text)
+};
+
+const { _normal: _normal$1, _ref: _ref$1, _bindProp: _bindProp$1, _conditional: _conditional$1, _prop: _prop$1, _functional: _functional$1, _state: _state$1, _staticState: _staticState$1, _event: _event$1 } = attributeTypes;
+
+/**
+ * parse attributes on element if any
+ * @param {Parsed_HTMLElement} element
+ * @param {string} targetCompName
+ */
+const parseAttributes = (element, targetCompName) => {
+
+  // throw error if component specific attributes are used on non-component elements
+  if (!targetCompName) {
+    testForCompAttributesUsage(element, targetCompName);
+  }
+
+  /** @type {Attribute_ParseInfo[] } */
+  const attributes = [];
+  const elementIsComp = !!targetCompName;
+
+  for (const attributeName of element.getAttributeNames()) {
+    const attributeValue = /** @type {string} */ (element.getAttribute(attributeName));
+    const variableValue = isBracketed(attributeValue);
+
+    let name = attributeName;
+
+    /**  @type {AttributeType} */
+    let type = _normal$1;
+    let value;
+    const firstChar = attributeName[0];
+
+    if (attributeName === otherAttributes._ref) {
+      type = _ref$1;
+      value = attributeValue;
+    }
+
+    // SETTING FN OF COMPONENT
+    else if (attributeName.startsWith('fn.')) {
+      if (!elementIsComp) continue
+      type = _functional$1;
+      name = attributeName.slice(3);
+      value = attributeValue;
+    }
+
+    // SETTING STATE OF COMPONENT
+    else if (attributeName.startsWith('$.')) {
+      if (!elementIsComp) continue
+      name = attributeName.slice(2);
+
+      if (variableValue) {
+        type = _state$1;
+        value = processPlaceholder(attributeValue);
+      } else {
+        type = _staticState$1;
+        value = attributeValue;
+      }
+    }
+
+    // ATTACHING EVENT OR ACTION
+    else if (firstChar === '@') {
+      type = _event$1;
+      name = attributeName.slice(1);
+      value = attributeValue;
+    }
+
+    // attributes that require variable value
+    else if (variableValue) {
+      // conditionally setting attribute
+      if (attributeName.endsWith(':if')) {
+        type = _conditional$1;
+        name = attributeName.slice(0, -3);
+      }
+
+      // binding property
+      else if (attributeName.startsWith('bind:')) {
+        type = _bindProp$1;
+        name = attributeName.slice(5);
+      }
+
+      // property
+      else if (firstChar === ':') {
+        type = _prop$1;
+        name = attributeName.slice(1);
+      }
+
+      value = processPlaceholder(attributeValue);
+    }
+
+    if (value) {
+      let camelCaseName = name;
+
+      if (name.includes('-')) camelCaseName = dashCaseToCamelCase(name);
+      // saving to array instead of object for better minification
+
+      attributes.push({
+        _name: camelCaseName,
+        _placeholder: value,
+        _type: type
+      });
+
+      removeAttr(element, attributeName);
+    }
+  }
+
+  // if value attributes found
+  if (attributes.length) {
+    if (!element._parsedInfo) {
+      // @ts-expect-error
+      element._parsedInfo = {};
+    }
+    element._parsedInfo._attributes = attributes;
+  }
+};
+
+/**
+ * parse attributes on element if any
+ * @param {Parsed_HTMLElement} element
+ * @param {string} targetCompName
+ */
+const testForCompAttributesUsage = (element, targetCompName) => {
+  const { _if, _else, _elseIf } = conditionAttributes;
+  const { _for, _key } = loopAttributes;
+  const compOnlyAttributes = [_if, _else, _elseIf, _key, _for];
+
+  compOnlyAttributes.forEach(attrName => {
+    if (getAttr(element, attrName)) {
+      throw errors.component_attribute_used_on_non_component(element, attrName, targetCompName)
+    }
+  });
+};
+
+/**
+ * take the string text and split it into placeholders and strings
+ * @param {string} text
+ * @param {string} compName
+ * @returns {SplitPart[]} parts
+ */
+
+const split = (text, compName) => {
+
+  /** @type {SplitPart[]} */
+  const parts = [];
+
+  let collectingVar = false;
+  let collectedString = '';
+  let i = -1;
+
+  /** @param {boolean} cv */
+  const reset = (cv) => {
+    collectedString = '';
+    collectingVar = cv;
+  };
+
+  while (++i < text.length) {
+    const char = text[i];
+    const nextChar = text[i + 1];
+
+    // if current char is ! and next [, ignore ! and don't make the
+    if (char === '!' && nextChar === '[') {
+      collectedString += '[';
+      i += 1;
+    }
+
+    else if (char === '[') {
+      // save current collected string (if any)
+      if (collectedString) parts.push(collectedString);
+      reset(true);
+    }
+
+    else if (collectingVar && char === ']') {
+      // process collected variable and save it in parts
+      const part = processPlaceholder(collectedString, true);
+      parts.push(part);
+      reset(false);
+    }
+
+    // keep collecting
+    else collectedString += char;
+  }
+
+  // add the remaining text
+  if (collectedString) {
+    if (collectingVar) {
+      throw errors.placeholder_not_closed(compName, collectedString)
+    }
+
+    parts.push(collectedString);
+  }
+  return parts
+};
+
+/**
+ * parse text node
+ * @param {Text} node
+ * @param {Function[]} deferredParsingWork
+ * @param {string} compName
+ */
+const parseTextNode = (node, deferredParsingWork, compName) => {
+  const text = node.textContent || '';
+  const trimmedText = text.trim();
+
+  // if the node is only empty string, it will be normalized by DOM, so remove it
+  if (!trimmedText) {
+    deferredParsingWork.push(() => node.remove());
+    return
+  }
+
+  const parts = split(text, compName);
+
+  /** @type {Parsed_Text[]} */
+  const textNodes = [];
+
+  // for each part create a text node
+  // if it's not TEXT type, save the part info in parsed.placeholder
+  parts.forEach(part => {
+
+    let textNode;
+    if (typeof part === 'string') {
+      textNode = document.createTextNode(part);
+    } else {
+      const temp = `[${part._content}]`;
+      textNode = document.createTextNode(temp);
+      /** @type {Parsed_Text} */(textNode)._parsedInfo = {
+        _placeholder: part
+      };
+    }
+
+    // @ts-expect-error
+    textNodes.push(textNode);
+  });
+
+  // replace the original node with new textNodes
+  deferredParsingWork.push(() => {
+    textNodes.forEach(textNode => node.before(textNode));
+    node.remove();
+  });
+};
+
+const { _enter: _enter$1, _exit: _exit$1 } = animationAttributes;
+
+/**
+ * parsed conditional component
+ * @param {ConditionalComp} comp
+ * @param {ConditionAttribute} conditionType
+ * @param {string} attributeValue
+ */
+const parseConditionComp = (comp, conditionType, attributeValue) => {
+
+  comp._parsedInfo = {
+    ...comp._parsedInfo,
+    _conditionType: conditionType,
+    _animationAttributes: getAnimationAttributes(comp)
+  };
+
+  if (conditionType !== conditionAttributes._else) {
+    /** @type {IfComp}*/
+    (comp)._parsedInfo._conditionAttribute = processPlaceholder(attributeValue);
+  }
+  const attributesToRemove = [_enter$1, _exit$1, conditionType];
+
+  attributesToRemove.forEach(att => removeAttr(comp, att));
+};
+
+/**
+ * parse if condition comp
+ * @param {IfComp} ifComp
+ */
+const parseIfComp = (ifComp) => {
+  /** @type {ConditionalComp[]}} */
+  const conditionGroup = [];
+
+  let node = /** @type {ConditionalComp | Node } */(ifComp.nextElementSibling);
+
+  // create a starting marker which will be used to add conditional nodes to DOM
+  const anchorNode = createComment('if');
+  ifComp.before(anchorNode);
+
+  // keep checking the next node
+  while (true) {
+    // get the conditionType of the node
+
+    // @ts-expect-error
+    const conditionType = node && node._parsedInfo && node._parsedInfo._conditionType;
+
+    // if the node is not a condition comp or is a part of separate condition,
+    // break the loop
+    if (
+      !conditionType ||
+      (conditionType === conditionAttributes._if)
+    ) break
+
+    conditionGroup.push(/** @type {ConditionalComp } */(node));
+
+    // @ts-expect-error
+    node = node.nextElementSibling;
+  }
+
+  // add a end if marker after the last node in conditionGroup
+  // if ifComp is alone, add after it
+  (conditionGroup[conditionGroup.length - 1] || ifComp).after(createComment('/if'));
+
+  // remove other nodes from template
+  conditionGroup.forEach(n => n.remove());
+
+  let conditionGroupStateDeps = [...ifComp._parsedInfo._conditionAttribute._statePaths];
+
+  conditionGroup.forEach(node => {
+    if (node._parsedInfo._conditionType !== conditionAttributes._else) {
+
+      const deps = /** @type {IfComp | ElseIfComp }*/(node)._parsedInfo._conditionAttribute._statePaths;
+
+      conditionGroupStateDeps = [...conditionGroupStateDeps, ...deps];
+    }
+  });
+
+  ifComp._parsedInfo = {
+    ...ifComp._parsedInfo,
+    _conditionGroup: conditionGroup,
+    _conditionGroupStateDeps: conditionGroupStateDeps,
+    _conditionGroupAnchor: anchorNode
+  };
+};
+
+const { _enter, _exit, _move } = animationAttributes;
+const { _for, _key } = loopAttributes;
+
+const attributesToRemove = [
+  _enter, _exit, _move,
+  _for, _key
+];
+
+/**
+ * parse looped component
+ * @param {LoopedComp} loopedComp
+ * @param {string} forAttribute
+ * @param {string} parentCompName
+ */
+
+const parseLoopedComp = (loopedComp, forAttribute, parentCompName) => {
+
+  const [a, b, c] =
+  forAttribute.replace(/\(|\)|,|(\sin\s)/g, ' ') // replace ' in ', '(', ')', ',' with space character
+    .split(/\s+/) // split with space character,
+    .filter(t => t); // remove empty strings
+
+  // ['item', 'index', 'arr'] or
+  // ['item', 'arr']
+  const indexUsed = isDefined(c);
+  const keyAttribute = getAttr(loopedComp, _key);
+
+  if (!keyAttribute) {
+    throw errors.missing_key_attribute(loopedComp._compName, parentCompName)
+  }
+
+  loopedComp._parsedInfo._loopAttributes = {
+    _itemArray: processPlaceholder(indexUsed ? c : b, true),
+    _item: a,
+    _itemIndex: indexUsed ? b : undefined,
+    _key: processPlaceholder(/** @type {string}*/(keyAttribute))
+  };
+
+  loopedComp._parsedInfo._animationAttributes = getAnimationAttributes(loopedComp);
+
+  attributesToRemove.forEach(name => removeAttr(loopedComp, name));
+};
+
+const { _else, _if, _elseIf } = conditionAttributes;
+
+/**
+ * parse component node
+ * @param {Comp} comp
+ * @param {string} compName
+ * @param {string} parentCompName
+ * @param {Function[]} deferredParsingWork
+ */
+const parseComp = (comp, compName, parentCompName, deferredParsingWork) => {
+
+  comp._parsedInfo = {
+    _isComp: true,
+    _compName: compName,
+    _attributes: []
+  };
+
+  const forAttribute = getAttr(comp, loopAttributes._for);
+
+  // if the component has FOR_ATTRIBUTE on it, it is looped component
+  if (forAttribute) {
+    parseLoopedComp(
+      /** @type {LoopedComp} */(comp),
+      forAttribute,
+      parentCompName
+    );
+  }
+
+  else {
+    const typeAndValue = usesConditionalAttribute(comp);
+
+    if (typeAndValue) {
+      const [type, value] = typeAndValue;
+      parseConditionComp(/** @type {ConditionalComp}*/(comp), type, value);
+
+      if (type === _if) {
+        deferredParsingWork.push(() => parseIfComp(/** @type {IfComp} */(comp)));
+      }
+    }
+  }
+};
+
+/**
+ * if the comp has conditional Attribute, return [attributeName, value] else false
+ * @param {Comp} conditionComp
+ * @returns {[ConditionAttribute, string] | false}
+ */
+const usesConditionalAttribute = conditionComp => {
+  const conditionalAttributes = /** @type {ConditionAttribute[]}*/(
+    [_else, _if, _elseIf]
+  );
+
+  for (const attributeName of conditionalAttributes) {
+    const value = getAttr(conditionComp, attributeName);
+    if (value !== null) return [attributeName, value]
+  }
+
+  return false
+};
+
+/**
+ * parse all types of nodes in context of parentComp
+ * and dump the work delayed work to deferredParsingWork array
+ * @param {Node} target
+ * @param {CompDef} compDef
+ * @param {Function[]} deferredParsingWork
+ */
+
+const parse = (target, compDef, deferredParsingWork) => {
+
+  // if target is component, get it's name else it will be undefined
+  const targetCompName = compDef._children[target.nodeName];
+  const parentCompName = compDef._compName;
+
+  // #text
+  if (target.nodeType === target.TEXT_NODE) {
+    return parseTextNode(/** @type {Text}*/(target), deferredParsingWork, parentCompName)
+  }
+
+  // component
+  if (targetCompName) {
+    parseComp(/** @type {Comp}*/(target), targetCompName, parentCompName, deferredParsingWork);
+  }
+
+  // attributes on component or simple target
+  // @ts-expect-error
+  if (target.hasAttribute) {
+    parseAttributes(/** @type {Parsed_HTMLElement}*/(target), targetCompName);
+  }
+
+  // child nodes of component or simple target
+  if (target.hasChildNodes()) {
+    target.childNodes.forEach(childNode => parse(childNode, compDef, deferredParsingWork));
+  }
+};
+
+/**
+ * create template and parse it
+ * @param {CompDef} compDef
+ */
+
+const createCompTemplate = (compDef) => {
+
+  const { components, html, css, _template } = compDef;
+
+  // replace compName with elName in html
+  const dashHtml = components
+    ? dashifyComponentNames(html, components)
+    : html;
+
+  // fill template innerHTML with html and css
+  const { defaultStyle } = data._config;
+
+  const defaultStyleTag = defaultStyle ? style(defaultStyle, 'default') : '';
+  const scopedStyleTag = css ? style(css, 'scoped') : '';
+
+  _template.innerHTML = dashHtml + defaultStyleTag + scopedStyleTag;
+
+  /** @type {Function[]} */
+  const deferredParsingWork = [];
+
+  parse(_template.content, compDef, deferredParsingWork);
+
+  flushArray(deferredParsingWork);
+
+};
+
+/**
+   * return a inline style
+   * @param {string} s
+   * @param {string} name
+   */
+const style = (s, name) => `<style ${name}>${s}</style>`;
+
+const modes = {
+  /** when detection mode is true,
+   * all key accessed in state is recorded in an array called "keyAccesses"
+   */
+  _detective: false,
+
+  /** when reactive is true
+   * state mutation does not invoke onMutate function
+   */
+  _reactive: false,
+
+  /** when noOverride is true,
+   * setting a key in state which already exists does nothing
+   * this is used so that default value of state does not override the state set by the parent component
+   * via state attribute
+   */
+  _noOverride: false,
+
+  /** when origin mode is true,
+   * it returns the comp where the piece of state is coming from rather it's value
+   */
+  _returnComp: false
+};
+
+/**
+ * get the origin component where the value of the state is coming from
+ * @param {Comp} baseComp
+ * @param {StatePath} statePath
+ * @returns {Comp}
+ */
+const getOrigin = (baseComp, statePath) => {
+  if (statePath.length === 0) return baseComp
+
+  let target, prop;
+  [target, prop] = getTargetProp(baseComp.$, statePath);
+
+  // @ts-ignore
+  if (!target[IS_REACTIVE]) {
+    [target, prop] = getTargetProp(baseComp.$, statePath.slice(0, -1));
+  }
+
+  modes._returnComp = true;
+  const originCompNode = target[prop];
+  modes._returnComp = false;
+
+  return originCompNode
+};
+
+/**
+ * higher order function that returns a new function that when called adds the cb to given batch
+ * @param {SubCallBack | Function} cb
+ * @param {Batch} batch
+ */
+const batchify = (cb, batch) => () => batch.add(cb);
 
 /**
  * subscribe to slice of state pointed by the statePath in baseNue
@@ -857,13 +1347,14 @@ const errors = {
  * @param {0 | 1} batch
  * @returns {Function}
  */
+
 const subscribe = (baseComp, statePath, updateCb, batch) => {
   // get the originComp where the state referred by statePath is coming from
-  const originComp = origin(baseComp, statePath);
+  const originComp = getOrigin(baseComp, statePath);
 
   // throw if no origin is found
   if (!originComp) {
-    if (!data._errorThrown) throw errors.invalid_state_placeholder(baseComp, statePath.join('.'))
+    if (!data._errorThrown) throw errors.invalid_state_placeholder(baseComp._compName, statePath.join('.'))
   }
 
   if (/** @type {SubCallBack}*/(updateCb)._node && originComp !== baseComp) {
@@ -871,7 +1362,6 @@ const subscribe = (baseComp, statePath, updateCb, batch) => {
   }
 
   // get the higher order updateCb that will only call the updateCb once every batch
-
   const batchCb = batchify(updateCb, originComp._batches[batch]);
 
   // start from the root of subscriptions
@@ -912,192 +1402,69 @@ const subscribeMultiple = (comp, statePaths, updateCb, batch) => {
   return () => unsubscribeFunctions.forEach(c => c())
 };
 
-// when detection mode is enabled is records all the keys that are accessed in state
-// if state.a.b and state.c.d.e is accessed it becomes [['a', 'b'], ['c', 'd', 'e']]
 /**
- * @type {{ _paths: StatePath[]}}
- */
-const accessed = {
-  _paths: []
-};
-
-// call the function and detect what keys it is using of this.$
-// also get the return value and send it as well
-/**
- *
- * @param {Function} fn
- * @returns {[any, StatePath[]]}
- */
-const detectStateUsage = (fn) => {
-
-  modes._detective = true;
-  const returnVal = fn();
-  modes._detective = false;
-
-  const paths = [...accessed._paths]; // shallow clone
-
-  accessed._paths = [];
-  return [returnVal, paths]
-};
-
-// when initializing the state, if a function is given
-// call that function, detect the state keys it depends on, get the initial value
-// update its value whenever its deps changes
-
-/**
- *
+ * add events api on comp
  * @param {Comp} comp
- * @param {Function} fn
- * @param {string} prop
- * @returns
  */
-const computedState = (comp, fn, prop) => {
-  const [initValue, paths] = detectStateUsage(fn);
 
-  /** @type {SubCallBack} */
-  const compute = () => {
-    const value = fn();
-    comp.$[prop] = value;
+const addEvents = (comp) => {
+  comp._eventCbs = {
+    _onMount: [],
+    _onDestroy: [],
+    _beforeUpdate: [],
+    _afterUpdate: []
   };
 
-  const deps = paths.map(path => path.length === 1 ? path : path.slice(0, -1));
-  subscribeMultiple(comp, deps, compute, batches._beforeDOM);
-  return initValue
+  const { _onMount, _onDestroy, _beforeUpdate, _afterUpdate } = comp._eventCbs;
+
+  comp.events = {
+    onMount: (cb) => _onMount.push(cb),
+    onDestroy: (cb) => _onDestroy.push(cb),
+    beforeUpdate: (cb) => _beforeUpdate.push(cb),
+    afterUpdate: (cb) => _afterUpdate.push(cb),
+
+    onMutate: (cb, slices) => {
+      if (!slices.length) {
+        throw errors.missing_dependency_array_in_onMutate(comp._compName)
+      }
+
+      _onMount.push(() => {
+        const stateDeps = slices.map(slice => slice.split('.'));
+        return subscribeMultiple(comp, stateDeps, cb, 0)
+      });
+    }
+  };
 };
 
 /**
- * @typedef {Record<string|number|symbol, any>} target
+ *
+ * @param {Comp} comp
+ * @param {string} compName
  */
+const construct = (comp, compName) => {
+
+  comp.refs = {};
+
+  comp._compName = compName;
+  comp._subscriptions = { [ITSELF]: new Set() };
+  comp._batches = /** @type {[Set<SubCallBack>, Set<SubCallBack>]}*/([new Set(), new Set()]);
+  comp._mutations = [];
+  comp._deferredWork = [];
+  comp._nodesUsingLocalState = new Set();
+  comp._nodesUsingClosureState = new Set();
+
+  if (!comp._prop$) comp._prop$ = {};
+  if (!comp.fn) comp.fn = comp.parent ? Object.create(comp.parent.fn) : {};
+
+  addEvents(comp);
+};
 
 /**
- * create a reactive state on compNode
- * @param {Comp} comp
- * @param {State} obj
- * @param {StatePath} _statePath
- * @returns {State}
+ * call this function to show that given node is updated
+ * @param {ParsedDOMElement} node
  */
-const reactify = (comp, obj, _statePath = []) => {
-
-  const closure$ = comp.parent && comp.parent.$;
-
-  let statePath = _statePath;
-  if (!isObject(obj)) return obj
-
-  // make the child objects reactive
-  /** @type {target} */
-  const target = Array.isArray(obj) ? [] : {};
-  Object.keys(obj).forEach(key => {
-    target[key] = reactify(comp, obj[key], [...statePath, key]);
-  });
-
-  const reactive = new Proxy(target, {
-    has (target, prop) {
-      // return true if the prop is in target or its closure
-      return prop in target || (closure$ ? prop in closure$ : false)
-    },
-
-    set (target, prop, newValue) {
-      // short circuit if the set is redundant
-
-      if (target[/** @type {string}*/(prop)] === newValue) return true
-
-      // change the reactive object's statePath, because it has been moved to a different key
-      if (prop === UPDATE_INDEX) {
-        // newValue is the index at which the reactive is moved
-        statePath = [...statePath.slice(0, -1), newValue];
-        return true
-      }
-
-      // if the mutated prop exists in the target already
-      const propInTarget = prop in target;
-
-      let value = newValue;
-
-      // do not override the state set by parent component by default value of the state added in component
-      if (modes._noOverride) {
-        // ignore set
-        if (propInTarget) return true
-
-        if (typeof value === 'function') {
-          value = computedState(comp, value, /** @type {string}*/(prop));
-        }
-      }
-
-      // if the prop is not in target but is in it's closure state
-      // then set the value in the closure state instead
-      else if (!propInTarget && closure$ && prop in closure$) {
-        return Reflect.set(closure$, prop, newValue)
-      }
-
-      if (isObject(value)) {
-        // if value is not reactive, make it reactive
-
-        if (!value[IS_REACTIVE]) {
-          value = reactify(comp, value, [...statePath, /** @type {string}*/(prop)]);
-        }
-        // when a reactive value is set on some index(prop) in target array
-        // we have to update that reactive object's statePath - because we are changing the index it was created at
-        else if (Array.isArray(target)) value[UPDATE_INDEX] = prop;
-      }
-
-      // -----------------------------
-      const set = () => Reflect.set(target, prop, value);
-
-      if (modes._reactive) {
-        // push to BATCH_INFO and call onMutate
-
-        const oldValue = target[/** @type {string}*/(prop)];
-        const newValue = value;
-        const success = set();
-        if (oldValue !== newValue) {
-          const livePath = () => [...statePath, /** @type {string}*/(prop)];
-
-          const mutatedPath = /** @type {StatePath}*/(livePath());
-          // statePath may have changed of reactive object, so add a getPath property to fetch the fresh statePath
-
-          comp._mutations.push({ oldValue, newValue, path: mutatedPath, livePath });
-
-          onMutate(comp, mutatedPath);
-        }
-
-        return success
-      }
-
-      return set()
-    },
-
-    deleteProperty (target, prop) {
-      if (modes._reactive) onMutate(comp, [...statePath, /** @type {string}*/(prop)]);
-      return Reflect.deleteProperty(target, prop)
-    },
-
-    get (target, prop) {
-      if (prop === IS_REACTIVE) return true
-      if (prop === TARGET) return target
-
-      if (modes._detective) {
-
-        /** @type {StatePath} */
-        const fullPath = [...statePath, /** @type {string}*/(prop)];
-
-        if (statePath.length !== 0) {
-          accessed._paths[accessed._paths.length - 1] = fullPath;
-        } else {
-          accessed._paths.push(fullPath);
-        }
-      }
-
-      // closure state API
-      if (prop in target) {
-        if (modes._returnComp) return comp
-        return Reflect.get(target, prop)
-      }
-      if (closure$) return Reflect.get(closure$, prop)
-    }
-
-  });
-
-  return reactive
+const nodeUpdated = (node) => {
+  if (data._onNodeUpdate) data._onNodeUpdate(node);
 };
 
 /**
@@ -1163,154 +1530,6 @@ const syncNode = (comp, node, deps, update) => {
 };
 
 /**
- * add dash at the end of string
- * @param {string} str
- * @returns {string}
- */
-const dashify = str => lower(str) + '-';
-
-/**
- * replace component names in html with dashed names
- * @param {string} html
- * @param {Function[]} components
- * @returns {string}
- */
-const dashifyComponentNames = (html, components) =>
-  components.reduce(
-    (acc, comp) => acc.replace(new RegExp(`<${comp.name}|</${comp.name}`, 'g'), dashify),
-    html
-  );
-
-/**
- * join strings and expressions
- * @param {string[]} strings
- * @param  {string[]} exprs
- * @returns
- */
-const joinTagArgs = (strings, exprs) => exprs.reduce(
-  (acc, expr, i) => acc + strings[i] + expr, '') + strings[strings.length - 1];
-
-/**
- * run compFn
- * @param {Comp} comp
- * @param {Function} compFn
- * @param {boolean} parsed
- * @returns {[string, string, Function[]]}
- */
-const runComponent = (comp, compFn, parsed) => {
-  /** @type {Function[]} */
-  let childComponents = [];
-
-  let htmlString = '';
-  let cssString = '';
-
-  /** @type {TaggedTemplate} */
-  const html = (strings, ...exprs) => {
-    if (parsed) return
-    htmlString = joinTagArgs(strings, exprs);
-  };
-
-  /** @type {TaggedTemplate} */
-  const css = (strings, ...exprs) => {
-    if (parsed) return
-    cssString = joinTagArgs(strings, exprs);
-  };
-
-  /** @param {Function[]} _childComponents */
-  const components = _childComponents => {
-
-    if (!data._errorThrown) {
-      const throwError = () => {
-        throw errors.invalid_args_given_to_components_method(comp)
-      };
-      const notArray = !Array.isArray(_childComponents);
-      if (notArray) throwError();
-      const notArrayOfFunctions = !_childComponents.every(item => typeof item === 'function');
-      if (notArrayOfFunctions) throwError();
-    }
-
-    if (parsed) return
-    childComponents = _childComponents;
-  };
-
-  modes._reactive = false;
-  modes._noOverride = true;
-
-  const { $, refs, fn, hooks } = comp;
-  compFn({ $, refs, fn, ...hooks, hooks, html, components, css });
-
-  modes._reactive = true;
-  modes._noOverride = false;
-
-  return [
-    dashifyComponentNames(htmlString, childComponents),
-    cssString,
-    childComponents
-  ]
-};
-
-/**
- * add lifecycle hooks to comp
- * @param {Comp} comp
- */
-const addHooks = (comp) => {
-  comp._hookCbs = {
-    _onMount: [],
-    _onDestroy: [],
-    _beforeUpdate: [],
-    _afterUpdate: []
-  };
-
-  comp.hooks = {
-    onMount: (cb) => comp._hookCbs._onMount.push(cb),
-    onDestroy: (cb) => comp._hookCbs._onDestroy.push(cb),
-    beforeUpdate: (cb) => comp._hookCbs._beforeUpdate.push(cb),
-    afterUpdate: (cb) => comp._hookCbs._afterUpdate.push(cb),
-
-    onMutate: (cb, slices) => {
-      if (!slices.length) throw errors.missing_dependency_array_in_onMutate(comp)
-
-      comp._hookCbs._onMount.push(() => {
-        const stateDeps = slices.map(slice => slice.split('.'));
-        return subscribeMultiple(comp, stateDeps, cb, 0)
-      });
-    }
-  };
-};
-
-/**
- * copy .parsed properties from node's tree to cloneNode's tree
- * cloneNode is clone of node but it does not have custom .parsed properties added in node's tree
- * @param {ParsedDOMElement} node
- * @param {ParsedDOMElement} cloneNode
- */
-
-const copyParsed = (node, cloneNode) => {
-  if (node._parsedInfo) cloneNode._parsedInfo = node._parsedInfo;
-
-  if (node.hasChildNodes()) {
-    node.childNodes.forEach((childNode, i) => {
-      copyParsed(
-        // @ts-expect-error
-        childNode,
-        cloneNode.childNodes[i]);
-    });
-  }
-};
-
-/**
- * clone the node and add the parsed prop
- * @template {ParsedDOMElement} T
- * @param {T} node
- * @returns {T}
- */
-const getParsedClone = (node) => {
-  const clone = /** @type {T}*/(node.cloneNode(true));
-  copyParsed(node, clone);
-  return clone
-};
-
-/**
  * process the text node
  * @param {Parsed_Text} textNode
  * @param {Comp} comp
@@ -1329,10 +1548,9 @@ const hydrateText = (textNode, comp) => {
  * @param {Record<string, any>} obj
  * @param {StatePath} path
  * @param {any} newValue
- * @returns
  */
 const mutate = (obj, path, newValue) => {
-  const [target, prop] = targetProp(obj, path);
+  const [target, prop] = getTargetProp(obj, path);
   return Reflect.set(target, prop, newValue)
 };
 
@@ -1343,32 +1561,35 @@ const mutate = (obj, path, newValue) => {
  * @param {Comp} comp
  */
 const hydrateProp = (target, attribute, comp) => {
-  // [{ getValue, deps, type, content }, propName]
+
   const propName = attribute._name;
-  const { _getValue, _type, _content, _statePaths, _text } = /** @type {Placeholder} */(attribute._placeholder);
+
+  const { _getValue, _statePaths } = /** @type {Placeholder} */(attribute._placeholder);
+
   const setProp = () => {
     // @ts-expect-error
     target[propName] = _getValue(comp);
   };
 
-  if (target.matches('input, textarea')) {
-    // TODO: move this error to parsing phase
-    if (_type === placeholderTypes._functional) throw errors.function_placeholder_used_in_input_binding(comp, _text)
+  syncNode(comp, target, _statePaths, setProp);
 
+  // bind:prop
+  if (attribute._type === attributeTypes._bindProp) {
     // @ts-expect-error
     const isNumber = target.type === 'number' || target.type === 'range';
 
     const handler = () => {
       // @ts-expect-error
       let value = target[propName];
+
       value = isNumber ? Number(value) : value;
+
+      // as this is not a functional placeholder - it will only have one state dependency - so use the first one
       mutate(comp.$, _statePaths[0], value);
     };
 
     target.addEventListener('input', handler);
   }
-
-  syncNode(comp, target, _statePaths, setProp);
 };
 
 /**
@@ -1395,7 +1616,9 @@ const hydrateEvent = (target, attribute, comp) => {
   const eventName = attribute._name;
   const fn = comp.fn[fnName];
 
-  if (!fn) throw errors.function_not_found(comp, fnName)
+  if (!fn) {
+    throw errors.event_handler_not_found(comp._compName, fnName)
+  }
 
   /** @type {EventListener} */
   const handleEvent = (e) => fn(e, comp.$);
@@ -1435,6 +1658,7 @@ const hydrateState = (target, attribute, comp) => {
   };
 
   if (target === comp) update();
+
   else {
     if (!target._prop$) target._prop$ = {};
     target._prop$[_name] = _getValue(comp);
@@ -1460,10 +1684,17 @@ const hydrateStaticState = (target, attribute) => {
  * @param {Comp} comp
  */
 const hydrateFnProp = (target, attribute, comp) => {
-  const propName = attribute._name;
-  const sourceFnName = /** @type {string}*/(attribute._placeholder);
-  // if (!target.fn) target.fn = Object.create(comp.fn)
-  target.fn[propName] = comp.fn[sourceFnName];
+
+  // create target.fn if not already
+  if (!target.fn) target.fn = Object.create(target.parent.fn);
+
+  // add the function in target.fn
+  target.fn[attribute._name] = comp.fn[/** @type {string}*/(attribute._placeholder)];
+
+  // @Example
+  // <comp fn.foo='bar'>
+  // attribute._name === 'foo'
+  // attribute._placeholder === 'bar'
 };
 
 /**
@@ -1472,6 +1703,7 @@ const hydrateFnProp = (target, attribute, comp) => {
  * @param {Attribute_ParseInfo} attribute
  * @param {Comp} comp
  */
+
 const hydrateConditionalAttribute = (element, attribute, comp) => {
   const placeholder = /** @type {Placeholder} */(attribute._placeholder);
   const name = attribute._name;
@@ -1491,12 +1723,14 @@ const {
   _functional,
   _state,
   _staticState,
-  _ref
+  _ref,
+  _bindProp
 } = attributeTypes;
 
 const typeToFn = {
   [_event]: hydrateEvent,
   [_prop]: hydrateProp,
+  [_bindProp]: hydrateProp,
   [_normal]: hydrateNormalAttribute,
   [_conditional]: hydrateConditionalAttribute,
   [_functional]: hydrateFnProp,
@@ -1523,6 +1757,92 @@ const hydrateAttributes = (target, attributes, comp) => {
         comp
       );
     }
+  });
+};
+
+/**
+ * copy .parsed properties from node's tree to cloneNode's tree
+ * cloneNode is clone of node but it does not have custom .parsed properties added in node's tree
+ * @param {ParsedDOMElement} node
+ * @param {ParsedDOMElement} cloneNode
+ */
+
+const copyParsed = (node, cloneNode) => {
+  if (node._parsedInfo) {
+    cloneNode._parsedInfo = node._parsedInfo;
+  }
+
+  if (node.hasChildNodes()) {
+    node.childNodes.forEach((childNode, i) => {
+      copyParsed(
+        // @ts-expect-error
+        childNode,
+        cloneNode.childNodes[i]);
+    });
+  }
+};
+
+/**
+ * clone the node and add the parsed prop
+ * @template {ParsedDOMElement} T
+ * @param {T} node
+ * @returns {T}
+ */
+const getParsedClone = (node) => {
+  const clone = /** @type {T}*/(node.cloneNode(true));
+  copyParsed(node, clone);
+  return clone
+};
+
+/**
+* remove name attribute from element
+* @param {HTMLElement} element
+* @param {string} name
+* @param {boolean} [clearAnimation]
+* @param {Function} [cb]
+*/
+const animate = (element, name, clearAnimation = false, cb) => {
+  element.style.animation = name;
+  if (clearAnimation) {
+    onAnimationEnd(element, () => {
+      element.style.animation = '';
+      if (cb) cb();
+    });
+  }
+};
+
+/**
+* when animation ends on element run callback
+* @param {HTMLElement} element
+* @param {() => any} cb
+*/
+const onAnimationEnd = (element, cb) => {
+  element.addEventListener('animationend', cb, { once: true });
+};
+
+/**
+ * call disconnectedCallback and then play remove animation
+ * @param {Comp} comp
+ * @param {string} animation
+ */
+const animatedRemove = (comp, animation) => {
+  comp.disconnectedCallback();
+  comp._manuallyDisconnected = true;
+  animate(comp, animation, true, () => comp.remove());
+};
+
+/**
+ * run animation on all elements, and call onAnimationEnd when last animation is completed
+ * @param {HTMLElement[]} elements
+ * @param {string} cssAnimation
+ * @param {Function} onLastAnimationEnd
+ */
+const animateAll = (elements, cssAnimation, onLastAnimationEnd) => {
+  const lastIndex = elements.length - 1;
+  elements.forEach((comp, i) => {
+    animate(comp, cssAnimation, true, () => {
+      if (i === lastIndex) onLastAnimationEnd();
+    });
   });
 };
 
@@ -1643,8 +1963,6 @@ const saveOffsets = (indexes, loopedComponents) => {
     comp._prevOffset = getOffset(comp);
   }
 };
-
-// import { CREATE, REMOVE, SWAP } from '../../../constants'
 
 /**
  * return steps to reconcile oldState to newState
@@ -1856,7 +2174,7 @@ const executeSteps = (steps, loopInfo) => {
  */
 const checkUniquenessOfKeys = (keys, comp) => {
   if (new Set(keys).size !== keys.length) {
-    throw errors.keys_not_unique(comp, keys)
+    throw errors.keys_not_unique(comp._compName, keys)
   }
 };
 
@@ -1948,7 +2266,7 @@ const handleArrayChange = (loopInfo, dirtyIndexes, updatedSlices, oldState) => {
       const comp = _loopedCompInstances[i];
       if (comp) {
         updatedSlices[i].forEach(info => {
-          const [target, prop] = targetProp(comp.$[_item], info._path);
+          const [target, prop] = getTargetProp(comp.$[_item], info._path);
           target[prop] = info._newValue;
         });
       }
@@ -1992,7 +2310,6 @@ const handleArrayChange = (loopInfo, dirtyIndexes, updatedSlices, oldState) => {
       const nodes = steps._remove.map((valueIndex, arrayIndex) => _loopedCompInstances[valueIndex + arrayIndex]);
       animateAll(nodes, _exit, executeAndMove);
     } else executeAndMove();
-    // ---------------------
 
     // save newState as oldState
     oldState._values = [...newState._values]; // only shallow clone required because we only care about indexes of oldState, not the deeply nested value
@@ -2132,7 +2449,7 @@ const hydrateLoopedComp = (loopedComp, parentComp) => {
   const getKey = (value, index) => {
     const pseudoComp = {
       $: getClosure(value, index),
-      _compFnName: loopedComp._compFnName
+      _compName: loopedComp._compName
     };
 
     return _key._getValue(
@@ -2189,6 +2506,7 @@ const hydrateLoopedComp = (loopedComp, parentComp) => {
 };
 
 /**
+ * return true if the given node is a component using the parsed info
  * @param {Node} target
  */
 const isComp = target =>
@@ -2255,761 +2573,485 @@ const hydrate = (target, comp) => {
 };
 
 /**
- * hydrate templateElement and add it in shadowDOM of comp
- * @param {Comp} comp
- * @param {HTMLTemplateElement} templateElement
+ * run all callbacks of a batch with mutations info
+ * ignore callbacks who are for updating a node and that node is not subscribed anymore to avoid extra dom updates
+ * @param {Batch} batch
+ * @param {Mutation[]} mutations
  */
-const buildShadowDOM = (comp, templateElement) => {
 
+const flushBatch = (batch, mutations) => {
+
+  batch.forEach(cb => {
+    const { _node } = /** @type {SubCallBack}*/(cb);
+
+    // if cb is for updating a node, only call cb if node is subscribed
+    if ((_node && _node._isSubscribed) || !_node) {
+      cb(mutations);
+      if (_node) nodeUpdated(_node);
+    }
+  });
+
+  batch.clear();
+};
+
+/**
+ * flush events and batched callbacks to outside world
+ * @param {Comp} comp
+ * @param {Mutation[]} mutations
+ */
+const flush = (comp, mutations) => {
+
+  const { _beforeUpdate, _afterUpdate } = comp._eventCbs;
+
+  // before updates
+  _beforeUpdate.forEach(cb => cb(mutations));
+
+  // updates
+  comp._batches.forEach(batch => flushBatch(batch, mutations));
+
+  // after updates
+  _afterUpdate.forEach(cb => cb(mutations));
+
+};
+
+/**
+ * schedule the flush
+ * @param {Comp} comp
+ */
+const scheduleFlush = (comp) => {
+
+  comp._flush_scheduled = true;
+
+  setTimeout(() => {
+    // do a shallow clone because comp.batchInfo will be cleared out
+    const mutations = [...comp._mutations];
+
+    flush(comp, mutations);
+
+    // clear batch info
+    comp._mutations.length = 0;
+
+    // reset flag
+    comp._flush_scheduled = false;
+  }, 0);
+
+};
+
+/**
+ * notify all the callbacks that are in given subscriptions
+ * @param {Subscriptions} subtree
+ */
+const notifySubTree = (subtree) => {
   // @ts-expect-error
-  const fragment = getParsedClone(templateElement.content);
+  subtree[ITSELF].forEach(cb => cb());
+  for (const k in subtree) notifySubTree(subtree[k]);
+};
 
+/**
+ * notify callbacks that are subscribed to given path that it is mutated
+ * navigate inside subscriptions using the path and notify entire subtree
+ * @param {Subscriptions} subscriptions
+ * @param {StatePath} path
+ */
+const notify = (subscriptions, path) => {
+  let tree = subscriptions;
+  const lastEdgeIndex = path.length - 1;
+
+  path.forEach((edge, edgeIndex) => {
+    // @ts-expect-error
+    tree[ITSELF].forEach(cb => cb());
+    tree = tree[edge];
+    // no subscription exists for the given edge, return
+    if (!tree) return
+    if (edgeIndex === lastEdgeIndex) notifySubTree(tree);
+  });
+};
+
+/**
+ * when state is mutated, add the cb in batch
+ * schedule flush if not already scheduled
+ * @param {Comp} comp
+ * @param {StatePath} path
+ */
+const onMutate = (comp, path) => {
+  notify(comp._subscriptions, path);
+  if (!comp._flush_scheduled) scheduleFlush(comp);
+};
+
+// when detection mode is enabled is records all the keys that are accessed in state
+// if state.a.b and state.c.d.e is accessed it becomes [['a', 'b'], ['c', 'd', 'e']]
+/**
+ * @type {{ _paths: StatePath[]}}
+ */
+const accessed = {
+  _paths: []
+};
+
+// call the function and detect what keys it is using of this.$
+// also get the return value and send it as well
+/**
+ *
+ * @param {Function} fn
+ * @returns {[any, StatePath[]]}
+ */
+const detectStateUsage = (fn) => {
+
+  modes._detective = true;
+  const returnVal = fn();
+  modes._detective = false;
+
+  const paths = [...accessed._paths]; // shallow clone
+
+  accessed._paths = [];
+  return [returnVal, paths]
+};
+
+// when initializing the state, if a function is given
+// call that function, detect the state keys it depends on, get the initial value
+// update its value whenever its deps changes
+
+/**
+ *
+ * @param {Comp} comp
+ * @param {Function} fn
+ * @param {string} prop
+ * @returns
+ */
+const computedState = (comp, fn, prop) => {
+  const [initValue, paths] = detectStateUsage(fn);
+
+  /** @type {SubCallBack} */
+  const compute = () => {
+    const value = fn();
+    comp.$[prop] = value;
+  };
+
+  const deps = paths.map(path => path.length === 1 ? path : path.slice(0, -1));
+  subscribeMultiple(comp, deps, compute, batches._beforeDOM);
+  return initValue
+};
+
+/**
+ * @typedef {Record<string|number|symbol, any>} target
+ */
+
+/**
+ * create a reactive state on compNode
+ * @param {Comp} comp
+ * @param {State} obj
+ * @param {StatePath} _statePath
+ * @returns {State}
+ */
+const reactify = (comp, obj, _statePath = []) => {
+
+  const closure$ = comp.parent && comp.parent.$;
+
+  let statePath = _statePath;
+  if (!isObject(obj)) return obj
+
+  // make the child objects reactive
+  /** @type {target} */
+  const target = Array.isArray(obj) ? [] : {};
+  Object.keys(obj).forEach(key => {
+    target[key] = reactify(comp, obj[key], [...statePath, key]);
+  });
+
+  const reactive = new Proxy(target, {
+    has (target, prop) {
+      // return true if the prop is in target or its closure
+      return prop in target || (closure$ ? prop in closure$ : false)
+    },
+
+    set (target, prop, newValue) {
+      // short circuit if the set is redundant
+
+      if (target[/** @type {string}*/(prop)] === newValue) return true
+
+      // change the reactive object's statePath, because it has been moved to a different key
+      if (prop === UPDATE_INDEX) {
+        // newValue is the index at which the reactive is moved
+        statePath = [...statePath.slice(0, -1), newValue];
+        return true
+      }
+
+      // if the mutated prop exists in the target already
+      const propInTarget = prop in target;
+
+      let value = newValue;
+
+      // do not override the state set by parent component by default value of the state added in component
+      if (modes._noOverride) {
+        // ignore set
+        if (propInTarget) return true
+
+        if (typeof value === 'function') {
+          value = computedState(comp, value, /** @type {string}*/(prop));
+        }
+      }
+
+      // if the prop is not in target but is in it's closure state
+      // then set the value in the closure state instead
+      else if (!propInTarget && closure$ && prop in closure$) {
+        return Reflect.set(closure$, prop, newValue)
+      }
+
+      if (isObject(value)) {
+        // if value is not reactive, make it reactive
+
+        if (!value[IS_REACTIVE]) {
+          value = reactify(comp, value, [...statePath, /** @type {string}*/(prop)]);
+        }
+        // when a reactive value is set on some index(prop) in target array
+        // we have to update that reactive object's statePath - because we are changing the index it was created at
+        else if (Array.isArray(target)) value[UPDATE_INDEX] = prop;
+      }
+
+      // -----------------------------
+      const set = () => Reflect.set(target, prop, value);
+
+      if (modes._reactive) {
+        // push to BATCH_INFO and call onMutate
+
+        const oldValue = target[/** @type {string}*/(prop)];
+        const newValue = value;
+        const success = set();
+        if (oldValue !== newValue) {
+          const livePath = () => [...statePath, /** @type {string}*/(prop)];
+
+          const mutatedPath = /** @type {StatePath}*/(livePath());
+          // statePath may have changed of reactive object, so add a getPath property to fetch the fresh statePath
+
+          comp._mutations.push({ oldValue, newValue, path: mutatedPath, livePath });
+
+          onMutate(comp, mutatedPath);
+        }
+
+        return success
+      }
+
+      return set()
+    },
+
+    deleteProperty (target, prop) {
+      if (modes._reactive) onMutate(comp, [...statePath, /** @type {string}*/(prop)]);
+      return Reflect.deleteProperty(target, prop)
+    },
+
+    get (target, prop) {
+      if (prop === IS_REACTIVE) return true
+      if (prop === TARGET) return target
+
+      if (modes._detective) {
+
+        /** @type {StatePath} */
+        const fullPath = [...statePath, /** @type {string}*/(prop)];
+
+        if (statePath.length !== 0) {
+          accessed._paths[accessed._paths.length - 1] = fullPath;
+        } else {
+          accessed._paths.push(fullPath);
+        }
+      }
+
+      // closure state API
+      if (prop in target) {
+        if (modes._returnComp) return comp
+        return Reflect.get(target, prop)
+      }
+      if (closure$) return Reflect.get(closure$, prop)
+    }
+
+  });
+
+  return reactive
+};
+
+/**
+ * hydrate template and add it in shadowDOM of comp
+ * @param {Comp} comp
+ * @param {HTMLTemplateElement} template
+ */
+const buildShadowDOM = (comp, template) => {
+
+  // create a clone of template
+  // @ts-expect-error
+  const fragment = getParsedClone(template.content);
+
+  // hydrate it
   hydrate(fragment, comp);
 
+  // complete the deferredWork
   flushArray(comp._deferredWork);
 
+  // create shadowDOM using this template
   comp.attachShadow({ mode: 'open' }).append(fragment);
 
 };
 
 /**
- * remove first and last character
- * @param {string} str
- * @returns {string}
- */
-const unBracket = str => str.slice(1, -1);
-
-/**
- * check if the string has brackets at the ends
- * @param {string} str
- * @returns {boolean}
- */
-const isBracketed = str => str[0] === '[' && str.endsWith(']');
-
-/**
- * process fn placeholder
- * @param {string} _content
- * @param {string} _text
- * @returns {Placeholder}
- */
-const processFnPlaceholder = (_content, _text) => {
-  // 'foo(bar.baz, fizz, buzz)'
-
-  // 'foo(bar.baz, fizz, buzz'
-  const closeParenRemoved = _content.slice(0, -1);
-
-  // [ 'foo', 'bar.baz, fizz, buzz' ]
-  const [fnName, argsStr] = closeParenRemoved.split('(');
-
-  // [ 'bar.baz', 'fizz', 'buzz' ]
-  const args = argsStr.split(',');
-
-  // [ ['bar', 'baz'], ['fizz'], ['buzz'] ]
-  const _statePaths = args.map(a => a.split('.'));
-
-  /**
-   * get the value of function placeholder
-   * @param {Comp} comp
-   * @returns {any}
-   */
-  const _getValue = (comp) => {
-    const fn = comp.fn[fnName];
-    // @todo move this to errors
-    if (!fn) {
-      throw errors.function_not_found(comp, fnName)
-    }
-    const tps = _statePaths.map(path => targetProp(comp.$, path));
-    const values = tps.map(([t, p]) => t[p]);
-    return fn(...values)
-  };
-
-  return {
-    _type: placeholderTypes._functional,
-    _statePaths,
-    _getValue,
-    _content,
-    _text
-  }
-};
-
-/**
- * process reactive placeholder
- * @param {string} _content
- * @param {string} _text
- * @returns {Placeholder}
- */
-
-const processReactivePlaceholder = (_content, _text) => {
-  const statePath = _content.split('.');
-
-  /**
-   * return the value of state placeholder in context of given component
-   * @param {Comp} comp
-   */
-  const _getValue = (comp) => {
-    {
-      try {
-        const [target, prop] = targetProp(comp.$, statePath);
-        const value = target[prop];
-        if (!isDefined(value)) throw value
-        else return value
-      } catch (e) {
-        if (!data._errorThrown) throw errors.invalid_state_placeholder(comp, _content)
-      }
-    }
-  };
-
-  return {
-    _type: placeholderTypes._reactive,
-    _getValue,
-    _statePaths: [statePath],
-    _content,
-    _text
-  }
-};
-
-/**
- * if functional placeholder's function name is not valid, make it not a placeholder
- * @param {string} text
- * @param {boolean} [noBrackets]
- * @returns {Placeholder}
- */
-const processPlaceholder = (text, noBrackets = false) => {
-  // if the text has bracket, remove it
-  const bracketsRemoved = noBrackets ? text : unBracket(text);
-  // remove all spaces
-  const content = bracketsRemoved.replace(/ /g, '');
-
-  if (content.includes('(')) {
-    return processFnPlaceholder(content, text)
-  }
-  return processReactivePlaceholder(content, text)
-};
-
-/**
- * parse attributes on element if any
- * @param {Parsed_HTMLElement} element
- * @param {string} compName
+ * invoke compJs with comp instance
+ * @param {CompDef['js']} compJs
  * @param {Comp} comp
  */
-const parseAttributes = (element, compName, comp) => {
-  // if component specific attributes are used on non-component elements
-  if (!compName) {
-    // DEV ONLy
-    const { _if, _else, _elseIf } = conditionAttributes;
-    const { _for, _key } = loopAttributes;
-    const compOnlyAttributes = [_if, _else, _elseIf, _key, _for];
+const invokeCompJs = (compJs, comp) => {
 
-    compOnlyAttributes.forEach(attrName => {
-      if (getAttr(element, attrName)) {
-        throw errors.component_attribute_used_on_non_component(element, attrName, comp)
-      }
-    });
-  }
+  modes._reactive = false;
+  modes._noOverride = true;
 
-  /** @type {Attribute_ParseInfo[] } */
-  const attributes = [];
-  const elementIsComp = !!compName;
+  // @ts-expect-error
+  compJs(comp);
 
-  for (const attributeName of element.getAttributeNames()) {
-    const attributeValue = /** @type {string} */ (element.getAttribute(attributeName));
-    const variableValue = isBracketed(attributeValue);
-
-    let name = attributeName;
-
-    /**  @type {AttributeType} */
-    let type = attributeTypes._normal;
-    let value;
-    const firstChar = attributeName[0];
-
-    if (attributeName === otherAttributes._ref) {
-      type = attributeTypes._ref;
-      value = attributeValue;
-    }
-
-    // SETTING FN OF COMPONENT
-    else if (attributeName.startsWith('fn.')) {
-      if (!elementIsComp) continue
-      type = attributeTypes._functional;
-      name = attributeName.slice(3);
-      value = attributeValue;
-    }
-
-    // SETTING STATE OF COMPONENT
-    else if (attributeName.startsWith('$.')) {
-      if (!elementIsComp) continue
-      name = attributeName.slice(2);
-
-      if (variableValue) {
-        type = attributeTypes._state;
-        value = processPlaceholder(attributeValue);
-      } else {
-        type = attributeTypes._staticState;
-        value = attributeValue;
-      }
-    }
-
-    // ATTACHING EVENT OR ACTION
-    else if (firstChar === '@') {
-      type = attributeTypes._event;
-      name = attributeName.slice(1);
-      value = attributeValue;
-    }
-
-    // attributes that require variable value
-    else if (variableValue) {
-      // conditionally setting attribute
-      if (attributeName.endsWith(':if')) {
-        type = attributeTypes._conditional;
-        name = attributeName.slice(0, -3);
-      }
-
-      // binding property
-      else if (firstChar === ':') {
-        type = attributeTypes._prop;
-        name = attributeName.slice(1);
-      }
-
-      value = processPlaceholder(attributeValue);
-    }
-
-    if (value) {
-      let camelCaseName = name;
-
-      if (name.includes('-')) camelCaseName = dashCaseToCamelCase(name);
-      // saving to array instead of object for better minification
-
-      attributes.push({
-        _name: camelCaseName,
-        _placeholder: value,
-        _type: type
-      });
-      removeAttr(element, attributeName);
-    }
-  }
-
-  // if value attributes found
-  if (attributes.length) {
-    if (!element._parsedInfo) {
-      // @ts-expect-error
-      element._parsedInfo = {};
-    }
-    element._parsedInfo._attributes = attributes;
-  }
+  modes._reactive = true;
+  modes._noOverride = false;
 };
 
 /**
- * take the string text and split it into placeholders and strings
+ * this function is called when comp is connected to DOM for the first time
  * @param {Comp} comp
- * @param {string} text
- * @returns {SplitPart[]} parts
+ * @param {CompDef} compDef
  */
 
-const split = (comp, text) => {
+function onFirstConnect (comp, compDef) {
 
-  /** @type {SplitPart[]} */
-  const parts = [];
+  // create state
+  comp.$ = reactify(comp, comp._prop$ || {}, []);
 
-  let collectingVar = false;
-  let collectedString = '';
-  let i = -1;
+  // after everything is set up, invoke js
+  if (compDef.js) invokeCompJs(compDef.js, comp);
 
-  /** @param {boolean} cv */
-  const reset = (cv) => {
-    collectedString = '';
-    collectingVar = cv;
-  };
-
-  while (++i < text.length) {
-    const char = text[i];
-    const nextChar = text[i + 1];
-
-    // if current char is ! and next [, ignore ! and don't make the
-    if (char === '!' && nextChar === '[') {
-      collectedString += '[';
-      i += 1;
-    }
-
-    else if (char === '[') {
-      // save current collected string (if any)
-      if (collectedString) parts.push(collectedString);
-      reset(true);
-    }
-
-    else if (collectingVar && char === ']') {
-      // process collected variable and save it in parts
-      const part = processPlaceholder(collectedString, true);
-      parts.push(part);
-      reset(false);
-    }
-
-    // keep collecting
-    else collectedString += char;
+  // manually created looped component requires hydration
+  if (comp._isLooped) {
+    hydrateAttributes(comp, comp._parsedInfo._attributes, comp);
   }
 
-  // add the remaining text
-  if (collectedString) {
-    if (collectingVar) {
-      throw errors.placeholder_not_closed(comp, collectedString)
-    }
+  // hydrate DOM (for slots)
+  comp.childNodes.forEach(node => hydrate(node, comp));
 
-    parts.push(collectedString);
-  }
-  return parts
-};
+  // create shadowDOM
+  buildShadowDOM(comp, compDef._template);
+
+  // keep the attributes of comp element in sync
+  subscribeNode(comp);
+
+}
 
 /**
- * parse text node
- * @param {Text} node
- * @param {Function[]} deferred
+ * called when comp is connected to DOM
  * @param {Comp} comp
- */
-const parseTextNode = (node, deferred, comp) => {
-  const text = node.textContent || '';
-  const trimmedText = text.trim();
-
-  // if the node is only empty string, it will be normalized by DOM, so remove it
-  if (!trimmedText) {
-    deferred.push(() => node.remove());
-    return
-  }
-
-  const parts = split(comp, text);
-
-  /** @type {Parsed_Text[]} */
-  const textNodes = [];
-
-  // for each part create a text node
-  // if it's not TEXT type, save the part info in parsed.placeholder
-  parts.forEach(part => {
-
-    let textNode;
-    if (typeof part === 'string') {
-      textNode = document.createTextNode(part);
-    } else {
-      const temp = `[${part._content}]`;
-      textNode = document.createTextNode(temp);
-      /** @type {Parsed_Text} */(textNode)._parsedInfo = {
-        _placeholder: part
-      };
-    }
-
-    // @ts-expect-error
-    textNodes.push(textNode);
-  });
-
-  // replace the original node with new textNodes
-  deferred.push(() => {
-    textNodes.forEach(textNode => node.before(textNode));
-    node.remove();
-  });
-};
-
-/**
- * parsed conditional component
- * @param {ConditionalComp} comp
- * @param {ConditionAttribute} conditionType
- * @param {string} attributeValue
- */
-const parseConditionComp = (comp, conditionType, attributeValue) => {
-
-  comp._parsedInfo = {
-    ...comp._parsedInfo,
-    _conditionType: conditionType,
-    _animationAttributes: getAnimationAttributes(comp)
-  };
-
-  if (conditionType !== conditionAttributes._else) {
-    /** @type {IfComp}*/
-    (comp)._parsedInfo._conditionAttribute = processPlaceholder(attributeValue);
-  }
-  [animationAttributes._enter, animationAttributes._exit, conditionType]
-    .forEach(att => removeAttr(comp, att));
-};
-
-/**
- * parse if condition comp
- * @param {IfComp} ifComp
- */
-const parseIfComp = (ifComp) => {
-  /** @type {ConditionalComp[]}} */
-  const conditionGroup = [];
-
-  let node = /** @type {ConditionalComp | Node } */(ifComp.nextElementSibling);
-
-  // create a starting marker which will be used to add conditional nodes to DOM
-  const anchorNode = createComment('if');
-  ifComp.before(anchorNode);
-
-  // keep checking the next node
-  while (true) {
-    // get the conditionType of the node
-
-    // @ts-expect-error
-    const conditionType = node && node._parsedInfo && node._parsedInfo._conditionType;
-
-    // if the node is not a condition comp or is a part of separate condition,
-    // break the loop
-    if (
-      !conditionType ||
-      (conditionType === conditionAttributes._if)
-    ) break
-
-    conditionGroup.push(/** @type {ConditionalComp } */(node));
-
-    // @ts-expect-error
-    node = node.nextElementSibling;
-  }
-
-  // add a end if marker after the last node in conditionGroup
-  // if ifComp is alone, add after it
-  (conditionGroup[conditionGroup.length - 1] || ifComp).after(createComment('/if'));
-
-  // remove other nodes from template
-  conditionGroup.forEach(n => n.remove());
-
-  let conditionGroupStateDeps = [...ifComp._parsedInfo._conditionAttribute._statePaths];
-
-  conditionGroup.forEach(node => {
-    if (node._parsedInfo._conditionType !== conditionAttributes._else) {
-
-      const deps = /** @type {IfComp | ElseIfComp }*/(node)._parsedInfo._conditionAttribute._statePaths;
-
-      conditionGroupStateDeps = [...conditionGroupStateDeps, ...deps];
-    }
-  });
-
-  ifComp._parsedInfo = {
-    ...ifComp._parsedInfo,
-    _conditionGroup: conditionGroup,
-    _conditionGroupStateDeps: conditionGroupStateDeps,
-    _conditionGroupAnchor: anchorNode
-  };
-};
-
-const { _enter, _exit, _move } = animationAttributes;
-const { _for, _key } = loopAttributes;
-
-const attributesToRemove = [
-  _enter, _exit, _move,
-  _for, _key
-];
-
-/**
- * parse looped component
- * @param {LoopedComp} comp
- * @param {string} forAttribute
- * @param {Comp} parentComp
+ * @param {CompDef} compDef
+ * @returns
  */
 
-const parseLoopedComp = (comp, forAttribute, parentComp) => {
+const onConnect = (comp, compDef) => {
 
-  const [a, b, c] =
-  forAttribute.replace(/\(|\)|,|(\sin\s)/g, ' ') // replace ' in ', '(', ')', ',' with space character
-    .split(/\s+/) // split with space character,
-    .filter(t => t); // remove empty strings
+  // do nothing if component is just moving
+  if (comp._moving) return
 
-  // ['item', 'index', 'arr'] or
-  // ['item', 'arr']
-  const indexUsed = isDefined(c);
-  const keyAttribute = getAttr(comp, _key);
+  comp._manuallyDisconnected = false;
 
-  if (!keyAttribute) {
-    throw errors.missing_key_attribute(comp, parentComp)
-  }
+  const { _nodesUsingLocalState, _nodesUsingClosureState, _eventCbs, shadowRoot } = comp;
 
-  comp._parsedInfo._loopAttributes = {
-    _itemArray: processPlaceholder(indexUsed ? c : b, true),
-    _item: a,
-    _itemIndex: indexUsed ? b : undefined,
-    _key: processPlaceholder(/** @type {string}*/(keyAttribute))
-  };
+  // when comp is being connected for the first time
+  if (!shadowRoot) {
+    onFirstConnect(comp, compDef);
 
-  comp._parsedInfo._animationAttributes = getAnimationAttributes(comp);
-
-  attributesToRemove.forEach(name => removeAttr(comp, name));
-};
-
-const { _else, _if, _elseIf } = conditionAttributes;
-
-/**
- * parse component node
- * @param {Comp} comp
- * @param {string} compName
- * @param {Comp} parentComp
- * @param {Function[]} deferred
- */
-const parseComp = (comp, compName, parentComp, deferred) => {
-
-  comp._parsedInfo = {
-    _isComp: true,
-    _compName: compName,
-    _attributes: []
-  };
-
-  const forAttribute = getAttr(comp, loopAttributes._for);
-
-  // if the component has FOR_ATTRIBUTE on it, it is looped component
-  if (forAttribute) {
-    parseLoopedComp(
-      /** @type {LoopedComp} */(comp),
-      forAttribute,
-      parentComp
-    );
+    // connect all nodes using local state
+    _nodesUsingLocalState.forEach(subscribeNode);
   }
 
   else {
-    const typeAndValue = usesConditionalAttribute(comp);
-
-    if (typeAndValue) {
-      const [type, value] = typeAndValue;
-      parseConditionComp(/** @type {ConditionalComp}*/(comp), type, value);
-
-      if (type === _if) {
-        deferred.push(
-          () => parseIfComp(/** @type {IfComp} */(comp))
-        );
-      }
-    }
+    // only connect nodes that were previously disconnected
+    // connect all nodes using closure state
+    _nodesUsingClosureState.forEach(subscribeNode);
   }
+
+  // after all the connections are done, run the onMount callbacks
+  _eventCbs._onMount.forEach(cb => cb());
 };
 
 /**
- * if the comp has conditional Attribute, return [attributeName, value] else false
- * @param {Comp} conditionComp
- * @returns {[ConditionAttribute, string] | false}
+ * called when comp is disconnected
+ * @param {Comp} comp
  */
-const usesConditionalAttribute = conditionComp => {
-  const conditionalAttributes = /** @type {ConditionAttribute[]}*/(
-    [_else, _if, _elseIf]
-  );
+const onDisconnect = (comp) => {
+  const { _eventCbs, _nodesUsingClosureState, _manuallyDisconnected, _moving } = comp;
 
-  for (const attributeName of conditionalAttributes) {
-    const value = getAttr(conditionComp, attributeName);
-    if (value !== null) return [attributeName, value]
-  }
+  if (_manuallyDisconnected || _moving) return
 
-  return false
+  _nodesUsingClosureState.forEach(unsubscribeNode);
+
+  _eventCbs._onDestroy.forEach(cb => cb());
+
 };
 
 /**
- * parse all types of nodes
- * @param {Node} target
- * @param {Record<string, string>} childCompNodeNames
- * @param {Function[]} deferred
- * @param {Comp} parentComp
+ * defines a custom element using the CompClass function
+ * @param {NueComp} CompClass
  */
 
-const parse = (target, childCompNodeNames, deferred, parentComp) => {
+const createComponent = CompClass => {
+  const { _definedComponents } = data;
 
-  // if target is component, get it's name else it will be undefined
-  const compName = childCompNodeNames[target.nodeName];
+  // get the name of CompClass
+  const compName = CompClass.name;
 
-  // #text
-  if (target.nodeType === target.TEXT_NODE) {
-    return parseTextNode(
-      /** @type {Text}*/(target),
-      deferred,
-      parentComp
-    )
-  }
+  // do nothing if a component by this name is already defined
+  if (compName in _definedComponents) return
 
-  // component
-  if (compName) {
-    parseComp(
-      /** @type {Comp}*/(target),
-      compName,
-      parentComp,
-      deferred
-    );
-  }
+  // else, mark this as defined
+  _definedComponents[compName] = CompClass;
 
-  // attributes on component or simple target
-  // @ts-expect-error
-  if (target.hasAttribute) {
-    parseAttributes(/** @type {Parsed_HTMLElement}*/(target), compName, parentComp);
-  }
+  const compDef = createCompDef(CompClass);
 
-  // child nodes of component or simple target
-  if (target.hasChildNodes()) {
-    target.childNodes.forEach(
-      childNode => parse(childNode, childCompNodeNames, deferred, parentComp)
-    );
-  }
-};
+  createCompTemplate(compDef);
 
-// import processAttributes from '../process/attributes/processAttributes.js'
-
-/**
- * defines a custom element using the compFn function
- * @param {Function} compFn
- */
-const defineCustomElement = (compFn) => {
-
-  if (typeof compFn !== 'function') {
-    throw errors.component_is_not_a_function(compFn)
-  }
-
-  const { _components, _config } = data;
-  const compFnName = compFn.name;
-
-  // return if already defined
-  if (compFnName in _components) return
-  _components[compFnName] = compFn;
-
-  /** @type {HTMLTemplateElement}*/
-  let componentTemplateElement;
+  // create a custom element for this component
 
   class NueComp extends HTMLElement {
+    /** @this {Comp} */
     constructor () {
       super();
-      /** @type {Comp} */
-      // @ts-expect-error
-      const comp = this;
-
-      comp._compFnName = compFnName;
-
-      // refs of child nodes with *ref='ref-name' attribute
-      comp.refs = {};
-
-      // subscription tree which contains the callbacks stored at various dependency paths
-      comp._subscriptions = { [ITSELF]: new Set() };
-
-      comp._batches = /** @type {[Set<SubCallBack>, Set<SubCallBack>]}*/([new Set(), new Set()]);
-
-      // Array of mutation info that happened in a batch
-      comp._mutations = [];
-
-      // array of callbacks that should be run after some process is done
-      comp._deferredWork = [];
-
-      // nodes that are using the state
-      comp._nodesUsingLocalState = new Set();
-
-      // nodes that are using the closure state
-      comp._nodesUsingClosureState = new Set();
-
-      comp.fn = comp.parent ? Object.create(comp.parent.fn) : {};
-
-      if (!comp._prop$) comp._prop$ = {};
-
-      addHooks(comp);
+      construct(this, compName);
     }
 
+    /** @this {Comp} */
     connectedCallback () {
-      /** @type {Comp} */
-      // @ts-expect-error
-      const comp = this;
-
-      if (comp._moving) return
-
-      comp._manuallyDisconnected = false;
-
-      // when compFn is being connected for the first time
-      if (!comp.shadowRoot) {
-
-        // create $
-        comp.$ = reactify(comp, comp._prop$ || {}, []);
-
-        if (comp._isLooped) {
-          // debugger
-          hydrateAttributes(comp, comp._parsedInfo._attributes, comp);
-        }
-
-        const [templateString, cssString, childComponents] = runComponent(comp, compFn, !!componentTemplateElement);
-
-        // do this only once per compFn ------------------
-        if (!componentTemplateElement) {
-          /** @type {Record<string, string>} */
-          let childCompNodeNames = {};
-          if (childComponents) {
-            childCompNodeNames = childComponents.reduce(
-              /**
-               * use the upper case dashed name of child function as key and save the original name
-               * @param {Record<string, string>} acc
-               * @param {Function} child
-               * @returns {Record<string, string>}
-               */
-              (acc, child) => {
-                const { name } = child;
-                acc[upper(dashify(name))] = name;
-                return acc
-              }, {});
-          }
-
-          // create componentTemplateElement using template, style, and defaultStyle
-          componentTemplateElement = /** @type {HTMLTemplateElement}*/(createElement('template'));
-          componentTemplateElement.innerHTML =
-          templateString +
-          `<style default> ${_config.defaultStyle} </style>` +
-          '<style scoped >' + cssString + '</style>';
-
-          // parse the template and create componentTemplateElement which has all the parsed info
-
-          /** @type {Function[]} */
-          const deferred = [];
-          parse(componentTemplateElement.content, childCompNodeNames, deferred, comp);
-          flushArray(deferred);
-
-          // define all child components
-          childComponents.forEach(defineCustomElement);
-        }
-
-        // hydrate DOM and shadow DOM
-        // TODO: process should be able to take the fragment node
-        comp.childNodes.forEach(node => hydrate(node, comp));
-        buildShadowDOM(comp, componentTemplateElement);
-
-        // connect all nodes using local state
-        comp._nodesUsingLocalState.forEach(subscribeNode);
-
-        // subscribe node, so that it's attributes are in sync
-        subscribeNode(comp);
-      }
-
-      // only connect nodes that were previously disconnected (nodes using closure state)
-      else {
-        comp._nodesUsingClosureState.forEach(subscribeNode);
-      }
-
-      comp._hookCbs._onMount.forEach(cb => cb());
+      onConnect(this, compDef);
     }
 
+    /** @this {Comp} */
     disconnectedCallback () {
-      /** @type {Comp} */
-      // @ts-expect-error
-      const comp = this;
-
-      if (comp._manuallyDisconnected) return
-      if (comp._moving) return
-
-      comp._hookCbs._onDestroy.forEach(cb => cb());
-
-      // only disconnect nodes that are using closure, no need to disconnect nodes that use local state only
-      comp._nodesUsingClosureState.forEach(unsubscribeNode);
-
-      // unsubscribeNode(comp) (not needed ?)
+      onDisconnect(this);
     }
   }
 
-  // define current compFn and then it's children
-  customElements.define(dashify(compFnName), NueComp);
-};
+  const { _elName, components } = compDef;
 
-const cardBg = '#222831';
-const codeBg = '#333C49';
-const overlay = 'rgba(51, 60, 73, 0.5)';
-const fontColor = '#dddddd';
-const fontColor2 = '#f05454';
+  // define component and then it's used child components
+  customElements.define(_elName, NueComp);
+
+  if (components) {
+    components.forEach(createComponent);
+  }
+};
 
 const errorOverlayCSS = /* css */`
 
-.panel {
-  background: ${overlay};
-  backdrop-filter: blur(5px);
-  min-height: 100vh;
-  margin: 0;
-  box-sizing: border-box;
+:host {
+    /* colors */
+  --cardBg: #212529;
+  --codeBg: #2A2E32;
+  --highlight: #212529;
+  --highlightWord: #FD413C;
+  --hoverHighlight: #212529;
+  --overlay: hsla(214deg, 10%, 27%, 94%);
+  --primaryColor: #BDC1C6;
+  --secondColor: #FD413C;
+}
+
+::selection {
+  background: var(--highlightWord);
+  color: white;
 }
 
 :host {
@@ -3028,18 +3070,52 @@ const errorOverlayCSS = /* css */`
   padding: 0;
 }
 
+.panel {
+  background: var(--overlay);
+  min-height: 100vh;
+  margin: 0;
+  box-sizing: border-box;
+}
+
 .code {
-  background: ${codeBg};
+  background: var(--codeBg);
   padding: 20px;
-  color: ${fontColor};
+  color: var(--primaryColor);
   font-size: 16px;
   border-radius: 5px;
   line-height: 1.5;
   overflow-x: auto;
+  max-height: 40vh;
+}
+
+.code span.error {
+  color: white;
+  display: inline-block;
+  background: var(--highlightWord);
+  padding: 0.1em 0.3em;
+  border-radius: 5px;
+  margin: 0 0.2em;
+}
+
+.code span.error:focus {
+  outline: none;
+}
+
+.code div {
+  border-radius: 5px;
+  margin-bottom: 0.2em;
+}
+
+.code div:hover {
+  background: var(--hoverHighlight);
+}
+
+.code div.has-error {
+  background: var(--highlight);
 }
 
 .card {
-  background: ${cardBg};
+  background: var(--cardBg);
   border-radius: 5px;
   padding: 30px;
   max-width: 850px;
@@ -3050,7 +3126,7 @@ const errorOverlayCSS = /* css */`
   margin: 0 auto;
   animation: fade-in 300ms ease;
   position: relative;
-  box-shadow: 2px 2px 20px rgba(0,0,0,0.1);
+  box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.15);
   position: absolute;
   left: 50%;
   top: 50%;
@@ -3064,12 +3140,30 @@ const errorOverlayCSS = /* css */`
 
 /* Track */
 .card::-webkit-scrollbar-track {
-  background: ${cardBg};
+  background: var(--cardBg);
+
 }
 
 /* Handle */
 .card::-webkit-scrollbar-thumb {
-  background: ${codeBg};
+  background: var(--codeBg);
+}
+
+/* width */
+.code::-webkit-scrollbar {
+  width: 5px;
+}
+
+/* Track */
+.code::-webkit-scrollbar-track {
+  background: var(--codeBg);
+  border-radius: 5px;
+}
+
+/* Handle */
+.code::-webkit-scrollbar-thumb {
+  background: var(--secondColor);
+  border-radius: 5px;
 }
 
 .close-icon {
@@ -3088,7 +3182,7 @@ const errorOverlayCSS = /* css */`
 }
 
 .close-icon svg {
-  fill: ${fontColor2};
+  fill: var(--secondColor);
 }
 
 .code-container {
@@ -3101,8 +3195,8 @@ const errorOverlayCSS = /* css */`
   right: 20px;
   padding: 10px 15px;
   font-size: 14px;
-  color: ${fontColor};
-  background: ${cardBg};
+  color: var(--primaryColor);
+  background: var(--cardBg);
   border: none;
   border-radius: 5px;
 }
@@ -3110,11 +3204,12 @@ const errorOverlayCSS = /* css */`
 .title {
   font-size: 24px;
   margin-bottom: 20px;
-  color: ${fontColor2};
+  /* font-weight: 700; */
+  color: var(--secondColor);
 }
 
 .console {
-  color: ${fontColor2};
+  color: var(--secondColor);
   font-size: 16px;
   margin-top: 20px;
 }
@@ -3124,7 +3219,7 @@ const errorOverlayCSS = /* css */`
   font-size: 16px;
   border-radius: 5px;
   white-space: pre-wrap;
-  color: ${fontColor};
+  color: var(--primaryColor);
   margin: 20px 0;
 }
 
@@ -3139,10 +3234,9 @@ const errorOverlayHTML = /* html */`
 <div class='panel'>
   <div class='card'>
     <button class='close-icon'> ${closeIcon} </button>
-    <div class='title'> ERROR </div>
-    <pre class='message'>  </pre>
-    <pre class='code'>  </pre>
-    <div class='console'> open console to see stack trace </div>
+    <div class='title'> </div>
+    <pre class='message'> </pre>
+    <pre class='code'> </pre>
   </div>
 </div>
 
@@ -3152,10 +3246,9 @@ const errorOverlayHTML = /* html */`
 /**
  * show error overlay by creating a custom overlay element
  * @param {NueError} error
- * @param {{ filename: string, lineno: string, colno: string }} location
  */
 
-const showErrorOverlay = (error, location) => {
+const showErrorOverlay = (error) => {
 
   // if already showing error, return
   if (data._errorThrown) return
@@ -3185,10 +3278,19 @@ const showErrorOverlay = (error, location) => {
   const code = /** @type {HTMLElement}*/(root.querySelector('.code'));
   const title = /** @type {HTMLElement}*/(root.querySelector('.title'));
 
+  // hide the .code if the no code is to be shown
+  if (!error.code) {
+    code.hidden = true;
+  }
+
   if (error.issue) {
     title.textContent = error.name;
-    message.textContent = `${error.issue}\n\n${error.fix}`;
-    code.textContent = error.code;
+    message.textContent = `${error.issue}\n${error.fix}`;
+    code.innerHTML = error.code.innerHTML;
+
+    const codeError = /** @type {HTMLElement} */(code.querySelector('.error'));
+    codeError.tabIndex = 0;
+    codeError.focus();
   }
 
   else {
@@ -3200,35 +3302,39 @@ const showErrorOverlay = (error, location) => {
   data._errorThrown = true;
 };
 
+const attachErrorOverlay = () => {
+
+  window.onerror = (message, filename, lineno, colno, error) => {
+    showErrorOverlay(/** @type {NueError}*/(error));
+  };
+
+};
+
 /**
- * define the custom targetElement of given name
- * @param {Function} component
- * @param {HTMLElement} targetElement
+ * render component in place of targetElement with optional config
+ * @param {NueComp} compClass
  * @param {Config} [config]
  * @returns {Comp}
  */
 
-const render = (component, targetElement, config) => {
+const render = (compClass, config) => {
 
-  // attach error-overlay
-  {
-    // @ts-expect-error
-    window.data = data;
-    window.onerror = (message, filename, lineno, colno, error) => {
-
-      // @ts-ignore
-      showErrorOverlay(error);
-    };
-
-  }
+  attachErrorOverlay();
 
   // override config with default config
   if (config) data._config = { ...data._config, ...config };
 
-  defineCustomElement(component);
+  createComponent(compClass);
 
-  // replace the targetElement with customElement
-  const customElement = /** @type {Comp}*/(document.createElement(dashify(component.name)));
+  // replace the <component> with <component->
+  const compName = compClass.name;
+  const targetElement = /** @type {Element}*/(document.querySelector(compName));
+
+  if (!targetElement) {
+    throw errors.root_not_found_in_html(compName)
+  }
+
+  const customElement = /** @type {Comp}*/(createElement(dashify(compName)));
   targetElement.replaceWith(customElement);
 
   return customElement
