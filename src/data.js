@@ -3,7 +3,7 @@ export const data = {
   _definedComponents: {},
   _errorThrown: false,
   _config: {
-    defaultStyle: ':host{display:block;}'
+    defaultStyle: ''
   },
   /** @type {Function | undefined} */
   _onNodeUpdate: undefined
