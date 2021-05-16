@@ -1,4 +1,4 @@
-import { errors } from '../dev/errors'
+import { errors } from '../dev/errors/index.js'
 import { processPlaceholder } from './placeholder/processPlaceholder'
 
 /**

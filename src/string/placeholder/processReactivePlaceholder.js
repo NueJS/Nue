@@ -1,5 +1,5 @@
 import { data } from '../../data'
-import { errors } from '../../dev/errors'
+import { errors } from '../../dev/errors/index.js'
 import { placeholderTypes } from '../../enums'
 import { isDefined } from '../../others'
 import { getTargetProp } from '../../state/getTargetProp'

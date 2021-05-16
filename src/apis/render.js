@@ -1,7 +1,7 @@
 import { createComponent } from '../component/createComponent'
 import { data } from '../data'
 import { attachErrorOverlay } from '../dev/error-overlay/attachErrorOverlay'
-import { errors } from '../dev/errors'
+import { errors } from '../dev/errors/index.js'
 import { createElement } from '../dom/create'
 import { dashify } from '../string/dashify'
 
