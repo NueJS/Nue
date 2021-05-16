@@ -1,4 +1,4 @@
-const { dashify } = require('../../src/utils/string/dashify')
+const { dashify } = require('../../src/string/dashify')
 const { useRender } = require('../utils/useRender')
 
 class App {}
