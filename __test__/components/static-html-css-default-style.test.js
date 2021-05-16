@@ -1,4 +1,3 @@
-const { dashify } = require('../../src/string/dashify')
 const { useRender } = require('../utils/useRender')
 
 const innerHTML = /* html */`
