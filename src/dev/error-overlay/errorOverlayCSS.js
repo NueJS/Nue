@@ -2,14 +2,14 @@ export const errorOverlayCSS = /* css */`
 
 :host {
     /* colors */
-  --cardBg: hsl(215deg, 15%, 22%);
-  --codeBg: hsl(215deg, 15%, 28%);
-  --highlight: hsl(215deg, 15%, 38%);
-  --highlightWord: #738397;
-  --hoverHighlight: #4d5968;
-  --overlay: hsla(0deg, 0%, 90%, 50%);
-  --primaryColor: #d2dae2;
-  --secondColor: #d2dae2;
+  --cardBg: #212529;
+  --codeBg: #2A2E32;
+  --highlight: #212529;
+  --highlightWord: #FD413C;
+  --hoverHighlight: #212529;
+  --overlay: hsla(214deg, 10%, 27%, 94%);
+  --primaryColor: #BDC1C6;
+  --secondColor: #FD413C;
 }
 
 ::selection {
@@ -89,7 +89,7 @@ export const errorOverlayCSS = /* css */`
   margin: 0 auto;
   animation: fade-in 300ms ease;
   position: relative;
-  box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+  box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.15);
   position: absolute;
   left: 50%;
   top: 50%;
@@ -104,6 +104,7 @@ export const errorOverlayCSS = /* css */`
 /* Track */
 .card::-webkit-scrollbar-track {
   background: var(--cardBg);
+
 }
 
 /* Handle */
@@ -119,11 +120,12 @@ export const errorOverlayCSS = /* css */`
 /* Track */
 .code::-webkit-scrollbar-track {
   background: var(--codeBg);
+  border-radius: 5px;
 }
 
 /* Handle */
 .code::-webkit-scrollbar-thumb {
-  background: var(--highlight);
+  background: var(--secondColor);
   border-radius: 5px;
 }
 
@@ -165,7 +167,7 @@ export const errorOverlayCSS = /* css */`
 .title {
   font-size: 24px;
   margin-bottom: 20px;
-  font-weight: 700;
+  /* font-weight: 700; */
   color: var(--secondColor);
 }
 
