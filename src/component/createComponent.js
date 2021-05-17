@@ -6,7 +6,7 @@ import { onConnect } from './onConnect'
 import { onDisconnect } from './onDisconnect'
 
 /**
- * defines a custom element using the CompClass function
+ * defines a custom element using nue.js component class
  * @param {NueComp} CompClass
  */
 
