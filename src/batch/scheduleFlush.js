@@ -9,16 +9,15 @@ export const scheduleFlush = (comp) => {
   comp._flush_scheduled = true
 
   setTimeout(() => {
-    // do a shallow clone because comp.batchInfo will be cleared out
-    const mutations = [...comp._mutations]
+    flush(comp)
 
-    flush(comp, mutations)
-
-    // clear batch info
-    comp._mutations.length = 0
+    // assign a new array instead of changing the length to 0
+    // so that component events api can use this mutations info
+    comp._mutations = []
 
     // reset flag
     comp._flush_scheduled = false
+
   }, 0)
 
 }
