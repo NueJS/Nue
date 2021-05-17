@@ -32,7 +32,7 @@ export const parseLoopedComp = (loopedComp, forAttribute, parentCompName) => {
   const keyAttribute = getAttr(loopedComp, _key)
 
   if (_DEV_ && !keyAttribute) {
-    throw errors.missing_key_attribute(loopedComp._compName, parentCompName)
+    throw errors.missing_key_attribute(loopedComp._parsedInfo._compName, parentCompName)
   }
 
   loopedComp._parsedInfo._loopAttributes = {
