@@ -1,6 +1,6 @@
 import { getParsedClone } from '../dom/getParsedClone.js'
 import { hydrate } from '../hydrate/hydrate.js'
-import { flushArray } from '../others.js'
+import { flushArray } from '../utils/array.js'
 
 /**
  * hydrate template and add it in shadowDOM of comp

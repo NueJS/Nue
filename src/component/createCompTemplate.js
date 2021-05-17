@@ -1,7 +1,7 @@
 import { data } from '../info'
-import { flushArray } from '../others'
 import { parse } from '../parse/parseNode'
 import { dashifyComponentNames } from '../string/dashify'
+import { flushArray } from '../utils/array'
 
 /**
  * create template and parse it

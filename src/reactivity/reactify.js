@@ -3,7 +3,7 @@ import { modes } from './modes.js'
 import { computedState } from '../state/computedState.js'
 import { accessed } from '../state/detectStateUsage.js'
 import { IS_REACTIVE, TARGET, UPDATE_INDEX } from '../constants.js'
-import { isObject } from '../others.js'
+import { isObject } from '../utils/type.js'
 
 /**
  * @typedef {Record<string|number|symbol, any>} target

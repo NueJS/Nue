@@ -1,10 +1,10 @@
 import { createComment } from '../../dom/create.js'
 import { handleArrayChange } from './utils/handleArrayChange.js'
-import { arraysAreShallowEqual } from '../../others.js'
 import { getArrayMutationInfo } from './utils/getArrayMutationInfo.js'
 import { zeroToNArray } from './utils/zeroToNArray.js'
 import { subscribe } from '../../subscription/subscribe.js'
 import { batches } from '../../enums.js'
+import { arraysAreShallowEqual } from '../../utils/array.js'
 
 /** @typedef {(value: any, index: number) => Record<string, any>} getClosure */
 /** @typedef {(value: any, index: number) => any } getKey */
