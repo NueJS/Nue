@@ -38,7 +38,9 @@ export const handleArrayChange = (loopInfo, dirtyIndexes, updatedSlices, oldStat
     const steps = reconcile(oldState, newState, dirtyIndexes)
 
     // if reorder animation is to be played, record offsets before DOM is updated
-    if (_move && _instanciated) saveOffsets(dirtyIndexes, _loopedCompInstances)
+    if (_move && _instanciated) {
+      saveOffsets(dirtyIndexes, _loopedCompInstances)
+    }
 
     const updateIndexes = () => {
       // if index is used, only then update the indexes
@@ -60,7 +62,9 @@ export const handleArrayChange = (loopInfo, dirtyIndexes, updatedSlices, oldStat
         updateStates()
       }
 
-      if (_move) animateMove(loopInfo, dirtyIndexes)
+      if (_move && _instanciated) {
+        animateMove(_loopedCompInstances, dirtyIndexes, _move)
+      }
     }
 
     // if exit animations are specified and we have to remove some nodes, run exit animations
