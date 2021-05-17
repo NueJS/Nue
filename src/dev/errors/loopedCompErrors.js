@@ -68,11 +68,9 @@ Example:
  */
 export const missing_key_attribute = (loopedCompName, parentCompName) => {
 
-  const issue = `"*key" attribute is missing on looped component <${loopedCompName}> in <${parentCompName}>`
+  const issue = `"*key" attribute is missing on looped component <${loopedCompName}> in <${parentCompName}>, which is required for efficient DOM updates`
 
-  const fix = '*key attribute is required on a looped component for efficient and correct updates'
+  const fix = `Add "*key" attribute on looped <${loopedCompName}> to fix this error`
 
-  const code = getCodeWithError(loopedCompName, new RegExp(`<${loopedCompName}`))
-
-  return createError(issue, fix, code, parentCompName)
+  return createError(issue, fix, undefined, parentCompName)
 }
