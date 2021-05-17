@@ -9,12 +9,12 @@ export const modes = {
    */
   _reactive: false,
 
-  /** when noOverride is true,
+  /** when setup mode is active,
    * setting a key in state which already exists does nothing
    * this is used so that default value of state does not override the state set by the parent component
    * via state attribute
    */
-  _noOverride: false,
+  _setup: false,
 
   /** when origin mode is true,
    * it returns the comp where the piece of state is coming from rather it's value

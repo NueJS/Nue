@@ -18,10 +18,13 @@ import { isObject } from '../utils/type.js'
  */
 export const reactify = (comp, obj, _statePath = []) => {
 
-  const closure$ = comp.parent && comp.parent.$
-
-  let statePath = _statePath
+  // can not reactify non-object
   if (!isObject(obj)) return obj
+
+  const parent$ = comp.parent && comp.parent.$
+
+  // if the obj is in array, this statePath may change if the obj is moved to different position in array
+  let statePath = _statePath
 
   // make the child objects reactive
   /** @type {target} */
@@ -30,20 +33,23 @@ export const reactify = (comp, obj, _statePath = []) => {
     target[key] = reactify(comp, obj[key], [...statePath, key])
   })
 
-  const reactive = new Proxy(target, {
+  return new Proxy(target, {
     has (target, prop) {
       // return true if the prop is in target or its closure
-      return prop in target || (closure$ ? prop in closure$ : false)
+      return prop in target || (parent$ ? prop in parent$ : false)
     },
 
     set (target, prop, newValue) {
-      // short circuit if the set is redundant
 
-      if (target[/** @type {string}*/(prop)] === newValue) return true
+      const oldValue = target[/** @type {string}*/(prop)]
 
-      // change the reactive object's statePath, because it has been moved to a different key
+      // do nothing if newValue is same as oldValue
+      if (oldValue === newValue) return true
+
       if (prop === UPDATE_INDEX) {
-        // newValue is the index at which the reactive is moved
+        // update statePath as it has been moved to a different position in array
+
+        // replace the oldIndex with newIndex in statePath
         statePath = [...statePath.slice(0, -1), newValue]
         return true
       }
@@ -53,9 +59,9 @@ export const reactify = (comp, obj, _statePath = []) => {
 
       let value = newValue
 
-      // do not override the state set by parent component by default value of the state added in component
-      if (modes._noOverride) {
-        // ignore set
+      // state creation mode
+      if (modes._setup) {
+        // do not override the state set by parent component by the default value set in this component
         if (propInTarget) return true
 
         if (typeof value === 'function') {
@@ -65,8 +71,8 @@ export const reactify = (comp, obj, _statePath = []) => {
 
       // if the prop is not in target but is in it's closure state
       // then set the value in the closure state instead
-      else if (!propInTarget && closure$ && prop in closure$) {
-        return Reflect.set(closure$, prop, newValue)
+      else if (!propInTarget && parent$ && prop in parent$) {
+        return Reflect.set(parent$, prop, newValue)
       }
 
       if (isObject(value)) {
@@ -86,7 +92,6 @@ export const reactify = (comp, obj, _statePath = []) => {
       if (modes._reactive) {
         // push to BATCH_INFO and call onMutate
 
-        const oldValue = target[/** @type {string}*/(prop)]
         const newValue = value
         const success = set()
         if (oldValue !== newValue) {
@@ -132,10 +137,9 @@ export const reactify = (comp, obj, _statePath = []) => {
         if (modes._returnComp) return comp
         return Reflect.get(target, prop)
       }
-      if (closure$) return Reflect.get(closure$, prop)
+      if (parent$) return Reflect.get(parent$, prop)
     }
 
   })
 
-  return reactive
 }
