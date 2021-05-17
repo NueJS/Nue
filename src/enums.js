@@ -15,13 +15,6 @@ export const placeholderTypes = {
   _functional: /** @type {1}*/ (1)
 }
 
-export const reactiveModes = {
-  _detective: /** @type {0}*/ (0),
-  _reactive: /** @type {1}*/ (1),
-  _noOverride: /** @type {2}*/ (2),
-  _returnComp: /** @type {3}*/ (3)
-}
-
 export const conditionTypes = {
   _if: /** @type {0}*/ (0),
   _elseIf: /** @type {1}*/ (1),
