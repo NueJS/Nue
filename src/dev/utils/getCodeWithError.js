@@ -1,4 +1,4 @@
-import { data } from '../data'
+import { data } from '../../info'
 
 /**
  * return array of lines of codes of given component's function

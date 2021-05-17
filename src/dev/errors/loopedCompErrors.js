@@ -1,6 +1,6 @@
-import { createError } from '../createError'
-import { toJSON } from '../toJSON'
-import { getCodeWithError } from '../code'
+import { createError } from '../utils/createError'
+import { toJSON } from '../utils/toJSON'
+import { getCodeWithError } from '../utils/getCodeWithError'
 
 /**
  * called when looped components are given non-unique key attribute

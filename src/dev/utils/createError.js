@@ -1,4 +1,4 @@
-import { data } from '../data'
+import { data } from '../../info'
 
 /**
  * create an error object that to be shown in error-overlay and in console

@@ -1,4 +1,4 @@
-import { createError } from '../createError'
+import { createError } from '../utils/createError'
 
 /**
  * called when root element is not added in html

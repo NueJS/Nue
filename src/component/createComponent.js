@@ -1,4 +1,4 @@
-import { data } from '../data'
+import { data } from '../info'
 import { createCompDef } from './createCompDef'
 import { createCompTemplate } from './createCompTemplate'
 import { construct } from './onCreate'

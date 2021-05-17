@@ -1,5 +1,5 @@
-import { createError } from '../createError'
-import { getCodeWithError } from '../code'
+import { createError } from '../utils/createError'
+import { getCodeWithError } from '../utils/getCodeWithError'
 
 /**
  * called when state placeholder is either a invalid path or a path which points to an undefined value in state

@@ -1,6 +1,6 @@
+import { devInfo } from '../dev/devInfo'
 import { batches } from '../enums'
 import { subscribeMultiple } from './subscribe'
-import { devTool } from '../data'
 
 /**
  * subscribe node to state
@@ -56,7 +56,7 @@ export const syncNode = (comp, node, deps, update) => {
     // @ts-expect-error
     update()
 
-    if (_DEV_) devTool.nodeUpdated(node)
+    if (_DEV_) devInfo.nodeUpdated(node)
 
     return subscribeMultiple(comp, deps, update, batches._DOM)
   }

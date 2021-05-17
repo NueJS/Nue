@@ -1,5 +1,5 @@
-import { createError } from '../createError'
-import { getCodeWithError } from '../code'
+import { createError } from '../utils/createError'
+import { getCodeWithError } from '../utils/getCodeWithError'
 
 /**
  * called when onMutate is called without a second argument of dependency array

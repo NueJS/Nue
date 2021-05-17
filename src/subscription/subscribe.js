@@ -1,7 +1,6 @@
 
 import { ITSELF } from '../constants'
 import { errors } from '../dev/errors/index.js'
-import { data } from '../data'
 import { getOrigin } from '../state/getOrigin'
 import { batchify } from '../batch/batchify'
 

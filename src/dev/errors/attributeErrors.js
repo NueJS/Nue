@@ -1,5 +1,5 @@
-import { createError } from '../createError'
-import { getCodeWithError } from '../code'
+import { createError } from '../utils/createError'
+import { getCodeWithError } from '../utils/getCodeWithError'
 
 /**
  * called when a component specific attribute is added on a non-component element
