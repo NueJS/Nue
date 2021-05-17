@@ -18,7 +18,7 @@ type Mutation = {
 type StatePath = string[]
 
 type Config = {
-  defaultStyle?: string,
+  defaultCSS?: string,
 }
 
 type Offset = {

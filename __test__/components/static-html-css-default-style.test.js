@@ -11,7 +11,7 @@ const scopedCSS = /* css */`
 }
 `
 
-const defaultStyle = /* css */`
+const defaultCSS = /* css */`
 :host {
   display: block;
 }
@@ -23,7 +23,10 @@ const defaultStyle = /* css */`
 }
 `
 
-const config = { defaultStyle }
+/**
+ * @type {Config}
+ */
+const config = { defaultCSS }
 
 
 class App {
@@ -38,7 +41,7 @@ test('app is rendered on the document', () => {
 
   const expectedHTML =
     innerHTML +
-    `<style default="">${defaultStyle}</style>` +
+    `<style default="">${defaultCSS}</style>` +
     `<style scoped="">${scopedCSS}</style>`
 
   expect(root.innerHTML).toBe(expectedHTML)
