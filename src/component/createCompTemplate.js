@@ -18,12 +18,10 @@ export const createCompTemplate = (compDef) => {
     : html
 
   // fill template innerHTML with html and css
-  const { defaultCSS } = data._config
-
-  const defaultStyleTag = defaultCSS ? style(defaultCSS, 'default') : ''
-  const scopedStyleTag = css ? style(css, 'scoped') : ''
-
-  _template.innerHTML = dashHtml + defaultStyleTag + scopedStyleTag
+  _template.innerHTML =
+    dashHtml +
+    style(data._config.defaultCSS, 'default') +
+    style(css, 'scoped')
 
   /** @type {Function[]} */
   const deferredParsingWork = []
@@ -35,8 +33,8 @@ export const createCompTemplate = (compDef) => {
 }
 
 /**
-   * return a inline style
-   * @param {string} s
-   * @param {string} name
-   */
-const style = (s, name) => `<style ${name}>${s}</style>`
+ * returns inline style
+ * @param {string|undefined} css
+ * @param {string} name
+ */
+const style = (css, name) => css ? `<style ${name}>${css}</style>` : ''
