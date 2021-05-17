@@ -11,18 +11,18 @@ import { onDisconnect } from './onDisconnect'
  */
 
 export const createComponent = CompClass => {
-  const { _definedComponents } = data
+  const { _components } = data
 
   // get the name of CompClass
   const compName = CompClass.name
 
   // do nothing if a component by this name is already defined
-  if (compName in _definedComponents) return
-
-  // else, mark this as defined
-  _definedComponents[compName] = CompClass
+  if (compName in _components) return
 
   const compDef = createCompDef(CompClass)
+
+  // save the def in data
+  _components[compName] = compDef
 
   createCompTemplate(compDef)
 

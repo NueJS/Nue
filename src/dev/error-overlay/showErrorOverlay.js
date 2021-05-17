@@ -1,5 +1,5 @@
 
-import { data } from '../../data'
+import { devTool } from '../../data'
 import { createElement } from '../../dom/create'
 import { errorOverlayHTML } from './errorOverlayHTML'
 
@@ -11,7 +11,7 @@ import { errorOverlayHTML } from './errorOverlayHTML'
 export const showErrorOverlay = (error) => {
 
   // if already showing error, return
-  if (data._errorThrown) return
+  if (devTool.errorThrown) return
 
   window.customElements.define('nue-error-overlay', class extends HTMLElement {
     constructor () {
@@ -59,5 +59,5 @@ export const showErrorOverlay = (error) => {
     code.textContent = /** @type {string}*/(error.stack)
   }
 
-  data._errorThrown = true
+  devTool.errorThrown = true
 }

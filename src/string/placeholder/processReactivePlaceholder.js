@@ -1,4 +1,3 @@
-import { data } from '../../data'
 import { errors } from '../../dev/errors/index.js'
 import { placeholderTypes } from '../../enums'
 import { isDefined } from '../../others'
@@ -26,7 +25,7 @@ export const processReactivePlaceholder = (_content, _text) => {
         if (!isDefined(value)) throw value
         else return value
       } catch (e) {
-        if (!data._errorThrown) throw errors.invalid_state_placeholder(comp._compName, _content)
+        throw errors.invalid_state_placeholder(comp._compName, _content)
       }
     }
 

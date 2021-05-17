@@ -12,9 +12,8 @@ export const createError = (issue, fix, code, compName) => {
 
   // get the component function
   if (compName) {
-    const compClass = data._definedComponents[compName]
-
-    console.error(compClass)
+    const compDef = data._components[compName]
+    console.error(compDef._class)
   }
 
   console.log(' ')

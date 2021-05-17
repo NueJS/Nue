@@ -1,10 +1,16 @@
 export const data = {
-  /** @type Record<string, NueComp> */
-  _definedComponents: {},
-  _errorThrown: false,
+  /** @type Record<string, CompDef> */
+  _components: {},
   _config: {
-    defaultStyle: ''
-  },
-  /** @type {Function | undefined} */
-  _onNodeUpdate: undefined
+    defaultCSS: ''
+  }
+}
+
+export const devTool = {
+  errorThrown: false,
+  /**
+   * called when node has been updated
+   * @param {Node} node
+   */
+  nodeUpdated: (node) => {}
 }

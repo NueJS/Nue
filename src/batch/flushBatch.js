@@ -1,4 +1,4 @@
-import { nodeUpdated } from '../dev/nodeUpdated'
+import { devTool } from '../data'
 
 /**
  * run all callbacks of a batch with mutations info
@@ -15,8 +15,9 @@ export const flushBatch = (batch, mutations) => {
     // if cb is for updating a node, only call cb if node is subscribed
     if ((_node && _node._isSubscribed) || !_node) {
       cb(mutations)
-      if (_DEV_ && _node) nodeUpdated(_node)
+      if (_DEV_ && _node) devTool.nodeUpdated(_node)
     }
+
   })
 
   batch.clear()

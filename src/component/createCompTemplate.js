@@ -18,9 +18,9 @@ export const createCompTemplate = (compDef) => {
     : html
 
   // fill template innerHTML with html and css
-  const { defaultStyle } = data._config
+  const { defaultCSS } = data._config
 
-  const defaultStyleTag = defaultStyle ? style(defaultStyle, 'default') : ''
+  const defaultStyleTag = defaultCSS ? style(defaultCSS, 'default') : ''
   const scopedStyleTag = css ? style(css, 'scoped') : ''
 
   _template.innerHTML = dashHtml + defaultStyleTag + scopedStyleTag

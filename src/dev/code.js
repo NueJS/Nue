@@ -8,8 +8,8 @@ import { data } from '../data'
 
 export const getCompClassCode = (compName) => {
   // get the component function
-  const compClass = data._definedComponents[compName]
-  return compClass.toString().split('\n')
+  const compDef = data._components[compName]
+  return compDef._class.toString().split('\n')
 }
 
 /**
