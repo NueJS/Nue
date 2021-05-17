@@ -1,5 +1,5 @@
-import { swap } from '../../../others'
 import { createElement } from '../../../dom/create'
+import { swap } from '../../../utils/array'
 
 // const swapNodes = (node1, node2) => {
 //   let type = 'before'

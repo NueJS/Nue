@@ -1,4 +1,4 @@
-import { arrayToHash } from '../../../others'
+import { arrayToHash } from '../../../utils/array'
 import { checkUniquenessOfKeys } from '../dev/checkUniquenessOfKeys'
 
 /**

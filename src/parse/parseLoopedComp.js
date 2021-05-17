@@ -1,8 +1,8 @@
 import { animationAttributes, loopAttributes } from '../constants'
 import { errors } from '../dev/errors/index.js'
 import { getAnimationAttributes, getAttr, removeAttr } from '../dom/attributes'
-import { isDefined } from '../others'
 import { processPlaceholder } from '../string/placeholder/processPlaceholder'
+import { isDefined } from '../utils/type'
 
 const { _enter, _exit, _move } = animationAttributes
 const { _for, _key } = loopAttributes

@@ -1,4 +1,5 @@
-import { arrayToHash, insert, isDefined, swap } from '../../../others'
+import { arrayToHash, insert, swap } from '../../../utils/array'
+import { isDefined } from '../../../utils/type'
 
 /**
  * return steps to reconcile oldState to newState
