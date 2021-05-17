@@ -16,8 +16,10 @@ export const hydrateState = (target, attribute, comp) => {
     target.$[_name] = _getValue(comp)
   }
 
-  if (target === comp) update()
+  // if target is looped component, set the $
+  if (target._isLooped) update()
 
+  // else set the prop$
   else {
     if (!target._prop$) target._prop$ = {}
     target._prop$[_name] = _getValue(comp)
