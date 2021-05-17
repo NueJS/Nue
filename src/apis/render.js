@@ -4,6 +4,7 @@ import { attachErrorOverlay } from '../dev/error-overlay/attachErrorOverlay'
 import { errors } from '../dev/errors/index.js'
 import { createElement } from '../dom/create'
 import { dashify } from '../string/dashify'
+import { devInfo } from '../dev/devInfo'
 
 /**
  * render component in place of targetElement with optional config
@@ -14,10 +15,20 @@ import { dashify } from '../string/dashify'
 
 export const render = (compClass, config) => {
 
-  if (_DEV_) attachErrorOverlay()
-
   // override config with default config
-  if (config) data._config = { ...data._config, ...config }
+  if (config) {
+    data._config = { ...data._config, ...config }
+
+    // add devTools
+    if (_DEV_) {
+      const { nodeUpdated } = config
+      if (nodeUpdated) devInfo.nodeUpdated = nodeUpdated
+    }
+  }
+
+  if (_DEV_) {
+    attachErrorOverlay()
+  }
 
   createComponent(compClass)
 
