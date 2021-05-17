@@ -39,33 +39,33 @@ export const reactify = (comp, obj, _statePath = []) => {
       return prop in target || (parent$ ? prop in parent$ : false)
     },
 
-    set (target, prop, newValue) {
+    set (target, prop, _newValue) {
 
       const oldValue = target[/** @type {string}*/(prop)]
 
       // do nothing if newValue is same as oldValue
-      if (oldValue === newValue) return true
+      if (oldValue === _newValue) return true
 
       if (prop === UPDATE_INDEX) {
         // update statePath as it has been moved to a different position in array
 
         // replace the oldIndex with newIndex in statePath
-        statePath = [...statePath.slice(0, -1), newValue]
+        statePath = [...statePath.slice(0, -1), _newValue]
         return true
       }
 
       // if the mutated prop exists in the target already
       const propInTarget = prop in target
 
-      let value = newValue
+      let newValue = _newValue
 
       // state creation mode
       if (modes._setup) {
         // do not override the state set by parent component by the default value set in this component
         if (propInTarget) return true
 
-        if (typeof value === 'function') {
-          value = computedState(comp, value, /** @type {string}*/(prop))
+        if (typeof newValue === 'function') {
+          newValue = computedState(comp, newValue, /** @type {string}*/(prop))
         }
       }
 
@@ -75,44 +75,39 @@ export const reactify = (comp, obj, _statePath = []) => {
         return Reflect.set(parent$, prop, newValue)
       }
 
-      if (isObject(value)) {
+      if (isObject(newValue)) {
         // if value is not reactive, make it reactive
 
-        if (!value[IS_REACTIVE]) {
-          value = reactify(comp, value, [...statePath, /** @type {string}*/(prop)])
+        if (!newValue[IS_REACTIVE]) {
+          newValue = reactify(comp, newValue, [...statePath, /** @type {string}*/(prop)])
         }
         // when a reactive value is set on some index(prop) in target array
         // we have to update that reactive object's statePath - because we are changing the index it was created at
-        else if (Array.isArray(target)) value[UPDATE_INDEX] = prop
+        else if (Array.isArray(target)) newValue[UPDATE_INDEX] = prop
       }
 
       // -----------------------------
-      const set = () => Reflect.set(target, prop, value)
 
-      if (modes._reactive) {
-        // push to BATCH_INFO and call onMutate
+      if (oldValue !== newValue) {
+        /**
+         * returns the current statePath of reactive object
+         * @returns {StatePath}
+         */
+        const livePath = () => [...statePath, /** @type {string}*/(prop)]
 
-        const newValue = value
-        const success = set()
-        if (oldValue !== newValue) {
-          const livePath = () => [...statePath, /** @type {string}*/(prop)]
+        const mutatedPath = livePath()
 
-          const mutatedPath = /** @type {StatePath}*/(livePath())
-          // statePath may have changed of reactive object, so add a getPath property to fetch the fresh statePath
+        comp._mutations.push({ oldValue, newValue, path: mutatedPath, livePath })
 
-          comp._mutations.push({ oldValue, newValue, path: mutatedPath, livePath })
-
-          onMutate(comp, mutatedPath)
-        }
-
-        return success
+        onMutate(comp, mutatedPath)
       }
 
-      return set()
+      return Reflect.set(target, prop, newValue)
+
     },
 
     deleteProperty (target, prop) {
-      if (modes._reactive) onMutate(comp, [...statePath, /** @type {string}*/(prop)])
+      onMutate(comp, [...statePath, /** @type {string}*/(prop)])
       return Reflect.deleteProperty(target, prop)
     },
 
