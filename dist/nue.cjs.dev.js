@@ -3,14 +3,11 @@
 Object.defineProperty(exports, '__esModule', { value: true });
 
 const data = {
-  /** @type Record<string, NueComp> */
-  _definedComponents: {},
-  _errorThrown: false,
+  /** @type Record<string, CompDef> */
+  _components: {},
   _config: {
-    defaultStyle: ''
-  },
-  /** @type {Function | undefined} */
-  _onNodeUpdate: undefined
+    defaultCSS: ''
+  }
 };
 
 /**
@@ -183,73 +180,6 @@ const createCompDef = (CompClass) => {
 };
 
 /**
- * swap items at indexes i and j in array arr
- * @param {any[]} arr
- * @param {number} i
- * @param {number} j
- */
-const swap = (arr, i, j) => {
-  [arr[i], arr[j]] = [arr[j], arr[i]];
-};
-
-/**
- * shorthand to insert value at index i in arr
- * @param {any[]} arr
- * @param {number} i
- * @param {any} value
- */
-const insert = (arr, i, value) => {
-  arr.splice(i, 0, value);
-};
-
-// convert array to hash with hash key as item's value and hash value as item's index
-/**
- * @param {string[]} arr
- * @returns {Record<string, number>}
- */
-const arrayToHash = (arr) => {
-  const init = /** @type {Record<string, number>} */({});
-  return arr.reduce((hash, value, i) => {
-    hash[value] = i;
-    return hash
-  }, init)
-};
-
-/**
- * return true if the x is defined
- * @param {any} x
- * @returns {boolean}
- */
-const isDefined = x => x !== undefined;
-
-/**
- * execute all functions in array and clear array
- * @param {Function[]} arr
- */
-const flushArray = (arr) => {
-  arr.forEach(fn => fn());
-  arr.length = 0;
-};
-
-/**
- * checks if two arrays of primitive values are equal or not
- * @param {string[]} arr1
- * @param {string[]} arr2
- * @returns {boolean}
- */
-const arraysAreShallowEqual = (arr1, arr2) => {
-  if (arr1.length !== arr2.length) return false
-  return arr1.every((item, index) => item === arr2[index])
-};
-
-/**
- * return true if x is object
- * @param {any} x
- * @returns {boolean}
- */
-const isObject = x => typeof x === 'object' && x !== null;
-
-/**
  * create an error object that to be shown in error-overlay and in console
  * @param {string} issue
  * @param {string} fix
@@ -261,9 +191,8 @@ const createError = (issue, fix, code, compName) => {
 
   // get the component function
   if (compName) {
-    const compClass = data._definedComponents[compName];
-
-    console.error(compClass);
+    const compDef = data._components[compName];
+    console.error(compDef._class);
   }
 
   console.log(' ');
@@ -286,8 +215,8 @@ const createError = (issue, fix, code, compName) => {
 
 const getCompClassCode = (compName) => {
   // get the component function
-  const compClass = data._definedComponents[compName];
-  return compClass.toString().split('\n')
+  const compDef = data._components[compName];
+  return compDef._class.toString().split('\n')
 };
 
 /**
@@ -497,13 +426,11 @@ Example:
  */
 const missing_key_attribute = (loopedCompName, parentCompName) => {
 
-  const issue = `"*key" attribute is missing on looped component <${loopedCompName}> in <${parentCompName}>`;
+  const issue = `"*key" attribute is missing on looped component <${loopedCompName}> in <${parentCompName}>, which is required for efficient DOM updates`;
 
-  const fix = '*key attribute is required on a looped component for efficient and correct updates';
+  const fix = `Add "*key" attribute on looped <${loopedCompName}> to fix this error`;
 
-  const code = getCodeWithError(loopedCompName, new RegExp(`<${loopedCompName}`));
-
-  return createError(issue, fix, code, parentCompName)
+  return createError(issue, fix, undefined, parentCompName)
 };
 
 var loopedCompErrors = /*#__PURE__*/Object.freeze({
@@ -678,6 +605,20 @@ const getTargetProp = (obj, path) => {
 };
 
 /**
+ * return true if the x is defined
+ * @param {any} x
+ * @returns {boolean}
+ */
+const isDefined = x => x !== undefined;
+
+/**
+  * return true if x is object
+  * @param {any} x
+  * @returns {boolean}
+  */
+const isObject = x => typeof x === 'object' && x !== null;
+
+/**
  * process fn placeholder
  * @param {string} _content
  * @param {string} _text
@@ -752,7 +693,7 @@ const processReactivePlaceholder = (_content, _text) => {
         if (!isDefined(value)) throw value
         else return value
       } catch (e) {
-        if (!data._errorThrown) throw errors.invalid_state_placeholder(comp._compName, _content)
+        throw errors.invalid_state_placeholder(comp._compName, _content)
       }
     }
   };
@@ -1133,7 +1074,7 @@ const parseLoopedComp = (loopedComp, forAttribute, parentCompName) => {
   const keyAttribute = getAttr(loopedComp, _key);
 
   if (!keyAttribute) {
-    throw errors.missing_key_attribute(loopedComp._compName, parentCompName)
+    throw errors.missing_key_attribute(loopedComp._parsedInfo._compName, parentCompName)
   }
 
   loopedComp._parsedInfo._loopAttributes = {
@@ -1244,6 +1185,59 @@ const parse = (target, compDef, deferredParsingWork) => {
   }
 };
 
+// convert array to hash with hash key as item's value and hash value as item's index
+/**
+ * @param {string[]} arr
+ * @returns {Record<string, number>}
+ */
+const arrayToHash = (arr) => {
+  const init = /** @type {Record<string, number>} */({});
+  return arr.reduce((hash, value, i) => {
+    hash[value] = i;
+    return hash
+  }, init)
+};
+
+/**
+ * shorthand to insert value at index i in arr
+ * @param {any[]} arr
+ * @param {number} i
+ * @param {any} value
+ */
+const insert = (arr, i, value) => {
+  arr.splice(i, 0, value);
+};
+
+/**
+ * swap items at indexes i and j in array arr
+ * @param {any[]} arr
+ * @param {number} i
+ * @param {number} j
+ */
+const swap = (arr, i, j) => {
+  [arr[i], arr[j]] = [arr[j], arr[i]];
+};
+
+/**
+ * checks if two arrays of primitive values are equal or not
+ * @param {string[]} arr1
+ * @param {string[]} arr2
+ * @returns {boolean}
+ */
+const arraysAreShallowEqual = (arr1, arr2) => {
+  if (arr1.length !== arr2.length) return false
+  return arr1.every((item, index) => item === arr2[index])
+};
+
+/**
+ * execute all functions in array and clear array
+ * @param {Function[]} arr
+ */
+const flushArray = (arr) => {
+  arr.forEach(fn => fn());
+  arr.length = 0;
+};
+
 /**
  * create template and parse it
  * @param {CompDef} compDef
@@ -1259,9 +1253,9 @@ const createCompTemplate = (compDef) => {
     : html;
 
   // fill template innerHTML with html and css
-  const { defaultStyle } = data._config;
+  const { defaultCSS } = data._config;
 
-  const defaultStyleTag = defaultStyle ? style(defaultStyle, 'default') : '';
+  const defaultStyleTag = defaultCSS ? style(defaultCSS, 'default') : '';
   const scopedStyleTag = css ? style(css, 'scoped') : '';
 
   _template.innerHTML = dashHtml + defaultStyleTag + scopedStyleTag;
@@ -1354,7 +1348,7 @@ const subscribe = (baseComp, statePath, updateCb, batch) => {
 
   // throw if no origin is found
   if (!originComp) {
-    if (!data._errorThrown) throw errors.invalid_state_placeholder(baseComp._compName, statePath.join('.'))
+    throw errors.invalid_state_placeholder(baseComp._compName, statePath.join('.'))
   }
 
   if (/** @type {SubCallBack}*/(updateCb)._node && originComp !== baseComp) {
@@ -1459,12 +1453,13 @@ const construct = (comp, compName) => {
   addEvents(comp);
 };
 
-/**
- * call this function to show that given node is updated
- * @param {ParsedDOMElement} node
- */
-const nodeUpdated = (node) => {
-  if (data._onNodeUpdate) data._onNodeUpdate(node);
+const devInfo = {
+  errorThrown: false,
+  /**
+   * called when node has been updated
+   * @param {Node} node
+   */
+  nodeUpdated: (node) => {}
 };
 
 /**
@@ -1520,8 +1515,6 @@ const syncNode = (comp, node, deps, update) => {
   const subscriber = () => {
     // @ts-expect-error
     update();
-
-    nodeUpdated(node);
 
     return subscribeMultiple(comp, deps, update, batches._DOM)
   };
@@ -1657,8 +1650,10 @@ const hydrateState = (target, attribute, comp) => {
     target.$[_name] = _getValue(comp);
   };
 
-  if (target === comp) update();
+  // if target is looped component, set the $
+  if (target._isLooped) update();
 
+  // else set the prop$
   else {
     if (!target._prop$) target._prop$ = {};
     target._prop$[_name] = _getValue(comp);
@@ -1674,7 +1669,8 @@ const hydrateState = (target, attribute, comp) => {
  */
 
 const hydrateStaticState = (target, attribute) => {
-  target._prop$[attribute._name] = /** @type {string}*/(attribute._placeholder);
+  const state = target._isLooped ? target.$ : target._prop$;
+  state[attribute._name] = /** @type {string}*/(attribute._placeholder);
 };
 
 /**
@@ -1960,7 +1956,7 @@ const getOffset = (comp) => ({
 const saveOffsets = (indexes, loopedComponents) => {
   for (const index of indexes) {
     const comp = loopedComponents[index];
-    comp._prevOffset = getOffset(comp);
+    if (comp) comp._prevOffset = getOffset(comp);
   }
 };
 
@@ -2226,23 +2222,22 @@ const transit = (comp, prevOffset, cssTransition) => {
 
 /**
  * animateMove comps at indexes
- * @param {LoopInfo} loopInfo
+ * @param {LoopedComp[]} loopedCompInstances
  * @param {Array<number>} indexes
+ * @param {string} moveAnimation
  */
 
 // @todo second arg should be comps instead of indexes
-const animateMove = (loopInfo, indexes) => {
-  const moveAnimation = loopInfo._animation._move;
-  const loopedCompInstances = loopInfo._loopedCompInstances;
+const animateMove = (loopedCompInstances, indexes, moveAnimation) => {
 
+  // debugger
   for (const index of indexes) {
     const comp = loopedCompInstances[index];
 
-    transit(
-      comp,
-      /** @type {Offset}  */(comp._prevOffset),
-      /** @type {string}*/(moveAnimation)
-    );
+    // if (!comp) debugger
+    if (comp && comp._prevOffset) {
+      transit(comp, /** @type {Offset}  */(comp._prevOffset), /** @type {string}*/(moveAnimation));
+    }
   }
 };
 
@@ -2278,7 +2273,9 @@ const handleArrayChange = (loopInfo, dirtyIndexes, updatedSlices, oldState) => {
     const steps = reconcile(oldState, newState, dirtyIndexes);
 
     // if reorder animation is to be played, record offsets before DOM is updated
-    if (_move && _instanciated) saveOffsets(dirtyIndexes, _loopedCompInstances);
+    if (_move && _instanciated) {
+      saveOffsets(dirtyIndexes, _loopedCompInstances);
+    }
 
     const updateIndexes = () => {
       // if index is used, only then update the indexes
@@ -2300,7 +2297,9 @@ const handleArrayChange = (loopInfo, dirtyIndexes, updatedSlices, oldState) => {
         updateStates();
       }
 
-      if (_move) animateMove(loopInfo, dirtyIndexes);
+      if (_move && _instanciated) {
+        animateMove(_loopedCompInstances, dirtyIndexes, _move);
+      }
     };
 
     // if exit animations are specified and we have to remove some nodes, run exit animations
@@ -2587,8 +2586,8 @@ const flushBatch = (batch, mutations) => {
     // if cb is for updating a node, only call cb if node is subscribed
     if ((_node && _node._isSubscribed) || !_node) {
       cb(mutations);
-      if (_node) nodeUpdated(_node);
     }
+
   });
 
   batch.clear();
@@ -2597,20 +2596,20 @@ const flushBatch = (batch, mutations) => {
 /**
  * flush events and batched callbacks to outside world
  * @param {Comp} comp
- * @param {Mutation[]} mutations
  */
-const flush = (comp, mutations) => {
+const flush = (comp) => {
 
   const { _beforeUpdate, _afterUpdate } = comp._eventCbs;
+  const { _mutations, _batches } = comp;
 
   // before updates
-  _beforeUpdate.forEach(cb => cb(mutations));
+  _beforeUpdate.forEach(cb => cb(_mutations));
 
   // updates
-  comp._batches.forEach(batch => flushBatch(batch, mutations));
+  _batches.forEach(batch => flushBatch(batch, _mutations));
 
   // after updates
-  _afterUpdate.forEach(cb => cb(mutations));
+  _afterUpdate.forEach(cb => cb(_mutations));
 
 };
 
@@ -2623,16 +2622,15 @@ const scheduleFlush = (comp) => {
   comp._flush_scheduled = true;
 
   setTimeout(() => {
-    // do a shallow clone because comp.batchInfo will be cleared out
-    const mutations = [...comp._mutations];
+    flush(comp);
 
-    flush(comp, mutations);
-
-    // clear batch info
-    comp._mutations.length = 0;
+    // assign a new array instead of changing the length to 0
+    // so that component events api can use this mutations info
+    comp._mutations = [];
 
     // reset flag
     comp._flush_scheduled = false;
+
   }, 0);
 
 };
@@ -2990,18 +2988,18 @@ const onDisconnect = (comp) => {
  */
 
 const createComponent = CompClass => {
-  const { _definedComponents } = data;
+  const { _components } = data;
 
   // get the name of CompClass
   const compName = CompClass.name;
 
   // do nothing if a component by this name is already defined
-  if (compName in _definedComponents) return
-
-  // else, mark this as defined
-  _definedComponents[compName] = CompClass;
+  if (compName in _components) return
 
   const compDef = createCompDef(CompClass);
+
+  // save the def in data
+  _components[compName] = compDef;
 
   createCompTemplate(compDef);
 
@@ -3251,7 +3249,7 @@ const errorOverlayHTML = /* html */`
 const showErrorOverlay = (error) => {
 
   // if already showing error, return
-  if (data._errorThrown) return
+  if (devInfo.errorThrown) return
 
   window.customElements.define('nue-error-overlay', class extends HTMLElement {
     constructor () {
@@ -3285,7 +3283,7 @@ const showErrorOverlay = (error) => {
 
   if (error.issue) {
     title.textContent = error.name;
-    message.textContent = `${error.issue}\n${error.fix}`;
+    message.textContent = `${error.issue}\n\n${error.fix}`;
     code.innerHTML = error.code.innerHTML;
 
     const codeError = /** @type {HTMLElement} */(code.querySelector('.error'));
@@ -3299,7 +3297,7 @@ const showErrorOverlay = (error) => {
     code.textContent = /** @type {string}*/(error.stack);
   }
 
-  data._errorThrown = true;
+  devInfo.errorThrown = true;
 };
 
 const attachErrorOverlay = () => {
