@@ -25,6 +25,6 @@ export const saveOffset = (comp) => {
 export const saveOffsets = (indexes, loopedComponents) => {
   for (const index of indexes) {
     const comp = loopedComponents[index]
-    comp._prevOffset = getOffset(comp)
+    if (comp) comp._prevOffset = getOffset(comp)
   }
 }
