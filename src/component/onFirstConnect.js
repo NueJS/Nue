@@ -14,7 +14,7 @@ import { invokeCompJs } from './invokeCompJs'
 export function onFirstConnect (comp, compDef) {
 
   // create state
-  comp.$ = reactify(comp, comp._prop$ || {}, [])
+  comp.$ = reactify(comp, comp._prop$ || {})
 
   // after everything is set up, invoke js
   if (compDef.js) invokeCompJs(compDef.js, comp)
