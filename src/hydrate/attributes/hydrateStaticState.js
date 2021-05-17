@@ -5,5 +5,6 @@
  */
 
 export const hydrateStaticState = (target, attribute) => {
-  target._prop$[attribute._name] = /** @type {string}*/(attribute._placeholder)
+  const state = target._isLooped ? target.$ : target._prop$
+  state[attribute._name] = /** @type {string}*/(attribute._placeholder)
 }
