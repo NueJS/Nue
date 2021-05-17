@@ -19,6 +19,7 @@ type StatePath = string[]
 
 type Config = {
   defaultCSS?: string,
+  nodeUpdated?: (node: Node) => void
 }
 
 type Offset = {
