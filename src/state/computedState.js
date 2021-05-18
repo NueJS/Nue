@@ -1,28 +1,25 @@
 import { batches } from '../enums'
-import { subscribeMultiple } from '../subscription/subscribe'
+import { subscribeMultiple } from '../subscription/subscribeMultiple'
 import { detectStateUsage } from './detectStateUsage.js'
 
-// when initializing the state, if a function is given
-// call that function, detect the state keys it depends on, get the initial value
-// update its value whenever its deps changes
-
 /**
- *
+ * create a computed state, stateName for comp component using the computeFn
+ * @param {Function} computeFn
+ * @param {string} stateName
  * @param {Comp} comp
- * @param {Function} fn
- * @param {string} prop
- * @returns
  */
-export const computedState = (comp, fn, prop) => {
-  const [initValue, paths] = detectStateUsage(fn)
+export const computedState = (computeFn, stateName, comp) => {
+  const [initialComputedValue, usedStatePaths] = detectStateUsage(computeFn)
 
-  /** @type {SubCallBack} */
-  const compute = () => {
-    const value = fn()
-    comp.$[prop] = value
+  const update = () => {
+    comp.$[stateName] = computeFn()
   }
 
-  const deps = paths.map(path => path.length === 1 ? path : path.slice(0, -1))
-  subscribeMultiple(comp, deps, compute, batches._beforeDOM)
-  return initValue
+  // to avoid depending on a particular index of an array, depend on one level up
+  // TODO: only slice if the path points to an array's item
+  const statePaths = usedStatePaths.map(path => path.length === 1 ? path : path.slice(0, -1))
+
+  subscribeMultiple(statePaths, comp, update, batches._beforeDOM)
+
+  return initialComputedValue
 }

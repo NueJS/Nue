@@ -1,6 +1,6 @@
 import { attributeTypes } from '../../enums'
 import { mutate } from '../../state/mutate'
-import { syncNode } from '../../subscription/node'
+import { syncNode } from '../../subscription/node/syncNode'
 
 /**
  * add prop on target
@@ -14,15 +14,17 @@ export const hydrateProp = (target, attribute, comp) => {
 
   const { _getValue, _statePaths } = /** @type {Placeholder} */(attribute._placeholder)
 
-  const setProp = () => {
+  const update = () => {
     // @ts-expect-error
     target[propName] = _getValue(comp)
   }
 
-  syncNode(comp, target, _statePaths, setProp)
+  syncNode(target, _statePaths, update, comp)
 
-  // bind:prop
+  // bindProp
   if (attribute._type === attributeTypes._bindProp) {
+    // TODO: add check for input type on dev
+
     // @ts-expect-error
     const isNumber = target.type === 'number' || target.type === 'range'
 

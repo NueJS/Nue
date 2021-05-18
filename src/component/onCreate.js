@@ -1,22 +1,24 @@
-import { ITSELF } from '../constants'
+import { createSubTree } from '../subscription/createSubTree'
 import { addEvents } from './addEvents'
 
 /**
- *
+ * called when comp is created (constructed)
  * @param {Comp} comp
  * @param {string} compName
  */
-export const construct = (comp, compName) => {
+export const onCreate = (comp, compName) => {
 
   comp.refs = {}
+  comp._subscribers = []
 
   comp._compName = compName
-  comp._subscriptions = { [ITSELF]: new Set() }
-  comp._batches = /** @type {[Set<SubCallBack>, Set<SubCallBack>]}*/([new Set(), new Set()])
+  comp._subscriptions = createSubTree()
+  comp._batches = [new Set(), new Set()]
   comp._mutations = []
-  comp._deferredWork = []
+  comp._deferredWork = [] // TODO: move this to hydrate
+
   comp._nodesUsingLocalState = new Set()
-  comp._nodesUsingClosureState = new Set()
+  comp._nodesUsingNonLocalState = new Set()
 
   if (!comp._prop$) comp._prop$ = {}
   if (!comp.fn) comp.fn = comp.parent ? Object.create(comp.parent.fn) : {}

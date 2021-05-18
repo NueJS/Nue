@@ -1,38 +1,32 @@
-type Batch = Set<SubCallBack|Function>
-
-/** collection of props that a parsed HTMLElement or parsed Text should have in order to receive notifications from the state updates */
-interface ConnectionProps {
-  _subscribers: Function[],
-  _unsubscribers: Function[],
-  _isSubscribed: boolean,
-  _isProcessed: boolean,
-}
+type Batch = Set<Function>;
 
 type Mutation = {
-  oldValue: any,
-  newValue: any,
-  path: string[],
-  livePath: () => string[]
+	oldValue: any;
+	newValue: any;
+	path: string[];
+	livePath: () => string[];
+};
+
+type BatchCallBack = {
+	(mutations: Mutation[]) : void
 }
 
-type StatePath = string[]
+type StatePath = string[];
 
 type Config = {
-  defaultCSS?: string,
-  nodeUpdated?: (node: Node) => void
-}
+	defaultCSS?: string;
+	nodeUpdated?: (node: Node) => void;
+};
 
 type Offset = {
-  _left: number,
-  _top: number
-}
+	_left: number;
+	_top: number;
+};
 
 interface NueError extends Error {
-  issue: string,
-  fix: string,
-  code: HTMLElement,
+	issue: string;
+	fix: string;
+	code: HTMLElement;
 }
 
-type TaggedTemplate = (strings: string[], ...exprs: string[] ) => void
-
-type State = Record<string, any>
+type State = Record<string, any>;

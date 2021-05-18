@@ -1,4 +1,4 @@
-import { syncNode } from '../subscription/node'
+import { syncNode } from '../subscription/node/syncNode'
 
 /**
  * process the text node
@@ -11,5 +11,5 @@ export const hydrateText = (textNode, comp) => {
   const update = () => {
     textNode.textContent = _getValue(comp)
   }
-  syncNode(comp, textNode, _statePaths, update)
+  syncNode(textNode, _statePaths, update, comp)
 }

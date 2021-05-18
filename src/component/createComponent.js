@@ -1,7 +1,7 @@
 import { data } from '../info'
 import { createCompDef } from './createCompDef'
 import { createCompTemplate } from './createCompTemplate'
-import { construct } from './onCreate'
+import { onCreate } from './onCreate'
 import { onConnect } from './onConnect'
 import { onDisconnect } from './onDisconnect'
 
@@ -32,7 +32,7 @@ export const createComponent = CompClass => {
     /** @this {Comp} */
     constructor () {
       super()
-      construct(this, compName)
+      onCreate(this, compName)
     }
 
     /** @this {Comp} */

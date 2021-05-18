@@ -1,5 +1,5 @@
 
-import { subscribeNode } from '../subscription/node'
+import { subscribeNode } from '../subscription/node/subscribeNode'
 import { onFirstConnect } from './onFirstConnect'
 
 /**
@@ -16,7 +16,7 @@ export const onConnect = (comp, compDef) => {
 
   comp._manuallyDisconnected = false
 
-  const { _nodesUsingLocalState, _nodesUsingClosureState, _eventCbs, shadowRoot } = comp
+  const { _nodesUsingLocalState, _nodesUsingNonLocalState, _eventCbs, shadowRoot } = comp
 
   // when comp is being connected for the first time
   if (!shadowRoot) {
@@ -29,7 +29,7 @@ export const onConnect = (comp, compDef) => {
   else {
     // only connect nodes that were previously disconnected
     // connect all nodes using closure state
-    _nodesUsingClosureState.forEach(subscribeNode)
+    _nodesUsingNonLocalState.forEach(subscribeNode)
   }
 
   // after all the connections are done, run the onMount callbacks

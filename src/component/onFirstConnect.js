@@ -1,7 +1,7 @@
 import { hydrate } from '../hydrate/hydrate'
 import { hydrateAttributes } from '../hydrate/hydrateAttributes'
 import { reactify } from '../reactivity/reactify'
-import { subscribeNode } from '../subscription/node'
+import { subscribeNode } from '../subscription/node/subscribeNode'
 import { buildShadowDOM } from './buildShadowDOM'
 import { invokeCompJs } from './invokeCompJs'
 

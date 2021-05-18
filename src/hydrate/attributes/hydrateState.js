@@ -1,29 +1,31 @@
 import { batches } from '../../enums'
-import { subscribeMultiple } from '../../subscription/subscribe'
+import { subscribeMultiple } from '../../subscription/subscribeMultiple'
 
 /**
- * add state on target
- * @param {Comp} target
- * @param {Attribute_ParseInfo} attribute
+ * add state on target passed by its parent component
  * @param {Comp} comp
+ * @param {Attribute_ParseInfo} attribute
+ * @param {Comp} parentComp
  */
 
-export const hydrateState = (target, attribute, comp) => {
+export const hydrateState = (comp, attribute, parentComp) => {
   const { _placeholder, _name } = attribute
   const { _getValue, _statePaths } = /** @type {Placeholder}*/(_placeholder)
 
   const update = () => {
-    target.$[_name] = _getValue(comp)
+    comp.$[_name] = _getValue(parentComp)
   }
 
-  // if target is looped component, set the $
-  if (target._isLooped) update()
+  // TODO: instead of checking the _isLooped, check if the $ is created on it or not
+
+  // if comp is looped, set the $ directly because it's $ is created already
+  if (comp._isLooped) update()
 
   // else set the prop$
   else {
-    if (!target._prop$) target._prop$ = {}
-    target._prop$[_name] = _getValue(comp)
+    if (!comp._prop$) comp._prop$ = {}
+    comp._prop$[_name] = _getValue(parentComp)
   }
 
-  subscribeMultiple(comp, _statePaths, update, batches._beforeDOM)
+  subscribeMultiple(_statePaths, parentComp, update, batches._beforeDOM)
 }

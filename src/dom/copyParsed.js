@@ -1,8 +1,8 @@
 /**
  * copy .parsed properties from node's tree to cloneNode's tree
  * cloneNode is clone of node but it does not have custom .parsed properties added in node's tree
- * @param {ParsedDOMElement} node
- * @param {ParsedDOMElement} cloneNode
+ * @param {ParsedDOMNode} node
+ * @param {ParsedDOMNode} cloneNode
  */
 
 export const copyParsed = (node, cloneNode) => {

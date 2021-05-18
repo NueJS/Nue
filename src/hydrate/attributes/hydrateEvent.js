@@ -1,5 +1,5 @@
 import { errors } from '../../dev/errors/index.js'
-import { addSubscriber } from '../../subscription/node'
+import { registerSubscriber } from '../../subscription/node/registerSubscriber'
 
 /**
  * add event on target target
@@ -16,13 +16,15 @@ export const hydrateEvent = (target, attribute, comp) => {
     throw errors.event_handler_not_found(comp._compName, fnName)
   }
 
+  // call the event listener with the event and state of component which the node is child of
   /** @type {EventListener} */
-  const handleEvent = (e) => fn(e, comp.$)
+  const handleEvent = (event) => fn(event, comp.$)
 
+  /** @type {Subscriber} */
   const subscriber = () => {
     target.addEventListener(eventName, handleEvent)
     return () => target.removeEventListener(eventName, handleEvent)
   }
 
-  addSubscriber(target, subscriber)
+  registerSubscriber(target, subscriber)
 }

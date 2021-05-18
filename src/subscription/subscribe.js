@@ -1,70 +1,60 @@
-
 import { ITSELF } from '../constants'
 import { errors } from '../dev/errors/index.js'
 import { getOrigin } from '../state/getOrigin'
 import { batchify } from '../batch/batchify'
+import { createSubTree } from './createSubTree'
 
 /**
- * subscribe to slice of state pointed by the statePath in baseNue
- * when that slice is updated, call the callback in "batch" batch
+ * subscribe to state of baseComp pointed by statePath
+ * when that state is updated, onUpdate is called and is put into given batch
  *
- * @param {Comp} baseComp
  * @param {StatePath} statePath
- * @param {SubCallBack | Function} updateCb
+ * @param {Comp} baseComp
+ * @param {Function} onUpdate
  * @param {0 | 1} batch
- * @returns {Function}
+ * @param {ParsedDOMNode} [targetNode]
  */
 
-export const subscribe = (baseComp, statePath, updateCb, batch) => {
-  // get the originComp where the state referred by statePath is coming from
+export const subscribe = (statePath, baseComp, onUpdate, batch, targetNode) => {
+  // get the originComp where the state is coming from
   const originComp = getOrigin(baseComp, statePath)
 
-  // throw if no origin is found
+  // if no origin is found
   if (_DEV_ && !originComp) {
     throw errors.invalid_state_placeholder(baseComp._compName, statePath.join('.'))
   }
 
-  if (/** @type {SubCallBack}*/(updateCb)._node && originComp !== baseComp) {
-    baseComp._nodesUsingClosureState.add(/** @type {SubCallBack}*/(updateCb)._node)
+  // if the node is using non-local state
+  if (targetNode && originComp !== baseComp) {
+    baseComp._nodesUsingNonLocalState.add(targetNode)
   }
 
-  // get the higher order updateCb that will only call the updateCb once every batch
-  const batchCb = batchify(updateCb, originComp._batches[batch])
+  // when addToBatch callback is called, it adds the onUpdate callback to batch so that it can be flushed
+  const addToBatch = batchify(onUpdate, originComp._batches[batch])
 
-  // start from the root of subscriptions
-  let target = originComp._subscriptions
+  // add the addToBatch callback in subscriptions
+  let tree = originComp._subscriptions
 
-  // add batchCb in statePath table at appropriate location
-  // map is used to unsubscribe in constant time
   const lastIndex = statePath.length - 1
+
   statePath.forEach((key, i) => {
-    if (!target[key]) target[key] = { [ITSELF]: new Set() }
-    target = target[key]
+
+    // create a new subtree if does not exist
+    if (!tree[key]) {
+      tree[key] = createSubTree()
+    }
+
+    // go to subtree of key
+    tree = tree[key]
+
+    // if this is the last subtree in traversal, add the callback there
     if (i === lastIndex) {
       // @ts-expect-error
-      target[ITSELF].add(batchCb)
+      tree[ITSELF].add(addToBatch)
     }
   })
 
-  // return unsubscribe function to remove subscription
+  // return unsubscribe function that removes the callback from subscriptions
   // @ts-expect-error
-  return () => target[ITSELF].delete(batchCb)
-}
-
-/**
- * returns an array of removeDep functions
- *
- * @param {Comp} comp
- * @param {StatePath[]} statePaths
- * @param {SubCallBack | Function} updateCb
- * @param {0 | 1} batch
- * @returns {Function}
- */
-
-export const subscribeMultiple = (comp, statePaths, updateCb, batch) => {
-  const unsubscribeFunctions = statePaths.map(
-    statePath => subscribe(comp, statePath, updateCb, batch)
-  )
-  // return unsubscribeMultiple
-  return () => unsubscribeFunctions.forEach(c => c())
+  return () => tree[ITSELF].delete(addToBatch)
 }

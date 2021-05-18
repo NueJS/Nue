@@ -65,7 +65,7 @@ export const reactify = (comp, obj, _statePath = []) => {
         if (propInTarget) return true
 
         if (typeof newValue === 'function') {
-          newValue = computedState(comp, newValue, /** @type {string}*/(prop))
+          newValue = computedState(newValue, /** @type {string}*/(prop), comp)
         }
       }
 

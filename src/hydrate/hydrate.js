@@ -1,25 +1,23 @@
-// hydration
 import { hydrateText } from './hydrateText.js'
 import { hydrateAttributes } from './hydrateAttributes.js'
 import { hydrateIfComp } from './hydrateIfComp.js'
 import { hydrateLoopedComp } from './loop/hydrateLoopedComp.js'
-
-// others
-import { isComp } from '../dom/isComp.js'
+import { isParsedComp } from '../utils/isParsedComp.js'
 import { conditionAttributes } from '../constants.js'
 
 /**
  * hydrate target element using _parsedInfo in context of given comp
- * @param {ParsedDOMElement | HTMLElement | Node } target
+ * @param {ParsedDOMNode | HTMLElement | Node } target
  * @param {Comp} comp
  * @returns
  */
+
 export const hydrate = (target, comp) => {
-  const { _parsedInfo, nodeType } = /** @type {ParsedDOMElement} */(target)
+  const { _parsedInfo, nodeType } = /** @type {ParsedDOMNode} */(target)
 
   if (_parsedInfo) {
 
-    comp._nodesUsingLocalState.add(/** @type {ParsedDOMElement} */(target))
+    comp._nodesUsingLocalState.add(/** @type {ParsedDOMNode} */(target))
 
     // if target is a comp
     if (/** @type {Comp_ParseInfo} */(_parsedInfo)._isComp) {
@@ -54,13 +52,12 @@ export const hydrate = (target, comp) => {
     }
   }
 
-  // if target is a component, do not hydrate it's childNodes
-  if (isComp(target)) return
+  // do not hydrate slot of a parsed component
+  // they will be hydrated when the component is constructed and connected
+  if (isParsedComp(/** @type {Comp}*/(target))) return
 
-  // else if it has childNodes hydrate all childNodes
+  // hydrate all childNodes
   if (target.hasChildNodes()) {
-    target.childNodes.forEach(
-      childNode => hydrate(childNode, comp)
-    )
+    target.childNodes.forEach(childNode => hydrate(childNode, comp))
   }
 }

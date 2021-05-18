@@ -1,6 +1,6 @@
 import { hydrate } from './hydrate.js'
 import { getParsedClone } from '../dom/getParsedClone.js'
-import { subscribeMultiple } from '../subscription/subscribe.js'
+import { subscribeMultiple } from '../subscription/subscribeMultiple'
 import { animate, animatedRemove, onAnimationEnd } from '../dom/animate.js'
 import { batches } from '../enums.js'
 
@@ -87,11 +87,7 @@ export const hydrateIfComp = (ifComp, parentComp) => {
   }
 
   // since this modifies the DOM, it should be done in dom batches
-  subscribeMultiple(
-    parentComp,
-    _conditionGroupStateDeps,
-    onGroupDepChange, batches._beforeDOM
-  )
+  subscribeMultiple(_conditionGroupStateDeps, parentComp, onGroupDepChange, batches._beforeDOM)
 
   parentComp._deferredWork.push(() => {
     ifComp.remove()

@@ -1,5 +1,5 @@
 import { setAttr, removeAttr } from '../../dom/attributes'
-import { syncNode } from '../../subscription/node'
+import { syncNode } from '../../subscription/node/syncNode'
 
 /**
  * add or remove attribute based on given condition
@@ -16,5 +16,5 @@ export const hydrateConditionalAttribute = (element, attribute, comp) => {
     ? setAttr(comp, name, '')
     : removeAttr(element, name)
 
-  syncNode(comp, element, placeholder._statePaths, update)
+  syncNode(element, placeholder._statePaths, update, comp)
 }

@@ -1,5 +1,6 @@
-import { subscribeMultiple } from '../subscription/subscribe.js'
+import { subscribeMultiple } from '../subscription/subscribeMultiple'
 import { errors } from '../dev/errors/index.js'
+import { batches } from '../enums'
 
 /**
  * add events api on comp
@@ -29,7 +30,7 @@ export const addEvents = (comp) => {
 
       _onMount.push(() => {
         const stateDeps = slices.map(slice => slice.split('.'))
-        return subscribeMultiple(comp, stateDeps, cb, 0)
+        return subscribeMultiple(stateDeps, comp, cb, batches._beforeDOM)
       })
     }
   }

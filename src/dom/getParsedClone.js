@@ -2,7 +2,7 @@ import { copyParsed } from './copyParsed'
 
 /**
  * clone the node and add the parsed prop
- * @template {ParsedDOMElement} T
+ * @template {ParsedDOMNode} T
  * @param {T} node
  * @returns {T}
  */

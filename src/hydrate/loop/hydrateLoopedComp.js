@@ -85,7 +85,7 @@ export const hydrateLoopedComp = (loopedComp, parentComp) => {
     loopInfo._instanciated = true
   })
 
-  /** @type {SubCallBack} */
+  /** @type {BatchCallBack} */
   const onDepsChange = (mutations) => {
     // if some mutation in batch assigned a new array
     const newArrayAssigned = mutations.some(batchInfo => arraysAreShallowEqual(batchInfo.path, arrayPath))
@@ -100,5 +100,5 @@ export const hydrateLoopedComp = (loopedComp, parentComp) => {
 
   }
 
-  subscribe(parentComp, arrayPath, onDepsChange, batches._DOM)
+  subscribe(arrayPath, parentComp, onDepsChange, batches._DOM)
 }
