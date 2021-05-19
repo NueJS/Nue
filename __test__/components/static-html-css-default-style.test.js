@@ -1,4 +1,4 @@
-const { useRender } = require('../utils/useRender')
+import { useRender } from "../utils/useRender"
 
 const innerHTML = /* html */`
 this is inner html

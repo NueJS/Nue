@@ -1,13 +1,9 @@
-const { useRender } = require('../utils/useRender')
-
-class App {
-
-}
+import { useRender } from "../utils/useRender"
 
 /**
-   * @param {object} x
-   */
-const shouldBeObject = (x) => {
+ * @param {object} x
+ */
+ const shouldBeObject = (x) => {
   expect(typeof x).toBe('object')
 }
 
@@ -18,8 +14,10 @@ const shouldBeFunction = (x) => {
   expect(typeof x).toBe('function')
 }
 
-test('app renders on the page', () => {
+// component
+class App {}
 
+test('app renders on the page', () => {
   const el = useRender(/** @type {NueComp} */(App))
 
   shouldBeObject(el.refs)

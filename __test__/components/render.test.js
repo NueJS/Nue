@@ -1,5 +1,5 @@
-const { dashify } = require('../../src/string/dashify')
-const { useRender } = require('../utils/useRender')
+import { dashify } from "../../src/string/dashify"
+import { useRender } from "../utils/useRender"
 
 class App {}
 
