@@ -7,16 +7,20 @@ import { ITSELF } from '../constants'
  */
 export const notify = (subscriptions, path) => {
   let tree = subscriptions
-  const lastEdgeIndex = path.length - 1
 
-  path.forEach((edge, edgeIndex) => {
+  for (let i = 0; i < path.length - 1; i++) {
+    // no subscription exists for the given edge, return
+    if (!tree) break
+
     // @ts-expect-error
     tree[ITSELF].forEach(cb => cb())
-    tree = tree[edge]
-    // no subscription exists for the given edge, return
-    if (!tree) return
-    if (edgeIndex === lastEdgeIndex) notifySubTree(tree)
-  })
+
+    tree = tree[path[i]]
+  }
+
+  // for the last path's tree, notify entire subtree
+  if (tree) notifySubTree(tree)
+
 }
 
 /**
