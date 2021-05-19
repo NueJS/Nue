@@ -9,7 +9,7 @@ import { addEvents } from './addEvents'
 export const onCreate = (comp, compName) => {
 
   comp.refs = {}
-  comp._subscribers = []
+  // comp._subscribers = []
 
   comp._compName = compName
   comp._subscriptions = createSubTree()

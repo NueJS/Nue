@@ -31,6 +31,6 @@ export function onFirstConnect (comp, compDef) {
   buildShadowDOM(comp, compDef._template)
 
   // keep the attributes of comp element in sync
-  subscribeNode(comp)
+  if (comp._subscribers) subscribeNode(comp)
 
 }

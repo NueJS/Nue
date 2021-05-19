@@ -17,6 +17,8 @@ export const hydrate = (target, comp) => {
 
   if (_parsedInfo) {
 
+    /** @type {ParsedDOMNode}*/(target)._subscribers = []
+
     comp._nodesUsingLocalState.add(/** @type {ParsedDOMNode} */(target))
 
     // if target is a comp
