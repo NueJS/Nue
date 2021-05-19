@@ -6,7 +6,7 @@ import { IS_REACTIVE, TARGET, UPDATE_INDEX } from '../constants.js'
 import { isObject } from '../utils/type.js'
 
 /**
- * @typedef {Record<string|number|symbol, any>} target
+ * @typedef {Record<string|number|symbol, any>} ReactiveWrapper
  */
 
 /**
@@ -23,17 +23,18 @@ export const reactify = (comp, obj, _statePath = []) => {
 
   const parent$ = comp.parent && comp.parent.$
 
-  // if the obj is in array, this statePath may change if the obj is moved to different position in array
+  // statePath may change if the obj is in an array and that array is mutated
   let statePath = _statePath
 
-  // make the child objects reactive
-  /** @type {target} */
-  const target = Array.isArray(obj) ? [] : {}
+  /** @type {ReactiveWrapper} */
+  const wrapper = Array.isArray(obj) ? [] : {}
+
   Object.keys(obj).forEach(key => {
-    target[key] = reactify(comp, obj[key], [...statePath, key])
+    wrapper[key] = reactify(comp, obj[key], [...statePath, key])
   })
 
-  return new Proxy(target, {
+  return new Proxy(wrapper, {
+
     has (target, prop) {
       // return true if the prop is in target or its closure
       return prop in target || (parent$ ? prop in parent$ : false)
