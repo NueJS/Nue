@@ -1255,12 +1255,10 @@ Example:
       : html;
 
     // fill template innerHTML with html and css
-    const { defaultCSS } = data._config;
-
-    const defaultStyleTag = defaultCSS ? style(defaultCSS, 'default') : '';
-    const scopedStyleTag = css ? style(css, 'scoped') : '';
-
-    _template.innerHTML = dashHtml + defaultStyleTag + scopedStyleTag;
+    _template.innerHTML =
+      dashHtml +
+      style(data._config.defaultCSS, 'default') +
+      style(css, 'scoped');
 
     /** @type {Function[]} */
     const deferredParsingWork = [];
@@ -1272,11 +1270,13 @@ Example:
   };
 
   /**
-     * return a inline style
-     * @param {string} s
-     * @param {string} name
-     */
-  const style = (s, name) => `<style ${name}>${s}</style>`;
+   * returns inline style
+   * @param {string|undefined} css
+   * @param {string} name
+   */
+  const style = (css, name) => css ? `<style ${name}>${css}</style>` : '';
+
+  const createSubTree = () => ({ [ITSELF]: new Set() });
 
   const modes = {
     /** when detection mode is true,
@@ -1284,17 +1284,12 @@ Example:
      */
     _detective: false,
 
-    /** when reactive is true
-     * state mutation does not invoke onMutate function
-     */
-    _reactive: false,
-
-    /** when noOverride is true,
+    /** when setup mode is active,
      * setting a key in state which already exists does nothing
      * this is used so that default value of state does not override the state set by the parent component
      * via state attribute
      */
-    _noOverride: false,
+    _setup: false,
 
     /** when origin mode is true,
      * it returns the comp where the piece of state is coming from rather it's value
@@ -1328,74 +1323,78 @@ Example:
 
   /**
    * higher order function that returns a new function that when called adds the cb to given batch
-   * @param {SubCallBack | Function} cb
+   * @param {Function} cb
    * @param {Batch} batch
    */
   const batchify = (cb, batch) => () => batch.add(cb);
 
   /**
-   * subscribe to slice of state pointed by the statePath in baseNue
-   * when that slice is updated, call the callback in "batch" batch
+   * subscribe to state of baseComp pointed by statePath
+   * when that state is updated, onUpdate is called and is put into given batch
    *
-   * @param {Comp} baseComp
    * @param {StatePath} statePath
-   * @param {SubCallBack | Function} updateCb
+   * @param {Comp} baseComp
+   * @param {Function} onUpdate
    * @param {0 | 1} batch
-   * @returns {Function}
+   * @param {ParsedDOMNode} [targetNode]
    */
 
-  const subscribe = (baseComp, statePath, updateCb, batch) => {
-    // get the originComp where the state referred by statePath is coming from
+  const subscribe = (statePath, baseComp, onUpdate, batch, targetNode) => {
+    // get the originComp where the state is coming from
     const originComp = getOrigin(baseComp, statePath);
 
-    // throw if no origin is found
+    // if no origin is found
     if (!originComp) {
       throw errors.invalid_state_placeholder(baseComp._compName, statePath.join('.'))
     }
 
-    if (/** @type {SubCallBack}*/(updateCb)._node && originComp !== baseComp) {
-      baseComp._nodesUsingClosureState.add(/** @type {SubCallBack}*/(updateCb)._node);
+    // if the node is using non-local state
+    if (targetNode && originComp !== baseComp) {
+      baseComp._nodesUsingNonLocalState.add(targetNode);
     }
 
-    // get the higher order updateCb that will only call the updateCb once every batch
-    const batchCb = batchify(updateCb, originComp._batches[batch]);
+    // when addToBatch callback is called, it adds the onUpdate callback to batch so that it can be flushed
+    const addToBatch = batchify(onUpdate, originComp._batches[batch]);
 
-    // start from the root of subscriptions
-    let target = originComp._subscriptions;
+    // add the addToBatch callback in subscriptions
+    let tree = originComp._subscriptions;
 
-    // add batchCb in statePath table at appropriate location
-    // map is used to unsubscribe in constant time
     const lastIndex = statePath.length - 1;
+
     statePath.forEach((key, i) => {
-      if (!target[key]) target[key] = { [ITSELF]: new Set() };
-      target = target[key];
+
+      // create a new subtree if does not exist
+      if (!tree[key]) {
+        tree[key] = createSubTree();
+      }
+
+      // go to subtree of key
+      tree = tree[key];
+
+      // if this is the last subtree in traversal, add the callback there
       if (i === lastIndex) {
         // @ts-expect-error
-        target[ITSELF].add(batchCb);
+        tree[ITSELF].add(addToBatch);
       }
     });
 
-    // return unsubscribe function to remove subscription
+    // return unsubscribe function that removes the callback from subscriptions
     // @ts-expect-error
-    return () => target[ITSELF].delete(batchCb)
+    return () => tree[ITSELF].delete(addToBatch)
   };
 
   /**
-   * returns an array of removeDep functions
+   * subscribe to multiple statePaths
    *
-   * @param {Comp} comp
    * @param {StatePath[]} statePaths
-   * @param {SubCallBack | Function} updateCb
-   * @param {0 | 1} batch
-   * @returns {Function}
+   * @param {[Comp, Function, 0 | 1, ParsedDOMNode? ]} rest
+   * @returns {Unsubscriber}
    */
 
-  const subscribeMultiple = (comp, statePaths, updateCb, batch) => {
-    const unsubscribeFunctions = statePaths.map(
-      statePath => subscribe(comp, statePath, updateCb, batch)
-    );
-    // return unsubscribeMultiple
-    return () => unsubscribeFunctions.forEach(c => c())
+  const subscribeMultiple = (statePaths, ...rest) => {
+    const unsubscribers = statePaths.map(statePath => subscribe(statePath, ...rest));
+    const unsubscriber = () => unsubscribers.forEach(c => c());
+    return unsubscriber
   };
 
   /**
@@ -1426,33 +1425,45 @@ Example:
 
         _onMount.push(() => {
           const stateDeps = slices.map(slice => slice.split('.'));
-          return subscribeMultiple(comp, stateDeps, cb, 0)
+          return subscribeMultiple(stateDeps, comp, cb, batches._beforeDOM)
         });
       }
     };
   };
 
   /**
-   *
+   * called when comp is created (constructed)
    * @param {Comp} comp
    * @param {string} compName
    */
-  const construct = (comp, compName) => {
+  const onCreate = (comp, compName) => {
 
     comp.refs = {};
+    // comp._subscribers = []
 
     comp._compName = compName;
-    comp._subscriptions = { [ITSELF]: new Set() };
-    comp._batches = /** @type {[Set<SubCallBack>, Set<SubCallBack>]}*/([new Set(), new Set()]);
+    comp._subscriptions = createSubTree();
+    comp._batches = [new Set(), new Set()];
     comp._mutations = [];
-    comp._deferredWork = [];
+    comp._deferredWork = []; // TODO: move this to hydrate
+
     comp._nodesUsingLocalState = new Set();
-    comp._nodesUsingClosureState = new Set();
+    comp._nodesUsingNonLocalState = new Set();
 
     if (!comp._prop$) comp._prop$ = {};
     if (!comp.fn) comp.fn = comp.parent ? Object.create(comp.parent.fn) : {};
 
     addEvents(comp);
+  };
+
+  /**
+   * subscribe node to state so that if the state is changed, node will be updated
+   * @param {ParsedDOMNode} node
+   */
+
+  const subscribeNode = (node) => {
+    node._isSubscribed = true;
+    node._unsubscribers = node._subscribers.map(s => s());
   };
 
   const devInfo = {
@@ -1465,63 +1476,41 @@ Example:
   };
 
   /**
-   * subscribe node to state
-   * @param {ParsedDOMElement} node
+   * add subscriber in subscribers array
+   * @param {ParsedDOMNode} node
+   * @param {Subscriber} subscriber
    */
 
-  const subscribeNode = (node) => {
-    if (!node._subscribers) return
-    node._unsubscribers = node._subscribers.map(s => s());
-    node._isSubscribed = true;
-  };
-
-  /**
-   * unsubscribe node to state
-   * @param {ParsedDOMElement} node
-   */
-
-  const unsubscribeNode = (node) => {
-    if (!node._unsubscribers) return
-    node._unsubscribers.forEach(dc => dc());
-    node._isSubscribed = false;
-  };
-
-  /**
-   * unsubscribe node to state
-   * @param {ParsedDOMElement} node
-   * @param {Function} subscriber
-   */
-
-  const addSubscriber = (node, subscriber) => {
+  const registerSubscriber = (node, subscriber) => {
     if (!node._subscribers) node._subscribers = [];
     node._subscribers.push(subscriber);
   };
 
-  // keep the dom node in sync with the state from comp
-  // by calling the update callback when deps change in state of comp
   /**
-   *
+   * keep the node in sync with comp's state
+   * by calling the update callback when its deps change in state of comp
    * @param {Comp} comp
-   * @param {ParsedDOMElement} node
-   * @param {StatePath[]} deps
-   * @param {SubCallBack} update
+   * @param {ParsedDOMNode} node
+   * @param {StatePath[]} statePaths
+   * @param {Function} updateNode
    */
 
-  const syncNode = (comp, node, deps, update) => {
-    // attach which node the update method is for so that when the update is called in batches
-    // it can check whether to invoke it or not based on whether the node is subscribed or not
-    update._node = node;
+  const syncNode = (node, statePaths, updateNode, comp) => {
 
-    // when node is subscribed, call update so that node is up-to-date with state
-    // returns unsubscriber function which removes subscription from comp subscriptions to prevent unnecessary dom updates
-    const subscriber = () => {
-      // @ts-expect-error
-      update();
-
-      return subscribeMultiple(comp, deps, update, batches._DOM)
+    const update = () => {
+      if (node._isSubscribed) {
+        updateNode();
+        devInfo.nodeUpdated(node);
+      }
     };
 
-    addSubscriber(node, subscriber);
+    /** @type {Subscriber} */
+    const subscriber = () => {
+      update();
+      return subscribeMultiple(statePaths, comp, update, batches._DOM, node)
+    };
+
+    registerSubscriber(node, subscriber);
   };
 
   /**
@@ -1535,7 +1524,7 @@ Example:
     const update = () => {
       textNode.textContent = _getValue(comp);
     };
-    syncNode(comp, textNode, _statePaths, update);
+    syncNode(textNode, _statePaths, update, comp);
   };
 
   /**
@@ -1561,15 +1550,17 @@ Example:
 
     const { _getValue, _statePaths } = /** @type {Placeholder} */(attribute._placeholder);
 
-    const setProp = () => {
+    const update = () => {
       // @ts-expect-error
       target[propName] = _getValue(comp);
     };
 
-    syncNode(comp, target, _statePaths, setProp);
+    syncNode(target, _statePaths, update, comp);
 
-    // bind:prop
+    // bindProp
     if (attribute._type === attributeTypes._bindProp) {
+      // TODO: add check for input type on dev
+
       // @ts-expect-error
       const isNumber = target.type === 'number' || target.type === 'range';
 
@@ -1588,16 +1579,20 @@ Example:
   };
 
   /**
-   * add attribute on target element in context of comp
-   * @param {Parsed_HTMLElement} target
+   * add attribute on element element in context of comp
+   * @param {Parsed_HTMLElement} element
    * @param {Attribute_ParseInfo} attribute
    * @param {Comp} comp
    */
 
-  const hydrateNormalAttribute = (target, attribute, comp) => {
-    const placeholder = /** @type {Placeholder} */(attribute._placeholder);
-    const update = () => setAttr(target, attribute._name, placeholder._getValue(comp));
-    syncNode(comp, target, placeholder._statePaths, update);
+  const hydrateNormalAttribute = (element, attribute, comp) => {
+
+    const { _placeholder, _name } = attribute;
+    const { _getValue, _statePaths } = /** @type {Placeholder} */(_placeholder);
+
+    const update = () => setAttr(element, _name, _getValue(comp));
+
+    syncNode(element, _statePaths, update, comp);
   };
 
   /**
@@ -1615,15 +1610,17 @@ Example:
       throw errors.event_handler_not_found(comp._compName, fnName)
     }
 
+    // call the event listener with the event and state of component which the node is child of
     /** @type {EventListener} */
-    const handleEvent = (e) => fn(e, comp.$);
+    const handleEvent = (event) => fn(event, comp.$);
 
+    /** @type {Subscriber} */
     const subscriber = () => {
       target.addEventListener(eventName, handleEvent);
       return () => target.removeEventListener(eventName, handleEvent)
     };
 
-    addSubscriber(target, subscriber);
+    registerSubscriber(target, subscriber);
   };
 
   /**
@@ -1638,30 +1635,32 @@ Example:
   };
 
   /**
-   * add state on target
-   * @param {Comp} target
-   * @param {Attribute_ParseInfo} attribute
+   * add state on target passed by its parent component
    * @param {Comp} comp
+   * @param {Attribute_ParseInfo} attribute
+   * @param {Comp} parentComp
    */
 
-  const hydrateState = (target, attribute, comp) => {
+  const hydrateState = (comp, attribute, parentComp) => {
     const { _placeholder, _name } = attribute;
     const { _getValue, _statePaths } = /** @type {Placeholder}*/(_placeholder);
 
     const update = () => {
-      target.$[_name] = _getValue(comp);
+      comp.$[_name] = _getValue(parentComp);
     };
 
-    // if target is looped component, set the $
-    if (target._isLooped) update();
+    // TODO: instead of checking the _isLooped, check if the $ is created on it or not
+
+    // if comp is looped, set the $ directly because it's $ is created already
+    if (comp._isLooped) update();
 
     // else set the prop$
     else {
-      if (!target._prop$) target._prop$ = {};
-      target._prop$[_name] = _getValue(comp);
+      if (!comp._prop$) comp._prop$ = {};
+      comp._prop$[_name] = _getValue(parentComp);
     }
 
-    subscribeMultiple(comp, _statePaths, update, batches._beforeDOM);
+    subscribeMultiple(_statePaths, parentComp, update, batches._beforeDOM);
   };
 
   /**
@@ -1710,7 +1709,7 @@ Example:
       ? setAttr(comp, name, '')
       : removeAttr(element, name);
 
-    syncNode(comp, element, placeholder._statePaths, update);
+    syncNode(element, placeholder._statePaths, update, comp);
   };
 
   const {
@@ -1761,8 +1760,8 @@ Example:
   /**
    * copy .parsed properties from node's tree to cloneNode's tree
    * cloneNode is clone of node but it does not have custom .parsed properties added in node's tree
-   * @param {ParsedDOMElement} node
-   * @param {ParsedDOMElement} cloneNode
+   * @param {ParsedDOMNode} node
+   * @param {ParsedDOMNode} cloneNode
    */
 
   const copyParsed = (node, cloneNode) => {
@@ -1782,7 +1781,7 @@ Example:
 
   /**
    * clone the node and add the parsed prop
-   * @template {ParsedDOMElement} T
+   * @template {ParsedDOMNode} T
    * @param {T} node
    * @returns {T}
    */
@@ -1927,11 +1926,7 @@ Example:
     };
 
     // since this modifies the DOM, it should be done in dom batches
-    subscribeMultiple(
-      parentComp,
-      _conditionGroupStateDeps,
-      onGroupDepChange, batches._beforeDOM
-    );
+    subscribeMultiple(_conditionGroupStateDeps, parentComp, onGroupDepChange, batches._beforeDOM);
 
     parentComp._deferredWork.push(() => {
       ifComp.remove();
@@ -2488,7 +2483,7 @@ Example:
       loopInfo._instanciated = true;
     });
 
-    /** @type {SubCallBack} */
+    /** @type {BatchCallBack} */
     const onDepsChange = (mutations) => {
       // if some mutation in batch assigned a new array
       const newArrayAssigned = mutations.some(batchInfo => arraysAreShallowEqual(batchInfo.path, arrayPath));
@@ -2503,31 +2498,30 @@ Example:
 
     };
 
-    subscribe(parentComp, arrayPath, onDepsChange, batches._DOM);
+    subscribe(arrayPath, parentComp, onDepsChange, batches._DOM);
   };
 
   /**
    * return true if the given node is a component using the parsed info
-   * @param {Node} target
+   * @param {Comp} target
    */
-  const isComp = target =>
-    /** @type {ParsedDOMElement}*/(target)._parsedInfo &&
-    /** @type {Comp}*/(target)._parsedInfo._isComp;
-
-  // hydration
+  const isParsedComp = target => (target)._parsedInfo && (target)._parsedInfo._isComp;
 
   /**
    * hydrate target element using _parsedInfo in context of given comp
-   * @param {ParsedDOMElement | HTMLElement | Node } target
+   * @param {ParsedDOMNode | HTMLElement | Node } target
    * @param {Comp} comp
    * @returns
    */
+
   const hydrate = (target, comp) => {
-    const { _parsedInfo, nodeType } = /** @type {ParsedDOMElement} */(target);
+    const { _parsedInfo, nodeType } = /** @type {ParsedDOMNode} */(target);
 
     if (_parsedInfo) {
 
-      comp._nodesUsingLocalState.add(/** @type {ParsedDOMElement} */(target));
+      /** @type {ParsedDOMNode}*/(target)._subscribers = [];
+
+      comp._nodesUsingLocalState.add(/** @type {ParsedDOMNode} */(target));
 
       // if target is a comp
       if (/** @type {Comp_ParseInfo} */(_parsedInfo)._isComp) {
@@ -2562,36 +2556,24 @@ Example:
       }
     }
 
-    // if target is a component, do not hydrate it's childNodes
-    if (isComp(target)) return
+    // do not hydrate slot of a parsed component
+    // they will be hydrated when the component is constructed and connected
+    if (isParsedComp(/** @type {Comp}*/(target))) return
 
-    // else if it has childNodes hydrate all childNodes
+    // hydrate all childNodes
     if (target.hasChildNodes()) {
-      target.childNodes.forEach(
-        childNode => hydrate(childNode, comp)
-      );
+      target.childNodes.forEach(childNode => hydrate(childNode, comp));
     }
   };
 
   /**
    * run all callbacks of a batch with mutations info
-   * ignore callbacks who are for updating a node and that node is not subscribed anymore to avoid extra dom updates
    * @param {Batch} batch
    * @param {Mutation[]} mutations
    */
 
   const flushBatch = (batch, mutations) => {
-
-    batch.forEach(cb => {
-      const { _node } = /** @type {SubCallBack}*/(cb);
-
-      // if cb is for updating a node, only call cb if node is subscribed
-      if ((_node && _node._isSubscribed) || !_node) {
-        cb(mutations);
-      }
-
-    });
-
+    batch.forEach(cb => cb(mutations));
     batch.clear();
   };
 
@@ -2638,6 +2620,29 @@ Example:
   };
 
   /**
+   * invoke callbacks that are subscribed to given path
+   * @param {Subscriptions} subscriptions
+   * @param {StatePath} path
+   */
+  const notify = (subscriptions, path) => {
+    let tree = subscriptions;
+
+    for (let i = 0; i < path.length - 1; i++) {
+      // no subscription exists for the given edge, return
+      if (!tree) break
+
+      // @ts-expect-error
+      tree[ITSELF].forEach(cb => cb());
+
+      tree = tree[path[i]];
+    }
+
+    // for the last path's tree, notify entire subtree
+    if (tree) notifySubTree(tree);
+
+  };
+
+  /**
    * notify all the callbacks that are in given subscriptions
    * @param {Subscriptions} subtree
    */
@@ -2645,26 +2650,6 @@ Example:
     // @ts-expect-error
     subtree[ITSELF].forEach(cb => cb());
     for (const k in subtree) notifySubTree(subtree[k]);
-  };
-
-  /**
-   * notify callbacks that are subscribed to given path that it is mutated
-   * navigate inside subscriptions using the path and notify entire subtree
-   * @param {Subscriptions} subscriptions
-   * @param {StatePath} path
-   */
-  const notify = (subscriptions, path) => {
-    let tree = subscriptions;
-    const lastEdgeIndex = path.length - 1;
-
-    path.forEach((edge, edgeIndex) => {
-      // @ts-expect-error
-      tree[ITSELF].forEach(cb => cb());
-      tree = tree[edge];
-      // no subscription exists for the given edge, return
-      if (!tree) return
-      if (edgeIndex === lastEdgeIndex) notifySubTree(tree);
-    });
   };
 
   /**
@@ -2706,33 +2691,30 @@ Example:
     return [returnVal, paths]
   };
 
-  // when initializing the state, if a function is given
-  // call that function, detect the state keys it depends on, get the initial value
-  // update its value whenever its deps changes
-
   /**
-   *
+   * create a computed state, stateName for comp component using the computeFn
+   * @param {Function} computeFn
+   * @param {string} stateName
    * @param {Comp} comp
-   * @param {Function} fn
-   * @param {string} prop
-   * @returns
    */
-  const computedState = (comp, fn, prop) => {
-    const [initValue, paths] = detectStateUsage(fn);
+  const computedState = (computeFn, stateName, comp) => {
+    const [initialComputedValue, usedStatePaths] = detectStateUsage(computeFn);
 
-    /** @type {SubCallBack} */
-    const compute = () => {
-      const value = fn();
-      comp.$[prop] = value;
+    const update = () => {
+      comp.$[stateName] = computeFn();
     };
 
-    const deps = paths.map(path => path.length === 1 ? path : path.slice(0, -1));
-    subscribeMultiple(comp, deps, compute, batches._beforeDOM);
-    return initValue
+    // to avoid depending on a particular index of an array, depend on one level up
+    // TODO: only slice if the path points to an array's item
+    const statePaths = usedStatePaths.map(path => path.length === 1 ? path : path.slice(0, -1));
+
+    subscribeMultiple(statePaths, comp, update, batches._beforeDOM);
+
+    return initialComputedValue
   };
 
   /**
-   * @typedef {Record<string|number|symbol, any>} target
+   * @typedef {Record<string|number|symbol, any>} ReactiveWrapper
    */
 
   /**
@@ -2744,96 +2726,97 @@ Example:
    */
   const reactify = (comp, obj, _statePath = []) => {
 
-    const closure$ = comp.parent && comp.parent.$;
-
-    let statePath = _statePath;
+    // can not reactify non-object
     if (!isObject(obj)) return obj
 
-    // make the child objects reactive
-    /** @type {target} */
-    const target = Array.isArray(obj) ? [] : {};
+    const parent$ = comp.parent && comp.parent.$;
+
+    // statePath may change if the obj is in an array and that array is mutated
+    let statePath = _statePath;
+
+    /** @type {ReactiveWrapper} */
+    const wrapper = Array.isArray(obj) ? [] : {};
+
     Object.keys(obj).forEach(key => {
-      target[key] = reactify(comp, obj[key], [...statePath, key]);
+      wrapper[key] = reactify(comp, obj[key], [...statePath, key]);
     });
 
-    const reactive = new Proxy(target, {
+    return new Proxy(wrapper, {
+
       has (target, prop) {
         // return true if the prop is in target or its closure
-        return prop in target || (closure$ ? prop in closure$ : false)
+        return prop in target || (parent$ ? prop in parent$ : false)
       },
 
-      set (target, prop, newValue) {
-        // short circuit if the set is redundant
+      set (target, prop, _newValue) {
 
-        if (target[/** @type {string}*/(prop)] === newValue) return true
+        const oldValue = target[/** @type {string}*/(prop)];
 
-        // change the reactive object's statePath, because it has been moved to a different key
+        // do nothing if newValue is same as oldValue
+        if (oldValue === _newValue) return true
+
         if (prop === UPDATE_INDEX) {
-          // newValue is the index at which the reactive is moved
-          statePath = [...statePath.slice(0, -1), newValue];
+          // update statePath as it has been moved to a different position in array
+
+          // replace the oldIndex with newIndex in statePath
+          statePath = [...statePath.slice(0, -1), _newValue];
           return true
         }
 
         // if the mutated prop exists in the target already
         const propInTarget = prop in target;
 
-        let value = newValue;
+        let newValue = _newValue;
 
-        // do not override the state set by parent component by default value of the state added in component
-        if (modes._noOverride) {
-          // ignore set
+        // state creation mode
+        if (modes._setup) {
+          // do not override the state set by parent component by the default value set in this component
           if (propInTarget) return true
 
-          if (typeof value === 'function') {
-            value = computedState(comp, value, /** @type {string}*/(prop));
+          if (typeof newValue === 'function') {
+            newValue = computedState(newValue, /** @type {string}*/(prop), comp);
           }
         }
 
         // if the prop is not in target but is in it's closure state
         // then set the value in the closure state instead
-        else if (!propInTarget && closure$ && prop in closure$) {
-          return Reflect.set(closure$, prop, newValue)
+        else if (!propInTarget && parent$ && prop in parent$) {
+          return Reflect.set(parent$, prop, newValue)
         }
 
-        if (isObject(value)) {
+        if (isObject(newValue)) {
           // if value is not reactive, make it reactive
 
-          if (!value[IS_REACTIVE]) {
-            value = reactify(comp, value, [...statePath, /** @type {string}*/(prop)]);
+          if (!newValue[IS_REACTIVE]) {
+            newValue = reactify(comp, newValue, [...statePath, /** @type {string}*/(prop)]);
           }
           // when a reactive value is set on some index(prop) in target array
           // we have to update that reactive object's statePath - because we are changing the index it was created at
-          else if (Array.isArray(target)) value[UPDATE_INDEX] = prop;
+          else if (Array.isArray(target)) newValue[UPDATE_INDEX] = prop;
         }
 
         // -----------------------------
-        const set = () => Reflect.set(target, prop, value);
 
-        if (modes._reactive) {
-          // push to BATCH_INFO and call onMutate
+        if (oldValue !== newValue) {
+          /**
+           * returns the current statePath of reactive object
+           * @returns {StatePath}
+           */
+          const livePath = () => [...statePath, /** @type {string}*/(prop)];
 
-          const oldValue = target[/** @type {string}*/(prop)];
-          const newValue = value;
-          const success = set();
-          if (oldValue !== newValue) {
-            const livePath = () => [...statePath, /** @type {string}*/(prop)];
+          const mutatedPath = livePath();
 
-            const mutatedPath = /** @type {StatePath}*/(livePath());
-            // statePath may have changed of reactive object, so add a getPath property to fetch the fresh statePath
+          comp._mutations.push({ oldValue, newValue, path: mutatedPath, livePath });
 
-            comp._mutations.push({ oldValue, newValue, path: mutatedPath, livePath });
-
-            onMutate(comp, mutatedPath);
-          }
-
-          return success
+          onMutate(comp, mutatedPath);
         }
 
-        return set()
+        return Reflect.set(target, prop, newValue)
+
       },
 
       deleteProperty (target, prop) {
-        if (modes._reactive) onMutate(comp, [...statePath, /** @type {string}*/(prop)]);
+        onMutate(comp, [...statePath, /** @type {string}*/(prop)]);
         return Reflect.deleteProperty(target, prop)
       },
 
@@ -2858,12 +2841,11 @@ Example:
           if (modes._returnComp) return comp
           return Reflect.get(target, prop)
         }
-        if (closure$) return Reflect.get(closure$, prop)
+        if (parent$) return Reflect.get(parent$, prop)
       }
 
-    });
+    })
 
-    return reactive
   };
 
   /**
@@ -2895,14 +2877,12 @@ Example:
    */
   const invokeCompJs = (compJs, comp) => {
 
-    modes._reactive = false;
-    modes._noOverride = true;
+    modes._setup = true;
 
     // @ts-expect-error
     compJs(comp);
 
-    modes._reactive = true;
-    modes._noOverride = false;
+    modes._setup = false;
   };
 
   /**
@@ -2914,7 +2894,7 @@ Example:
   function onFirstConnect (comp, compDef) {
 
     // create state
-    comp.$ = reactify(comp, comp._prop$ || {}, []);
+    comp.$ = reactify(comp, comp._prop$ || {});
 
     // after everything is set up, invoke js
     if (compDef.js) invokeCompJs(compDef.js, comp);
@@ -2931,7 +2911,7 @@ Example:
     buildShadowDOM(comp, compDef._template);
 
     // keep the attributes of comp element in sync
-    subscribeNode(comp);
+    if (comp._subscribers) subscribeNode(comp);
 
   }
 
@@ -2949,7 +2929,7 @@ Example:
 
     comp._manuallyDisconnected = false;
 
-    const { _nodesUsingLocalState, _nodesUsingClosureState, _eventCbs, shadowRoot } = comp;
+    const { _nodesUsingLocalState, _nodesUsingNonLocalState, _eventCbs, shadowRoot } = comp;
 
     // when comp is being connected for the first time
     if (!shadowRoot) {
@@ -2962,7 +2942,7 @@ Example:
     else {
       // only connect nodes that were previously disconnected
       // connect all nodes using closure state
-      _nodesUsingClosureState.forEach(subscribeNode);
+      _nodesUsingNonLocalState.forEach(subscribeNode);
     }
 
     // after all the connections are done, run the onMount callbacks
@@ -2970,22 +2950,33 @@ Example:
   };
 
   /**
+   * unsubscribe node from state, so that any change in state does not trigger updates on it
+   * this is done when the node is removed from DOM and we don't want to do extra work of updating it
+   * @param {ParsedDOMNode} node
+   */
+
+  const unsubscribeNode = (node) => {
+    node._isSubscribed = false;
+    node._unsubscribers.forEach(dc => dc());
+  };
+
+  /**
    * called when comp is disconnected
    * @param {Comp} comp
    */
   const onDisconnect = (comp) => {
-    const { _eventCbs, _nodesUsingClosureState, _manuallyDisconnected, _moving } = comp;
+    const { _eventCbs, _nodesUsingNonLocalState, _manuallyDisconnected, _moving } = comp;
 
     if (_manuallyDisconnected || _moving) return
 
-    _nodesUsingClosureState.forEach(unsubscribeNode);
+    _nodesUsingNonLocalState.forEach(unsubscribeNode);
 
     _eventCbs._onDestroy.forEach(cb => cb());
 
   };
 
   /**
-   * defines a custom element using the CompClass function
+   * defines a custom element using nue.js component class
    * @param {NueComp} CompClass
    */
 
@@ -3011,7 +3002,7 @@ Example:
       /** @this {Comp} */
       constructor () {
         super();
-        construct(this, compName);
+        onCreate(this, compName);
       }
 
       /** @this {Comp} */
@@ -3319,10 +3310,20 @@ Example:
 
   const render = (compClass, config) => {
 
-    attachErrorOverlay();
-
     // override config with default config
-    if (config) data._config = { ...data._config, ...config };
+    if (config) {
+      data._config = { ...data._config, ...config };
+
+      // add devTools
+      {
+        const { nodeUpdated } = config;
+        if (nodeUpdated) devInfo.nodeUpdated = nodeUpdated;
+      }
+    }
+
+    {
+      attachErrorOverlay();
+    }
 
     createComponent(compClass);
 
